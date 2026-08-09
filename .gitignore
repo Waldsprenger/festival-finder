@@ -19,6 +19,9 @@ site/fonts.css
 #   data/gazetteer.json - Ortsverzeichnis, ändert sich kaum
 #   data/europe.json    - Kartengrenzen, statisch
 
+# lokale Werkzeug-Einstellungen, geraetespezifisch
+.claude/settings.local.json
+
 __pycache__/
 *.pyc
 .venv/
