@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Festival Finder — Lineup-Abgleich für Europa</title>
+<meta name="description" content="Finde Festivals nach Wohnort, Radius, Ticketpreis und deinen Lieblingsbands.">
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="inner">
+    <h1><span class="bolt">⚡</span>Festival<span class="hl">Finder</span></h1>
+    <p class="tag">Dein Lineup. Dein Radius. Dein Wochenende.</p>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ Schritt 1: Filter ============ -->
+  <section class="panel" id="step-filter">
+    <h2><span class="num">1</span> Wo, wie weit, wie teuer, ab wann</h2>
+
+    <div class="grid">
+      <div class="field">
+        <label for="home">Wohnort</label>
+        <div class="row">
+          <input type="text" id="home" placeholder="z. B. Mannheim" autocomplete="address-level2"
+                 title="Deine Stadt eingeben. Sie ist der Mittelpunkt der Umkreissuche und die Basis für alle Entfernungsangaben. Enter genügt.">
+          <button type="button" id="locate" class="ghost"
+                  title="Sucht die Koordinaten deines Wohnorts im mitgelieferten Ortsverzeichnis (85.098 Orte) und aktiviert die Umkreissuche.">Suchen</button>
+        </div>
+        <p class="hint" id="home-status">Stadt eingeben und „Suchen“ drücken.</p>
+        <label class="check" title="Für einige Festivals liefert die Quelle keinen brauchbaren Ort. Ohne Haken bleiben sie bei gesetztem Wohnort außen vor, mit Haken erscheinen sie ohne Entfernungsangabe.">
+          <input type="checkbox" id="geo-unknown">
+          Festivals ohne Ortskoordinaten mitzeigen</label>
+      </div>
+
+      <div class="field">
+        <label for="radius">Umkreis <output id="radius-out">200 km</output></label>
+        <input type="range" id="radius" min="10" max="2000" step="10" value="200"
+               title="Wie weit du maximal fahren willst, in Luftlinie ab Wohnort. Der Kreis auf der Karte zeigt den Bereich sofort an.">
+        <p class="hint">Luftlinie ab Wohnort.</p>
+      </div>
+
+      <div class="field">
+        <label for="price">Ticket maximal <output id="price-out">150 €</output></label>
+        <input type="range" id="price" min="0" max="600" step="5" value="150"
+               title="Obergrenze für das günstigste Ticket. Preise aus anderen Währungen sind zum Vergleich in Euro umgerechnet.">
+        <label class="check" title="Für rund 270 Festivals nennt die Quelle keinen Preis. Mit Haken bleiben sie in der Liste, ohne Haken verschwinden sie.">
+          <input type="checkbox" id="price-unknown" checked>
+          Festivals ohne Preisangabe mitzeigen</label>
+      </div>
+
+      <div class="field">
+        <label for="from">Frühester Start</label>
+        <input type="date" id="from"
+               title="Festivals, die vor diesem Datum beginnen, werden ausgeblendet. Voreingestellt ist heute.">
+        <label class="check" title="Manche Festivals haben noch keinen bestätigten Termin für die nächste Ausgabe. Mit Haken erscheinen sie trotzdem, mit dem Hinweis auf die letzte bekannte Ausgabe.">
+          <input type="checkbox" id="date-unknown">
+          Festivals ohne Termin mitzeigen</label>
+      </div>
+    </div>
+
+    <figure class="map-wrap">
+      <canvas id="map" width="1000" height="440"
+              title="Karte des Suchgebiets: Der rote Kreis zeigt deinen Umkreis, das Kreuz deinen Wohnort. Sobald Bands gewählt sind, erscheinen die passenden Festivals als Pins — Pin anklicken springt zum Eintrag."></canvas>
+      <figcaption id="map-caption">Wohnort eingeben, um den Suchradius zu sehen.</figcaption>
+    </figure>
+
+    <p class="stat" id="filter-stat">—</p>
+  </section>
+
+  <!-- ============ Schritt 2: Bands ============ -->
+  <section class="panel" id="step-bands">
+    <h2><span class="num">2</span> Bands wählen</h2>
+    <p class="lead">Suchen, anklicken, auswählen. Ein zweiter Klick auf <b>×2</b> gewichtet
+      eine Band doppelt — sie zählt dann doppelt so stark für die Übereinstimmung.</p>
+
+    <div class="field">
+      <label for="band-search">Band suchen</label>
+      <input type="text" id="band-search" placeholder="z. B. Powerwolf, Wolf Alice, Deichkind …"
+             title="Ab zwei Zeichen wird gesucht. Die Trefferliste zeigt, auf wie vielen Festivals eine Band insgesamt spielt — die häufigsten zuerst.">
+      <p class="hint" id="band-hint"></p>
+    </div>
+
+    <ul class="results" id="band-results"></ul>
+
+    <div class="chosen">
+      <div class="chosen-head">
+        <h3>Ausgewählt <span class="badge" id="chosen-count">0</span></h3>
+        <button type="button" id="clear-bands" class="ghost small"
+                title="Leert die komplette Bandauswahl und setzt die Trefferliste zurück.">Alle entfernen</button>
+      </div>
+      <ul class="chips" id="chosen-list"></ul>
+    </div>
+  </section>
+
+  <!-- ============ Schritt 3: Treffer ============ -->
+  <section class="panel" id="step-results">
+    <h2><span class="num">3</span> Deine Festivals</h2>
+    <p class="stat" id="result-stat">Wähle mindestens eine Band.</p>
+    <ol class="festivals" id="festival-list"></ol>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="inner">
+    <nav>
+      <a href="impressum.html">Impressum</a>
+      <a href="datenschutz.html">Datenschutz</a>
+    </nav>
+    <p class="src">Festival- und Lineup-Daten zusammengetragen von
+      <a href="https://www.festivalticker.de" target="_blank" rel="noopener">festivalticker.de</a> und
+      <a href="https://www.festivalsunited.com" target="_blank" rel="noopener">festivalsunited.com</a>.
+      Ortskoordinaten aus <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>
+      (ODbL), Ortsverzeichnis von <a href="https://www.geonames.org" target="_blank" rel="noopener">GeoNames</a>
+      (CC BY 4.0). Alle Angaben ohne Gewähr — Termine, Preise und Lineups ändern sich; verbindlich ist
+      immer die offizielle Festivalseite.</p>
+    <p class="src" id="build-info"></p>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+name: Tägliche Aktualisierung
+
+# Läuft auf GitHub-Servern - unabhängig davon, ob der eigene Rechner an ist.
+on:
+  schedule:
+    - cron: "17 3 * * *"        # täglich 03:17 UTC (04:17 bzw. 05:17 deutscher Zeit)
+  workflow_dispatch:             # zusätzlich jederzeit von Hand startbar
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Abhängigkeiten
+        run: pip install requests beautifulsoup4
+
+      # Der Seiten-Cache spart Abrufe bei den Quellen, der Geo-Cache spart
+      # Nominatim-Anfragen. Ohne ihn liefe jeder Tag von vorn.
+      - name: Cache wiederherstellen
+        uses: actions/cache@v4
+        with:
+          path: |
+            cache
+            data/geo.json
+            data/gazetteer.json
+            data/europe.json
+          key: festival-cache-${{ github.run_id }}
+          restore-keys: festival-cache-
+
+      - name: Festivaldaten einsammeln
+        run: python scraper/festival_scraper.py --max-age 24
+
+      - name: Neue Orte geokodieren
+        run: python scraper/geocode.py
+
+      - name: Ortsverzeichnis, Kartengrenzen, Schrift
+        run: |
+          python scraper/build_gazetteer.py
+          python scraper/build_map.py
+          python scraper/fetch_fonts.py
+
+      - name: Seite bauen
+        run: |
+          python scraper/build_overview.py
+          python scraper/build_site.py
+          python scraper/build_artifact.py
+
+      - name: CSV- und JSON-Ausgaben mitveröffentlichen
+        run: |
+          mkdir -p site/daten
+          cp data/festivals.csv data/lineups.csv data/bands.csv \
+             data/festivals.json data/uebersicht.html site/daten/
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,24 @@
+# Abgerufene Quellseiten und Downloads - werden bei Bedarf neu geladen
+cache/
+
+# Erzeugte Ausgaben; der Workflow baut sie bei jedem Lauf neu
+data/festivals.json
+data/festivals.csv
+data/lineups.csv
+data/bands.csv
+data/band_normalisierung.json
+data/uebersicht.html
+data/update.log
+data/failed.txt
+site/data.js
+site/artifact.html
+site/fonts.css
+
+# Zwischenstände, die sich lohnen zu behalten, stehen bewusst NICHT hier:
+#   data/geo.json       - erspart ~2000 Nominatim-Anfragen je Lauf
+#   data/gazetteer.json - Ortsverzeichnis, ändert sich kaum
+#   data/europe.json    - Kartengrenzen, statisch
+
+__pycache__/
+*.pyc
+.venv/
