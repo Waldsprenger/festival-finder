@@ -201,6 +201,14 @@ button.small { padding: .3rem .6rem; font-size: .8rem; }
   background: #0e1116;
 }
 
+.map-wrap canvas { cursor: grab; touch-action: none; }
+.map-wrap canvas:active { cursor: grabbing; }
+
+.map-tools { display: flex; gap: .4rem; margin-top: .5rem; }
+.map-tools button:first-child, .map-tools button:nth-child(2) {
+  min-width: 2.2rem; font-size: 1rem; line-height: 1;
+}
+
 .map-wrap figcaption {
   margin-top: .5rem;
   color: var(--mut);
@@ -367,7 +375,8 @@ button.small { padding: .3rem .6rem; font-size: .8rem; }
 
 .hits { margin: .7rem 0 0; font-size: .9rem; }
 .hits .hit { color: var(--ok); font-weight: 600; }
-.hits .hit.dbl::after { content: " ×2"; color: var(--amber); font-size: .78em; }
+/* doppelt gewichtete Bands heben sich durch Farbe ab, nicht durch Zusatztext */
+.hits .hit.dbl { color: var(--amber); font-weight: 800; }
 .hits .miss { color: var(--mut); text-decoration: line-through; }
 
 details.lineup { margin-top: .75rem; border-top: 1px dashed var(--line); padding-top: .6rem; }
@@ -401,6 +410,7 @@ details.lineup .all mark { background: transparent; color: var(--ok); font-weigh
 .legal p, .legal li { color: #d7d4ce; }
 .legal a { color: var(--amber); }
 .legal .back { display: inline-block; margin-bottom: 2rem; color: var(--mut); }
+.legal .legal-close { display: block; margin-top: 2.5rem; }
 
 @media (max-width: 620px) {
   .fest-head { flex-direction: column-reverse; align-items: flex-start; gap: .4rem; }

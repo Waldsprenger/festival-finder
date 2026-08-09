@@ -67,6 +67,14 @@
     <figure class="map-wrap">
       <canvas id="map" width="1000" height="440"
               title="Karte des Suchgebiets: Der rote Kreis zeigt deinen Umkreis, das Kreuz deinen Wohnort. Sobald Bands gewählt sind, erscheinen die passenden Festivals als Pins — Pin anklicken springt zum Eintrag."></canvas>
+      <div class="map-tools">
+        <button type="button" id="zoom-in" class="ghost small"
+                title="Näher heranzoomen. Am Mausrad geht es auch — der Punkt unter dem Zeiger bleibt dabei liegen.">+</button>
+        <button type="button" id="zoom-out" class="ghost small"
+                title="Weiter herauszoomen.">−</button>
+        <button type="button" id="zoom-reset" class="ghost small"
+                title="Zurück zur Ausgangsansicht, in der der Suchradius genau ins Bild passt. Doppelklick auf die Karte tut dasselbe.">Ansicht zurücksetzen</button>
+      </div>
       <figcaption id="map-caption">Wohnort eingeben, um den Suchradius zu sehen.</figcaption>
     </figure>
 

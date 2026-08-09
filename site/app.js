@@ -133,7 +133,10 @@
 
   const map = {
     canvas: null, ctx: null, view: null, pins: [], hover: -1,
+    zoom: 1, center: null, drag: null, moved: false,
   };
+
+  const ZOOM_MIN = 0.25, ZOOM_MAX = 60;
 
   // Mittabstandstreue Zylinderprojektion, an der Bildmitte ausgerichtet.
   // Für Ausschnitte bis ~2000 km ist die Verzerrung vernachlässigbar.
@@ -141,13 +144,32 @@
     const kmPerDegLat = 111.32;
     const kmPerDegLon = kmPerDegLat * Math.cos(centerLat * Math.PI / 180);
     const aspect = w / h;
-    let halfKmY = spanKm, halfKmX = spanKm * aspect;
+    const halfKmY = spanKm, halfKmX = spanKm * aspect;
+    const sx = (w / 2) / halfKmX, sy = (h / 2) / halfKmY;
     return {
       w, h, centerLat, centerLon,
-      x: (lon) => w / 2 + ((lon - centerLon) * kmPerDegLon) / halfKmX * (w / 2),
-      y: (lat) => h / 2 - ((lat - centerLat) * kmPerDegLat) / halfKmY * (h / 2),
-      kmToPxY: (km) => (km / halfKmY) * (h / 2),
+      x: (lon) => w / 2 + (lon - centerLon) * kmPerDegLon * sx,
+      y: (lat) => h / 2 - (lat - centerLat) * kmPerDegLat * sy,
+      lon: (px) => centerLon + (px - w / 2) / (kmPerDegLon * sx),
+      lat: (py) => centerLat - (py - h / 2) / (kmPerDegLat * sy),
+      kmToPxY: (km) => km * sy,
     };
+  }
+
+  function baseSpan() {
+    return state.home ? state.radius * 1.35 : 2100;
+  }
+
+  function mapCenter() {
+    if (map.center) return map.center;
+    return state.home ? { lat: state.home.lat, lon: state.home.lon }
+                      : { lat: 52.5, lon: 12.0 };
+  }
+
+  function resetMapView() {
+    map.zoom = 1;
+    map.center = null;
+    drawMap();
   }
 
   function drawMap() {
@@ -165,11 +187,10 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, w, h);
 
-    // Ausschnitt: um den Wohnort herum etwas mehr als der Radius,
-    // ohne Wohnort ganz Europa
-    const v = state.home
-      ? makeView(state.home.lat, state.home.lon, state.radius * 1.35, w, h)
-      : makeView(52.5, 12.0, 2100, w, h);
+    // Ausschnitt: um den Wohnort herum etwas mehr als der Radius, ohne Wohnort
+    // ganz Europa - beides veränderbar durch Zoomen und Ziehen
+    const c = mapCenter();
+    const v = makeView(c.lat, c.lon, baseSpan() / map.zoom, w, h);
     map.view = v;
 
     ctx.fillStyle = '#0e1116';
@@ -191,24 +212,21 @@
     ctx.lineWidth = 0.7;
     ctx.stroke();
 
-    if (!state.home) {
-      $('map-caption').textContent = 'Wohnort eingeben, um den Suchradius zu sehen.';
-      map.pins = [];
-      return;
+    // Radiuskreis. Die Projektion ist in beiden Achsen maßstabsgleich,
+    // ein Bildschirmkreis entspricht also einer echten Luftlinie.
+    if (state.home) {
+      const hx = v.x(state.home.lon), hy = v.y(state.home.lat);
+      const rPx = v.kmToPxY(state.radius);
+      ctx.beginPath();
+      ctx.ellipse(hx, hy, rPx, rPx, 0, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(226,35,26,.11)';
+      ctx.fill();
+      ctx.strokeStyle = '#e2231a';
+      ctx.lineWidth = 1.8;
+      ctx.setLineDash([6, 5]);
+      ctx.stroke();
+      ctx.setLineDash([]);
     }
-
-    // Radiuskreis: als Punktfolge in echter Entfernung, nicht als Ellipse
-    const hx = v.x(state.home.lon), hy = v.y(state.home.lat);
-    const rPx = v.kmToPxY(state.radius);
-    ctx.beginPath();
-    ctx.ellipse(hx, hy, rPx, rPx, 0, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(226,35,26,.11)';
-    ctx.fill();
-    ctx.strokeStyle = '#e2231a';
-    ctx.lineWidth = 1.8;
-    ctx.setLineDash([6, 5]);
-    ctx.stroke();
-    ctx.setLineDash([]);
 
     // Pins der aktuellen Treffer
     for (const p of map.pins) {
@@ -227,15 +245,20 @@
     });
 
     // Wohnort als Kreuz
-    ctx.strokeStyle = '#6ec36e';
-    ctx.lineWidth = 2.4;
-    ctx.beginPath();
-    ctx.moveTo(hx - 7, hy); ctx.lineTo(hx + 7, hy);
-    ctx.moveTo(hx, hy - 7); ctx.lineTo(hx, hy + 7);
-    ctx.stroke();
+    if (state.home) {
+      const hx = v.x(state.home.lon), hy = v.y(state.home.lat);
+      ctx.strokeStyle = '#6ec36e';
+      ctx.lineWidth = 2.4;
+      ctx.beginPath();
+      ctx.moveTo(hx - 7, hy); ctx.lineTo(hx + 7, hy);
+      ctx.moveTo(hx, hy - 7); ctx.lineTo(hx, hy + 7);
+      ctx.stroke();
+    }
 
-    // Maßstab
-    const stepKm = state.radius >= 800 ? 500 : state.radius >= 200 ? 100 : 25;
+    // Maßstab: passt sich dem sichtbaren Ausschnitt an
+    const visibleKm = baseSpan() / map.zoom;
+    const stepKm = visibleKm >= 800 ? 500 : visibleKm >= 300 ? 100
+                 : visibleKm >= 80 ? 25 : visibleKm >= 25 ? 10 : 2;
     const barPx = v.kmToPxY(stepKm);
     ctx.strokeStyle = '#9a978f';
     ctx.lineWidth = 2;
@@ -248,15 +271,23 @@
 
     // Hinweistext unter der Karte
     const cap = $('map-caption');
-    if (!map.pins.length) {
+    const zoomInfo = map.zoom !== 1 || map.center
+      ? ` · Ansicht ${map.zoom.toFixed(1)}×`
+      : ' · Mausrad zoomt, Ziehen verschiebt';
+    const hovered = map.hover >= 0 ? map.pins[map.hover] : null;
+
+    if (hovered) {
+      cap.textContent = `${hovered.name} — ${hovered.pct.toFixed(0)} % Übereinstimmung` +
+        (hovered.dist === null ? '' : `, ${hovered.dist.toLocaleString('de-DE')} km`);
+    } else if (!state.home) {
+      cap.textContent = 'Wohnort eingeben, um den Suchradius zu sehen.' + zoomInfo;
+    } else if (!map.pins.length) {
       cap.textContent = `Umkreis ${state.radius.toLocaleString('de-DE')} km um ${state.home.label}. ` +
-        'Nach der Bandauswahl erscheinen hier die passenden Festivals.';
+        'Nach der Bandauswahl erscheinen hier die passenden Festivals.' + zoomInfo;
     } else {
-      const hovered = map.hover >= 0 ? map.pins[map.hover] : null;
-      cap.textContent = hovered
-        ? `${hovered.name} — ${hovered.pct.toFixed(0)} % Übereinstimmung, ${hovered.dist} km`
-        : `${map.pins.length} Festival${map.pins.length === 1 ? '' : 's'} im Umkreis von ` +
-          `${state.radius.toLocaleString('de-DE')} km um ${state.home.label}. Pin anklicken springt zum Eintrag.`;
+      cap.textContent = `${map.pins.length} Festival${map.pins.length === 1 ? '' : 's'} im Umkreis von ` +
+        `${state.radius.toLocaleString('de-DE')} km um ${state.home.label}. Pin anklicken springt zum Eintrag.` +
+        zoomInfo;
     }
   }
 
@@ -265,9 +296,55 @@
     if (!map.canvas) return;
     map.ctx = map.canvas.getContext('2d');
 
+    // Zoom am Mauszeiger: der Punkt unter dem Cursor bleibt liegen
+    map.canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const v = map.view;
+      if (!v) return;
+      const r = map.canvas.getBoundingClientRect();
+      const mx = e.clientX - r.left, my = e.clientY - r.top;
+      const lon0 = v.lon(mx), lat0 = v.lat(my);
+
+      const factor = Math.exp(-e.deltaY * 0.0015);
+      const next = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, map.zoom * factor));
+      if (next === map.zoom) return;
+      map.zoom = next;
+
+      const c = mapCenter();
+      const v2 = makeView(c.lat, c.lon, baseSpan() / map.zoom,
+                          map.canvas.clientWidth, parseFloat(map.canvas.style.height));
+      map.center = { lat: c.lat + (lat0 - v2.lat(my)), lon: c.lon + (lon0 - v2.lon(mx)) };
+      drawMap();
+    }, { passive: false });
+
+    map.canvas.addEventListener('mousedown', (e) => {
+      map.drag = { x: e.clientX, y: e.clientY, center: mapCenter() };
+      map.moved = false;
+      map.canvas.style.cursor = 'grabbing';
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (!map.drag) return;
+      map.drag = null;
+      map.canvas.style.cursor = map.hover >= 0 ? 'pointer' : 'default';
+    });
+
+    map.canvas.addEventListener('dblclick', resetMapView);
+
     map.canvas.addEventListener('mousemove', (e) => {
       const r = map.canvas.getBoundingClientRect();
       const mx = e.clientX - r.left, my = e.clientY - r.top;
+
+      if (map.drag && map.view) {
+        const v = map.view;
+        const dLon = v.lon(mx) - v.lon(mx - (e.clientX - map.drag.x));
+        const dLat = v.lat(my) - v.lat(my - (e.clientY - map.drag.y));
+        map.center = { lat: map.drag.center.lat - dLat, lon: map.drag.center.lon - dLon };
+        if (Math.abs(e.clientX - map.drag.x) + Math.abs(e.clientY - map.drag.y) > 3) map.moved = true;
+        drawMap();
+        return;
+      }
+
       let found = -1, bestD = 12 * 12;
       map.pins.forEach((p, i) => {
         const d = (p.px - mx) ** 2 + (p.py - my) ** 2;
@@ -285,6 +362,7 @@
     });
 
     map.canvas.addEventListener('click', () => {
+      if (map.moved) { map.moved = false; return; }   // war ein Verschieben
       if (map.hover < 0) return;
       const card = document.getElementById(map.pins[map.hover].cardId);
       if (card) {
@@ -293,6 +371,30 @@
         setTimeout(() => card.classList.remove('flash'), 1600);
       }
     });
+
+    const step = (factor) => {
+      map.zoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, map.zoom * factor));
+      drawMap();
+    };
+    $('zoom-in').addEventListener('click', () => step(1.5));
+    $('zoom-out').addEventListener('click', () => step(1 / 1.5));
+    $('zoom-reset').addEventListener('click', resetMapView);
+
+    // Zwei Finger auf Touchgeräten
+    let pinch = 0;
+    const spread = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+    map.canvas.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 2) pinch = spread(e.touches);
+    }, { passive: true });
+    map.canvas.addEventListener('touchmove', (e) => {
+      if (e.touches.length !== 2 || !pinch) return;
+      e.preventDefault();
+      const now = spread(e.touches);
+      map.zoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, map.zoom * (now / pinch)));
+      pinch = now;
+      drawMap();
+    }, { passive: false });
+    map.canvas.addEventListener('touchend', () => { pinch = 0; });
 
     window.addEventListener('resize', () => drawMap());
   }
@@ -574,6 +676,9 @@
       const span = document.createElement('span');
       span.className = 'hit' + (w === 2 ? ' dbl' : '');
       span.textContent = BANDS[b];
+      span.title = w === 2
+        ? `${BANDS[b]} zählt doppelt (gelb hervorgehoben).`
+        : `${BANDS[b]} zählt einfach.`;
       hits.append(span);
       if (n < hitNames.length - 1) hits.append(document.createTextNode(', '));
     });
@@ -600,6 +705,47 @@
 
     li.append(head, facts, hits, det);
     return li;
+  }
+
+  /* ---------------- Rechtstexte ----------------
+     Nur die gebündelte Einzelseite enthält Impressum und Datenschutz als
+     Abschnitte. Dort bleiben sie eingeklappt, bis der Fußlink sie öffnet.
+     In der lokalen Fassung sind es eigene Dateien - dann tut das hier nichts. */
+
+  function initLegal() {
+    const ids = ['impressum', 'datenschutz'];
+    const secs = ids.map((id) => $(id)).filter(Boolean);
+    if (!secs.length) return;
+
+    for (const sec of secs) {
+      sec.hidden = true;
+      const back = document.createElement('button');
+      back.type = 'button';
+      back.className = 'ghost small legal-close';
+      back.textContent = '← zurück zur Suche';
+      back.title = 'Schließt den Rechtstext und kehrt zur Festivalsuche zurück.';
+      back.addEventListener('click', () => show(null));
+      sec.append(back);
+    }
+
+    function show(id) {
+      for (const sec of secs) sec.hidden = sec.id !== id;
+      const main = document.querySelector('main');
+      const foot = document.querySelector('.site-footer');
+      if (main) main.hidden = !!id;
+      if (foot) foot.hidden = !!id;
+      if (id) $(id).scrollIntoView({ block: 'start' });
+      else window.scrollTo({ top: 0 });
+    }
+
+    for (const a of document.querySelectorAll('.site-footer nav a')) {
+      const id = (a.getAttribute('href') || '').replace('#', '');
+      if (!ids.includes(id)) continue;
+      a.title = id === 'impressum'
+        ? 'Impressum mit Anbieterangaben öffnen.'
+        : 'Datenschutzerklärung öffnen — was mit deinen Eingaben passiert.';
+      a.addEventListener('click', (e) => { e.preventDefault(); show(id); });
+    }
   }
 
   /* ---------------- Verdrahtung ---------------- */
@@ -653,6 +799,7 @@
       `${BANDS.length.toLocaleString('de-DE')} Acts.`;
 
     initMap();
+    initLegal();
     renderBandResults();
     renderChosen();
     render();
