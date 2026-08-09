@@ -555,6 +555,44 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
         keep["_bands"].update(drop["_bands"])
         merged.pop(drop_key, None)
 
+    # Stufe 3: gleiche Veranstaltung, unterschiedlich benannt.
+    # "Kosmos Festival" (festivalticker) und "Kosmos Festival Chemnitz"
+    # (festivalsunited) sind dasselbe. Verlangt werden verschiedene Quellen,
+    # gleiche Stadt, gleicher Starttermin und ein gemeinsamer Namensbestandteil.
+    # Der Starttermin ist der entscheidende Schutz: "Winter Wutzrock" im Februar
+    # und "Wutzrock" im August teilen Stadt und Namen, sind aber zwei Feste.
+    slots: dict[tuple[str, str, str], list[tuple]] = {}
+    for key, rec in merged.items():
+        if rec["date_from"] and rec["city"]:
+            slots.setdefault((rec["year"], key[2], rec["date_from"]), []).append((key, rec))
+
+    for group in slots.values():
+        if len(group) < 2:
+            continue
+        for i in range(len(group)):
+            ka, a = group[i]
+            if ka not in merged:
+                continue
+            for j in range(i + 1, len(group)):
+                kb, b = group[j]
+                if kb not in merged or ka not in merged:
+                    continue
+                if set(a["sources"]) & set(b["sources"]):
+                    continue
+                if not (set(ka[0].split()) & set(kb[0].split())):
+                    continue
+                keep, drop, drop_key = ((a, b, kb) if a["source_order"] <= b["source_order"]
+                                        else (b, a, ka))
+                for field in ("date_from", "date_to", "city", "country", "venue",
+                              "location", "price", "website", "genre", "visitors", "note"):
+                    if not keep[field] and drop[field]:
+                        keep[field] = drop[field]
+                keep["sources"].update(drop["sources"])
+                keep["_bands"].update(drop["_bands"])
+                merged.pop(drop_key, None)
+                if drop_key == ka:
+                    break
+
     out = []
     for rec in merged.values():
         rec.pop("source_order", None)

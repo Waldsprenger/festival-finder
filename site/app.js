@@ -583,9 +583,11 @@
       a.row[NAME].localeCompare(b.row[NAME], 'de'));
 
     $('result-stat').innerHTML = scored.length
-      ? `<b>${scored.length}</b> ${scored.length === 1 ? 'Festival spielt' : 'Festivals spielen'} mindestens eine deiner ` +
-        `${state.selected.size} ${state.selected.size === 1 ? 'Band' : 'Bands'}. ` +
-        'Sortiert nach Übereinstimmung, dann Entfernung, dann Preis.'
+      ? `<b>${scored.length}</b> ${scored.length === 1 ? 'Festival spielt' : 'Festivals spielen'} ` +
+        (state.selected.size === 1
+          ? 'deine gewählte Band'
+          : `mindestens eine deiner ${state.selected.size} Bands`) +
+        '. Sortiert nach Übereinstimmung, dann Entfernung, dann Preis.'
       : 'Keines der gefilterten Festivals spielt eine deiner Bands. Radius, Preis oder Zeitraum lockern.';
 
     const shown = scored.slice(0, 300);

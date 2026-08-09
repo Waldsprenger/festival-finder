@@ -96,7 +96,14 @@ Cron-Job, kein Serverdienst.
 
 ## Abgleich
 
-**Festivals** werden über Name + Jahr + Stadt zusammengeführt. Der Name wird dafür
+**Festivals** werden in drei Stufen zusammengeführt: exakt über Name + Jahr + Stadt,
+dann über eindeutige Quellenpaare zu Name + Jahr, zuletzt über gleiche Stadt +
+gleichen Starttermin + gemeinsamen Namensbestandteil bei verschiedenen Quellen.
+Die dritte Stufe fängt Fälle wie „Kosmos Festival" gegen „Kosmos Festival Chemnitz"
+ab. Der Starttermin ist dabei der entscheidende Schutz: „Winter Wutzrock" im Februar
+und „Wutzrock" im August teilen Stadt und Namensteil, sind aber zwei Veranstaltungen.
+
+Die erste Stufe im Detail: Der Name wird dafür
 normalisiert (Umlaute, Artikel, Jahreszahl und die Wörter „Festival/Open Air" fallen weg).
 Die Stadt gehört bewusst zum Schlüssel: Tour-Formate wie das *Irish Spring Festival*
 laufen unter einem Namen an 30 Orten und sind eigenständige Termine. In einem zweiten
