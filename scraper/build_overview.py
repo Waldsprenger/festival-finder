@@ -44,8 +44,9 @@ def main() -> None:
         multi = " multi" if len(f["sources"]) > 1 else ""
         more = (f'<span class="rest" id="r{i}" hidden>, {esc(rest)}</span>'
                 f'<button class="more" data-t="r{i}">+{len(lineup) - 8}</button>') if rest else ""
-        rows.append(f"""<tr class="row{multi}" data-search="{esc((f['name'] + ' ' + f['city'] + ' ' + f['country'] + ' ' + ' '.join(lineup)).lower())}">
-<td class="nm">{esc(f['name'])}<div class="sub">{esc(f['genre'][:60])}</div></td>
+        flag = '<span class="flag">Abgesagt</span> ' if f.get("cancelled") else ""
+        rows.append(f"""<tr class="row{multi}{' cancelled' if f.get('cancelled') else ''}" data-search="{esc((f['name'] + ' ' + f['city'] + ' ' + f['country'] + ' ' + ' '.join(lineup)).lower())}">
+<td class="nm">{flag}{esc(f['name'])}<div class="sub">{esc(f['genre'][:60])}</div></td>
 <td class="dt">{date}</td>
 <td>{esc(f['location'] or f['city'])}</td>
 <td class="pr">{esc(f['price']) or '–'}</td>
@@ -94,6 +95,11 @@ a {{ color:var(--acc); }}
 .tags {{ display:flex; flex-wrap:wrap; gap:.35rem; margin:.5rem 0 1.25rem; }}
 .tag {{ background:var(--chip); border-radius:999px; padding:.2rem .6rem; font-size:12px; }}
 .tag b {{ color:var(--acc); }}
+tr.cancelled .nm {{ text-decoration:line-through; }}
+.flag {{ display:inline-block; background:#c62828; color:#fff; font-size:10px;
+  font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+  padding:.05em .35em; border-radius:3px; margin-right:.35em;
+  text-decoration:none; vertical-align:middle; }}
 </style></head><body>
 <h1>Festival-Übersicht Europa</h1>
 <div class="meta">{len(festivals)} Festivals · {with_lineup} mit Lineup · {both} in beiden Quellen ·

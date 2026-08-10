@@ -284,7 +284,14 @@ def ft_parse_detail(url: str, html: str, seed: dict | None = None) -> dict | Non
     if not name:
         return None
 
+    # Abgesagte Termine: durchgestrichene Ueberschrift plus roter Hinweis
+    titel = s.find("h2")
+    cancelled = bool(titel and "line-through" in (titel.get("class") or []))
+
     text = s.get_text("\n", strip=True)
+    if re.search(r"wurde abgesagt", text, re.I):
+        cancelled = True
+
     dm = re.search(r"Vom:\s*(\d{2}\.\d{2}\.\d{4})\s*bis:\s*(\d{2}\.\d{2}\.\d{4})", text)
     if dm:
         date_from, date_to = dm.group(1), dm.group(2)
@@ -344,6 +351,7 @@ def ft_parse_detail(url: str, html: str, seed: dict | None = None) -> dict | Non
         "genre": fields.get("Stil", "") or seed.get("genre", "") or fields.get("Kategorie", ""),
         "visitors": fields.get("Besucher", ""),
         "note": "",
+        "cancelled": cancelled,
         "lineup": bands,
     }
 
@@ -423,6 +431,15 @@ def fu_parse_detail(url: str, html: str) -> dict | None:
 
     text = re.sub(r"\n{2,}", "\n", s.get_text("\n", strip=True))
 
+    # Abgesagt? Der Hinweis "Abgesagt" steht auf vielen Seiten auch bei anderen
+    # Jahrgaengen in der Ausgabenliste. Gewertet wird deshalb nur der Status im
+    # Kopfbereich sowie der Klartext, der den Namen dieser Ausgabe nennt.
+    cancelled = bool(re.search(re.escape(raw_name) + r"\s+wurde abgesagt", text, re.I))
+    if not cancelled:
+        kopf = h1.find_parent(["section", "div"])
+        if kopf and re.search(r"\bAbgesagt\b", kopf.get_text(" ", strip=True), re.I):
+            cancelled = True
+
     # Seiten ohne bestaetigte Neuauflage zeigen das Datum der letzten Ausgabe.
     # Deshalb bevorzugt der Treffer, dessen Jahr zur Ausgabe im Titel passt.
     ranges = [(m.group(1), m.group(2) or m.group(1)) for m in
@@ -489,6 +506,7 @@ def fu_parse_detail(url: str, html: str) -> dict | None:
         "genre": genre,
         "visitors": "",
         "note": note,
+        "cancelled": cancelled,
         "lineup": lineup,
     }
 
@@ -568,6 +586,7 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
                 "genre": rec["genre"],
                 "visitors": rec["visitors"],
                 "note": rec.get("note", ""),
+                "cancelled": bool(rec.get("cancelled")),
                 "sources": {},
                 "source_order": 0 if rec["source"] == "festivalticker" else 1,
                 "_bands": {},
@@ -580,6 +599,8 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
                 cur[field] = rec[field]
         if len(rec["name"]) > len(cur["name"]) and rec["source"] == "festivalticker":
             cur["name"] = rec["name"]
+        # Eine Absage aus einer Quelle genuegt
+        cur["cancelled"] = cur["cancelled"] or bool(rec.get("cancelled"))
         cur["sources"][rec["source"]] = rec["source_url"]
         for b in rec["lineup"]:
             k = band_key(b)
@@ -601,6 +622,7 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
                       "location", "price", "website", "genre", "visitors", "note"):
             if not keep[field] and drop[field]:
                 keep[field] = drop[field]
+        keep["cancelled"] = keep["cancelled"] or drop["cancelled"]
         keep["sources"].update(drop["sources"])
         keep["_bands"].update(drop["_bands"])
         merged.pop(drop_key, None)
@@ -637,6 +659,7 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
                               "location", "price", "website", "genre", "visitors", "note"):
                     if not keep[field] and drop[field]:
                         keep[field] = drop[field]
+                keep["cancelled"] = keep["cancelled"] or drop["cancelled"]
                 keep["sources"].update(drop["sources"])
                 keep["_bands"].update(drop["_bands"])
                 merged.pop(drop_key, None)
@@ -667,12 +690,13 @@ def write_outputs(festivals: list[dict]) -> None:
     with (OUT / "festivals.csv").open("w", encoding="utf-8-sig", newline="") as fh:
         w = csv.writer(fh, delimiter=";")
         w.writerow(["Name", "Jahr", "Von", "Bis", "Ort", "Land", "Venue", "Preis",
-                    "Webseite", "Genre", "Besucher", "Hinweis", "Anzahl Acts",
-                    "Lineup", "Quellen"])
+                    "Webseite", "Genre", "Besucher", "Abgesagt", "Hinweis",
+                    "Anzahl Acts", "Lineup", "Quellen"])
         for f in festivals:
             w.writerow([f["name"], f["year"], f["date_from"], f["date_to"], f["city"],
                         f["country"], f["venue"], f["price"], f["website"], f["genre"],
-                        f["visitors"], f.get("note", ""), f["lineup_count"],
+                        f["visitors"], "ja" if f["cancelled"] else "",
+                        f.get("note", ""), f["lineup_count"],
                         ", ".join(f["lineup"]), " | ".join(f["sources"].values())])
 
     with (OUT / "lineups.csv").open("w", encoding="utf-8-sig", newline="") as fh:
@@ -724,11 +748,13 @@ def main() -> None:
     (OUT / "band_normalisierung.json").write_text(
         json.dumps(bstats, ensure_ascii=False, indent=2), encoding="utf-8")
 
+    abgesagt = sum(1 for f in festivals if f["cancelled"])
     both = sum(1 for f in festivals if len(f["sources"]) > 1)
     acts = len({b for f in festivals for b in f["lineup"]})
     print(f"\nFestivals gesamt : {len(festivals)}")
     print(f"  davon in beiden Quellen: {both}")
     print(f"  mit Lineup            : {sum(1 for f in festivals if f['lineup'])}")
+    print(f"  abgesagt              : {abgesagt}")
     print(f"Acts (normalisiert)     : {acts}")
     print(f"  Rohschreibweisen      : {bstats['roh_schreibweisen']}, davon "
           f"{bstats['vereinheitlicht']} auf eine Schreibweise vereinheitlicht")

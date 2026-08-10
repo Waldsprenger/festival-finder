@@ -79,6 +79,12 @@
           <button type="button" class="help" aria-label="Erklärung zu Festivals ohne Termin"
                   title="Manche Festivals haben noch keinen bestätigten Termin für die nächste Ausgabe. Mit Haken erscheinen sie trotzdem, mit dem Hinweis auf die letzte bekannte Ausgabe.">?</button>
         </label>
+        <label class="check">
+          <input type="checkbox" id="show-cancelled">
+          Abgesagte Festivals mitzeigen
+          <button type="button" class="help" aria-label="Erklärung zu abgesagten Festivals"
+                  title="29 Ausgaben sind in den Quellen als abgesagt gemeldet. Sie bleiben standardmäßig ausgeblendet; mit Haken erscheinen sie deutlich gekennzeichnet.">?</button>
+        </label>
       </div>
     </div>
 
@@ -103,6 +109,17 @@
   <!-- ============ Schritt 2: Bands ============ -->
   <section class="panel" id="step-bands">
     <h2><span class="num">2</span> Bands wählen</h2>
+
+    <div class="toggle-row">
+      <label class="switch" for="use-bands">
+        <input type="checkbox" id="use-bands" checked role="switch">
+        <span class="track"><span class="knob"></span></span>
+        <span class="switch-text">Nach Bands filtern</span>
+      </label>
+      <button type="button" class="help" aria-label="Erklärung zum Bandfilter"
+              title="Eingeschaltet zeigt die Liste nur Festivals, die mindestens eine deiner Bands spielen, sortiert nach Übereinstimmung. Ausgeschaltet erscheinen alle Festivals, die zu Wohnort, Umkreis, Preis und Termin passen — dann ohne Prozentwert, sortiert nach Entfernung.">?</button>
+    </div>
+
     <p class="lead">Suchen, anklicken, auswählen. Ein zweiter Klick auf <b>×2</b> gewichtet
       eine Band doppelt — sie zählt dann doppelt so stark für die Übereinstimmung.</p>
 

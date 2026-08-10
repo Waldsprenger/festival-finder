@@ -174,6 +174,7 @@ def main() -> None:
             sorted(bid(b) for b in f["lineup"]),         # 11
             f["genre"][:70],                             # 12
             f.get("note", ""),                           # 13
+            1 if f.get("cancelled") else 0,              # 14
         ])
 
     # Ortsverzeichnis fuer die Wohnortsuche. Die veroeffentlichte Fassung darf

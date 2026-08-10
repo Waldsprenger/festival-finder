@@ -11,7 +11,7 @@
   // Spaltenindizes von data.js
   const NAME = 0, FROM = 1, TO = 2, CITY = 3, LAND = 4, VENUE = 5,
         EUR = 6, PRICE_RAW = 7, WEB = 8, LAT = 9, LON = 10, LINEUP = 11,
-        GENRE = 12, NOTE = 13;
+        GENRE = 12, NOTE = 13, CANCELLED = 14;
 
   const $ = (id) => document.getElementById(id);
 
@@ -21,6 +21,8 @@
     maxPrice: 150,
     allowUnknownPrice: true,
     allowUnknownGeo: false,
+    showCancelled: false,
+    useBands: true,
     from: '',
     allowUnknownDate: false,
     selected: new Map(),     // bandIndex -> Gewicht (1 oder 2)
@@ -447,6 +449,7 @@
   /* ---------------- Filter ---------------- */
 
   function passes(row) {
+    if (row[CANCELLED] && !state.showCancelled) return false;
     if (state.home) {
       const d = distanceOf(row);
       if (d === null) { if (!state.allowUnknownGeo) return false; }
@@ -601,8 +604,9 @@
     const list = $('festival-list');
     list.innerHTML = '';
 
-    if (!total) {
-      $('result-stat').textContent = 'Wähle mindestens eine Band.';
+    if (state.useBands && !total) {
+      $('result-stat').textContent =
+        'Wähle mindestens eine Band — oder schalte den Bandfilter aus, um alle passenden Festivals zu sehen.';
       map.pins = [];
       map.hover = -1;
       drawMap();
@@ -612,28 +616,41 @@
     const scored = [];
     for (const i of pool) {
       const row = F[i], set = sets[i];
-      let weight = 0;
-      const hits = [];
-      for (const [b, w] of state.selected) {
-        if (set.has(b)) { weight += w; hits.push([b, w]); }
+      const eintrag = { i, row, pct: null, hits: [], dist: distanceOf(row) };
+      if (state.useBands) {
+        let weight = 0;
+        for (const [b, w] of state.selected) {
+          if (set.has(b)) { weight += w; eintrag.hits.push([b, w]); }
+        }
+        if (!weight) continue;                 // ohne Treffer nicht anzeigen
+        eintrag.pct = (weight / total) * 100;
       }
-      if (!weight) continue;
-      scored.push({ i, row, pct: (weight / total) * 100, hits, dist: distanceOf(row) });
+      scored.push(eintrag);
     }
 
+    // Ohne Bandfilter gibt es keine Übereinstimmung, nach der sich sortieren
+    // ließe - dann entscheidet Entfernung, danach Termin und Preis.
     scored.sort((a, b) =>
-      b.pct - a.pct ||
+      (state.useBands ? b.pct - a.pct : 0) ||
       (a.dist ?? Infinity) - (b.dist ?? Infinity) ||
+      (a.row[FROM] || '9999').localeCompare(b.row[FROM] || '9999') ||
       (a.row[EUR] ?? Infinity) - (b.row[EUR] ?? Infinity) ||
       a.row[NAME].localeCompare(b.row[NAME], 'de'));
 
-    $('result-stat').innerHTML = scored.length
-      ? `<b>${scored.length}</b> ${scored.length === 1 ? 'Festival spielt' : 'Festivals spielen'} ` +
-        (state.selected.size === 1
-          ? 'deine gewählte Band'
-          : `mindestens eine deiner ${state.selected.size} Bands`) +
-        '. Sortiert nach Übereinstimmung, dann Entfernung, dann Preis.'
-      : 'Keines der gefilterten Festivals spielt eine deiner Bands. Radius, Preis oder Zeitraum lockern.';
+    if (!state.useBands) {
+      $('result-stat').innerHTML = scored.length
+        ? `<b>${scored.length}</b> ${scored.length === 1 ? 'Festival passt' : 'Festivals passen'} zu deinen Filtern. ` +
+          'Bandfilter ist aus — sortiert nach Entfernung, dann Termin, dann Preis.'
+        : 'Kein Festival passt zu diesen Filtern. Radius, Preis oder Zeitraum lockern.';
+    } else {
+      $('result-stat').innerHTML = scored.length
+        ? `<b>${scored.length}</b> ${scored.length === 1 ? 'Festival spielt' : 'Festivals spielen'} ` +
+          (state.selected.size === 1
+            ? 'deine gewählte Band'
+            : `mindestens eine deiner ${state.selected.size} Bands`) +
+          '. Sortiert nach Übereinstimmung, dann Entfernung, dann Preis.'
+        : 'Keines der gefilterten Festivals spielt eine deiner Bands. Radius, Preis oder Zeitraum lockern.';
+    }
 
     const shown = scored.slice(0, 300);
     const frag = document.createDocumentFragment();
@@ -660,7 +677,8 @@
   function card(s) {
     const row = s.row;
     const li = document.createElement('li');
-    li.className = 'fest' + (s.pct >= 50 ? ' top' : '');
+    li.className = 'fest' + (s.pct !== null && s.pct >= 50 ? ' top' : '') +
+                   (row[CANCELLED] ? ' cancelled' : '');
     li.id = s.cardId;
 
     const head = document.createElement('div');
@@ -676,16 +694,26 @@
       h3.append(a);
     } else h3.textContent = row[NAME];
 
-    const pct = document.createElement('div');
-    pct.className = 'pct';
-    pct.textContent = `${s.pct.toFixed(0)} %`;
-    const small = document.createElement('small');
-    small.textContent = 'Übereinstimmung';
-    pct.append(small);
-
     const titleBox = document.createElement('div');
+    if (row[CANCELLED]) {
+      const flag = document.createElement('span');
+      flag.className = 'flag';
+      flag.textContent = 'Abgesagt';
+      flag.title = 'Diese Ausgabe wurde von der Quelle als abgesagt gemeldet.';
+      titleBox.append(flag);
+    }
     titleBox.append(h3);
-    head.append(titleBox, pct);
+    head.append(titleBox);
+
+    if (s.pct !== null) {
+      const pct = document.createElement('div');
+      pct.className = 'pct';
+      pct.textContent = `${s.pct.toFixed(0)} %`;
+      const small = document.createElement('small');
+      small.textContent = 'Übereinstimmung';
+      pct.append(small);
+      head.append(pct);
+    }
 
     const facts = document.createElement('ul');
     facts.className = 'facts';
@@ -716,6 +744,7 @@
 
     const hits = document.createElement('p');
     hits.className = 'hits';
+    if (!s.hits.length) hits.hidden = true;
     const hitNames = s.hits
       .sort((a, b) => b[1] - a[1] || BANDS[a[0]].localeCompare(BANDS[b[0]], 'de'));
     hits.append(document.createTextNode('Deine Bands: '));
@@ -834,6 +863,16 @@
 
     $('geo-unknown').addEventListener('change', (e) => {
       state.allowUnknownGeo = e.target.checked; render();
+    });
+
+    $('show-cancelled').addEventListener('change', (e) => {
+      state.showCancelled = e.target.checked; render();
+    });
+
+    $('use-bands').addEventListener('change', (e) => {
+      state.useBands = e.target.checked;
+      $('step-bands').classList.toggle('bands-off', !state.useBands);
+      render();
     });
 
     $('from').addEventListener('change', (e) => { state.from = e.target.value; render(); });

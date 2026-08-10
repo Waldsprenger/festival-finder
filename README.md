@@ -57,6 +57,14 @@ der Umkreis reicht bis zum entferntesten Festival ab `REF_PLZ` in `build_site.py
 (derzeit 97209 → 3.300 km), der Preis bis zum teuersten gefundenen Ticket
 (derzeit 1.600 €), jeweils aufgerundet.
 
+**Abgesagte Ausgaben** erkennt der Scraper an der durchgestrichenen Überschrift und
+dem Hinweis „wurde abgesagt" (festivalticker) beziehungsweise am Status im Kopfbereich
+und dem Klartext „&lt;Name&gt; wurde abgesagt" (festivalsunited). Wichtig ist die enge
+Fassung: Bei festivalsunited steht „Abgesagt" auf 416 Seiten als Hinweis auf *andere*
+Jahrgänge in der Ausgabenliste — gewertet wird nur die dargestellte Ausgabe. Derzeit
+sind 29 Festivals betroffen; sie bleiben in der Webseite ausgeblendet, lassen sich per
+Haken einblenden und erscheinen dann durchgestrichen mit rotem Vermerk.
+
 **Ablauf:** Wohnort → Umkreis → Ticketobergrenze → frühester Starttermin; danach Bands
 suchen und auswählen, optional pro Band auf `×2` stellen. Die Trefferquote ist die
 gewichtete Summe der gefundenen Bands geteilt durch die Summe aller gewählten Gewichte.

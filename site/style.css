@@ -281,6 +281,47 @@ button.small { padding: .3rem .6rem; font-size: .8rem; }
 .results .cnt { color: var(--mut); font-size: .8rem; white-space: nowrap; }
 .results button { padding: .25rem .6rem; font-size: .8rem; }
 
+/* ---------- Umschalter Bandfilter ---------- */
+
+.toggle-row { display: flex; align-items: center; gap: .1rem; margin: -.4rem 0 1rem; }
+
+.switch { display: inline-flex; align-items: center; gap: .6rem; cursor: pointer;
+  text-transform: none; letter-spacing: 0; font-size: .95rem; color: var(--fg);
+  font-weight: 600; margin: 0; }
+
+.switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+
+.switch .track {
+  position: relative;
+  width: 2.9rem;
+  height: 1.55rem;
+  border-radius: 999px;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  transition: background .15s, border-color .15s;
+  flex: none;
+}
+
+.switch .knob {
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 1.15rem; height: 1.15rem;
+  border-radius: 50%;
+  background: var(--mut);
+  transition: transform .15s, background .15s;
+}
+
+.switch input:checked + .track { background: rgba(226,35,26,.28); border-color: var(--red); }
+.switch input:checked + .track .knob { transform: translateX(1.32rem); background: var(--red); }
+.switch input:focus-visible + .track { outline: 2px solid var(--amber); outline-offset: 2px; }
+
+/* Bandauswahl bleibt bedienbar, tritt aber zurück, wenn der Filter aus ist */
+.bands-off .lead, .bands-off .field, .bands-off .results, .bands-off .chosen { opacity: .45; }
+
+@media (prefers-reduced-motion: reduce) {
+  .switch .track, .switch .knob { transition: none; }
+}
+
 .chosen { margin-top: 1.5rem; }
 
 .chosen-head {
@@ -351,6 +392,22 @@ button.small { padding: .3rem .6rem; font-size: .8rem; }
 }
 
 .fest.top { border-left-color: var(--amber); }
+
+.fest.cancelled { border-left-color: var(--red); opacity: .8; }
+.fest.cancelled h3 { text-decoration: line-through; text-decoration-thickness: 2px; }
+
+.flag {
+  display: inline-block;
+  background: var(--red);
+  color: #fff;
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: .12rem .45rem;
+  border-radius: 2px;
+  margin-bottom: .35rem;
+}
 
 .fest-head {
   display: flex;
