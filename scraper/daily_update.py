@@ -21,6 +21,11 @@ LOG = BASE / "data" / "update.log"
 STEPS = [
     ("Festivaldaten", [sys.executable, "scraper/festival_scraper.py", "--max-age", "24"]),
     ("Ortskoordinaten", [sys.executable, "scraper/geocode.py"]),
+    # Die folgenden drei Datensaetze aendern sich kaum und laufen aus dem Cache.
+    # Sie stehen trotzdem hier, damit ein frischer Klon vollstaendig baut.
+    ("Ortsverzeichnis", [sys.executable, "scraper/build_gazetteer.py"]),
+    ("Kartengrenzen", [sys.executable, "scraper/build_map.py"]),
+    ("Schrift", [sys.executable, "scraper/fetch_fonts.py"]),
     ("Uebersicht", [sys.executable, "scraper/build_overview.py"]),
     ("Webseite", [sys.executable, "scraper/build_site.py"]),
     ("Artifact-Bundle", [sys.executable, "scraper/build_artifact.py"]),

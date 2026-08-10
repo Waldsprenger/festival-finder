@@ -23,7 +23,10 @@ RATES = {"EUR": 1.0, "€": 1.0, "CHF": 1.06, "GBP": 1.17, "USD": 0.92,
          "DKK": 0.134, "SEK": 0.088, "NOK": 0.086, "PLN": 0.235,
          "CZK": 0.040, "HUF": 0.0025}
 
-FREE = re.compile(r"kostenlos|gratis|freier eintritt|umsonst|frei\b", re.I)
+# "Spende" und "Zahl was du willst" sind kein fehlender Preis, sondern
+# freier Eintritt mit Spendenbitte - fuer den Filter zaehlen sie als 0 EUR.
+FREE = re.compile(r"kostenlos|gratis|freier eintritt|umsonst|frei\b|spende|"
+                  r"zahl[,]?\s*was|pay what", re.I)
 
 _N = r"\d{1,3}(?:\.\d{3})*(?:,\d{1,2})?|\d+(?:\.\d{1,2})?"
 _C = r"€|EUR|CHF|GBP|USD|DKK|SEK|NOK|PLN|CZK|HUF"
@@ -59,8 +62,6 @@ def price_eur(text: str) -> float | None:
     """
     if not text:
         return None
-    if FREE.search(text):
-        return 0.0
 
     candidates: list[float] = []
     for m in RANGE.finditer(text):              # "19,80 - 27,50 €"
@@ -73,6 +74,17 @@ def price_eur(text: str) -> float | None:
             if v is not None:
                 candidates.append(v * rate(m.group(cur_g)))
 
+    candidates = [c for c in candidates if 0 < c <= 5000]
+
+    # Ein Gratis-Hinweis zaehlt nur, wenn er vor der ersten Preisangabe steht.
+    # "Kostenlos bis 39 EUR je Event" ist freier Eintritt, waehrend bei
+    # "VVK 45-172 EUR (Pay what you can)" der Nachsatz den Preis nicht aufhebt.
+    frei = FREE.search(text)
+    if frei:
+        betrag = re.search(rf"({_N})\s*(?:{_C})|(?:{_C})\s*({_N})", text, re.I)
+        if not candidates or (betrag and frei.start() < betrag.start()):
+            return 0.0
+
     if not candidates and not ANY_CUR.search(text):
         # Waehrungslose Angabe wie "VVK 42,95 (Stufe 2)": hier zaehlt die erste
         # Zahl, nicht die kleinste - die Nachsaetze nennen Preisstufen, keine Preise.
@@ -82,7 +94,6 @@ def price_eur(text: str) -> float | None:
                 return round(v, 2)
         return None
 
-    candidates = [c for c in candidates if 0 < c <= 5000]
     return round(min(candidates), 2) if candidates else None
 
 

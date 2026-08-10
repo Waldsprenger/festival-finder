@@ -357,7 +357,7 @@
 
       const c = mapCenter();
       const v2 = makeView(c.lat, c.lon, baseSpan() / map.zoom,
-                          map.canvas.clientWidth, parseFloat(map.canvas.style.height));
+                          map.canvas.clientWidth, map.canvas.clientHeight);
       map.center = { lat: c.lat + (lat0 - v2.lat(my)), lon: c.lon + (lon0 - v2.lon(mx)) };
       drawMap();
     }, { passive: false });

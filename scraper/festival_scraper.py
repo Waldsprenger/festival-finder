@@ -259,7 +259,7 @@ def ft_parse_detail(url: str, html: str, seed: dict | None = None) -> dict | Non
         if label == "Website":
             a = value_td.find("a", href=True)
             if a:
-                website = ft_resolve_website(urljoin(url, a["href"]))
+                website = ft_resolve_website(urljoin(url, a["href"].strip())).strip()
             continue
         if label == "Bands":
             bands.extend(ft_split_bands(clean(value_td.get_text())))
@@ -303,7 +303,7 @@ def ft_resolve_website(link: str) -> str:
     q = parse_qs(urlparse(link).query)
     for key in ("url", "u", "link", "goto"):
         if key in q and q[key]:
-            return q[key][0]
+            return q[key][0].strip()
     if "festivalticker.de" not in urlparse(link).netloc:
         return link
     try:
@@ -413,7 +413,7 @@ def fu_parse_detail(url: str, html: str) -> dict | None:
             continue
         if re.search(r"offizielle|website|webseite|homepage", label) or \
            re.search(r"offizielle|website|homepage", clean(a.get("title", "")), re.I):
-            website = href
+            website = href.strip()
             break
 
     lineup = fu_extract_lineup(s)

@@ -133,3 +133,11 @@ und ersetzt alle übrigen.
   Das Feld `Hinweis` nennt dann die letzte gefundene Ausgabe.
 - Bei reinen Akronymen kann die Mehrheitsregel die falsche Variante wählen
   (`GANS` → `Gans`), da sie gemischte Schreibweise bevorzugt.
+- Preise sind Freitext in zehn Währungen. Als Preis zählt nur eine Zahl direkt an
+  einer Währung, sonst würde „VVK 199 € (Stufe 2)" als 2 € gelesen. „Spende" und
+  „Zahl was du willst" ergeben 0 €; ein solcher Hinweis nach einer Preisangabe
+  („VVK 45-172 € (Pay what you can)") hebt den Preis dagegen nicht auf.
+  Zwei Angaben bleiben undeutbar, weil die Quelle dort Unsinn liefert (`Pop Punk`).
+- Die Geokodierung ist auf europäische Länder begrenzt. Ohne diese Grenze liefert
+  Nominatim bei mehrdeutigen Namen den weltweit bekanntesten Ort — „Newark" wurde
+  New Jersey statt England.
