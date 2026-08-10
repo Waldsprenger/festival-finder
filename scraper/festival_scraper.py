@@ -42,7 +42,10 @@ FT = "https://www.festivalticker.de"
 FU = "https://www.festivalsunited.com"
 FA = "https://www.festival-alarm.com"
 
-JAHRE = range(2006, 2030)
+# Jahrgaenge, die abgeklopft werden. Die Obergrenze waechst mit der Zeit mit,
+# damit kuenftige Jahre (2028, 2029 ...) ohne Codeaenderung erfasst werden.
+JAHR_HEUTE = date.today().year
+JAHRE = range(2006, JAHR_HEUTE + 6)
 MONATE = ["januar", "februar", "maerz", "april", "mai", "juni", "juli", "august",
           "september", "oktober", "november", "dezember"]
 
@@ -59,6 +62,11 @@ FT_LISTS = (
 
 # festivalsunited pflegt eine Sitemap - der vollstaendige Weg ueber alle Jahre
 FU_SITEMAP = f"{FU}/sitemap.xml"
+
+# Pfade unter /festivals/, die keine Einzelveranstaltung sind
+FU_KEINE_DETAILS = {"calendar", "countries", "lists", "genres", "months",
+                    "cities", "venues", "artists", "search", "upcoming",
+                    "new", "top", "magazine"}
 
 # festival-alarm listet je Jahrgang eine Uebersichtsseite
 FA_LISTS = [f"{FA}/Festivals-{j}" for j in JAHRE]
@@ -218,7 +226,10 @@ def ft_collect_seeds(since: int = 0) -> dict[str, dict]:
     for url in FT_LISTS:
         html = fetch(url)
         if not html:
-            print(f"  ! Liste nicht ladbar: {url}", file=sys.stderr)
+            # Kuenftige Jahrgaenge existieren noch nicht - das ist kein Fehler
+            jahr = re.search(r"/(?:festivals-)?(\d{4})/?$", url)
+            if not (jahr and int(jahr.group(1)) > JAHR_HEUTE + 1):
+                print(f"  ! Liste nicht ladbar: {url}", file=sys.stderr)
             continue
         for ev in soup(html).find_all("tbody", class_="vevent"):
             a = ev.find("a", class_="summary")
@@ -439,8 +450,12 @@ def fu_collect_links(since: int) -> list[str]:
             continue
         for loc in re.findall(r"<loc>([^<]+)</loc>", html):
             # nur Detailseiten, keine Magazinartikel und keine Buchstabenlisten
-            if re.fullmatch(r"https://www\.festivalsunited\.com/festivals/"
-                            r"[a-z0-9\-]+(?:/\d{4})?", loc):
+            m = re.fullmatch(r"https://www\.festivalsunited\.com/festivals/"
+                             r"([a-z0-9\-]+)(?:/\d{4})?", loc)
+            # "/festivals/calendar/2026" sieht wie eine Detailseite aus, ist aber
+            # eine Uebersicht - sonst landet ein Festival namens "Festivals" in
+            # den Daten
+            if m and m.group(1) not in FU_KEINE_DETAILS:
                 links[loc] = None
     return list(links)
 

@@ -25,6 +25,7 @@
     useBands: true,
     from: '',
     to: '',
+    minDate: '',
     allowUnknownDate: false,
     selected: new Map(),     // bandIndex -> Gewicht (1 oder 2)
   };
@@ -842,10 +843,14 @@
     $('radius-out').textContent = `${state.radius.toLocaleString('de-DE')} km`;
     $('price-out').textContent = `${state.maxPrice} €`;
 
+    // Untergrenze des Kalenders: Monatsanfang des frühesten Festivals im
+    // Datenbestand. Voreingestellt bleibt heute, sofern das darin liegt.
     const today = new Date().toISOString().slice(0, 10);
-    $('from').value = today;
-    state.from = today;
-    $('to').min = today;
+    const minDate = D.minDate || '';
+    state.minDate = minDate;
+    if (minDate) { $('from').min = minDate; $('to').min = minDate; }
+    state.from = minDate && today < minDate ? minDate : today;
+    $('from').value = state.from;
 
     $('locate').addEventListener('click', resolveHome);
     $('home').addEventListener('keydown', (e) => { if (e.key === 'Enter') resolveHome(); });
@@ -883,9 +888,15 @@
 
     // Die beiden Felder begrenzen sich gegenseitig, damit kein leerer
     // Zeitraum entstehen kann
+    // Eingetippte Daten koennen die Untergrenze unterlaufen - der Kalender
+    // selbst bietet sie gar nicht erst an
+    const klemme = (wert) => (state.minDate && wert && wert < state.minDate)
+      ? state.minDate : wert;
+
     $('from').addEventListener('change', (e) => {
+      e.target.value = klemme(e.target.value);
       state.from = e.target.value;
-      $('to').min = state.from || '';
+      $('to').min = state.from || state.minDate || '';
       if (state.to && state.from && state.to < state.from) {
         state.to = state.from;
         $('to').value = state.to;
@@ -894,6 +905,7 @@
     });
 
     $('to').addEventListener('change', (e) => {
+      e.target.value = klemme(e.target.value);
       state.to = e.target.value;
       $('from').max = state.to || '';
       if (state.from && state.to && state.from > state.to) {

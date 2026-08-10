@@ -13,6 +13,10 @@ Der Scraper enumeriert die Seiten vollständig statt einzelne Listen abzuklapper
 | festivalsunited.com | `sitemap.xml` mit Unterkarten je Jahrgang | 16.044 Detailseiten insgesamt |
 | festival-alarm.com | Jahresseiten `/Festivals-JAHR` | 4.750 Detailseiten insgesamt |
 
+Die Jahresliste wächst automatisch mit: Die Obergrenze ist das laufende Jahr
+plus fünf, künftige Jahrgänge wie 2028 werden also ohne Codeänderung erfasst.
+Fehlende Zukunftsjahrgänge melden die Quellen mit 404, das gilt nicht als Fehler.
+
 `--since JAHR` steuert die Tiefe; voreingestellt ist das laufende Jahr. Ein
 kompletter Durchlauf über alle Jahrgänge geht mit `--since 2006`, erzeugt aber
 über 23.000 Abrufe und eine Datei, die für die Veröffentlichung zu groß wird.
@@ -72,6 +76,10 @@ python -m http.server 8765 --directory site
 „Seeheim" gibt es in Südhessen und in Oberbayern. Erkannt werden `97209`,
 `97209 Veitshöchheim` und `1010 AT` (zur Trennung gleicher Codes in AT und CH),
 ebenso weiterhin reine Ortsnamen. Bei mehrdeutigen Namen weist die Seite darauf hin.
+
+**Kalendergrenze:** Früher als der Monatsanfang des zeitlich ersten Festivals im
+Datenbestand lässt sich nichts einstellen — startet das früheste am 24.06.2025,
+ist der 01.06.2025 die Untergrenze. Getippte Daten davor werden zurückgezogen.
 
 **Reglergrenzen** stammen aus den Daten und werden bei jedem Build neu berechnet:
 der Umkreis reicht bis zum entferntesten Festival ab `REF_PLZ` in `build_site.py`

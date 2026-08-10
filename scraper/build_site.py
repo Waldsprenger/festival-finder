@@ -127,6 +127,19 @@ def max_distance_km(rows: list, plz: list) -> int:
     return nice_ceil(far)
 
 
+def earliest_month(rows: list) -> str:
+    """Erster Tag des Monats, in dem das früheste Festival beginnt.
+
+    Damit lässt sich im Kalender nichts einstellen, wofür es ohnehin keine
+    Daten gibt: Startet das früheste Festival am 16.05.2018, ist der
+    01.05.2018 die Untergrenze.
+    """
+    termine = [r[1] for r in rows if r[1]]
+    if not termine:
+        return ""
+    return min(termine)[:8] + "01"
+
+
 def max_price_eur(rows: list) -> int:
     """Teuerstes ausgelesenes Ticket, aufgerundet."""
     top = max((r[EURO] for r in rows if r[EURO] is not None), default=0)
@@ -201,6 +214,7 @@ def main() -> None:
         "europe": europe,
         "maxDistanceKm": max_distance_km(rows, plz),
         "maxPriceEur": max_price_eur(rows),
+        "minDate": earliest_month(rows),
     }
     out = SITE / "data.js"
     out.write_text("window.DATA = " + json.dumps(payload, ensure_ascii=False,
@@ -213,7 +227,8 @@ def main() -> None:
           f"mit Preis in EUR {priced} | Acts {len(bands)} | Orte {len(places)} | "
           f"PLZ {len(plz)}")
     print(f"  Reglergrenzen: Umkreis bis {payload['maxDistanceKm']} km "
-          f"(ab {REF_PLZ}), Preis bis {payload['maxPriceEur']} EUR")
+          f"(ab {REF_PLZ}), Preis bis {payload['maxPriceEur']} EUR, "
+          f"Kalender ab {payload['minDate'] or 'unbegrenzt'}")
 
 
 if __name__ == "__main__":
