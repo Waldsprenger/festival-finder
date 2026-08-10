@@ -63,16 +63,19 @@
           <input type="checkbox" id="price-unknown" checked>
           Festivals ohne Preisangabe mitzeigen
           <button type="button" class="help" aria-label="Erklärung zu Festivals ohne Preisangabe"
-                  title="Für rund 260 Festivals nennt die Quelle keinen Preis. Mit Haken bleiben sie in der Liste, ohne Haken verschwinden sie.">?</button>
+                  title="Für rund 460 Festivals nennt die Quelle keinen Preis. Mit Haken bleiben sie in der Liste, ohne Haken verschwinden sie.">?</button>
         </label>
       </div>
 
       <div class="field">
-        <label for="from">Frühester Start
-          <button type="button" class="help" aria-label="Erklärung zum frühesten Starttermin"
-                  title="Festivals, die vor diesem Datum beginnen, werden ausgeblendet. Voreingestellt ist heute.">?</button>
+        <label for="from">Zeitraum
+          <button type="button" class="help" aria-label="Erklärung zum Zeitraum"
+                  title="Angezeigt werden Festivals, die in diesem Zeitraum beginnen. Das Startdatum ist mit heute vorbelegt, das Enddatum bleibt offen, bis du eines setzt.">?</button>
         </label>
-        <input type="date" id="from">
+        <div class="row dates">
+          <input type="date" id="from" aria-label="Frühester Start">
+          <span class="bis">bis</span>
+          <input type="date" id="to" aria-label="Spätester Start"></div>
         <label class="check">
           <input type="checkbox" id="date-unknown">
           Festivals ohne Termin mitzeigen
@@ -160,8 +163,9 @@
       <a href="datenschutz.html">Datenschutz</a>
     </nav>
     <p class="src">Festival- und Lineup-Daten zusammengetragen von
-      <a href="https://www.festivalticker.de" target="_blank" rel="noopener">festivalticker.de</a> und
-      <a href="https://www.festivalsunited.com" target="_blank" rel="noopener">festivalsunited.com</a>.
+      <a href="https://www.festivalticker.de" target="_blank" rel="noopener">festivalticker.de</a>,
+      <a href="https://www.festivalsunited.com" target="_blank" rel="noopener">festivalsunited.com</a> und
+      <a href="https://www.festival-alarm.com" target="_blank" rel="noopener">festival-alarm.com</a>.
       Ortskoordinaten aus <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>
       (ODbL), Orts- und Postleitzahlenverzeichnis von
       <a href="https://www.geonames.org" target="_blank" rel="noopener">GeoNames</a> (CC BY 4.0),

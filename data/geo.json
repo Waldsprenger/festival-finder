@@ -9717,5 +9717,2809 @@
   "lon": -5.9554682,
   "display": "Lidl Electric Vehicle Charger, Crumlin Road, The Bone, Woodvale, Belfast, County Antrim, Nordirland, BT14 7EX, Vereinigtes Königreich"
  },
- "Southhampton|GB": {}
+ "Southhampton|GB": {},
+ "Zernitz|Deutschland": {
+  "lat": 52.0136476,
+  "lon": 12.0908682,
+  "display": "Zernitz, Zerbst/Anhalt, Anhalt-Bitterfeld, Sachsen-Anhalt, Deutschland"
+ },
+ "Les Deux Alpes|FR": {
+  "lat": 45.0099949,
+  "lon": 6.1237609,
+  "display": "Les Deux Alpes, Grenoble, Isère, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 38860, Frankreich"
+ },
+ "St. Peter-Ording|": {
+  "lat": 54.3172664,
+  "lon": 8.6254937,
+  "display": "Sankt Peter-Ording, Eiderstedt, Kreis Nordfriesland, Schleswig-Holstein, 25826, Deutschland"
+ },
+ "Mumbai|IN": {
+  "lat": 40.4427341,
+  "lon": -3.6370906,
+  "display": "Mumbai, Travesía López de Aranda, Salvador, San Blas - Canillejas, Madrid, Autonome Gemeinschaft Madrid, 28027, Spanien"
+ },
+ "Utrecht|NL": {
+  "lat": 52.0907006,
+  "lon": 5.1215634,
+  "display": "Utrecht, Niederlande"
+ },
+ "Neuss|DE": {
+  "lat": 51.1981778,
+  "lon": 6.6916476,
+  "display": "Neuss, Rhein-Kreis Neuss, Nordrhein-Westfalen, Deutschland"
+ },
+ "Uvita|CR": {
+  "lat": 43.7245009,
+  "lon": 7.4110388,
+  "display": "Uvita, Avenue Marquet, Cap-d'Ail, Nizza, Alpes-Maritimes, Provence-Alpes-Côte d'Azur, Metropolitanes Frankreich, 06320, Frankreich"
+ },
+ "Freising|DE": {
+  "lat": 48.4008273,
+  "lon": 11.7439565,
+  "display": "Freising, Landkreis Freising, Bayern, Deutschland"
+ },
+ "Meredith|": {
+  "lat": 51.8879632,
+  "lon": -2.7349793,
+  "display": "Meredith's Farm, Llancloudy, Llangarron, Herefordshire, England, Vereinigtes Königreich"
+ },
+ "Sydney|": {
+  "lat": 47.5463296,
+  "lon": 1.9618505,
+  "display": "Sydney, Courmeme, Saint-Viâtre, Romorantin-Lanthenay, Loir-et-Cher, Zentrum-Loiretal, Metropolitanes Frankreich, 41210, Frankreich"
+ },
+ "Melbourne|": {
+  "lat": 52.8228825,
+  "lon": -1.4283027,
+  "display": "Melbourne CP, King's Newton, South Derbyshire, Derbyshire, East Midlands, England, Vereinigtes Königreich"
+ },
+ "104 45 Athen|Griechenland": {
+  "lat": 38.0055075,
+  "lon": 23.723913,
+  "display": "104 45, 4η Κοινότητα Αθηνών, Athen, Δήμος Αθηναίων, Regionalbezirk Athen-Zentrum, Region Attika, Attika, Griechenland"
+ },
+ "Buenos Aires|AR": {
+  "lat": 40.9537167,
+  "lon": -5.7051935,
+  "display": "Buenos Aires, Salamanca, Kastilien und León, Spanien"
+ },
+ "Santiago de Chile|CL": {
+  "lat": 50.5060917,
+  "lon": 30.5090828,
+  "display": "площа Сантьяго-де-Чилі, Оболонь, Rajon Obolon, Kiew, 04210, Ukraine"
+ },
+ "Nordhorn|Deutschland": {
+  "lat": 52.4359731,
+  "lon": 7.0707659,
+  "display": "Nordhorn, Landkreis Grafschaft Bentheim, Niedersachsen, Deutschland"
+ },
+ "Avoriaz|FR": {
+  "lat": 46.1925439,
+  "lon": 6.7702857,
+  "display": "Avoriaz, Morzine, Thonon-les-Bains, Hochsavoyen, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 74110, Frankreich"
+ },
+ "Koh Mak|": {},
+ "Leysin|CH": {
+  "lat": 46.3438701,
+  "lon": 7.0148403,
+  "display": "Leysin, District d'Aigle, Waadt, 1854, Schweiz"
+ },
+ "Asunción|PY": {
+  "lat": 42.6165374,
+  "lon": -5.5684051,
+  "display": "Asunción, León, Kastilien und León, Spanien"
+ },
+ "Adelboden|CH": {
+  "lat": 46.4927213,
+  "lon": 7.5587618,
+  "display": "Adelboden, Verwaltungskreis Frutigen-Niedersimmental, Verwaltungsregion Oberland, Bern, 3715, Schweiz"
+ },
+ "Bogota|CO": {
+  "lat": 47.3269285,
+  "lon": 3.6626658,
+  "display": "bogota, Monceaux-le-Comte, Clamecy, Nièvre, Bourgogne-Franche-Comté, Metropolitanes Frankreich, 58190, Frankreich"
+ },
+ "Fröndenberg|Deutschland": {
+  "lat": 51.4739253,
+  "lon": 7.765505,
+  "display": "Fröndenberg/Ruhr, Kreis Unna, Nordrhein-Westfalen, 58730, Deutschland"
+ },
+ "Locarno|CH": {
+  "lat": 46.1695739,
+  "lon": 8.7954859,
+  "display": "Locarno, Kreis Locarno, Bezirk Locarno, Tessin, Schweiz"
+ },
+ "Gosheim|": {
+  "lat": 48.1363107,
+  "lon": 8.7527322,
+  "display": "Gosheim, GVV Heuberg, Landkreis Tuttlingen, Baden-Württemberg, 78559, Deutschland"
+ },
+ "Byron Bay|": {
+  "lat": 38.5365527,
+  "lon": -0.1285347,
+  "display": "Byron Bay, 1, Carrer de Gambo, el Calvari, Benidorm, la Marina Baixa, Alicante, Valencianische Gemeinschaft, 03503, Spanien"
+ },
+ "ZR Schijndel|Niederlande": {
+  "lat": 51.6176954,
+  "lon": 5.4362541,
+  "display": "Schijndel, Meierijstad, Nordbrabant, Niederlande"
+ },
+ "Villeurbanne|FR": {
+  "lat": 45.7660581,
+  "lon": 4.8796267,
+  "display": "Villeurbanne, Lyon, Métropole de Lyon, Rhône, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 69100, Frankreich"
+ },
+ "Bautzen|DE": {
+  "lat": 51.1809132,
+  "lon": 14.4276003,
+  "display": "Bautzen, Sachsen, 02625, Deutschland"
+ },
+ "Lech|AT": {
+  "lat": 47.2091173,
+  "lon": 10.1401259,
+  "display": "Lech, Bezirk Bludenz, Vorarlberg, Österreich"
+ },
+ "Herdecke|DE": {
+  "lat": 51.4001119,
+  "lon": 7.4330062,
+  "display": "Herdecke, Ennepe-Ruhr-Kreis, Nordrhein-Westfalen, 58313, Deutschland"
+ },
+ "Istanbul|TR": {
+  "lat": 41.006381,
+  "lon": 28.9758715,
+  "display": "Istanbul, Fatih, İstanbul, Marmararegion, 34122, Türkei"
+ },
+ "Rheine|DE": {
+  "lat": 52.2797707,
+  "lon": 7.4373615,
+  "display": "Rheine, Kreis Steinfurt, Nordrhein-Westfalen, Deutschland"
+ },
+ "Altdorf|CH": {
+  "lat": 46.8820732,
+  "lon": 8.6413922,
+  "display": "Altdorf (UR), Uri, 6460, Schweiz"
+ },
+ "Kirchdorf am Inn|": {
+  "lat": 48.2417259,
+  "lon": 12.9782358,
+  "display": "Kirchdorf am Inn, Landkreis Rottal-Inn, Bayern, 84375, Deutschland"
+ },
+ "Ilsenburg|DE": {
+  "lat": 51.8667349,
+  "lon": 10.6831785,
+  "display": "Ilsenburg, Landkreis Harz, Sachsen-Anhalt, 38871, Deutschland"
+ },
+ "Mülheim-Kärlich|": {
+  "lat": 50.3868869,
+  "lon": 7.4975336,
+  "display": "Mülheim-Kärlich, Weißenthurm, Landkreis Mayen-Koblenz, Rheinland-Pfalz, Deutschland"
+ },
+ "Bregenz|Österreich": {
+  "lat": 47.5025779,
+  "lon": 9.7472924,
+  "display": "Bregenz, Bezirk Bregenz, Vorarlberg, Österreich"
+ },
+ "Großrosseln|Deutschland": {
+  "lat": 49.2038888,
+  "lon": 6.83536,
+  "display": "Großrosseln, Regionalverband Saarbrücken, Saarland, 66352, Deutschland"
+ },
+ "Johannesburg|ZA": {
+  "lat": 60.046509,
+  "lon": 18.5600281,
+  "display": "Johannesburg, Norrtälje kommun, Provinz Stockholm, 763 23, Schweden"
+ },
+ "Calatafimi|IT": {
+  "lat": 37.9041421,
+  "lon": 12.8685834,
+  "display": "Calatafimi Segesta, Trapani, Sizilien, 91013, Italien"
+ },
+ "Krems an der Donau|Österreich": {
+  "lat": 48.4108382,
+  "lon": 15.6003717,
+  "display": "Krems an der Donau, Niederösterreich, Österreich"
+ },
+ "Balzers|Liechtenstein": {
+  "lat": 47.0688822,
+  "lon": 9.506159,
+  "display": "Balzers, Oberland, 9496, Liechtenstein"
+ },
+ "Lamure-sur-Azergues|Frankreich": {
+  "lat": 46.0615827,
+  "lon": 4.4932835,
+  "display": "Lamure-sur-Azergues, Villefranche-sur-Saône, Rhône, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 69870, Frankreich"
+ },
+ "Jakarta|ID": {
+  "lat": 52.534585,
+  "lon": 13.3653585,
+  "display": "Jakarta, Hedwig-Porschütz-Straße, Europacity, Moabit, Mitte, Berlin, 10557, Deutschland"
+ },
+ "Spielberg|Österreich": {
+  "lat": 47.2122736,
+  "lon": 14.7857412,
+  "display": "Spielberg, Bezirk Murtal, Steiermark, 8724, Österreich"
+ },
+ "Neukieritzsch|DE": {
+  "lat": 51.1502147,
+  "lon": 12.4090412,
+  "display": "Neukieritzsch, Landkreis Leipzig, Sachsen, 04575, Deutschland"
+ },
+ "RR Haarzuilens|Niederlande": {
+  "lat": 52.1209809,
+  "lon": 4.9980509,
+  "display": "Haarzuilens, Vleuten - De Meern, Utrecht, Niederlande"
+ },
+ "Wadern|DE": {
+  "lat": 49.5410205,
+  "lon": 6.8889313,
+  "display": "Wadern, Landkreis Merzig-Wadern, Saarland, 66687, Deutschland"
+ },
+ "Geestland - Bad Bederkesa|Deutschland": {
+  "lat": 53.6252526,
+  "lon": 8.8415788,
+  "display": "Stadtbücherei Geestland – Bad Bederkesa, 8, Am Markt, Bad Bederkesa, Geestland, Landkreis Cuxhaven, Niedersachsen, 27624, Deutschland"
+ },
+ "Braunschweg|Deutschland": {
+  "lat": 46.771136,
+  "lon": 9.8160552,
+  "display": "Braunschweg, Clavadel, Davos, Prättigau/Davos, Graubünden, 7276, Schweiz"
+ },
+ "Sebnitz|DE": {
+  "lat": 50.9408356,
+  "lon": 14.2677232,
+  "display": "Sebnitz, Sächsische Schweiz-Osterzgebirge, Sachsen, 01855, Deutschland"
+ },
+ "Herne|DE": {
+  "lat": 51.5380394,
+  "lon": 7.219985,
+  "display": "Herne, Nordrhein-Westfalen, Deutschland"
+ },
+ "Mol|Belgien": {
+  "lat": 51.1840421,
+  "lon": 5.1155267,
+  "display": "Mol, Turnhout, Antwerpen, Flandern, Belgien"
+ },
+ "Hünfeld|DE": {
+  "lat": 50.65546,
+  "lon": 9.7764627,
+  "display": "Hünfeld, Landkreis Fulda, Hessen, 36088, Deutschland"
+ },
+ "Amsterdam|": {
+  "lat": 52.3730796,
+  "lon": 4.8924534,
+  "display": "Amsterdam, Nordholland, Niederlande"
+ },
+ "Heide|DE": {
+  "lat": 54.1948848,
+  "lon": 9.0928251,
+  "display": "Heide, Kreis Dithmarschen, Schleswig-Holstein, 25746, Deutschland"
+ },
+ "Dillenburg|Deutschland": {
+  "lat": 50.75211,
+  "lon": 8.31573,
+  "display": "Dillenburg, Lahn-Dill-Kreis, Hessen, Deutschland"
+ },
+ "Rülzheim|DE": {
+  "lat": 49.1539607,
+  "lon": 8.2911891,
+  "display": "Rülzheim, Landkreis Germersheim, Rheinland-Pfalz, 76761, Deutschland"
+ },
+ "Markdorf|Deutschland": {
+  "lat": 47.7206084,
+  "lon": 9.3917257,
+  "display": "Markdorf, GVV Markdorf, Bodenseekreis, Baden-Württemberg, 88677, Deutschland"
+ },
+ "BN2 Brighton|Vereinigtes Königreich": {
+  "lat": 50.8291435,
+  "lon": -0.1192555,
+  "display": "Royal Mail, Pankhurst Avenue, Queen's Park, Brighton, Brighton and Hove, England, BN2 9YN, Vereinigtes Königreich"
+ },
+ "Amerang|Deutschland": {
+  "lat": 47.9919747,
+  "lon": 12.3085415,
+  "display": "Amerang, Landkreis Rosenheim, Bayern, 83123, Deutschland"
+ },
+ "Weinbach / Freienfels|Deutschland": {
+  "lat": 50.4560711,
+  "lon": 8.2930903,
+  "display": "Weinbach, Freienfels, Weinbach, Landkreis Limburg-Weilburg, Hessen, 35796, Deutschland"
+ },
+ "Weißenburg|DE": {
+  "lat": 49.0305748,
+  "lon": 10.9718974,
+  "display": "Weißenburg in Bayern, Landkreis Weißenburg-Gunzenhausen, Bayern, 91781, Deutschland"
+ },
+ "Gebesee|DE": {
+  "lat": 51.1167,
+  "lon": 10.9333,
+  "display": "Gebesee, Gera-Aue, Landkreis Sömmerda, Thüringen, Deutschland"
+ },
+ "Apt|FR": {
+  "lat": 43.8757936,
+  "lon": 5.3970648,
+  "display": "Apt, Vaucluse, Provence-Alpes-Côte d'Azur, Metropolitanes Frankreich, 84400, Frankreich"
+ },
+ "Vilvoorde|BE": {
+  "lat": 50.928711,
+  "lon": 4.423126,
+  "display": "Vilvoorde, Halle-Vilvoorde, Flämisch-Brabant, Flandern, Belgien"
+ },
+ "SG Amsterdam|Niederlande": {},
+ "Gorleben|DE": {
+  "lat": 53.0483796,
+  "lon": 11.3569035,
+  "display": "Gorleben, Samtgemeinde Gartow, Landkreis Lüchow-Dannenberg, Niedersachsen, 29475, Deutschland"
+ },
+ "Oberscheidweiler|DE": {
+  "lat": 50.0738927,
+  "lon": 6.9351017,
+  "display": "Oberscheidweiler, Wittlich-Land, Landkreis Bernkastel-Wittlich, Rheinland-Pfalz, Deutschland"
+ },
+ "Halle|BE": {
+  "lat": 50.7360524,
+  "lon": 4.2374349,
+  "display": "Halle, Halle-Vilvoorde, Flämisch-Brabant, Flandern, Belgien"
+ },
+ "Volkerode|Deutschland": {
+  "lat": 51.2586011,
+  "lon": 10.0751812,
+  "display": "Volkerode, Ershausen/Geismar, Landkreis Eichsfeld, Thüringen, Deutschland"
+ },
+ "Hattenheim|DE": {
+  "lat": 50.0151382,
+  "lon": 8.0562951,
+  "display": "Hattenheim, Eltville am Rhein, Rheingau-Taunus-Kreis, Hessen, 65347, Deutschland"
+ },
+ "Regen|Deutschland": {
+  "lat": 48.9676424,
+  "lon": 13.123546,
+  "display": "Regen, Landkreis Regen, Bayern, 94209, Deutschland"
+ },
+ "Gmunden|AT": {
+  "lat": 47.9185855,
+  "lon": 13.8003048,
+  "display": "Gmunden, Bezirk Gmunden, Oberösterreich, 4810, Österreich"
+ },
+ "Baltimore|": {
+  "lat": 51.4833209,
+  "lon": -9.3732052,
+  "display": "Baltimore, West Cork, County Cork, Munster, P81 F623, Irland"
+ },
+ "Graz|": {
+  "lat": 47.0708678,
+  "lon": 15.4382786,
+  "display": "Graz, Steiermark, Österreich"
+ },
+ "São Lourenco|PT": {
+  "lat": 41.8053823,
+  "lon": -8.367698,
+  "display": "Touvedo (São Lourenço), Ponte da Barca, Viana do Castelo, Portugal"
+ },
+ "Andorf|DE": {
+  "lat": 52.8675231,
+  "lon": 11.0073935,
+  "display": "Andorf, Salzwedel, Altmarkkreis Salzwedel, Sachsen-Anhalt, Deutschland"
+ },
+ "Olen|BE": {
+  "lat": 51.1438611,
+  "lon": 4.8597257,
+  "display": "Olen, Laakdal, Turnhout, Antwerpen, Flandern, 2250, Belgien"
+ },
+ "Torgau|DE": {
+  "lat": 51.5383243,
+  "lon": 12.9934474,
+  "display": "Torgau, Nordsachsen, Sachsen, 04861, Deutschland"
+ },
+ "Mildestausee|Deutschland": {},
+ "Loburg|DE": {
+  "lat": 52.1140753,
+  "lon": 12.0770309,
+  "display": "Loburg, Möckern, Jerichower Land, Sachsen-Anhalt, 39279, Deutschland"
+ },
+ "Baden|CH": {
+  "lat": 47.4736827,
+  "lon": 8.3086822,
+  "display": "Baden, Bezirk Baden, Aargau, Schweiz"
+ },
+ "Schöppingen|DE": {
+  "lat": 52.0926043,
+  "lon": 7.2369135,
+  "display": "Schöppingen, Kreis Borken, Nordrhein-Westfalen, 48624, Deutschland"
+ },
+ "Kubschütz|DE": {
+  "lat": 51.1696316,
+  "lon": 14.5061006,
+  "display": "Kubschütz, Bautzen, Sachsen, 02627, Deutschland"
+ },
+ "Oostzaan|NL": {
+  "lat": 52.4387666,
+  "lon": 4.8753615,
+  "display": "Oostzaan, Nordholland, Niederlande"
+ },
+ "Torcy|FR": {
+  "lat": 50.4830626,
+  "lon": 2.02302,
+  "display": "Torcy, Montreuil-sur-Mer, Pas-de-Calais, Nordfrankreich, Metropolitanes Frankreich, 62310, Frankreich"
+ },
+ "Herzberg|Deutschland": {
+  "lat": 51.6565219,
+  "lon": 10.3428415,
+  "display": "Herzberg am Harz, Landkreis Göttingen, Niedersachsen, 37412, Deutschland"
+ },
+ "Las Vegas|": {
+  "lat": 40.794965,
+  "lon": -4.2779726,
+  "display": "Vegas de Matute, Segovia, Kastilien und León, Spanien"
+ },
+ "Landsweiler-Reden|Deutschland": {
+  "lat": 49.3569043,
+  "lon": 7.1217961,
+  "display": "Landsweiler-Reden, Schiffweiler, Landkreis Neunkirchen, Saarland, 66578, Deutschland"
+ },
+ "Zossen|DE": {
+  "lat": 52.2159073,
+  "lon": 13.4488958,
+  "display": "Zossen, Teltow-Fläming, Brandenburg, 15806, Deutschland"
+ },
+ "Urloffen|DE": {
+  "lat": 48.5606801,
+  "lon": 7.9698734,
+  "display": "Urloffen, Appenweier, Ortenaukreis, Baden-Württemberg, 77767, Deutschland"
+ },
+ "Gries|DE": {
+  "lat": 49.4194848,
+  "lon": 7.4026921,
+  "display": "Gries, Oberes Glantal, Landkreis Kusel, Rheinland-Pfalz, Deutschland"
+ },
+ "Hattingen|Deutschland": {
+  "lat": 51.4007175,
+  "lon": 7.1862486,
+  "display": "Hattingen, Ennepe-Ruhr-Kreis, Nordrhein-Westfalen, Deutschland"
+ },
+ "Peenemünde|DE": {
+  "lat": 54.1355894,
+  "lon": 13.7730504,
+  "display": "Peenemünde, Usedom-Nord, Vorpommern-Greifswald, Mecklenburg-Vorpommern, 17449, Deutschland"
+ },
+ "RZ Haarle|Niederlande": {},
+ "Courgenay|CH": {
+  "lat": 47.4045434,
+  "lon": 7.1242961,
+  "display": "Courgenay, Bezirk Porrentruy, Jura, 2950, Schweiz"
+ },
+ "Fieberbrunn|Österreich": {
+  "lat": 47.4762087,
+  "lon": 12.5454618,
+  "display": "Fieberbrunn, Bezirk Kitzbühel, Tirol, 6391, Österreich"
+ },
+ "Desselbrunn|AT": {
+  "lat": 48.0220048,
+  "lon": 13.7722804,
+  "display": "Desselbrunn, Bezirk Vöcklabruck, Oberösterreich, 4693, Österreich"
+ },
+ "Bühl|Deutschland": {
+  "lat": 48.6945066,
+  "lon": 8.134423,
+  "display": "Bühl, VVG der Stadt Bühl, Landkreis Rastatt, Baden-Württemberg, 77815, Deutschland"
+ },
+ "Margate|GB": {
+  "lat": 51.3878174,
+  "lon": 1.3819699,
+  "display": "Margate, Thanet District, Kent, England, Vereinigtes Königreich"
+ },
+ "Homberg An Der Ohm|Deutschland": {
+  "lat": 50.7240735,
+  "lon": 9.0007942,
+  "display": "DRK Rettungswache Homberg (Ohm), An der Altenstadt, Obermühle, Homberg, Homberg (Ohm), Vogelsbergkreis, Hessen, 35315, Deutschland"
+ },
+ "49ß74 Osnabrück|Deutschland": {},
+ "Klüsserath|Deutschland": {
+  "lat": 49.8423921,
+  "lon": 6.8471255,
+  "display": "Klüsserath, Schweich an der Römischen Weinstraße, Landkreis Trier-Saarburg, Rheinland-Pfalz, Deutschland"
+ },
+ "Merseburg|Deutschland": {
+  "lat": 51.3564413,
+  "lon": 11.996148,
+  "display": "Merseburg, Saalekreis, Sachsen-Anhalt, 06217, Deutschland"
+ },
+ "Norddeich|DE": {
+  "lat": 54.2176341,
+  "lon": 8.9001752,
+  "display": "Norddeich, Büsum-Wesselburen, Kreis Dithmarschen, Schleswig-Holstein, Deutschland"
+ },
+ "Küsnacht|Schweiz": {
+  "lat": 47.3176276,
+  "lon": 8.5830859,
+  "display": "Küsnacht, Bezirk Meilen, Zürich, 8700, Schweiz"
+ },
+ "Alsorf|DE": {},
+ "Rovereto|IT": {
+  "lat": 45.886548,
+  "lon": 11.0452369,
+  "display": "Rovereto, Comunità della Vallagarina, Autonome Provinz Trient, Trentino-Südtirol, 38060, Italien"
+ },
+ "Oppenheim|DE": {
+  "lat": 49.8527604,
+  "lon": 8.3548557,
+  "display": "Oppenheim, Rhein-Selz, Landkreis Mainz-Bingen, Rheinland-Pfalz, Deutschland"
+ },
+ "Eiligen|DE": {},
+ "Wolfhagen|DE": {
+  "lat": 51.3333355,
+  "lon": 9.1968854,
+  "display": "Wolfhagen, Landkreis Kassel, Hessen, 34466, Deutschland"
+ },
+ "Dhermi|AL": {
+  "lat": 40.151199,
+  "lon": 19.6414118,
+  "display": "Dhërmi, Himarë, Bashkia Himarë, Qark Vlora, 9425, Albanien"
+ },
+ "Altenkrempe|Deutschland": {
+  "lat": 54.1316968,
+  "lon": 10.8274868,
+  "display": "Altenkrempe, Ostholstein-Mitte, Kreis Ostholstein, Schleswig-Holstein, Deutschland"
+ },
+ "Kloten|CH": {
+  "lat": 47.4525133,
+  "lon": 8.5861477,
+  "display": "Kloten, Bezirk Bülach, Zürich, 8302, Schweiz"
+ },
+ "Horn|Österreich": {
+  "lat": 48.6636596,
+  "lon": 15.6563147,
+  "display": "Horn, Bezirk Horn, Niederösterreich, 3580, Österreich"
+ },
+ "Quarnstedt|Deutschland": {
+  "lat": 53.954381,
+  "lon": 9.7866367,
+  "display": "Quarnstedt, Amt Kellinghusen, Kreis Steinburg, Schleswig-Holstein, Deutschland"
+ },
+ "Bischofmais|Deutschland": {
+  "lat": 48.1971895,
+  "lon": 16.2102929,
+  "display": "Große Bischofmais, Katastralgemeinde Auhof, Hietzing, Wien, 1130, Österreich"
+ },
+ "Niedergörsdorf|DE": {
+  "lat": 51.9508295,
+  "lon": 12.9874948,
+  "display": "Niedergörsdorf, Teltow-Fläming, Brandenburg, 14913, Deutschland"
+ },
+ "Buochs|CH": {
+  "lat": 46.9739978,
+  "lon": 8.4205883,
+  "display": "Buochs, Nidwalden, 6374, Schweiz"
+ },
+ "Kirchdorf am Inn|Deutschland": {
+  "lat": 48.2417259,
+  "lon": 12.9782358,
+  "display": "Kirchdorf am Inn, Landkreis Rottal-Inn, Bayern, 84375, Deutschland"
+ },
+ "Bürden|Deutschland": {
+  "lat": 50.4433368,
+  "lon": 10.804558,
+  "display": "Bürden, Hildburghausen, Landkreis Hildburghausen, Thüringen, 98646, Deutschland"
+ },
+ "Genoa|Italien": {
+  "lat": 44.40726,
+  "lon": 8.9338624,
+  "display": "Genua, Ligurien, Italien"
+ },
+ "301 00 Pilsen|Tschechien": {
+  "lat": 49.7294991,
+  "lon": 13.3689615,
+  "display": "301 00, Plzeň 3, Pilsen, Bezirk Pilsen-Stadt, Pilsner Region, Südwesten, Tschechien"
+ },
+ "Maia|PT": {
+  "lat": 41.2373456,
+  "lon": -8.6299982,
+  "display": "Maia, Porto, Portugal"
+ },
+ "Düren|DE": {
+  "lat": 50.8031684,
+  "lon": 6.4820806,
+  "display": "Düren, Kreis Düren, Nordrhein-Westfalen, Deutschland"
+ },
+ "Stavern|Deutschland": {
+  "lat": 52.797273,
+  "lon": 7.4345519,
+  "display": "Stavern, Samtgemeinde Sögel, Landkreis Emsland, Niedersachsen, 49777, Deutschland"
+ },
+ "Wels|AT": {
+  "lat": 48.1565472,
+  "lon": 14.0243752,
+  "display": "Wels, Oberösterreich, 4600, Österreich"
+ },
+ "Loxstedt|Deutschland": {
+  "lat": 53.4698653,
+  "lon": 8.6479179,
+  "display": "Loxstedt, Landkreis Cuxhaven, Niedersachsen, 27612, Deutschland"
+ },
+ "Ellerdorf|": {
+  "lat": 54.1929895,
+  "lon": 9.8399788,
+  "display": "Ellerdorf, Amt Nortorfer Land, Kreis Rendsburg-Eckernförde, Schleswig-Holstein, Deutschland"
+ },
+ "Wittingen|Deutschland": {
+  "lat": 52.7289399,
+  "lon": 10.735743,
+  "display": "Wittingen, Landkreis Gifhorn, Niedersachsen, Deutschland"
+ },
+ "Brück (Mark)|DE": {
+  "lat": 52.1867065,
+  "lon": 12.7582766,
+  "display": "Brück (Mark), Karl-Heinz-Borgmann-Platz, Rottstock, Brück, Potsdam-Mittelmark, Brandenburg, 14822, Deutschland"
+ },
+ "Stockstadt|DE": {
+  "lat": 49.8063487,
+  "lon": 8.4602546,
+  "display": "Stockstadt am Rhein, Kreis Groß-Gerau, Hessen, 64589, Deutschland"
+ },
+ "Lübben|DE": {
+  "lat": 51.9418987,
+  "lon": 13.8963805,
+  "display": "Lübben (Spreewald), Dahme-Spreewald, Brandenburg, 15907, Deutschland"
+ },
+ "Weißenburg|": {
+  "lat": 49.0365935,
+  "lon": 7.9445109,
+  "display": "Weißenburg, Hagenau-Weißenburg, Unterelsass, Collectivité européenne d'Alsace, Grand Est, Metropolitanes Frankreich, 67160, Frankreich"
+ },
+ "Ravenna|IT": {
+  "lat": 44.4161414,
+  "lon": 12.2017617,
+  "display": "Ravenna, Emilia-Romagna, 48121-48125, Italien"
+ },
+ "DE74 2RP Derby|Vereinigtes Königreich": {
+  "lat": 52.9142235,
+  "lon": -1.4719885,
+  "display": "Derby, East Midlands, England, Vereinigtes Königreich"
+ },
+ "Kropp|DE": {
+  "lat": 54.4115609,
+  "lon": 9.5093321,
+  "display": "Kropp, Kropp-Stapelholm, Kreis Schleswig-Flensburg, Schleswig-Holstein, 24848, Deutschland"
+ },
+ "Hameln OT Halvestorf|Deutschland": {},
+ "Matten bei Interlaken|Schweiz": {
+  "lat": 46.6798821,
+  "lon": 7.8686253,
+  "display": "Matten bei Interlaken, Verwaltungskreis Interlaken-Oberhasli, Verwaltungsregion Oberland, Bern, 3800, Schweiz"
+ },
+ "Meersburg|DE": {
+  "lat": 47.6955538,
+  "lon": 9.2719656,
+  "display": "Meersburg, GVV Meersburg, Bodenseekreis, Baden-Württemberg, 88709, Deutschland"
+ },
+ "Nieklitz|Deutschland": {
+  "lat": 53.4883821,
+  "lon": 10.8775455,
+  "display": "Nieklitz, Gallin, Zarrentin, Ludwigslust-Parchim, Mecklenburg-Vorpommern, 19258, Deutschland"
+ },
+ "Grevenbroich|DE": {
+  "lat": 51.0862467,
+  "lon": 6.5848937,
+  "display": "Grevenbroich, Rhein-Kreis Neuss, Nordrhein-Westfalen, Deutschland"
+ },
+ "Neuhausen/Spree|Deutschland": {
+  "lat": 51.7004524,
+  "lon": 14.4535229,
+  "display": "Neuhausen/Spree, Spree-Neiße, Brandenburg, 03058, Deutschland"
+ },
+ "NJ Hilvarenbeek|Niederlande": {},
+ "Firenze|Italien": {
+  "lat": 43.7697955,
+  "lon": 11.2556404,
+  "display": "Florenz, Firenze, Toskana, Italien"
+ },
+ "Pirna-Graupa|DE": {
+  "lat": 50.985759,
+  "lon": 13.9241034,
+  "display": "Pirna-Graupa, S 177, Pratzschwitz, Graupa, Pirna, Sächsische Schweiz-Osterzgebirge, Sachsen, 01796, Deutschland"
+ },
+ "Commerau / Klix|Deutschland": {
+  "lat": 51.2928987,
+  "lon": 14.5089735,
+  "display": "Commerau bei Klix Gasthaus, Boxberger Straße, Commerau, Großdubrau, Bautzen, Sachsen, 02694, Deutschland"
+ },
+ "Bernau bei Berlin|Deutschland": {
+  "lat": 52.6787254,
+  "lon": 13.5881114,
+  "display": "Bernau, Barnim, Brandenburg, 16321, Deutschland"
+ },
+ "Karup|DK": {
+  "lat": 56.3111225,
+  "lon": 9.1706768,
+  "display": "Karup, Viborg Kommune, Region Mitteljütland, 7470, Dänemark"
+ },
+ "Friedberg (Hessen)|Deutschland": {
+  "lat": 50.328272,
+  "lon": 8.747636,
+  "display": "Friedberg (Hessen), Wetteraukreis, Hessen, 61169, Deutschland"
+ },
+ "Stockport|GB": {
+  "lat": 53.407901,
+  "lon": -2.160243,
+  "display": "Stockport, Greater Manchester, England, SK1 3FZ, Vereinigtes Königreich"
+ },
+ "Weisstannen|CH": {
+  "lat": 46.9891838,
+  "lon": 9.3443349,
+  "display": "Weisstannen, Mels, Wahlkreis Sarganserland, St. Gallen, 8887, Schweiz"
+ },
+ "Vlotho-Exter|Deutschland": {
+  "lat": 52.1386304,
+  "lon": 8.7760293,
+  "display": "Freiw. Feuerwehr Vlotho, LG Exter, Am Exterbach, Exter, Vlotho, Kreis Herford, Nordrhein-Westfalen, 32602, Deutschland"
+ },
+ "Vlotho|DE": {
+  "lat": 52.1664861,
+  "lon": 8.8619172,
+  "display": "Vlotho, Kreis Herford, Nordrhein-Westfalen, 32602, Deutschland"
+ },
+ "Bad Klosterlausnitz|DE": {
+  "lat": 50.9162624,
+  "lon": 11.8681702,
+  "display": "Bad Klosterlausnitz, Saale-Holzland-Kreis, Thüringen, Deutschland"
+ },
+ "Heimbach|Deutschland": {
+  "lat": 49.6141458,
+  "lon": 7.2481879,
+  "display": "Heimbach, Baumholder, Landkreis Birkenfeld, Rheinland-Pfalz, 55779, Deutschland"
+ },
+ "Ferrara|IT": {
+  "lat": 44.8372737,
+  "lon": 11.6186451,
+  "display": "Ferrara, Emilia-Romagna, 44121-44124, Italien"
+ },
+ "Mittweida|Deutschland": {
+  "lat": 50.9854597,
+  "lon": 12.9810458,
+  "display": "Mittweida, Mittelsachsen, Sachsen, 09648, Deutschland"
+ },
+ "Natz-Schabs|Italien": {
+  "lat": 46.7630738,
+  "lon": 11.6779347,
+  "display": "Natz - Schabs, Eisacktal, Bozen, Trentino-Südtirol, Italien"
+ },
+ "Markdorf|DE": {
+  "lat": 47.7206084,
+  "lon": 9.3917257,
+  "display": "Markdorf, GVV Markdorf, Bodenseekreis, Baden-Württemberg, 88677, Deutschland"
+ },
+ "Nummijärvi|FI": {
+  "lat": 62.289896,
+  "lon": 22.4428545,
+  "display": "Nummijärvi, Kauhajoki, Suupohjan seutukunta, Südösterbotten, Festland-Finnland, 61910, Finnland"
+ },
+ "Ahrenshoop|DE": {
+  "lat": 54.3789509,
+  "lon": 12.419192,
+  "display": "Ahrenshoop, Darß/Fischland, Vorpommern-Rügen, Mecklenburg-Vorpommern, Deutschland"
+ },
+ "Goldberg|Deutschland": {
+  "lat": 53.5902655,
+  "lon": 12.0883101,
+  "display": "Goldberg, Goldberg-Mildenitz, Ludwigslust-Parchim, Mecklenburg-Vorpommern, 19399, Deutschland"
+ },
+ "Kværndrup|DK": {
+  "lat": 55.1783707,
+  "lon": 10.5256048,
+  "display": "Kværndrup, Faaborg-Midtfyn Kommune, Region Süddänemark, 5772, Dänemark"
+ },
+ "Sierre|CH": {
+  "lat": 46.2922522,
+  "lon": 7.5323195,
+  "display": "Siders, Mittelwallis, Wallis, Schweiz"
+ },
+ "Dusiburg|DE": {},
+ "Emmen|CH": {
+  "lat": 47.0752429,
+  "lon": 8.2839456,
+  "display": "Emmen, Luzern, Schweiz"
+ },
+ "Kettenkamp|Deutschland": {
+  "lat": 52.5863903,
+  "lon": 7.8290125,
+  "display": "Kettenkamp, Samtgemeinde Bersenbrück, Landkreis Osnabrück, Niedersachsen, Deutschland"
+ },
+ "Pleinfeld|DE": {
+  "lat": 49.1203766,
+  "lon": 11.000989,
+  "display": "Pleinfeld, Landkreis Weißenburg-Gunzenhausen, Bayern, 91785, Deutschland"
+ },
+ "Daun-Rengen|Deutschland": {
+  "lat": 50.2143217,
+  "lon": 6.8398453,
+  "display": "Bharat Forge Daun GmbH, 4, Julius-Saxler-Straße, Rengen, Daun, Landkreis Vulkaneifel, Rheinland-Pfalz, 54550, Deutschland"
+ },
+ "Rietberg|DE": {
+  "lat": 51.8074106,
+  "lon": 8.4286614,
+  "display": "Rietberg, Kreis Gütersloh, Nordrhein-Westfalen, 33397, Deutschland"
+ },
+ "Lido di Camaiore|IT": {
+  "lat": 43.8933095,
+  "lon": 10.2286954,
+  "display": "Lido di Camaiore, Camaiore, Unione dei comuni della Versilia, Lucca, Toskana, 55043, Italien"
+ },
+ "vaulx en velin|Frankreich": {
+  "lat": 45.7784255,
+  "lon": 4.9206153,
+  "display": "Vaulx-en-Velin, Lyon, Métropole de Lyon, Rhône, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 69120, Frankreich"
+ },
+ "Gronau|DE": {
+  "lat": 52.0841729,
+  "lon": 9.7751956,
+  "display": "Gronau, Samtgemeinde Leinebergland, Landkreis Hildesheim, Niedersachsen, 31028, Deutschland"
+ },
+ "170 00 Prague|Tschechien": {
+  "lat": 50.1024871,
+  "lon": 14.4356404,
+  "display": "170 00, Prag 7, Stadtbezirk Prag 7, Prag, Tschechien"
+ },
+ "Wipkingen|CH": {
+  "lat": 47.3934951,
+  "lon": 8.5286022,
+  "display": "Wipkingen, Kreis 10, Zürich, Bezirk Zürich, Zürich, Schweiz"
+ },
+ "Ostseebad Binz|Deutschland": {
+  "lat": 54.4010291,
+  "lon": 13.6076477,
+  "display": "Binz, Vorpommern-Rügen, Mecklenburg-Vorpommern, 18609, Deutschland"
+ },
+ "XC Landgraaf|Niederlande": {},
+ "Kragelund|DE": {
+  "lat": 54.5674991,
+  "lon": 9.1334742,
+  "display": "Kragelund, Viöl, Kreis Nordfriesland, Schleswig-Holstein, 25884, Deutschland"
+ },
+ "Burgdorf|": {
+  "lat": 47.0571316,
+  "lon": 7.6237466,
+  "display": "Burgdorf, Verwaltungskreis Emmental, Verwaltungsregion Emmental-Oberaargau, Bern, Schweiz"
+ },
+ "Armsheim|DE": {
+  "lat": 49.8072109,
+  "lon": 8.0589606,
+  "display": "Armsheim, Wörrstadt, Landkreis Alzey-Worms, Rheinland-Pfalz, Deutschland"
+ },
+ "Bielefeld|": {
+  "lat": 52.0191005,
+  "lon": 8.531007,
+  "display": "Bielefeld, Nordrhein-Westfalen, Deutschland"
+ },
+ "Sperken|AT": {
+  "lat": 48.2236571,
+  "lon": 14.7723604,
+  "display": "Sperken, Achatzberg, Klam, Bezirk Perg, Oberösterreich, 4352, Österreich"
+ },
+ "Wangen im Allgäu|Deutschland": {
+  "lat": 47.6883491,
+  "lon": 9.8111703,
+  "display": "Wangen im Allgäu, VVG der Stadt Wangen im Allgäu, Landkreis Ravensburg, Baden-Württemberg, 88239, Deutschland"
+ },
+ "Hille|DE": {
+  "lat": 52.3360492,
+  "lon": 8.7452571,
+  "display": "Hille, Kreis Minden-Lübbecke, Nordrhein-Westfalen, 32479, Deutschland"
+ },
+ "Langkampfen|AT": {
+  "lat": 47.5516301,
+  "lon": 12.0797239,
+  "display": "Langkampfen, Bezirk Kufstein, Tirol, 6336, Österreich"
+ },
+ "335 61 Spálené Pořǐčǐ|Tschechien": {
+  "lat": 49.6174279,
+  "lon": 13.6204335,
+  "display": "335 61, Brennporitschen, Bezirk Pilsen-Süd, Pilsner Region, Südwesten, Tschechien"
+ },
+ "København K|Dänemark": {
+  "lat": 55.6792979,
+  "lon": 12.5686548,
+  "display": "København K, Teglgårdstræde, Pisserenden, Nørrevold, Kødbyen, Kopenhagen, Hauptstadtregion, 1452, Dänemark"
+ },
+ "Lärz|DE": {
+  "lat": 53.2918111,
+  "lon": 12.7454315,
+  "display": "Lärz, Röbel-Müritz, Mecklenburgische Seenplatte, Mecklenburg-Vorpommern, Deutschland"
+ },
+ "Zernitz|DE": {
+  "lat": 52.0136476,
+  "lon": 12.0908682,
+  "display": "Zernitz, Zerbst/Anhalt, Anhalt-Bitterfeld, Sachsen-Anhalt, Deutschland"
+ },
+ "Jeinsen|Deutschland": {
+  "lat": 52.2160194,
+  "lon": 9.7922289,
+  "display": "Jeinsen, Pattensen, Region Hannover, Niedersachsen, 30982, Deutschland"
+ },
+ "Feuchtwangen|Deutschland": {
+  "lat": 49.1678603,
+  "lon": 10.3313268,
+  "display": "Feuchtwangen, Landkreis Ansbach, Bayern, 91555, Deutschland"
+ },
+ "Hauteville|CH": {
+  "lat": 46.6696479,
+  "lon": 7.1083702,
+  "display": "Hauteville, Greyerzbezirk, Freiburg, 1648, Schweiz"
+ },
+ "Thyrnau|Deutschland": {
+  "lat": 48.6148738,
+  "lon": 13.5379465,
+  "display": "Thyrnau, Landkreis Passau, Bayern, 94136, Deutschland"
+ },
+ "Butzbach|DE": {
+  "lat": 50.41768,
+  "lon": 8.63873,
+  "display": "Butzbach, Wetteraukreis, Hessen, 35510, Deutschland"
+ },
+ "Langnau|CH": {
+  "lat": 46.9392339,
+  "lon": 7.7882673,
+  "display": "Langnau im Emmental, Verwaltungskreis Emmental, Verwaltungsregion Emmental-Oberaargau, Bern, Schweiz"
+ },
+ "Fontainebleau|FR": {
+  "lat": 48.4049375,
+  "lon": 2.7015872,
+  "display": "Fontainebleau, Seine-et-Marne, Île-de-France, Metropolitanes Frankreich, 77300, Frankreich"
+ },
+ "EB Ysselstein|Niederlande": {
+  "lat": 51.6964738,
+  "lon": 5.3067742,
+  "display": "Van Ysselsteinstraat, De Muntel, Muntel/Vliert, Herzogenbusch, Nordbrabant, Niederlande, 5212 TS, Niederlande"
+ },
+ "Oschersleben|Deutschland": {
+  "lat": 52.0266526,
+  "lon": 11.227781,
+  "display": "Oschersleben, Börde, Sachsen-Anhalt, 39387, Deutschland"
+ },
+ "Hörselberg-Hainich|": {
+  "lat": 51.0112668,
+  "lon": 10.4789687,
+  "display": "Hörselberg-Hainich, Wartburgkreis, Thüringen, 99820, Deutschland"
+ },
+ "Grenchen|CH": {
+  "lat": 47.1911495,
+  "lon": 7.3967199,
+  "display": "Grenchen, Bezirk Lebern, Amtei Solothurn-Lebern, Solothurn, 2540, Schweiz"
+ },
+ "Belp|CH": {
+  "lat": 46.88978,
+  "lon": 7.498388,
+  "display": "Belp, Verwaltungskreis Bern-Mittelland, Verwaltungsregion Bern-Mittelland, Bern, Schweiz"
+ },
+ "Wittmund|DE": {
+  "lat": 53.5792685,
+  "lon": 7.7815477,
+  "display": "Wittmund, Landkreis Wittmund, Niedersachsen, 26409, Deutschland"
+ },
+ "Büren|Deutschland": {
+  "lat": 51.5525333,
+  "lon": 8.5591919,
+  "display": "Büren, Kreis Paderborn, Nordrhein-Westfalen, 33142, Deutschland"
+ },
+ "Daubitz|Deutschland": {
+  "lat": 51.3962353,
+  "lon": 14.8279151,
+  "display": "Daubitz, Neuhammer, Rietschen, Görlitz, Sachsen, 02956, Deutschland"
+ },
+ "Saint Austell|GB": {
+  "lat": 51.4260405,
+  "lon": -2.7456248,
+  "display": "Saint Austell Close, East End, Nailsea, North Somerset, England, BS48 2US, Vereinigtes Königreich"
+ },
+ "Mühlacker|DE": {
+  "lat": 48.9466697,
+  "lon": 8.8413323,
+  "display": "Mühlacker, VVG der Stadt Mühlacker, Enzkreis, Baden-Württemberg, 75417, Deutschland"
+ },
+ "Burg|DE": {
+  "lat": 49.9600346,
+  "lon": 6.3512069,
+  "display": "Burg, Südeifel, Eifelkreis Bitburg-Prüm, Rheinland-Pfalz, Deutschland"
+ },
+ "Irsee|DE": {
+  "lat": 47.9082759,
+  "lon": 10.5720573,
+  "display": "Irsee, Pforzen (VGem), Landkreis Ostallgäu, Bayern, 87660, Deutschland"
+ },
+ "Freudenberg|DE": {
+  "lat": 50.8983662,
+  "lon": 7.8773745,
+  "display": "Freudenberg, Kreis Siegen-Wittgenstein, Nordrhein-Westfalen, 57258, Deutschland"
+ },
+ "Riehen|CH": {
+  "lat": 47.5816927,
+  "lon": 7.6479737,
+  "display": "Riehen, Basel-Stadt, 4125, Schweiz"
+ },
+ "Haan|DE": {
+  "lat": 51.1954956,
+  "lon": 7.0085328,
+  "display": "Haan, Kreis Mettmann, Nordrhein-Westfalen, 42781, Deutschland"
+ },
+ "Dielsdorf|CH": {
+  "lat": 47.4810371,
+  "lon": 8.4543245,
+  "display": "Dielsdorf, Bezirk Dielsdorf, Zürich, 8157, Schweiz"
+ },
+ "Osterode am Harz|Deutschland": {
+  "lat": 51.72784,
+  "lon": 10.2508204,
+  "display": "Osterode am Harz, Landkreis Göttingen, Niedersachsen, 37520, Deutschland"
+ },
+ "Malling|DK": {
+  "lat": 56.0387694,
+  "lon": 10.1944889,
+  "display": "Malling, Beder-Malling, Aarhus Kommune, Region Mitteljütland, 8340, Dänemark"
+ },
+ "Perk|BE": {
+  "lat": 50.9331623,
+  "lon": 4.4960702,
+  "display": "Perk, Steenokkerzeel, Halle-Vilvoorde, Flämisch-Brabant, Flandern, Belgien"
+ },
+ "Butjadingen|DE": {
+  "lat": 53.5472,
+  "lon": 8.335,
+  "display": "Butjadingen, Landkreis Wesermarsch, Niedersachsen, 26969, Deutschland"
+ },
+ "Höxter|DE": {
+  "lat": 51.7938902,
+  "lon": 9.348855,
+  "display": "Höxter, Kreis Höxter, Nordrhein-Westfalen, 37671, Deutschland"
+ },
+ "Paris Longchamp|FR": {
+  "lat": 48.8747227,
+  "lon": 2.2707358,
+  "display": "Paris - Allée de Longchamp|SO->NE, Allée de Longchamp, Quartier de la Porte-Dauphine, Paris 16e Arrondissement, Paris, Île-de-France, Metropolitanes Frankreich, 75116, Frankreich"
+ },
+ "De Lilse Bergen|BE": {
+  "lat": 51.2851845,
+  "lon": 4.841579,
+  "display": "Lilse Bergen, E34, Hemeldonk, Gierle, Lille, Turnhout, Antwerpen, Flandern, 2275, Belgien"
+ },
+ "Remptendorf|DE": {
+  "lat": 50.5290352,
+  "lon": 11.6595527,
+  "display": "Remptendorf, Saale-Orla-Kreis, Thüringen, 07368, Deutschland"
+ },
+ "Woodstock, Oxford|": {
+  "lat": 51.7740152,
+  "lon": -1.2668828,
+  "display": "Woodstock Road Baptist Church, 198, Woodstock Road, Summertown, Oxford, Oxfordshire, England, OX2 7NQ, Vereinigtes Königreich"
+ },
+ "Prittriching|DE": {
+  "lat": 48.2015073,
+  "lon": 10.9287384,
+  "display": "Prittriching, Landkreis Landsberg am Lech, Bayern, 86931, Deutschland"
+ },
+ "Barolo|IT": {
+  "lat": 44.6146791,
+  "lon": 7.9394434,
+  "display": "Barolo, Cuneo, Piemont, Italien"
+ },
+ "Weisendorf|DE": {
+  "lat": 49.6272489,
+  "lon": 10.811585,
+  "display": "Weisendorf, Landkreis Erlangen-Höchstadt, Bayern, 91085, Deutschland"
+ },
+ "Schwäbisch Hall|DE": {
+  "lat": 49.1124305,
+  "lon": 9.7371246,
+  "display": "Schwäbisch Hall, VVG der Stadt Schwäbisch Hall, Landkreis Schwäbisch Hall, Baden-Württemberg, 74523, Deutschland"
+ },
+ "Portimão|": {
+  "lat": 37.1375808,
+  "lon": -8.5368426,
+  "display": "Portimão, Faro, Portugal"
+ },
+ "Haltern am See|Deutschland": {
+  "lat": 51.7430516,
+  "lon": 7.187221,
+  "display": "Haltern am See, Kreis Recklinghausen, Nordrhein-Westfalen, 45721, Deutschland"
+ },
+ "Leinefelde-Worbis|Deutschland": {
+  "lat": 51.408267,
+  "lon": 10.3261532,
+  "display": "Leinefelde-Worbis, Landkreis Eichsfeld, Thüringen, Deutschland"
+ },
+ "Frankfurt|Deutschland": {
+  "lat": 50.1106444,
+  "lon": 8.6820917,
+  "display": "Frankfurt am Main, Hessen, Deutschland"
+ },
+ "Padua|IT": {
+  "lat": 45.3984428,
+  "lon": 11.8956829,
+  "display": "Padua, Padova, Venetien, 35121-35143, Italien"
+ },
+ "Cascais|PT": {
+  "lat": 38.6968919,
+  "lon": -9.4204495,
+  "display": "Cascais, Lissabon, Portugal"
+ },
+ "Saint-Malô-du-Bois|FR": {
+  "lat": 46.9287366,
+  "lon": -0.9005877,
+  "display": "Saint-Malô-du-Bois, La Roche-sur-Yon, Vendée, Pays de la Loire, Metropolitanes Frankreich, 85590, Frankreich"
+ },
+ "541 01 Trutnov|Tschechien": {
+  "lat": 50.5696318,
+  "lon": 15.9094155,
+  "display": "541 01, Trautenau, Bezirk Trautenau, Königgrätzer Region, Tschechien"
+ },
+ "Viveiro|ES": {
+  "lat": 43.6433582,
+  "lon": -7.5957612,
+  "display": "Viveiro, A Mariña Occidental, Lugo, Galicien, Spanien"
+ },
+ "Augst|CH": {
+  "lat": 47.5338077,
+  "lon": 7.7206018,
+  "display": "Augst, Bezirk Liestal, Basel-Landschaft, 4302, Schweiz"
+ },
+ "Donje Primislje|HR": {
+  "lat": 45.1897621,
+  "lon": 15.4965527,
+  "display": "Donje Primišlje, Grad Slunj, Gespanschaft Karlstadt, Kroatien"
+ },
+ "Hérouville Saint-Clair|Frankreich": {
+  "lat": 49.2031097,
+  "lon": -0.3353513,
+  "display": "Hérouville-Saint-Clair, Caen, Calvados, Normandie, Metropolitanes Frankreich, 14200, Frankreich"
+ },
+ "Nort-sur-Erdre|FR": {
+  "lat": 47.4398626,
+  "lon": -1.499037,
+  "display": "Nort-sur-Erdre, Châteaubriant-Ancenis, Loire-Atlantique, Pays de la Loire, Metropolitanes Frankreich, 44390, Frankreich"
+ },
+ "Lokalahti|Finnland": {
+  "lat": 60.6808998,
+  "lon": 21.465251,
+  "display": "Lokalahti, Uusikaupunki, Vakka-Suomen seutukunta, Eigentliches Finnland, Festland-Finnland, 23450, Finnland"
+ },
+ "Pistoia|IT": {
+  "lat": 43.9336213,
+  "lon": 10.9174238,
+  "display": "Pistoia, Toskana, 51100, Italien"
+ },
+ "Balendijk|BE": {
+  "lat": 51.220574,
+  "lon": 5.2964923,
+  "display": "Balendijk, Lommel, Maaseik, Limburg, Flandern, 3920, Belgien"
+ },
+ "Sopron|HU": {
+  "lat": 47.6803063,
+  "lon": 16.5983457,
+  "display": "Ödenburg, Kreis Ödenburg, Komitat Győr-Moson-Sopron, Westtransdanubien, Transdanubien, Ungarn"
+ },
+ "Larvik|NO": {
+  "lat": 59.0967308,
+  "lon": 10.02193,
+  "display": "Larvik, Vestfold, Norwegen"
+ },
+ "Schweinfurt|Deutschland": {
+  "lat": 50.0451485,
+  "lon": 10.2340647,
+  "display": "Schweinfurt, Bayern, Deutschland"
+ },
+ "Rivas-Vaciamadrid|ES": {
+  "lat": 40.3536054,
+  "lon": -3.5310879,
+  "display": "Rivas-Vaciamadrid, Autonome Gemeinschaft Madrid, Spanien"
+ },
+ "Friedberg|DE": {
+  "lat": 50.328272,
+  "lon": 8.747636,
+  "display": "Friedberg (Hessen), Wetteraukreis, Hessen, 61169, Deutschland"
+ },
+ "Seewald Besenfeld|Deutschland": {
+  "lat": 48.5976669,
+  "lon": 8.421826,
+  "display": "Seewald, Sonnenstraße, Urnagold, Besenfeld, Seewald, VVG der Stadt Freudenstadt, Landkreis Freudenstadt, Baden-Württemberg, 72297, Deutschland"
+ },
+ "Tratten|Österreich": {
+  "lat": 46.6204583,
+  "lon": 13.5403025,
+  "display": "Tratten, Sankt Stefan im Gailtal, Bezirk Hermagor, Kärnten, 9623, Österreich"
+ },
+ "Glynde Place|GB": {
+  "lat": 50.8650928,
+  "lon": 0.0680755,
+  "display": "Glynde Place, The Street, Glynde, Lewes, East Sussex, England, BN8 6SX, Vereinigtes Königreich"
+ },
+ "Muttenz|CH": {
+  "lat": 47.525113,
+  "lon": 7.6477401,
+  "display": "Muttenz, Bezirk Arlesheim, Basel-Landschaft, 4132, Schweiz"
+ },
+ "Einsiedeln|CH": {
+  "lat": 47.1286095,
+  "lon": 8.7500299,
+  "display": "Einsiedeln, Schwyz, 8840, Schweiz"
+ },
+ "Schwarzenburg|CH": {
+  "lat": 46.8179164,
+  "lon": 7.3411883,
+  "display": "Schwarzenburg, Verwaltungskreis Bern-Mittelland, Verwaltungsregion Bern-Mittelland, Bern, Schweiz"
+ },
+ "Grebs-Niendorf|Deutschland": {
+  "lat": 53.229698,
+  "lon": 11.265788,
+  "display": "Grebs-Niendorf, Dömitz-Malliß, Ludwigslust-Parchim, Mecklenburg-Vorpommern, 19303, Deutschland"
+ },
+ "Cartagena|ES": {
+  "lat": 37.6155018,
+  "lon": -0.987511,
+  "display": "Cartagena, Campo de Cartagena y Mar Menor, Region Murcia, Murcia, Spanien"
+ },
+ "Sandförstgen|Deutschland": {
+  "lat": 51.2347227,
+  "lon": 14.6524269,
+  "display": "Sandförstgen, Hohendubrau, Diehsa, Görlitz, Sachsen, Deutschland"
+ },
+ "Eggolsheim|DE": {
+  "lat": 49.7916671,
+  "lon": 11.0845293,
+  "display": "Eggolsheim, Landkreis Forchheim, Bayern, 91330, Deutschland"
+ },
+ "Ericeira|PT": {
+  "lat": 38.9632411,
+  "lon": -9.4170802,
+  "display": "Ericeira, Mafra, Lissabon, Portugal"
+ },
+ "Wilhelmsburg|DE": {
+  "lat": 53.6413424,
+  "lon": 13.8590054,
+  "display": "Wilhelmsburg, Torgelow-Ferdinandshof, Vorpommern-Greifswald, Mecklenburg-Vorpommern, 17379, Deutschland"
+ },
+ "Wie|AT": {
+  "lat": 48.1359362,
+  "lon": 16.2816656,
+  "display": "Gewußt wie Cellar, 360, Breitenfurter Straße, Katastralgemeinde Liesing, Liesing, Wien, 1230, Österreich"
+ },
+ "Wettingen|CH": {
+  "lat": 47.465839,
+  "lon": 8.3266114,
+  "display": "Wettingen, Bezirk Baden, Aargau, Schweiz"
+ },
+ "Kraggenburg|NL": {
+  "lat": 52.6624599,
+  "lon": 5.8993238,
+  "display": "Kraggenburg, Noordoostpolder, Flevoland, Niederlande"
+ },
+ "Beek en Donk|NL": {
+  "lat": 51.5337801,
+  "lon": 5.6329857,
+  "display": "Beek en Donk, Laarbeek, Nordbrabant, Niederlande"
+ },
+ "Dietingen|DE": {
+  "lat": 48.2054811,
+  "lon": 8.64673,
+  "display": "Dietingen, VVG der Stadt Rottweil, Landkreis Rottweil, Baden-Württemberg, 78661, Deutschland"
+ },
+ "Vianen|NL": {
+  "lat": 51.9889916,
+  "lon": 5.0939178,
+  "display": "Vianen, Vijfheerenlanden, Utrecht, Niederlande"
+ },
+ "Reggio Emilia|IT": {
+  "lat": 44.6978389,
+  "lon": 10.6304971,
+  "display": "Reggio Emilia, Reggio nell'Emilia, Emilia-Romagna, Italien"
+ },
+ "Lucca|IT": {
+  "lat": 43.8428381,
+  "lon": 10.502876,
+  "display": "Lucca, Toskana, Italien"
+ },
+ "Willingshausen|DE": {
+  "lat": 50.861196,
+  "lon": 9.2116383,
+  "display": "Willingshausen, Schwalm-Eder-Kreis, Hessen, 34628, Deutschland"
+ },
+ "Klein Wesenberg|Deutschland": {
+  "lat": 53.813706,
+  "lon": 10.5456176,
+  "display": "Klein Wesenberg, Nordstormarn, Kreis Stormarn, Schleswig-Holstein, 23860, Deutschland"
+ },
+ "Neustadt an der Weinstraße|": {
+  "lat": 49.3536057,
+  "lon": 8.1360247,
+  "display": "Neustadt an der Weinstraße, Rheinland-Pfalz, Deutschland"
+ },
+ "Püttlingen|Deutschland": {
+  "lat": 49.287307,
+  "lon": 6.8827786,
+  "display": "Püttlingen, Regionalverband Saarbrücken, Saarland, 66346, Deutschland"
+ },
+ "Luxemburg|LU": {
+  "lat": 49.6112768,
+  "lon": 6.129799,
+  "display": "Luxemburg, Kanton Luxemburg, Luxemburg"
+ },
+ "Costinesti|RO": {
+  "lat": 43.9469694,
+  "lon": 28.6124117,
+  "display": "Costinești, Zona Metropolitană Constanța, Konstanza, Rumänien"
+ },
+ "Sukoró|HU": {
+  "lat": 47.2411794,
+  "lon": 18.601614,
+  "display": "Sukoró, Gárdonyi járás, Komitat Fejér, Mitteltransdanubien, Transdanubien, 8096, Ungarn"
+ },
+ "Überlingen|DE": {
+  "lat": 47.7664456,
+  "lon": 9.1605106,
+  "display": "Überlingen, VVG der Stadt Überlingen, Bodenseekreis, Baden-Württemberg, Deutschland"
+ },
+ "Traena|": {
+  "lat": 66.5571596,
+  "lon": 11.9193084,
+  "display": "Træna, Nordland, Norwegen"
+ },
+ "Aix-Les-Bains|": {
+  "lat": 45.6886292,
+  "lon": 5.9146362,
+  "display": "Aix-les-Bains, Chambéry, Savoyen, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 73100, Frankreich"
+ },
+ "Rauhenebrach|DE": {
+  "lat": 49.8896546,
+  "lon": 10.54932,
+  "display": "Rauhenebrach, Landkreis Haßberge, Bayern, 96181, Deutschland"
+ },
+ "Lugano|CH": {
+  "lat": 46.0038007,
+  "lon": 8.9512275,
+  "display": "Lugano, Kreis Lugano West, Bezirk Lugano, Tessin, Schweiz"
+ },
+ "Koerich|LU": {
+  "lat": 49.6697542,
+  "lon": 5.949443,
+  "display": "Koerich, Kanton Kapellen, Luxemburg"
+ },
+ "Blankenfelde|Deutschland": {
+  "lat": 52.6186272,
+  "lon": 13.3884468,
+  "display": "Blankenfelde, Pankow, Berlin, 13159, Deutschland"
+ },
+ "Visperterminen|CH": {
+  "lat": 46.2589888,
+  "lon": 7.9030118,
+  "display": "Visperterminen, Visp, Oberwallis, Wallis, 3932, Schweiz"
+ },
+ "Nalbach|Deutschland": {
+  "lat": 49.3783774,
+  "lon": 6.7877238,
+  "display": "Nalbach, Landkreis Saarlouis, Saarland, 66809, Deutschland"
+ },
+ "Eichelsdorf|Deutschland": {
+  "lat": 50.4547095,
+  "lon": 9.0527768,
+  "display": "Eichelsdorf, Nidda, Wetteraukreis, Hessen, Deutschland"
+ },
+ "Leutenbach|Deutschland": {
+  "lat": 49.7096512,
+  "lon": 11.1720678,
+  "display": "Leutenbach, Kirchehrenbach (VGem), Landkreis Forchheim, Bayern, 91359, Deutschland"
+ },
+ "Kotka|Finnland": {
+  "lat": 60.4672673,
+  "lon": 26.9459462,
+  "display": "Kotka, Kotkan–Haminan seutukunta, Kymenlaakso, Festland-Finnland, Finnland"
+ },
+ "Bieberehren|Deutschland": {
+  "lat": 49.5166639,
+  "lon": 10.0099868,
+  "display": "Bieberehren, Verwaltungsgemeinschaft Röttingen, Landkreis Würzburg, Bayern, 97243, Deutschland"
+ },
+ "Sandersleben (Anhalt)|Deutschland": {
+  "lat": 51.6778824,
+  "lon": 11.5644976,
+  "display": "Sandersleben (Anhalt), Arnstein, Mansfeld-Südharz, Sachsen-Anhalt, 06456, Deutschland"
+ },
+ "Knebworth|GB": {
+  "lat": 51.8658893,
+  "lon": -0.1844945,
+  "display": "Knebworth, North Hertfordshire, Hertfordshire, England, Vereinigtes Königreich"
+ },
+ "Vitrolles|FR": {
+  "lat": 44.4347105,
+  "lon": 5.9496043,
+  "display": "Vitrolles, Gap, Hochalpen, Provence-Alpes-Côte d'Azur, Metropolitanes Frankreich, 05110, Frankreich"
+ },
+ "Twann|CH": {
+  "lat": 47.093989,
+  "lon": 7.1548139,
+  "display": "Twann, Twann-Tüscherz, Verwaltungskreis Biel/Bienne, Verwaltungsregion Seeland, Bern, 2513, Schweiz"
+ },
+ "Lingen (Ems)|Deutschland": {
+  "lat": 52.5224659,
+  "lon": 7.316584,
+  "display": "Lingen (Ems), Landkreis Emsland, Niedersachsen, Deutschland"
+ },
+ "Mogilovo|BG": {
+  "lat": 42.3406875,
+  "lon": 25.3971856,
+  "display": "Могилово, Tschirpan, Oblast Stara Sagora, 6239, Bulgarien"
+ },
+ "Fischbachtal|DE": {
+  "lat": 49.7673565,
+  "lon": 8.8097032,
+  "display": "Fischbachtal, Landkreis Darmstadt-Dieburg, Hessen, 64405, Deutschland"
+ },
+ "Hamm am Rhein|Deutschland": {
+  "lat": 49.7323924,
+  "lon": 8.4339635,
+  "display": "Hamm am Rhein, Eich, Landkreis Alzey-Worms, Rheinland-Pfalz, 67580, Deutschland"
+ },
+ "Wollishofen|CH": {
+  "lat": 47.3424271,
+  "lon": 8.5307085,
+  "display": "Wollishofen, Kreis 2, Zürich, Bezirk Zürich, Zürich, 8038, Schweiz"
+ },
+ "Ostende|BE": {
+  "lat": 51.2258565,
+  "lon": 2.919496,
+  "display": "Ostende, Westflandern, Flandern, 8400, Belgien"
+ },
+ "Saint-Aubin-sur-Mer|": {
+  "lat": 49.3291667,
+  "lon": -0.3886111,
+  "display": "Saint-Aubin-sur-Mer, Caen, Calvados, Normandie, Metropolitanes Frankreich, 14750, Frankreich"
+ },
+ "Wörth|Deutschland": {
+  "lat": 49.0543232,
+  "lon": 8.2667399,
+  "display": "Wörth am Rhein, Landkreis Germersheim, Rheinland-Pfalz, 76744, Deutschland"
+ },
+ "Figueria da Foz|": {},
+ "Sendenhorst|DE": {
+  "lat": 51.8444362,
+  "lon": 7.8273931,
+  "display": "Sendenhorst, Kreis Warendorf, Nordrhein-Westfalen, 48324, Deutschland"
+ },
+ "Asolo|IT": {
+  "lat": 45.8007265,
+  "lon": 11.9142444,
+  "display": "Asolo, Treviso, Venetien, 31011, Italien"
+ },
+ "Schöllkrippen|Deutschland": {
+  "lat": 50.0845481,
+  "lon": 9.2462316,
+  "display": "Schöllkrippen, Landkreis Aschaffenburg, Bayern, Deutschland"
+ },
+ "Mühlheim am Main|": {
+  "lat": 50.1080582,
+  "lon": 8.8467138,
+  "display": "Mühlheim am Main, Landkreis Offenbach, Hessen, 63165, Deutschland"
+ },
+ "Drage|DE": {
+  "lat": 54.3540518,
+  "lon": 9.1576462,
+  "display": "Drage, Nordsee-Treene, Kreis Nordfriesland, Schleswig-Holstein, Deutschland"
+ },
+ "Blumenthal|Deutschland": {
+  "lat": 54.2263979,
+  "lon": 10.0019426,
+  "display": "Blumenthal, Molfsee, Kreis Rendsburg-Eckernförde, Schleswig-Holstein, 24241, Deutschland"
+ },
+ "Stapelmoor|DE": {
+  "lat": 53.1346074,
+  "lon": 7.3203253,
+  "display": "Stapelmoor, Weener, Landkreis Leer, Niedersachsen, 26826, Deutschland"
+ },
+ "Bad Neuenahr-Ahrweiler|": {
+  "lat": 50.5444551,
+  "lon": 7.1186671,
+  "display": "Bad Neuenahr-Ahrweiler, Brohl-Lützing, Landkreis Ahrweiler, Rheinland-Pfalz, 53474, Deutschland"
+ },
+ "Eschach|Deutschland": {
+  "lat": 48.889384,
+  "lon": 9.8711892,
+  "display": "Eschach, GVV Leintal-Frickenhofer Höhe, Ostalbkreis, Baden-Württemberg, 73569, Deutschland"
+ },
+ "Labenz|DE": {
+  "lat": 53.7100669,
+  "lon": 10.5254888,
+  "display": "Labenz, Sandesneben-Nusse, Kreis Herzogtum Lauenburg, Schleswig-Holstein, Deutschland"
+ },
+ "Argelès-sur-Mer|FR": {
+  "lat": 42.5476734,
+  "lon": 3.0253613,
+  "display": "Argelès-sur-Mer, Céret, Ostpyrenäen, Okzitanien, Metropolitanes Frankreich, 66700, Frankreich"
+ },
+ "Newcastle upon Tyne|": {
+  "lat": 54.9738474,
+  "lon": -1.6131572,
+  "display": "Newcastle upon Tyne, Tyne and Wear, North East, England, Vereinigtes Königreich"
+ },
+ "Saalfeld|DE": {
+  "lat": 50.6479143,
+  "lon": 11.3610041,
+  "display": "Saalfeld/Saale, Kamsdorf, Landkreis Saalfeld-Rudolstadt, Thüringen, 07318, Deutschland"
+ },
+ "Esmoriz|PT": {
+  "lat": 40.9602526,
+  "lon": -8.6228198,
+  "display": "Esmoriz, Ovar, Aveiro, Portugal"
+ },
+ "Hagen|DE": {
+  "lat": 51.3582945,
+  "lon": 7.473296,
+  "display": "Hagen, Nordrhein-Westfalen, Deutschland"
+ },
+ "Eslov|Schweden": {
+  "lat": 55.85,
+  "lon": 13.316667,
+  "display": "Eslövs kommun, Provinz Schonen, Schweden"
+ },
+ "Modena|IT": {
+  "lat": 44.6458885,
+  "lon": 10.9255707,
+  "display": "Modena, Emilia-Romagna, Italien"
+ },
+ "Obermehler|Deutschland": {
+  "lat": 51.269009,
+  "lon": 10.5981044,
+  "display": "Obermehler, Nottertal-Heilinger Höhen, Unstrut-Hainich-Kreis, Thüringen, Deutschland"
+ },
+ "Saint-Julien-en-Genevois|": {
+  "lat": 46.1444789,
+  "lon": 6.0812467,
+  "display": "Saint-Julien-en-Genevois, Hochsavoyen, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 74160, Frankreich"
+ },
+ "Velence|HU": {
+  "lat": 47.2353177,
+  "lon": 18.6605263,
+  "display": "Velence, Gárdonyi járás, Komitat Fejér, Mitteltransdanubien, Transdanubien, 2481, Ungarn"
+ },
+ "Joachimsthal|DE": {
+  "lat": 52.9770643,
+  "lon": 13.7453282,
+  "display": "Joachimsthal, Joachimsthal (Schorfheide), Barnim, Brandenburg, 16247, Deutschland"
+ },
+ "Bontida|RO": {
+  "lat": 46.9121311,
+  "lon": 23.8157063,
+  "display": "Bonisbruck, Zona Metropolitană Cluj, Klausenburg, Rumänien"
+ },
+ "Carcassonne|": {
+  "lat": 43.2130358,
+  "lon": 2.3491069,
+  "display": "Carcassonne, Aude, Okzitanien, Metropolitanes Frankreich, 11000, Frankreich"
+ },
+ "Syrugøta|FO": {
+  "lat": 62.0214214,
+  "lon": -6.7918821,
+  "display": "Sýrugøta, Thorshaven, Tórshavnar kommuna, Streymoyar sýsla, 100, Färöer"
+ },
+ "Dellach|Österreich": {
+  "lat": 46.6613594,
+  "lon": 13.078508,
+  "display": "Dellach, Bezirk Hermagor, Kärnten, 9635, Österreich"
+ },
+ "Haunetal|DE": {
+  "lat": 50.7588341,
+  "lon": 9.6672876,
+  "display": "Haunetal, Landkreis Hersfeld-Rotenburg, Hessen, 36166, Deutschland"
+ },
+ "Hasselvika|NO": {
+  "lat": 63.6314571,
+  "lon": 9.8257357,
+  "display": "Hasselvika, Indre Fosen, Tröndelag, 7112, Norwegen"
+ },
+ "Unterföhring bei München|Deutschland": {},
+ "Laukaa|FI": {
+  "lat": 62.416667,
+  "lon": 25.95,
+  "display": "Laukaa, Jyväskylän seutukunta, Mittelfinnland, Festland-Finnland, Finnland"
+ },
+ "Carhaix-Plouguer|": {
+  "lat": 48.2764997,
+  "lon": -3.5711477,
+  "display": "Carhaix-Plouguer, Châteaulin, Finistère, Bretagne, Metropolitanes Frankreich, 29270, Frankreich"
+ },
+ "Brive-la-Gaillarde|": {
+  "lat": 45.1584982,
+  "lon": 1.5332389,
+  "display": "Brive-la-Gaillarde, Corrèze, Neu-Aquitanien, Metropolitanes Frankreich, 19100, Frankreich"
+ },
+ "Marburg|DE": {
+  "lat": 50.8090106,
+  "lon": 8.7704695,
+  "display": "Marburg, Landkreis Marburg-Biedenkopf, Hessen, Deutschland"
+ },
+ "763 12 Vizovice|Tschechien": {
+  "lat": 49.2201172,
+  "lon": 17.8542682,
+  "display": "763 12, Wisowitz, Bezirk Zlin, Region Zlin, Tschechien"
+ },
+ "Pori|FI": {
+  "lat": 61.4866126,
+  "lon": 21.7972071,
+  "display": "Pori, Porin seutukunta, Satakunta, Festland-Finnland, Finnland"
+ },
+ "Bergamo|Italien": {
+  "lat": 45.6944947,
+  "lon": 9.6698727,
+  "display": "Bergamo, Lombardei, 24121-24129, Italien"
+ },
+ "Schopfheim|": {
+  "lat": 47.6500525,
+  "lon": 7.8216997,
+  "display": "Schopfheim, VVG der Stadt Schopfheim, Landkreis Lörrach, Baden-Württemberg, 79650, Deutschland"
+ },
+ "Vilagarcía de Arousa|": {
+  "lat": 42.5950502,
+  "lon": -8.7430537,
+  "display": "Vilagarcía de Arousa, O Salnés, Pontevedra, Galicien, Spanien"
+ },
+ "Schöningen|Deutschland": {
+  "lat": 52.1388507,
+  "lon": 10.9671073,
+  "display": "Schöningen, Landkreis Helmstedt, Niedersachsen, 38364, Deutschland"
+ },
+ "Villa Nova de Gaia|PT": {
+  "lat": 41.0618623,
+  "lon": -8.5997,
+  "display": "Taberna Da Villa, Rua do 25 de Abril, Perosinho, Vila Nova de Gaia, Porto, 4415-028, Portugal"
+ },
+ "Joensuu|FI": {
+  "lat": 62.6006375,
+  "lon": 29.7619759,
+  "display": "Joensuu, Joensuun seutukunta, Nordkarelien, Festland-Finnland, Finnland"
+ },
+ "Nordfjordeid|NO": {
+  "lat": 61.907681,
+  "lon": 5.9891381,
+  "display": "Nordfjordeid, Stad, Vestland, 6770, Norwegen"
+ },
+ "Piercy|": {
+  "lat": 54.6749509,
+  "lon": -1.2807065,
+  "display": "Dalton Piercy, Borough of Hartlepool, Tees Valley, England, Vereinigtes Königreich"
+ },
+ "Grünberg|DE": {
+  "lat": 50.6137167,
+  "lon": 8.945947,
+  "display": "Grünberg, Landkreis Gießen, Hessen, 35305, Deutschland"
+ },
+ "Balge/Holzbalge|Deutschland": {
+  "lat": 52.717389,
+  "lon": 9.1837959,
+  "display": "Friedhof Balge, Holzbalge, Sebbenhausen, Balge, Samtgemeinde Weser-Aue, Landkreis Nienburg/Weser, Niedersachsen, Deutschland"
+ },
+ "Tunisee|DE": {
+  "lat": 48.0661014,
+  "lon": 7.814414,
+  "display": "Tunisee, Hochdorf, Freiburg im Breisgau, Baden-Württemberg, Deutschland"
+ },
+ "Selters|DE": {
+  "lat": 50.5203849,
+  "lon": 7.7337742,
+  "display": "Selters (Westerwald), Westerwaldkreis, Rheinland-Pfalz, 56242, Deutschland"
+ },
+ "Dörphof|Deutschland": {
+  "lat": 54.6184868,
+  "lon": 9.9770988,
+  "display": "Dörphof, Schlei-Ostsee, Kreis Rendsburg-Eckernförde, Schleswig-Holstein, 24398, Deutschland"
+ },
+ "Tholey|DE": {
+  "lat": 49.481406,
+  "lon": 7.0323463,
+  "display": "Tholey, Landkreis St. Wendel, Saarland, 66636, Deutschland"
+ },
+ "Hanau|DE": {
+  "lat": 50.132881,
+  "lon": 8.9169797,
+  "display": "Hanau, Hessen, Deutschland"
+ },
+ "Osterwieck OT Rohrsheim|Deutschland": {
+  "lat": 52.0200869,
+  "lon": 10.8303144,
+  "display": "Freiwillige Feuerwehr Rohrsheim OT Osterwieck, 143, Kliebe, Rohrsheim, Osterwieck, Landkreis Harz, Sachsen-Anhalt, 38836, Deutschland"
+ },
+ "Nottingham|GB": {
+  "lat": 52.9534193,
+  "lon": -1.1496461,
+  "display": "Nottingham, Nottinghamshire, East Midlands, England, Vereinigtes Königreich"
+ },
+ "Salzhausen|Deutschland": {
+  "lat": 53.2243693,
+  "lon": 10.1693795,
+  "display": "Salzhausen, Samtgemeinde Salzhausen, Landkreis Harburg, Niedersachsen, 21376, Deutschland"
+ },
+ "Wiesmoor|DE": {
+  "lat": 53.4114442,
+  "lon": 7.7309444,
+  "display": "Wiesmoor, Landkreis Aurich, Niedersachsen, 26639, Deutschland"
+ },
+ "Lollapalooza Festival Paris 2025|FR": {},
+ "Super Bock Super Rock 2019|PT": {},
+ "Gerlafingen|CH": {
+  "lat": 47.169342,
+  "lon": 7.572082,
+  "display": "Gerlafingen, Bezirk Wasseramt, Amtei Bucheggberg-Wasseramt, Solothurn, 4563, Schweiz"
+ },
+ "Rödental|DE": {
+  "lat": 50.295987,
+  "lon": 11.0431938,
+  "display": "Rödental, Landkreis Coburg, Bayern, 96472, Deutschland"
+ },
+ "Vaduz|LI": {
+  "lat": 47.1392862,
+  "lon": 9.5227962,
+  "display": "Vaduz, Oberland, 9490, Liechtenstein"
+ },
+ "Bad Sulza|DE": {
+  "lat": 51.0879382,
+  "lon": 11.6234198,
+  "display": "Bad Sulza, Landkreis Weimarer Land, Thüringen, Deutschland"
+ },
+ "Boxberg|DE": {
+  "lat": 50.2731793,
+  "lon": 6.8751755,
+  "display": "Boxberg, Kelberg, Landkreis Vulkaneifel, Rheinland-Pfalz, Deutschland"
+ },
+ "Bergheider See|": {
+  "lat": 51.5717953,
+  "lon": 13.791063,
+  "display": "Bergheider See, Lichterfeld, Lichterfeld-Schacksdorf, Kleine Elster (Niederlausitz), Elbe-Elster, Brandenburg, Deutschland"
+ },
+ "Heimburg|Deutschland": {
+  "lat": 51.8140575,
+  "lon": 10.9020397,
+  "display": "Heimburg, Blankenburg, Landkreis Harz, Sachsen-Anhalt, Deutschland"
+ },
+ "Tisno|HR": {
+  "lat": 43.7987234,
+  "lon": 15.6415407,
+  "display": "Tisno, Općina Tisno, Gespanschaft Šibenik-Knin, 22240, Kroatien"
+ },
+ "Spiez|CH": {
+  "lat": 46.6919473,
+  "lon": 7.6774655,
+  "display": "Spiez, Verwaltungskreis Frutigen-Niedersimmental, Verwaltungsregion Oberland, Bern, Schweiz"
+ },
+ "Morschen|Deutschland": {
+  "lat": 51.0717144,
+  "lon": 9.5969183,
+  "display": "Morschen, Schwalm-Eder-Kreis, Hessen, 34326, Deutschland"
+ },
+ "Steventon|GB": {
+  "lat": 51.2289303,
+  "lon": -1.2190958,
+  "display": "Steventon, Ashe, Basingstoke and Deane, Hampshire, England, Vereinigtes Königreich"
+ },
+ "Västerås|Schweden": {
+  "lat": 59.6110992,
+  "lon": 16.5463679,
+  "display": "Västerås, Västerås kommun, Provinz Västmanland, 721 01, Schweden"
+ },
+ "Chapella|CH": {
+  "lat": 46.6333066,
+  "lon": 10.0106572,
+  "display": "Chapella, S-chanf, Maloja, Graubünden, 7526, Schweiz"
+ },
+ "50-427 Wrocław|Polen": {
+  "lat": 51.0906798,
+  "lon": 17.0669134,
+  "display": "50-427, Przedmieście Oławskie, Breslau, Woiwodschaft Niederschlesien, Polen"
+ },
+ "Topcliffe|GB": {
+  "lat": 54.1781348,
+  "lon": -1.3871054,
+  "display": "Topcliffe, North Yorkshire, York and North Yorkshire, England, Vereinigtes Königreich"
+ },
+ "Luckau|DE": {
+  "lat": 51.8524163,
+  "lon": 13.7150055,
+  "display": "Luckau, Pitschen-Pickel, Dahme-Spreewald, Brandenburg, Deutschland"
+ },
+ "Emo Village|IE": {
+  "lat": 53.0968171,
+  "lon": -7.208369,
+  "display": "Emo, Emo ED, The Municipal District of Graiguecullen — Portarlington, County Laois, Leinster, R32 YY64, Irland"
+ },
+ "Niederorschel OT Hausen|Deutschland": {},
+ "Jessen OT Battin|Deutschland": {},
+ "Springen - Heidenrod|Deutschland": {
+  "lat": 50.1427368,
+  "lon": 7.9845531,
+  "display": "Springen, Heidenrod, Rheingau-Taunus-Kreis, Hessen, Deutschland"
+ },
+ "Bad Goisern am Hallstättersee|Österreich": {
+  "lat": 47.6408949,
+  "lon": 13.61648,
+  "display": "Bad Goisern am Hallstättersee, Bezirk Gmunden, Oberösterreich, 4822, Österreich"
+ },
+ "Oudkarspel|NL": {
+  "lat": 52.7149563,
+  "lon": 4.8013695,
+  "display": "Oudkarspel, Dijk en Waard, Nordholland, Niederlande"
+ },
+ "Hyères|FR": {
+  "lat": 43.1202573,
+  "lon": 6.1301614,
+  "display": "Hyères, Toulon, Var, Provence-Alpes-Côte d'Azur, Metropolitanes Frankreich, 83400, Frankreich"
+ },
+ "Trogir|HR": {
+  "lat": 43.5164142,
+  "lon": 16.2497163,
+  "display": "Trau, Gespanschaft Split-Dalmatien, Kroatien"
+ },
+ "Insming|FR": {
+  "lat": 48.9549761,
+  "lon": 6.8757646,
+  "display": "Insmingen, Sarrebourg-Château-Salins, Moselle, Grand Est, Metropolitanes Frankreich, 57670, Frankreich"
+ },
+ "Geschinen|CH": {
+  "lat": 46.4959033,
+  "lon": 8.2800416,
+  "display": "Geschinen, Goms, Oberwallis, Wallis, 3985, Schweiz"
+ },
+ "Ulrichen|Schweiz": {
+  "lat": 46.5065607,
+  "lon": 8.3049713,
+  "display": "Ulrichen, Obergoms, Goms, Oberwallis, Wallis, 3988, Schweiz"
+ },
+ "Salem|DE": {
+  "lat": 53.6563082,
+  "lon": 10.8253152,
+  "display": "Salem, Lauenburgische Seen, Kreis Herzogtum Lauenburg, Schleswig-Holstein, Deutschland"
+ },
+ "Sellin|DE": {
+  "lat": 54.3770567,
+  "lon": 13.6942765,
+  "display": "Sellin, Mönchgut-Granitz, Vorpommern-Rügen, Mecklenburg-Vorpommern, Deutschland"
+ },
+ "Schüpfheim|CH": {
+  "lat": 46.9517174,
+  "lon": 8.017953,
+  "display": "Schüpfheim, Luzern, 6170, Schweiz"
+ },
+ "Kirchheim unter Teck|Deutschland": {
+  "lat": 48.6480545,
+  "lon": 9.4510227,
+  "display": "Kirchheim unter Teck, VVG der Stadt Kirchheim unter Teck, Landkreis Esslingen, Baden-Württemberg, 73230, Deutschland"
+ },
+ "Hohenems|AT": {
+  "lat": 47.3639973,
+  "lon": 9.689271,
+  "display": "Hohenems, Bezirk Dornbirn, Vorarlberg, 6845, Österreich"
+ },
+ "Tolmin|SI": {
+  "lat": 46.1437264,
+  "lon": 13.789284,
+  "display": "Tolmin, Slowenien"
+ },
+ "Loshausen|DE": {
+  "lat": 50.8860813,
+  "lon": 9.2519865,
+  "display": "Loshausen, Willingshausen, Schwalm-Eder-Kreis, Hessen, Deutschland"
+ },
+ "Schwaan OT Letschow|Deutschland": {},
+ "Schönewalde OT Berndsdorf|Deutschland": {},
+ "Meuselwitz|DE": {
+  "lat": 51.0475,
+  "lon": 12.2975,
+  "display": "Meuselwitz, Altenburger Land, Thüringen, 04610, Deutschland"
+ },
+ "Engelberg|CH": {
+  "lat": 46.8223497,
+  "lon": 8.4043996,
+  "display": "Engelberg, Obwalden, Schweiz"
+ },
+ "Fraga|ES": {
+  "lat": 41.4762813,
+  "lon": 0.2035917,
+  "display": "Fraga, Bajo Cinca / Baix Cinca, Huesca, Aragonien, 22520, Spanien"
+ },
+ "Irnfritz|AT": {
+  "lat": 48.7399579,
+  "lon": 15.5579981,
+  "display": "Irnfritz-Ort, Irnfritz-Messern, Bezirk Horn, Niederösterreich, 3754, Österreich"
+ },
+ "Wien|Österreich": {
+  "lat": 48.2083537,
+  "lon": 16.3725042,
+  "display": "Wien, Österreich"
+ },
+ "Brasov|RO": {
+  "lat": 45.6525105,
+  "lon": 25.6105654,
+  "display": "Kronstadt, Zona Metropolitană Brașov, Kronstadt, Rumänien"
+ },
+ "Estavayer-Le-Lac|": {
+  "lat": 46.8496406,
+  "lon": 6.8477378,
+  "display": "Estavayer-le-Lac, Estavayer, Broyebezirk, Freiburg, 1470, Schweiz"
+ },
+ "County Waterford|": {
+  "lat": 52.1509131,
+  "lon": -7.6577982,
+  "display": "County Waterford, Munster, Irland"
+ },
+ "Inverness|GB": {
+  "lat": 57.4790124,
+  "lon": -4.225739,
+  "display": "Inverness, Highland, Schottland, IV1 1AN, Vereinigtes Königreich"
+ },
+ "Mank|Österreich": {
+  "lat": 48.111069,
+  "lon": 15.3410341,
+  "display": "Mank, Bezirk Melk, Niederösterreich, 3240, Österreich"
+ },
+ "Lulworth Castle|": {
+  "lat": 50.6390726,
+  "lon": -2.208823,
+  "display": "Lulworth Castle, Wareham, East Lulworth, Dorset, England, BH20 5QS, Vereinigtes Königreich"
+ },
+ "Roitzschjora|Deutschland": {
+  "lat": 51.5913955,
+  "lon": 12.4859942,
+  "display": "Roitzschjora, Löbnitz, Nordsachsen, Sachsen, 04509, Deutschland"
+ },
+ "Biel-Nidau|CH": {
+  "lat": 47.1258215,
+  "lon": 7.2531492,
+  "display": "Emile-Ganguillet-Weg, Mühlefeld, Madretsch, Biel, Verwaltungskreis Biel/Bienne, Verwaltungsregion Seeland, Bern, 2503, Schweiz"
+ },
+ "Schwetzingen|DE": {
+  "lat": 49.3832919,
+  "lon": 8.5735135,
+  "display": "Schwetzingen, Rhein-Neckar-Kreis, Baden-Württemberg, 68782, Deutschland"
+ },
+ "Czaplinek|PL": {
+  "lat": 53.560673,
+  "lon": 16.2319428,
+  "display": "Tempelburg, gmina Czaplinek, powiat drawski, Woiwodschaft Westpommern, 78-550, Polen"
+ },
+ "Rejmyre|SE": {
+  "lat": 58.8300571,
+  "lon": 15.9313667,
+  "display": "Rejmyre, Finspångs kommun, Provinz Östergötland, 612 71, Schweden"
+ },
+ "Rastow|DE": {
+  "lat": 53.4551154,
+  "lon": 11.4302831,
+  "display": "Rastow, Ludwigslust-Land, Ludwigslust-Parchim, Mecklenburg-Vorpommern, Deutschland"
+ },
+ "Charlbury|GB": {
+  "lat": 51.8746975,
+  "lon": -1.4806612,
+  "display": "Charlbury, West Oxfordshire, Oxfordshire, England, Vereinigtes Königreich"
+ },
+ "Le Garric|FR": {
+  "lat": 44.0103,
+  "lon": 2.16538,
+  "display": "Le Garric, Albi, Tarn, Okzitanien, Metropolitanes Frankreich, 81450, Frankreich"
+ },
+ "Camigliatello Silano|": {
+  "lat": 39.3395972,
+  "lon": 16.4441207,
+  "display": "Camigliatello Silano, Spezzano della Sila, Cosenza, Kalabrien, 87052, Italien"
+ },
+ "Málaga|ES": {
+  "lat": 36.7647913,
+  "lon": -4.4422005,
+  "display": "Málaga, Málaga-Costa del Sol, Málaga, Andalusien, Spanien"
+ },
+ "Dahnsdorf|DE": {
+  "lat": 52.1015623,
+  "lon": 12.6690838,
+  "display": "Dahnsdorf, Planetal, Niemegk, Potsdam-Mittelmark, Brandenburg, Deutschland"
+ },
+ "Luckenwalde|Deutschland": {
+  "lat": 52.0902045,
+  "lon": 13.1741882,
+  "display": "Luckenwalde, Teltow-Fläming, Brandenburg, 14943, Deutschland"
+ },
+ "Friedrichshafen|Deutschland": {
+  "lat": 47.6500279,
+  "lon": 9.4800858,
+  "display": "Friedrichshafen, VVG der Stadt Friedrichshafen, Bodenseekreis, Baden-Württemberg, Deutschland"
+ },
+ "Muri|Schweiz": {
+  "lat": 46.9290477,
+  "lon": 7.4870909,
+  "display": "Muri bei Bern, Verwaltungskreis Bern-Mittelland, Verwaltungsregion Bern-Mittelland, Bern, Schweiz"
+ },
+ "Oberwangen|CH": {
+  "lat": 46.9129867,
+  "lon": 7.3602385,
+  "display": "Oberwangen, Köniz, Verwaltungskreis Bern-Mittelland, Verwaltungsregion Bern-Mittelland, Bern, 3173, Schweiz"
+ },
+ "Incheon|KR": {
+  "lat": 38.7421801,
+  "lon": -9.148602,
+  "display": "Incheon, 16, Avenida Júlio Dinis, Campo Pequeno, Avenidas Novas, Lissabon, 1069-199, Portugal"
+ },
+ "Dorsten|": {
+  "lat": 51.6604071,
+  "lon": 6.9647431,
+  "display": "Dorsten, Kreis Recklinghausen, Nordrhein-Westfalen, Deutschland"
+ },
+ "Stetten|Deutschland": {
+  "lat": 48.6684882,
+  "lon": 9.1701941,
+  "display": "Stetten, Leinfelden-Echterdingen, Landkreis Esslingen, Baden-Württemberg, Deutschland"
+ },
+ "Leonberg Warmbronn|Deutschland": {
+  "lat": 48.7676491,
+  "lon": 9.0009469,
+  "display": "Wander- und Radwegeplan Leonberg, Lämmlestraße, Neubruch, Warmbronn, Leonberg, Landkreis Böblingen, Baden-Württemberg, 71229, Deutschland"
+ },
+ "Marktredwitz|Deutschland": {
+  "lat": 50.0009915,
+  "lon": 12.0856433,
+  "display": "Marktredwitz, Landkreis Wunsiedel im Fichtelgebirge, Bayern, 95615, Deutschland"
+ },
+ "Östersund|SE": {
+  "lat": 63.1793655,
+  "lon": 14.6357061,
+  "display": "Östersund, Östersunds kommun, Provinz Jämtland, 831 86, Schweden"
+ },
+ "Tallinn|EE": {
+  "lat": 59.437242,
+  "lon": 24.7572693,
+  "display": "Tallinn, Stadtgemeinde Tallinn, Kreis Harju, Estland"
+ },
+ "Heiligenhaus|DE": {
+  "lat": 51.32658,
+  "lon": 6.9710401,
+  "display": "Heiligenhaus, Kreis Mettmann, Nordrhein-Westfalen, 42579, Deutschland"
+ },
+ "Locorotondo|IT": {
+  "lat": 40.75523,
+  "lon": 17.3265,
+  "display": "Locorotondo, Bari, Apulien, Italien"
+ },
+ "Espoo|FI": {
+  "lat": 60.2049651,
+  "lon": 24.6559808,
+  "display": "Espoo, Verwaltungsgemeinschaft Helsinki, Uusimaa, Festland-Finnland, Finnland"
+ },
+ "Riedhausen|DE": {
+  "lat": 47.9088973,
+  "lon": 9.4304964,
+  "display": "Riedhausen, GVV Altshausen, Landkreis Ravensburg, Baden-Württemberg, 88377, Deutschland"
+ },
+ "Neustadt An Der Weinstrasse|DE": {
+  "lat": 49.3536057,
+  "lon": 8.1360247,
+  "display": "Neustadt an der Weinstraße, Rheinland-Pfalz, Deutschland"
+ },
+ "Nöda|Deutschland": {
+  "lat": 51.0692364,
+  "lon": 11.0182132,
+  "display": "Nöda, Gramme-Vippach, Landkreis Sömmerda, Thüringen, Deutschland"
+ },
+ "Oberstdorf|DE": {
+  "lat": 47.3708539,
+  "lon": 10.3119292,
+  "display": "Oberstdorf, Landkreis Oberallgäu, Bayern, 87561, Deutschland"
+ },
+ "Obertraubling|DE": {
+  "lat": 48.9657993,
+  "lon": 12.1671324,
+  "display": "Obertraubling, Landkreis Regensburg, Bayern, 93083, Deutschland"
+ },
+ "Nordwalde|DE": {
+  "lat": 52.0841354,
+  "lon": 7.480264,
+  "display": "Nordwalde, Steinfurt, Kreis Steinfurt, Nordrhein-Westfalen, 48565, Deutschland"
+ },
+ "Königstein|DE": {
+  "lat": 50.195133,
+  "lon": 8.4628165,
+  "display": "Königstein im Taunus, Hochtaunuskreis, Hessen, 61462, Deutschland"
+ },
+ "Brandenburg an der Havel|DE": {
+  "lat": 52.4108261,
+  "lon": 12.5497933,
+  "display": "Brandenburg an der Havel, Brandenburg, Deutschland"
+ },
+ "St. Gallenkirch|AT": {
+  "lat": 47.0202245,
+  "lon": 9.9740516,
+  "display": "St. Gallenkirch, Bezirk Bludenz, Vorarlberg, Österreich"
+ },
+ "Altheim|DE": {
+  "lat": 48.5808015,
+  "lon": 10.0271338,
+  "display": "Altheim (Alb), GVV Langenau, Alb-Donau-Kreis, Baden-Württemberg, 89174, Deutschland"
+ },
+ "Radevormwald|Deutschland": {
+  "lat": 51.2029228,
+  "lon": 7.3571392,
+  "display": "Radevormwald, Oberbergischer Kreis, Nordrhein-Westfalen, 42477, Deutschland"
+ },
+ "551 02 Jaroměř|Tschechien": {
+  "lat": 50.3392401,
+  "lon": 15.9241931,
+  "display": "551 02, Jermer, Bezirk Nachod, Königgrätzer Region, Tschechien"
+ },
+ "Villena|ES": {
+  "lat": 38.6360967,
+  "lon": -0.8659745,
+  "display": "Villena, l'Alt Vinalopó / El Alto Vinalopó, Alicante, Valencianische Gemeinschaft, Spanien"
+ },
+ "Traunreut|DE": {
+  "lat": 47.9623271,
+  "lon": 12.5924162,
+  "display": "Traunreut, Landkreis Traunstein, Bayern, Deutschland"
+ },
+ "Brienz|CH": {
+  "lat": 46.7560001,
+  "lon": 8.0303006,
+  "display": "Brienz BE, Verwaltungskreis Interlaken-Oberhasli, Verwaltungsregion Oberland, Bern, Schweiz"
+ },
+ "Böblingen|DE": {
+  "lat": 48.684969,
+  "lon": 9.0113444,
+  "display": "Böblingen, Landkreis Böblingen, Baden-Württemberg, Deutschland"
+ },
+ "Lichtensteig|CH": {
+  "lat": 47.3231436,
+  "lon": 9.0874862,
+  "display": "Lichtensteig, Wahlkreis Toggenburg, St. Gallen, 9620, Schweiz"
+ },
+ "Ribeira Grande|PT": {
+  "lat": 37.8136666,
+  "lon": -25.4644342,
+  "display": "Ribeira Grande, Azoren, Portugal"
+ },
+ "Viana do Castelo|PT": {
+  "lat": 41.6935131,
+  "lon": -8.828277,
+  "display": "Viana do Castelo, Portugal"
+ },
+ "Fels am Wagram|Österreich": {
+  "lat": 48.43804,
+  "lon": 15.8186134,
+  "display": "Fels am Wagram, Bezirk Tulln, Niederösterreich, Österreich"
+ },
+ "Stemwede / Wehdem|Deutschland": {
+  "lat": 52.4334462,
+  "lon": 8.448331,
+  "display": "Freiwillige Feuerwehr Stemwede Löschgrupppe Wehdem / Westrup, 35, Stemwederberg-Straße, Kleine Holz, Westrup, Stemwede, Kreis Minden-Lübbecke, Nordrhein-Westfalen, 32351, Deutschland"
+ },
+ "Duffel|BE": {
+  "lat": 51.0957176,
+  "lon": 4.5061988,
+  "display": "Duffel, Mecheln, Antwerpen, Flandern, 2570, Belgien"
+ },
+ "Milton Keynes|": {
+  "lat": 52.0406502,
+  "lon": -0.7594092,
+  "display": "Milton Keynes, City of Milton Keynes, England, Vereinigtes Königreich"
+ },
+ "Möckmühl-Korb|Deutschland": {
+  "lat": 49.3551595,
+  "lon": 9.3995256,
+  "display": "Korb, Möckmühl, VVG der Stadt Möckmühl, Landkreis Heilbronn, Baden-Württemberg, Deutschland"
+ },
+ "Finkenbach-Oberzent|Deutschland": {
+  "lat": 49.517244,
+  "lon": 8.9068883,
+  "display": "Finkenbach, Rothenberg, Oberzent, Odenwaldkreis, Hessen, Deutschland"
+ },
+ "Schwarmstedt|DE": {
+  "lat": 52.6777594,
+  "lon": 9.6170557,
+  "display": "Schwarmstedt, Samtgemeinde Schwarmstedt, Heidekreis, Niedersachsen, Deutschland"
+ },
+ "Büdesheim|DE": {
+  "lat": 50.2162619,
+  "lon": 6.5528273,
+  "display": "Büdesheim, Prüm, Eifelkreis Bitburg-Prüm, Rheinland-Pfalz, 54610, Deutschland"
+ },
+ "Kreuzlingen|Schweiz": {
+  "lat": 47.6464362,
+  "lon": 9.1725621,
+  "display": "Kreuzlingen, Bezirk Kreuzlingen, Thurgau, Schweiz"
+ },
+ "Roggenstorf|Deutschland": {
+  "lat": 53.9132044,
+  "lon": 11.0679277,
+  "display": "Roggenstorf, Grevesmühlen-Land, Nordwestmecklenburg, Mecklenburg-Vorpommern, Deutschland"
+ },
+ "Karstädt|Deutschland": {
+  "lat": 53.2883824,
+  "lon": 11.4893222,
+  "display": "Karstädt, Grabow, Ludwigslust-Parchim, Mecklenburg-Vorpommern, Deutschland"
+ },
+ "Höchstadt|DE": {
+  "lat": 49.2416656,
+  "lon": 8.2109957,
+  "display": "Hochstadt (Pfalz), Offenbach an der Queich, Landkreis Südliche Weinstraße, Rheinland-Pfalz, 76879, Deutschland"
+ },
+ "Eggersriet|CH": {
+  "lat": 47.4484705,
+  "lon": 9.4892149,
+  "display": "Eggersriet, Wahlkreis St. Gallen, St. Gallen, Schweiz"
+ },
+ "Leinefelde-Worbis|DE": {
+  "lat": 51.408267,
+  "lon": 10.3261532,
+  "display": "Leinefelde-Worbis, Landkreis Eichsfeld, Thüringen, Deutschland"
+ },
+ "Thallichtenberg|DE": {
+  "lat": 49.5575732,
+  "lon": 7.3504409,
+  "display": "Thallichtenberg, Kusel-Altenglan, Landkreis Kusel, Rheinland-Pfalz, Deutschland"
+ },
+ "Omaha|": {
+  "lat": 48.1523179,
+  "lon": 11.577837,
+  "display": "Omaha, 21, Adalbertstraße, Am alten nördlichen Friedhof, Maxvorstadt, München, Bayern, 80799, Deutschland"
+ },
+ "Zwentendorf|": {
+  "lat": 48.6106026,
+  "lon": 16.4330201,
+  "display": "Zwentendorf, Gnadendorf, Bezirk Mistelbach, Niederösterreich, 2152, Österreich"
+ },
+ "Marienthal|Deutschland": {
+  "lat": 53.5651302,
+  "lon": 10.0823813,
+  "display": "Marienthal, Wandsbek, Hamburg, 22043, Deutschland"
+ },
+ "Ovendorf|": {
+  "lat": 53.9431873,
+  "lon": 10.8103727,
+  "display": "Ovendorf, Ratekau, Kreis Ostholstein, Schleswig-Holstein, Deutschland"
+ },
+ "Hellenthal/ Eifel|Deutschland": {
+  "lat": 50.4905771,
+  "lon": 6.4428404,
+  "display": "Eifel e-Bike, Kölner Straße, Hönningen, Hellenthal, Kreis Euskirchen, Nordrhein-Westfalen, 53940, Deutschland"
+ },
+ "Hamburg-Wilhelmsburg|Deutschland": {
+  "lat": 53.5053715,
+  "lon": 10.0114898,
+  "display": "Bahn Landwirtschaft Bezirk Hamburg  e.v., Ubz. Hamburg Wilhelmsburg, Gartenverein 150, Niedergeorgswerder, Wilhelmsburg, Hamburg-Mitte, Hamburg, Deutschland"
+ },
+ "Neetzow-Liepen OT Steinmocker|Deutschland": {},
+ "Ilwede|": {},
+ "Ennetmoos|Schweiz": {
+  "lat": 46.9569495,
+  "lon": 8.3374027,
+  "display": "Ennetmoos, Nidwalden, 6372, Schweiz"
+ },
+ "Meinerzhagen|Deutschland": {
+  "lat": 51.1063495,
+  "lon": 7.6408956,
+  "display": "Meinerzhagen, Märkischer Kreis, Nordrhein-Westfalen, 58540, Deutschland"
+ },
+ "Beeskow|Deutschland": {
+  "lat": 52.1721569,
+  "lon": 14.2471058,
+  "display": "Beeskow, Oder-Spree, Brandenburg, 15848, Deutschland"
+ },
+ "Preddöhl|": {
+  "lat": 53.2244978,
+  "lon": 12.1576947,
+  "display": "Preddöhl, Kümmernitztal, Meyenburg, Halenbeck-Rohlsdorf, Prignitz, Brandenburg, 16945, Deutschland"
+ },
+ "Mettingen|Deutschland": {
+  "lat": 52.3161663,
+  "lon": 7.7836981,
+  "display": "Mettingen, Kreis Steinfurt, Nordrhein-Westfalen, 49497, Deutschland"
+ },
+ "Champtoceaux|Frankreich": {
+  "lat": 47.3204002,
+  "lon": -1.2615366,
+  "display": "Champtoceaux, Orée d'Anjou, Cholet, Maine-et-Loire, Pays de la Loire, Metropolitanes Frankreich, 49270, Frankreich"
+ },
+ "0 Dărmănești|Rumänien": {
+  "lat": 46.3690446,
+  "lon": 26.4705105,
+  "display": "Dărmănești, Barchau, Rumänien"
+ },
+ "Schneeberg|Deutschland": {
+  "lat": 50.5950694,
+  "lon": 12.6417008,
+  "display": "Schneeberg, Erzgebirgskreis, Sachsen, 08289, Deutschland"
+ },
+ "Pellingen|Deutschland": {
+  "lat": 49.67532,
+  "lon": 6.6705104,
+  "display": "Pellingen, Konz, Landkreis Trier-Saarburg, Rheinland-Pfalz, Deutschland"
+ },
+ "Buchholz|Deutschland": {
+  "lat": 53.2759502,
+  "lon": 12.6459399,
+  "display": "Buchholz, Röbel-Müritz, Mecklenburgische Seenplatte, Mecklenburg-Vorpommern, Deutschland"
+ },
+ "RJ Biddinghuizen|Niederlande": {},
+ "-170 Pindelo dos Milagres|Portugal": {
+  "lat": 40.8048744,
+  "lon": -7.962965,
+  "display": "Pindelo dos Milagres, São Pedro do Sul, Viseu, 3660-011, Portugal"
+ },
+ "Uelzen|Deutschland": {
+  "lat": 52.9649759,
+  "lon": 10.5605453,
+  "display": "Uelzen, Landkreis Uelzen, Niedersachsen, 29525, Deutschland"
+ },
+ "Almaty|KZ": {
+  "lat": 44.7724485,
+  "lon": -0.6140958,
+  "display": "Almaty, Allée Raymond Mirande, Laurenzane, Gradignan, Bordeaux, Gironde, Neu-Aquitanien, Metropolitanes Frankreich, 33170, Frankreich"
+ },
+ "Kautzen|Österreich": {
+  "lat": 48.9302844,
+  "lon": 15.240086,
+  "display": "Kautzen, Bezirk Waidhofen an der Thaya, Niederösterreich, 3851, Österreich"
+ },
+ "Topolna|Tschechien": {
+  "lat": 49.1218671,
+  "lon": 17.5443354,
+  "display": "Topolná, Bezirk Ungarisch Hradisch, Region Zlin, 687 11, Tschechien"
+ },
+ "1 Alba Iulia|Rumänien": {
+  "lat": 44.4264964,
+  "lon": 26.1290182,
+  "display": "1, Piața Alba Iulia, Decebal, Piața Alba Iulia, Centrul Civic, Sector 3, Bukarest, 031103, Rumänien"
+ },
+ "Hallbergmoos|Deutschland": {
+  "lat": 48.3182064,
+  "lon": 11.7445128,
+  "display": "Hallbergmoos, Landkreis Freising, Bayern, 85399, Deutschland"
+ },
+ "Seth|Deutschland": {
+  "lat": 53.8494522,
+  "lon": 10.1750076,
+  "display": "Seth, Itzstedt, Kreis Segeberg, Schleswig-Holstein, Deutschland"
+ },
+ "Alfeld OT Wispenstein|Deutschland": {},
+ "Berge|Deutschland": {
+  "lat": 52.6206915,
+  "lon": 7.7427274,
+  "display": "Berge, Samtgemeinde Fürstenau, Landkreis Osnabrück, Niedersachsen, Deutschland"
+ },
+ "Einbeck|Deutschland": {
+  "lat": 51.8222338,
+  "lon": 9.8991418,
+  "display": "Einbeck, Landkreis Northeim, Niedersachsen, 37574, Deutschland"
+ },
+ "Rossau|Deutschland": {
+  "lat": 50.9980658,
+  "lon": 13.0477409,
+  "display": "Rossau, Lichtenau, Mittelsachsen, Sachsen, Deutschland"
+ },
+ "Gemünden|Deutschland": {
+  "lat": 50.5599325,
+  "lon": 8.0176918,
+  "display": "Gemünden, Westerburg, Westerwaldkreis, Rheinland-Pfalz, Deutschland"
+ },
+ "Teuchern|Deutschland": {
+  "lat": 51.1185488,
+  "lon": 12.0223935,
+  "display": "Teuchern, Burgenlandkreis, Sachsen-Anhalt, 06682, Deutschland"
+ },
+ "Kaufbeuren|Deutschland": {
+  "lat": 47.8803788,
+  "lon": 10.622246,
+  "display": "Kaufbeuren, Bayern, 87600, Deutschland"
+ },
+ "Naestved|Dänemark": {
+  "lat": 55.2328252,
+  "lon": 11.7674102,
+  "display": "Nästved, Næstved Kommune, Region Seeland, 4700, Dänemark"
+ },
+ "rg1 8eq Reading|Vereinigtes Königreich": {
+  "lat": 51.4633741,
+  "lon": -0.9866772,
+  "display": "RG1 8EQ, Reading, England, Vereinigtes Königreich"
+ },
+ "Vaduz|Liechtenstein": {
+  "lat": 47.1392862,
+  "lon": 9.5227962,
+  "display": "Vaduz, Oberland, 9490, Liechtenstein"
+ },
+ "Llubí|Spanien": {
+  "lat": 39.7003358,
+  "lon": 3.0042475,
+  "display": "Llubí, Pla de Mallorca, Balearische Inseln, 07430, Spanien"
+ },
+ "Norrtälje|Schweden": {
+  "lat": 59.766667,
+  "lon": 18.7,
+  "display": "Norrtälje kommun, Provinz Stockholm, Schweden"
+ },
+ "Tennenbronn|Deutschland": {
+  "lat": 48.1904993,
+  "lon": 8.3514397,
+  "display": "Tennenbronn, Schramberg, VVG der Stadt Schramberg, Landkreis Rottweil, Baden-Württemberg, 78144, Deutschland"
+ },
+ "Hamburg Hamburg|Deutschland": {
+  "lat": 53.5501721,
+  "lon": 10.0013165,
+  "display": "Hamburg, Deutschland"
+ },
+ "Morbach|Deutschland": {
+  "lat": 49.8105138,
+  "lon": 7.1229799,
+  "display": "Morbach, Landkreis Bernkastel-Wittlich, Rheinland-Pfalz, 54497, Deutschland"
+ },
+ "Laage|Deutschland": {
+  "lat": 53.9258806,
+  "lon": 12.3501625,
+  "display": "Laage, Landkreis Rostock, Mecklenburg-Vorpommern, 18299, Deutschland"
+ },
+ "Wallesau|Deutschland": {
+  "lat": 49.1898024,
+  "lon": 11.1094009,
+  "display": "Wallesau, Roth, Landkreis Roth, Bayern, 91154, Deutschland"
+ },
+ "Qunito|": {},
+ "Brakel-Hembsen|Deutschland": {
+  "lat": 51.7054923,
+  "lon": 9.238112,
+  "display": "Städtische Gemeinschaftsgrundschule der Stadt Brakel, Teilstandort Hembsen, 5, Angerlinde, Hembsen, Brakel, Kreis Höxter, Nordrhein-Westfalen, 33034, Deutschland"
+ },
+ "Neuwied bei Koblenz|": {},
+ "Hochstetten|Deutschland": {
+  "lat": 48.0190769,
+  "lon": 7.6098263,
+  "display": "Hochstetten, Breisach am Rhein, VVG der Stadt Breisach am Rhein, Landkreis Breisgau-Hochschwarzwald, Baden-Württemberg, 79206, Deutschland"
+ },
+ "Sandstedt|Deutschland": {
+  "lat": 53.361006,
+  "lon": 8.5170062,
+  "display": "Sandstedt, Hagen im Bremischen, Landkreis Cuxhaven, Niedersachsen, Deutschland"
+ },
+ "Voltlage-Höckel|Deutschland": {
+  "lat": 52.452335,
+  "lon": 7.7467687,
+  "display": "AED 24/7 Voltlage Schützenhalle Höckel, 2A, Merzener Straße, Höckel, Voltlage, Samtgemeinde Neuenkirchen, Landkreis Osnabrück, Niedersachsen, 49599, Deutschland"
+ },
+ "Woltersdorf|Deutschland": {
+  "lat": 53.5776994,
+  "lon": 10.6387716,
+  "display": "Woltersdorf, Breitenfelde, Kreis Herzogtum Lauenburg, Schleswig-Holstein, Deutschland"
+ },
+ "Black Rock City|": {
+  "lat": 45.8028894,
+  "lon": 15.9641726,
+  "display": "Black Rock, 30, Savska cesta, Mjesni odbor \"Antun Mihanović\", Gradska četvrt Trešnjevka - sjever, Zagreb, Stadt Zagreb, 10126, Kroatien"
+ },
+ "Breddin OT Damelack|Deutschland": {},
+ "Neusiedl am See|Österreich": {
+  "lat": 47.9491855,
+  "lon": 16.8425149,
+  "display": "Neusiedl am See, Bezirk Neusiedl am See, Burgenland, 7100, Österreich"
+ },
+ "Lenk im Simmental|Schweiz": {
+  "lat": 46.4579692,
+  "lon": 7.4437345,
+  "display": "Lenk im Simmental, 2, Bahnhofplatz, Lenk, Verwaltungskreis Obersimmental-Saanen, Verwaltungsregion Oberland, Bern, 3775, Schweiz"
+ },
+ "Gägelow|Deutschland": {
+  "lat": 53.9000945,
+  "lon": 11.3832152,
+  "display": "Gägelow, Grevesmühlen-Land, Nordwestmecklenburg, Mecklenburg-Vorpommern, Deutschland"
+ },
+ "Bridgeview|": {
+  "lat": 51.9252055,
+  "lon": -8.4788744,
+  "display": "Bridgeview, Kilnap, Commons ED, Cork, County Cork, Munster, Irland"
+ },
+ "Pünderich|Deutschland": {
+  "lat": 50.0403021,
+  "lon": 7.1268052,
+  "display": "Pünderich, Zell (Mosel), Landkreis Cochem-Zell, Rheinland-Pfalz, 56862, Deutschland"
+ },
+ "Wetschen|Deutschland": {
+  "lat": 52.6139068,
+  "lon": 8.4505715,
+  "display": "Wetschen, Samtgemeinde Rehden, Landkreis Diepholz, Niedersachsen, Deutschland"
+ },
+ "Jarmen|Deutschland": {
+  "lat": 53.9221033,
+  "lon": 13.3374416,
+  "display": "Jarmen, Jarmen-Tutow, Vorpommern-Greifswald, Mecklenburg-Vorpommern, Deutschland"
+ },
+ "Mechernich|Deutschland": {
+  "lat": 50.5909999,
+  "lon": 6.6525479,
+  "display": "Mechernich, Kreis Euskirchen, Nordrhein-Westfalen, 53894, Deutschland"
+ },
+ "Egelsbach|Deutschland": {
+  "lat": 49.9668352,
+  "lon": 8.6659289,
+  "display": "Egelsbach, Landkreis Offenbach, Hessen, 63329, Deutschland"
+ },
+ "Teltow|Deutschland": {
+  "lat": 52.3805562,
+  "lon": 13.2685278,
+  "display": "Teltow, Potsdam-Mittelmark, Brandenburg, 14513, Deutschland"
+ },
+ "Arnsberg|Deutschland": {
+  "lat": 51.4002384,
+  "lon": 8.0605908,
+  "display": "Arnsberg, Hochsauerlandkreis, Nordrhein-Westfalen, Deutschland"
+ },
+ "Neustadt an der Weinstrasse|": {
+  "lat": 49.3536057,
+  "lon": 8.1360247,
+  "display": "Neustadt an der Weinstraße, Rheinland-Pfalz, Deutschland"
+ },
+ "Emlohe|Deutschland": {},
+ "Cavertitz|Deutschland": {
+  "lat": 51.3869974,
+  "lon": 13.1301296,
+  "display": "Cavertitz, Nordsachsen, Sachsen, Deutschland"
+ },
+ "Vöhringen|Deutschland": {
+  "lat": 48.2833039,
+  "lon": 10.0832982,
+  "display": "Vöhringen, Landkreis Neu-Ulm, Bayern, 89269, Deutschland"
+ },
+ "Bad Füssing|Deutschland": {
+  "lat": 48.3404449,
+  "lon": 13.3184397,
+  "display": "Bad Füssing, Landkreis Passau, Bayern, 94072, Deutschland"
+ },
+ "Selb|Deutschland": {
+  "lat": 50.1696241,
+  "lon": 12.1309201,
+  "display": "Selb, Landkreis Wunsiedel im Fichtelgebirge, Bayern, 95100, Deutschland"
+ },
+ "Biberach a.d. Riss|Deutschland": {
+  "lat": 48.0984413,
+  "lon": 9.7899938,
+  "display": "Biberach an der Riß, VVG der Stadt Biberach an der Riß, Landkreis Biberach, Baden-Württemberg, 88400, Deutschland"
+ },
+ "Hohenlimburg - Hagen|Deutschland": {
+  "lat": 51.3474138,
+  "lon": 7.5690847,
+  "display": "Hohenlimburg, Hagen, Nordrhein-Westfalen, Deutschland"
+ },
+ "Hagen-Hohenlimburg|Deutschland": {
+  "lat": 51.3507696,
+  "lon": 7.5725993,
+  "display": "Hagen-Hohenlimburg, Oeger Straße, Hohenlimburg, Hagen, Nordrhein-Westfalen, 58119, Deutschland"
+ },
+ "Ernsthausen|Deutschland": {
+  "lat": 50.45299,
+  "lon": 8.351778,
+  "display": "Ernsthausen, Weilmünster, Landkreis Limburg-Weilburg, Hessen, Deutschland"
+ },
+ "Fehring|Österreich": {
+  "lat": 46.9360862,
+  "lon": 16.0104462,
+  "display": "Fehring, Bezirk Südoststeiermark, Steiermark, Österreich"
+ },
+ "Gazi; (Athen)|Griechenland": {
+  "lat": 37.9717949,
+  "lon": 23.7107716,
+  "display": "Ποδηλατόδρομος Γκάζι-Φάληρο, Κάτω Πετράλωνα, Συνοικία Κάτω Πετραλώνων, Πετράλωνα, 3η Κοινότητα Αθηνών, Athen, Δήμος Αθηναίων, Regionalbezirk Athen-Zentrum, Region Attika, Attika, 118 52, Griechenland"
+ },
+ "Püchersreuth|Deutschland": {
+  "lat": 49.7726311,
+  "lon": 12.2063942,
+  "display": "Püchersreuth, Neustadt an der Waldnaab (VGem), Landkreis Neustadt an der Waldnaab, Bayern, 92715, Deutschland"
+ },
+ "Kadov|Tschechien": {
+  "lat": 49.6352029,
+  "lon": 16.0769231,
+  "display": "Kadov, Bezirk Saar, Region Hochland, Tschechien"
+ },
+ "St. Martin im Mühlkreis|Österreich": {
+  "lat": 48.415073,
+  "lon": 14.0387795,
+  "display": "St. Martin im Mühlkreis, Bezirk Rohrbach, Oberösterreich, 4113, Österreich"
+ },
+ "Puch bei Weiz|Österreich": {
+  "lat": 47.224767,
+  "lon": 15.7257485,
+  "display": "Puch bei Weiz, Bezirk Weiz, Steiermark, 8182, Österreich"
+ },
+ "East Aurora|": {
+  "lat": 51.0216929,
+  "lon": 3.7164095,
+  "display": "Aurora, Kikvorsstraat, Nieuw Gent, Gent, Ostflandern, Flandern, 9000, Belgien"
+ },
+ "Haby|Deutschland": {
+  "lat": 54.394424,
+  "lon": 9.8194929,
+  "display": "Haby, Hüttener Berge, Kreis Rendsburg-Eckernförde, Schleswig-Holstein, Deutschland"
+ },
+ "Geldern|Deutschland": {
+  "lat": 51.5169736,
+  "lon": 6.3228189,
+  "display": "Geldern, Kreis Kleve, Nordrhein-Westfalen, 47608, Deutschland"
+ },
+ "Camden|": {
+  "lat": 51.5427966,
+  "lon": -0.1624803,
+  "display": "London Borough of Camden, Groß-London, England, Vereinigtes Königreich"
+ },
+ "Villingen-Schwenningen|Deutschland": {
+  "lat": 48.063152,
+  "lon": 8.4929618,
+  "display": "Villingen-Schwenningen, VVG der Stadt Villingen-Schwenningen, Schwarzwald-Baar-Kreis, Baden-Württemberg, Deutschland"
+ },
+ "BE Arcen|Niederlande": {
+  "lat": 51.476261,
+  "lon": 6.1785077,
+  "display": "Aersen, Venlo, Limburg, Niederlande"
+ },
+ "New York City|": {
+  "lat": 51.897262,
+  "lon": 17.7833606,
+  "display": "New York City, 4, Kazimierza Sopałowicza, Pleschen, gmina Pleszew, powiat pleszewski, Woiwodschaft Großpolen, 63-300, Polen"
+ },
+ "San Bernardino|": {
+  "lat": 45.0367265,
+  "lon": 7.3945003,
+  "display": "San Bernardino, Trana, Turin, Piemont, 10051, Italien"
+ },
+ "Asbury Park|": {
+  "lat": 44.6011842,
+  "lon": 10.6859344,
+  "display": "Asbury Park, 24d, Viale Giuseppe Mazzini, Scandiano centro, Pratissolo, Scandiano, Tresinaro - Secchia, Reggio nell'Emilia, Emilia-Romagna, 42019, Italien"
+ },
+ "Kronberg|Deutschland": {
+  "lat": 50.1796561,
+  "lon": 8.5085855,
+  "display": "Kronberg im Taunus, Hochtaunuskreis, Hessen, 61476, Deutschland"
+ },
+ "Celle|Deutschland": {
+  "lat": 52.624056,
+  "lon": 10.081052,
+  "display": "Celle, Landkreis Celle, Niedersachsen, Deutschland"
+ },
+ "E51 RD London|Vereinigtes Königreich": {
+  "lat": 51.5077016,
+  "lon": 0.0577254,
+  "display": "Lascars Avenue, Cyprus, London Borough of Newham, Groß-London, England, E16 2XD, Vereinigtes Königreich"
+ },
+ "Hinte|Deutschland": {
+  "lat": 53.4130866,
+  "lon": 7.1890964,
+  "display": "Hinte, Landkreis Aurich, Niedersachsen, 26759, Deutschland"
+ },
+ "Pfaffenhofen|Deutschland": {
+  "lat": 49.0641578,
+  "lon": 8.9753958,
+  "display": "Pfaffenhofen, GVV Oberes Zabergäu, Landkreis Heilbronn, Baden-Württemberg, 74397, Deutschland"
+ },
+ "DK-9900 Frederikshavn|Dänemark": {
+  "lat": 57.4400362,
+  "lon": 10.5023571,
+  "display": "9900, Frederikshavn Kommune, Region Nordjütland, Dänemark"
+ },
+ "Den Burg|Niederlande": {
+  "lat": 53.055232,
+  "lon": 4.7967379,
+  "display": "Den Burg, Texel, Nordholland, Niederlande"
+ },
+ "Inning am Ammersee|Deutschland": {
+  "lat": 48.0774991,
+  "lon": 11.1526202,
+  "display": "Inning am Ammersee, Landkreis Starnberg, Bayern, 82266, Deutschland"
+ },
+ "Unterschleißheim|Deutschland": {
+  "lat": 48.2770031,
+  "lon": 11.5535459,
+  "display": "Unterschleißheim, Landkreis München, Bayern, 85716, Deutschland"
+ },
+ "Vorchdorf|Österreich": {
+  "lat": 48.0035141,
+  "lon": 13.922837,
+  "display": "Vorchdorf, Bezirk Gmunden, Oberösterreich, 4655, Österreich"
+ },
+ "Live Oak|": {},
+ "NR30 1TB Great Yarmouth|Vereinigtes Königreich": {
+  "lat": 52.6182514,
+  "lon": 1.7173425,
+  "display": "NR30 1TB, Great Yarmouth, Norfolk, England, Vereinigtes Königreich"
+ },
+ "Weissenhäuser Strand|Deutschland": {
+  "lat": 54.3064794,
+  "lon": 10.7941461,
+  "display": "Betriebshof Weissenhäuser Strand, Wangels, Oldenburg-Land, Kreis Ostholstein, Schleswig-Holstein, Deutschland"
+ },
+ "Salzbergen|Deutschland": {
+  "lat": 52.3227446,
+  "lon": 7.3474905,
+  "display": "Salzbergen, Landkreis Emsland, Niedersachsen, 48499, Deutschland"
+ },
+ "Feldkirchen in Kärnten|Österreich": {
+  "lat": 46.7229178,
+  "lon": 14.0964965,
+  "display": "Feldkirchen in Kärnten, Bezirk Feldkirchen, Kärnten, 9560, Österreich"
+ },
+ "Wangels|Deutschland": {
+  "lat": 54.2733206,
+  "lon": 10.7663663,
+  "display": "Wangels, Oldenburg-Land, Kreis Ostholstein, Schleswig-Holstein, Deutschland"
+ },
+ "Pattaya|TH": {
+  "lat": 49.4868756,
+  "lon": 0.1279136,
+  "display": "Pattaya, 64, Rue de Prony, Saint-Nicolas, Le Havre, Seine-Maritime, Normandie, Metropolitanes Frankreich, 76600, Frankreich"
+ },
+ "Hong Kong|CN": {
+  "lat": 48.876213,
+  "lon": 2.3456817,
+  "display": "Hong Kong, Rue La Fayette, Quartier du Faubourg-Montmartre, Paris 9e Arrondissement, Paris, Île-de-France, Metropolitanes Frankreich, 75009, Frankreich"
+ },
+ "Saalbach Hinterglemm|Österreich": {
+  "lat": 47.3724977,
+  "lon": 12.5936777,
+  "display": "Saalbach-Hinterglemm, Bezirk Zell am See, Salzburg, Österreich"
+ },
+ "Neumünster|Deutschland": {
+  "lat": 54.0757442,
+  "lon": 9.9815377,
+  "display": "Neumünster, Schleswig-Holstein, 24534, Deutschland"
+ },
+ "Glenworth Valley|": {},
+ "Gisborne|": {
+  "lat": 57.6807885,
+  "lon": -4.038091,
+  "display": "Gisborne, Hospital Road, Cromarty, Highland, Schottland, IV11 8YS, Vereinigtes Königreich"
+ },
+ "Leutkirch in der Nähe von Kempten|DE": {},
+ "Riga|LV": {
+  "lat": 56.9493977,
+  "lon": 24.1051846,
+  "display": "Riga, Lettland"
+ },
+ "Stupinigi in der Nähe von Turin|IT": {},
+ "Dagenham in der Nähe von London|GB": {},
+ "Fort Lauderdale|": {
+  "lat": 51.0776923,
+  "lon": -4.0460226,
+  "display": "Lauderdale Drive, Fort Hill, Barnstaple, North Devon, Devon, Devon and Torbay, England, EX32 8LF, Vereinigtes Königreich"
+ },
+ "Tempe|": {
+  "lat": 63.4085445,
+  "lon": 10.3970833,
+  "display": "Tempe, Sorgenfri, Lerkendal, Trondheim, Tröndelag, 7031, Norwegen"
+ },
+ "Bischofswerda|Deutschland": {
+  "lat": 51.1186642,
+  "lon": 14.1737211,
+  "display": "Bischofswerda, Bautzen, Sachsen, 01877, Deutschland"
+ },
+ "Boise|": {
+  "lat": 45.7082915,
+  "lon": 4.2991137,
+  "display": "Boise, Valeille, Montbrison, Loire, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 42110, Frankreich"
+ },
+ "Knoxville|": {
+  "lat": 55.7489534,
+  "lon": -4.6815687,
+  "display": "Knoxville Road, Kilbirnie, North Ayrshire, Schottland, KA25 7ED, Vereinigtes Königreich"
+ },
+ "Sölden|Österreich": {
+  "lat": 46.9666319,
+  "lon": 11.0072845,
+  "display": "Sölden, Bezirk Imst, Tirol, Österreich"
+ },
+ "Redondo Beach|": {},
+ "São Paulo|": {
+  "lat": 32.694457,
+  "lon": -17.0285509,
+  "display": "São Paulo, Ribeira Brava, Madeira, 9350-129, Portugal"
+ },
+ "Kierspe|Deutschland": {
+  "lat": 51.1278531,
+  "lon": 7.6006513,
+  "display": "Kierspe, Märkischer Kreis, Nordrhein-Westfalen, 58566, Deutschland"
+ },
+ "NL5991 Baarlo|Niederlande": {},
+ "Erkheim|Deutschland": {
+  "lat": 48.0382786,
+  "lon": 10.3345815,
+  "display": "Erkheim, Landkreis Unterallgäu, Bayern, 87746, Deutschland"
+ }
 }

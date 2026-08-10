@@ -19,6 +19,7 @@ import sys
 import threading
 import time
 import unicodedata
+from datetime import date
 from pathlib import Path
 from urllib.parse import urljoin, urlparse, parse_qs
 
@@ -39,9 +40,28 @@ HEADERS = {
 
 FT = "https://www.festivalticker.de"
 FU = "https://www.festivalsunited.com"
+FA = "https://www.festival-alarm.com"
 
-FT_LISTS = [f"{FT}/alle-festivals/", f"{FT}/festivals-2027/"]
-FU_LISTS = [f"{FU}/festivals/countries/europe", f"{FU}/festivals/countries/germany"]
+JAHRE = range(2006, 2030)
+MONATE = ["januar", "februar", "maerz", "april", "mai", "juni", "juli", "august",
+          "september", "oktober", "november", "dezember"]
+
+# Saemtliche Listenseiten von festivalticker. Die Jahresarchive zeigen jeweils
+# nur 40 Eintraege - mehr gibt die Seite fuer vergangene Jahre nicht her.
+FT_LISTS = (
+    [f"{FT}/alle-festivals/", f"{FT}/alle-festivals-ab-jetzt/",
+     f"{FT}/festivals-in-deutschland/", f"{FT}/internationale-festivals/",
+     f"{FT}/laufende-festivals/", f"{FT}/neue-festivals/"]
+    + [f"{FT}/festivals-{m}/" for m in MONATE]
+    + [f"{FT}/festivals-{j}/" for j in JAHRE]
+    + [f"{FT}/{j}/" for j in JAHRE]
+)
+
+# festivalsunited pflegt eine Sitemap - der vollstaendige Weg ueber alle Jahre
+FU_SITEMAP = f"{FU}/sitemap.xml"
+
+# festival-alarm listet je Jahrgang eine Uebersichtsseite
+FA_LISTS = [f"{FA}/Festivals-{j}" for j in JAHRE]
 
 _throttle = threading.Semaphore(4)
 _session = threading.local()
@@ -139,6 +159,12 @@ def festival_key(name: str) -> str:
 
 BAND_DATE = re.compile(r"^\d{1,2}\.\s?\d{1,2}\.\d{2,4}\b")
 
+# Reste aus Beschreibungstexten, die keine Bandnamen sind
+BAND_FELD = re.compile(r"\b(?:VVK|AK|Kategorie:|Preis:|Besucher:|Camping|"
+                       r"Rahmenprogramm|zum kompletten Programm)\b", re.I)
+BAND_SATZ = re.compile(r"\b(?:ist|sind|wird|werden|findet|treffen|startet|sorgen|"
+                       r"bestätigt|außerdem)\b", re.I)
+
 
 def valid_band(name: str) -> bool:
     n = clean(name)
@@ -151,6 +177,13 @@ def valid_band(name: str) -> bool:
     # Datumsangaben aus dem Fliesstext sind keine Bands:
     # "26. 7.2026" oder "04.07.2026 Auch der zweite Festivaltag"
     if BAND_DATE.match(n):
+        return False
+    # Bruchstuecke aus Beschreibungs- und Preisfeldern aussortieren.
+    # Satzwoerter erst ab einer Laenge pruefen, die kein Bandname mehr hat -
+    # "Werden Wir Uns Wiedersehen" soll nicht durchfallen.
+    if BAND_FELD.search(n):
+        return False
+    if len(n.split()) >= 6 and BAND_SATZ.search(n):
         return False
     return True
 
@@ -179,7 +212,7 @@ def _iso_to_de(value: str) -> str:
     return f"{m.group(3)}.{m.group(2)}.{m.group(1)}" if m else ""
 
 
-def ft_collect_seeds() -> dict[str, dict]:
+def ft_collect_seeds(since: int = 0) -> dict[str, dict]:
     """Stammdaten je Festival aus den Listenseiten (Name, Datum, Ort, Land, Stil)."""
     seeds: dict[str, dict] = {}
     for url in FT_LISTS:
@@ -207,6 +240,8 @@ def ft_collect_seeds() -> dict[str, dict]:
             place = clean(loc.get_text()) if loc else ""
             city = re.sub(r"^\d[\w\- ]*?\s+", "", place).strip() or place
             cm = re.search(r"Land:\s*(\w{2,})", ev.get_text(" ", strip=True))
+            if since and date_from and int(date_from[-4:]) < since:
+                continue
             style = ev.find("span", title=True)
             seeds[link] = {
                 "name": clean(a.get_text()),
@@ -222,7 +257,9 @@ def ft_collect_seeds() -> dict[str, dict]:
 FT_LABELS = ["Stil", "Kategorie", "Preis", "Besucher", "Location", "Plz",
              "Ort", "Strasse", "Land", "Website", "Bands", "Zeiten", "Veranstalter"]
 
-FT_BANDS_END = re.compile(r"\s*(?:Neues zu:|Kommentare zu:|Zurück\b|Zum Festivalplaner)")
+FT_BANDS_END = re.compile(
+    r"\s*(?:Neues zu:|Kommentare zu:|Zurück\b|Zum Festivalplaner|\bclose\b|"
+    r"Kategorie:|Preis:|Besucher:|Location:|Stil:|Plz:|Ort:|Strasse:|Land:|Website:)")
 
 # Fallback fuer Bandlisten ohne Komma, die stattdessen die Bauform
 # "Bandname (Stilbeschreibung)" aneinanderreihen.
@@ -378,18 +415,136 @@ def ft_resolve_website(link: str) -> str:
 # festivalsunited.com
 # --------------------------------------------------------------------------
 
-def fu_collect_links() -> list[str]:
+def fu_collect_links(since: int) -> list[str]:
+    """Alle Festivalseiten aus der Sitemap.
+
+    Die Sitemap ist nach Jahrgaengen aufgeteilt (upcoming plus historic-JAHR),
+    deshalb laesst sich der Zeitraum ohne einen einzigen ueberfluessigen Abruf
+    eingrenzen.
+    """
+    index = fetch(FU_SITEMAP)
+    if not index:
+        print("  ! Sitemap nicht ladbar", file=sys.stderr)
+        return []
+
     links: dict[str, None] = {}
-    for url in FU_LISTS:
-        html = fetch(url)
-        if not html:
-            print(f"  ! Liste nicht ladbar: {url}", file=sys.stderr)
+    for sub in re.findall(r"<loc>([^<]+)</loc>", index):
+        if "festival" not in sub:
             continue
-        for a in soup(html).find_all("a", href=True):
-            href = a["href"]
-            if re.match(r"^/festivals/[a-z0-9\-]+(?:/\d{4})?$", href):
-                links[urljoin(FU, href)] = None
+        jahr = re.search(r"historic-(\d{4})", sub)
+        if jahr and int(jahr.group(1)) < since:
+            continue
+        html = fetch(sub)
+        if not html:
+            continue
+        for loc in re.findall(r"<loc>([^<]+)</loc>", html):
+            # nur Detailseiten, keine Magazinartikel und keine Buchstabenlisten
+            if re.fullmatch(r"https://www\.festivalsunited\.com/festivals/"
+                            r"[a-z0-9\-]+(?:/\d{4})?", loc):
+                links[loc] = None
     return list(links)
+
+
+# --------------------------------------------------------------------------
+# festival-alarm.com
+# --------------------------------------------------------------------------
+
+def fa_collect_links(since: int) -> list[str]:
+    links: dict[str, None] = {}
+    for jahr in JAHRE:
+        if jahr < since:
+            continue
+        html = fetch(f"{FA}/Festivals-{jahr}")
+        if not html:
+            continue
+        for href in re.findall(rf'href="(/Festivals-{jahr}/[^"]+)"', html):
+            links[urljoin(FA, href)] = None
+    return list(links)
+
+
+# Die Werte stehen im Quelltext ueber mehrere Zeilen verteilt, deshalb wird der
+# Text zuerst zu einer Zeile geglaettet und jedes Feld bis zur naechsten
+# bekannten Beschriftung gelesen.
+FA_FELDER = {
+    "preis":     r"Festivalticket \(ab\):\s*(.*?)\s*(?:Tagesticket|Ticketshop|Teilnehmer)",
+    "stadt":     r"Stadt:\s*(.*?)\s*(?:Bundesland:|Land:)",
+    "land":      r"\bLand:\s*(.*?)\s*(?:Veranstaltungsplatz|Wo:|Örtlichkeit|Camping)",
+    "genre":     r"Genres:\s*(.*?)\s*(?:Gründung|Festivalausgabe|Besucher)",
+    "besucher":  r"Besucher:\s*(.*?)\s*(?:Sonstiges|Weiterführende|Webseite)",
+    "acts":      r"Künstler:\s*(.*?)\s*(?:Anreise|Wie komme)",
+}
+
+FA_LEER = re.compile(r"^(keine daten|unbekannt|-|)$", re.I)
+
+
+def fa_parse_detail(url: str, html: str, seed: dict | None = None) -> dict | None:
+    s = soup(html)
+    h1 = s.find("h1")
+    roh = clean(h1.get_text(" ", strip=True)) if h1 else ""
+    if not roh:
+        return None
+
+    # "Baltic Open Air 19.08. - 21.08.2026"
+    dm = re.search(r"(\d{2}\.\d{2}\.)\s*-\s*(\d{2}\.\d{2}\.\d{4})|(\d{2}\.\d{2}\.\d{4})", roh)
+    date_from = date_to = ""
+    if dm and dm.group(2):
+        jahr = dm.group(2)[-4:]
+        date_from, date_to = dm.group(1) + jahr, dm.group(2)
+    elif dm and dm.group(3):
+        date_from = date_to = dm.group(3)
+    name = clean(roh[:dm.start()]) if dm else roh
+    name = re.sub(r"[\s\-–|]+$", "", name)
+    if not name:
+        return None
+
+    flach = clean(s.get_text(" ", strip=True))
+
+    feld: dict[str, str] = {}
+    for name_feld, muster in FA_FELDER.items():
+        m = re.search(muster, flach, re.S)
+        wert = clean(m.group(1)) if m else ""
+        if wert and not FA_LEER.match(wert):
+            feld[name_feld] = wert
+
+    ort = clean(re.sub(r"^\d{4,5}\s*", "", feld.get("stadt", "")))   # PLZ abtrennen
+    preis = feld.get("preis", "")
+    if preis:
+        preis = clean(preis.replace("ca.", "").replace("€", "EUR"))
+        preis = "" if not re.search(r"\d", preis) else preis
+    if preis and not preis.lower().startswith("ab"):
+        preis = f"ab {preis}"
+
+    bands = [clean(b) for b in feld.get("acts", "").split(",") if valid_band(b)]
+
+    website = ""
+    for li in s.find_all(["li", "div", "p"]):
+        if "Webseite" not in li.get_text():
+            continue
+        a = li.find("a", href=True)
+        if a and a["href"].startswith("http") and "awin1.com" not in a["href"] \
+                and "festival-alarm" not in a["href"]:
+            website = a["href"].strip()
+            break
+
+    return {
+        "source": "festivalalarm",
+        "source_url": url,
+        "name": name,
+        "date_from": date_from,
+        "date_to": date_to,
+        "year": date_from[-4:] if date_from else "",
+        "city": ort,
+        "country": feld.get("land", ""),
+        "venue": "",
+        "location": ", ".join(x for x in [ort, feld.get("land", "")] if x),
+        "price": preis,
+        "website": website,
+        "genre": feld.get("genre", ""),
+        "visitors": re.sub(r"\D", "", feld.get("besucher", "")),
+        "note": "",
+        "cancelled": False,
+        "lineup": bands,
+    }
 
 
 def fu_extract_lineup(s: BeautifulSoup) -> list[str]:
@@ -454,6 +609,8 @@ def fu_parse_detail(url: str, html: str) -> dict | None:
             note = f"Termin offen; letzte gefundene Ausgabe {ranges[0][0]}"
         else:
             date_from, date_to = ranges[0]
+    elif year:
+        note = "Termin noch nicht veröffentlicht"
     if not year and date_from:
         year = date_from[-4:]
 
@@ -554,6 +711,22 @@ def build_band_registry(records: list[dict]) -> tuple[dict[str, str], dict]:
     return registry, stats
 
 
+# festival-alarm fuehrt auch Ueberseefestivals. Das Projekt sammelt Europa,
+# und die Geokodierung ist ohnehin auf europaeische Laender begrenzt.
+NICHT_EUROPA = {
+    "usa", "vereinigte staaten", "united states", "kanada", "canada", "mexiko",
+    "brasilien", "argentinien", "chile", "kolumbien", "peru", "uruguay",
+    "australien", "neuseeland", "japan", "china", "indien", "indonesien",
+    "thailand", "vietnam", "philippinen", "singapur", "suedafrika", "südafrika",
+    "aegypten", "ägypten", "marokko", "tunesien", "israel", "katar",
+    "vereinigte arabische emirate", "us", "ca", "au", "nz", "jp", "br", "mx",
+}
+
+
+def ausser_europa(country: str) -> bool:
+    return (country or "").strip().lower() in NICHT_EUROPA
+
+
 def city_key(value: str) -> str:
     v = re.sub(r"\b\d{4,6}\b", " ", value or "")       # PLZ entfernen
     return _fold(v)
@@ -569,6 +742,8 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
     """
     merged: dict[tuple[str, str, str], dict] = {}
     for rec in records:
+        if ausser_europa(rec["country"]):
+            continue
         key = (festival_key(rec["name"]), rec.get("year", ""), city_key(rec["city"]))
         cur = merged.get(key)
         if cur is None:
@@ -588,7 +763,8 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
                 "note": rec.get("note", ""),
                 "cancelled": bool(rec.get("cancelled")),
                 "sources": {},
-                "source_order": 0 if rec["source"] == "festivalticker" else 1,
+                "source_order": {"festivalticker": 0, "festivalsunited": 1}
+                                .get(rec["source"], 2),
                 "_bands": {},
             }
             merged[key] = cur
@@ -612,20 +788,27 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
     for key, rec in merged.items():
         by_name.setdefault((key[0], key[1]), []).append((key, rec))
     for group in by_name.values():
-        if len(group) != 2:
+        if len(group) < 2:
             continue
-        (ka, a), (kb, b) = group
-        if set(a["sources"]) & set(b["sources"]) or len(a["sources"]) != 1 or len(b["sources"]) != 1:
+        # Jede Gruppe muss aus genau einer Quelle stammen und die Quellen
+        # muessen sich unterscheiden - sonst waeren es echte Parallelveranstaltungen.
+        if any(len(rec["sources"]) != 1 for _, rec in group):
             continue
-        keep, drop, drop_key = (a, b, kb) if a["source_order"] <= b["source_order"] else (b, a, ka)
-        for field in ("date_from", "date_to", "city", "country", "venue",
-                      "location", "price", "website", "genre", "visitors", "note"):
-            if not keep[field] and drop[field]:
-                keep[field] = drop[field]
-        keep["cancelled"] = keep["cancelled"] or drop["cancelled"]
-        keep["sources"].update(drop["sources"])
-        keep["_bands"].update(drop["_bands"])
-        merged.pop(drop_key, None)
+        quellen = [next(iter(rec["sources"])) for _, rec in group]
+        if len(set(quellen)) != len(quellen):
+            continue
+
+        group = sorted(group, key=lambda kr: kr[1]["source_order"])
+        _, keep = group[0]
+        for drop_key, drop in group[1:]:
+            for field in ("date_from", "date_to", "city", "country", "venue",
+                          "location", "price", "website", "genre", "visitors", "note"):
+                if not keep[field] and drop[field]:
+                    keep[field] = drop[field]
+            keep["cancelled"] = keep["cancelled"] or drop["cancelled"]
+            keep["sources"].update(drop["sources"])
+            keep["_bands"].update(drop["_bands"])
+            merged.pop(drop_key, None)
 
     # Stufe 3: gleiche Veranstaltung, unterschiedlich benannt.
     # "Kosmos Festival" (festivalticker) und "Kosmos Festival Chemnitz"
@@ -724,22 +907,29 @@ def main() -> None:
     ap.add_argument("--limit", type=int, default=0, help="nur N Detailseiten je Quelle")
     ap.add_argument("--max-age", type=float, default=24.0,
                     help="Cache-Alter in Stunden, ab dem neu geladen wird (0 = nie)")
+    ap.add_argument("--since", type=int, default=date.today().year,
+                    help="fruehester Jahrgang; 2006 holt das komplette Archiv")
     args = ap.parse_args()
 
     global MAX_AGE_H
     MAX_AGE_H = args.max_age
 
     t0 = time.time()
-    print("Sammle Detail-Links ...", flush=True)
-    ft_seeds = ft_collect_seeds()
+    print(f"Sammle Detail-Links ab Jahrgang {args.since} ...", flush=True)
+    ft_seeds = ft_collect_seeds(args.since)
     ft_links = list(ft_seeds)
-    fu_links = fu_collect_links()
-    print(f"  festivalticker: {len(ft_links)} | festivalsunited: {len(fu_links)}", flush=True)
+    fu_links = fu_collect_links(args.since)
+    fa_links = fa_collect_links(args.since)
+    print(f"  festivalticker {len(ft_links)} | festivalsunited {len(fu_links)} | "
+          f"festival-alarm {len(fa_links)}", flush=True)
     if args.limit:
-        ft_links, fu_links = ft_links[:args.limit], fu_links[:args.limit]
+        ft_links = ft_links[:args.limit]
+        fu_links = fu_links[:args.limit]
+        fa_links = fa_links[:args.limit]
 
     records = scrape(ft_links, ft_parse_detail, "festivalticker", ft_seeds)
     records += scrape(fu_links, fu_parse_detail, "festivalsunited")
+    records += scrape(fa_links, fa_parse_detail, "festival-alarm")
     print(f"Datensaetze: {len(records)}", flush=True)
 
     registry, bstats = build_band_registry(records)

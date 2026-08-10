@@ -167,6 +167,10 @@ input[type=range] { width: 100%; accent-color: var(--red); }
 .row { display: flex; gap: .5rem; }
 .row input { flex: 1; }
 
+.row.dates { align-items: center; }
+.row.dates input { min-width: 0; }
+.bis { color: var(--mut); font-size: .8rem; flex: none; }
+
 .check {
   display: flex;
   align-items: center;

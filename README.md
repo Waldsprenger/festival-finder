@@ -1,6 +1,27 @@
 # Festival-Übersicht Europa
 
-Zusammengeführte Festival- und Lineup-Daten aus festivalticker.de und festivalsunited.com.
+Zusammengeführte Festival- und Lineup-Daten aus festivalticker.de,
+festivalsunited.com und festival-alarm.com.
+
+## Quellenerfassung
+
+Der Scraper enumeriert die Seiten vollständig statt einzelne Listen abzuklappern:
+
+| Quelle | Weg | Umfang |
+|---|---|---|
+| festivalticker.de | alle Listenseiten: Jahres-, Monats-, Länder- und Statusarchive | 2.720 Detailseiten insgesamt |
+| festivalsunited.com | `sitemap.xml` mit Unterkarten je Jahrgang | 16.044 Detailseiten insgesamt |
+| festival-alarm.com | Jahresseiten `/Festivals-JAHR` | 4.750 Detailseiten insgesamt |
+
+`--since JAHR` steuert die Tiefe; voreingestellt ist das laufende Jahr. Ein
+kompletter Durchlauf über alle Jahrgänge geht mit `--since 2006`, erzeugt aber
+über 23.000 Abrufe und eine Datei, die für die Veröffentlichung zu groß wird.
+Vergangene Jahrgänge werden von der Webseite ohnehin herausgefiltert.
+
+Zwei Grenzen der Quellen: festivalticker zeigt für vergangene Jahre nur je 40
+Einträge, mehr gibt die Seite nicht her. Und festival-alarm führt bei den
+meisten Festivals kein Lineup („keine Daten") — es liefert vor allem zusätzliche
+Termine, Preise und Orte. Außereuropäische Einträge werden verworfen.
 
 ## Neu erzeugen
 

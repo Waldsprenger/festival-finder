@@ -24,6 +24,7 @@
     showCancelled: false,
     useBands: true,
     from: '',
+    to: '',
     allowUnknownDate: false,
     selected: new Map(),     // bandIndex -> Gewicht (1 oder 2)
   };
@@ -459,8 +460,12 @@
     if (p === null) { if (!state.allowUnknownPrice) return false; }
     else if (p > state.maxPrice) return false;
 
-    if (!row[FROM]) { if (!state.allowUnknownDate) return false; }
-    else if (state.from && row[FROM] < state.from) return false;
+    if (!row[FROM]) {
+      if (!state.allowUnknownDate) return false;
+    } else {
+      if (state.from && row[FROM] < state.from) return false;
+      if (state.to && row[FROM] > state.to) return false;
+    }
 
     return true;
   }
@@ -840,6 +845,7 @@
     const today = new Date().toISOString().slice(0, 10);
     $('from').value = today;
     state.from = today;
+    $('to').min = today;
 
     $('locate').addEventListener('click', resolveHome);
     $('home').addEventListener('keydown', (e) => { if (e.key === 'Enter') resolveHome(); });
@@ -875,7 +881,27 @@
       render();
     });
 
-    $('from').addEventListener('change', (e) => { state.from = e.target.value; render(); });
+    // Die beiden Felder begrenzen sich gegenseitig, damit kein leerer
+    // Zeitraum entstehen kann
+    $('from').addEventListener('change', (e) => {
+      state.from = e.target.value;
+      $('to').min = state.from || '';
+      if (state.to && state.from && state.to < state.from) {
+        state.to = state.from;
+        $('to').value = state.to;
+      }
+      render();
+    });
+
+    $('to').addEventListener('change', (e) => {
+      state.to = e.target.value;
+      $('from').max = state.to || '';
+      if (state.from && state.to && state.from > state.to) {
+        state.from = state.to;
+        $('from').value = state.from;
+      }
+      render();
+    });
 
     $('date-unknown').addEventListener('change', (e) => {
       state.allowUnknownDate = e.target.checked; render();
