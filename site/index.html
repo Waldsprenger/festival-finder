@@ -155,6 +155,50 @@
     <ol class="festivals" id="festival-list"></ol>
   </section>
 
+  <!-- ============ Rückmeldung ============ -->
+  <section class="panel" id="step-feedback">
+    <h2><span class="num">✉</span> Rückmeldung
+      <button type="button" class="help" aria-label="Erklärung zur Rückmeldung"
+              title="Fehlt ein Festival, stimmt ein Termin nicht, oder fehlt dir eine Funktion? Der Knopf öffnet dein E-Mail-Programm mit fertig vorbereitetem Text — abgeschickt wird erst dort von dir. Die Seite selbst verschickt nichts.">?</button>
+    </h2>
+    <p class="lead">Fehlendes Festival, falscher Termin, Wunsch oder Kritik — alles willkommen.</p>
+
+    <div class="grid">
+      <div class="field">
+        <label for="fb-art">Worum geht es?</label>
+        <select id="fb-art">
+          <option>Fehlendes Festival</option>
+          <option>Falsche Angabe (Termin, Preis, Ort, Lineup)</option>
+          <option>Funktionswunsch</option>
+          <option>Fehler auf der Seite</option>
+          <option>Kritik oder Lob</option>
+          <option>Sonstiges</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="fb-kontakt">Rückmeldeadresse <span class="opt">optional</span></label>
+        <input type="text" id="fb-kontakt" placeholder="nur falls du eine Antwort möchtest">
+      </div>
+    </div>
+
+    <div class="field feedback-text">
+      <label for="fb-text">Deine Nachricht</label>
+      <textarea id="fb-text" rows="5"
+                placeholder="Zum Beispiel: Das Festival XY am 12.07. in Musterstadt fehlt, Webseite ist xy.de"></textarea>
+    </div>
+
+    <div class="feedback-actions">
+      <a id="fb-send" class="btn-link" href="mailto:waldsprenger@gmail.com"
+         title="Öffnet dein E-Mail-Programm mit Betreff und Text. Abgeschickt wird erst dort von dir.">
+        E-Mail-Programm öffnen</a>
+      <button type="button" id="fb-copy" class="ghost"
+              title="Kopiert Adresse und Nachricht in die Zwischenablage — praktisch, wenn kein E-Mail-Programm eingerichtet ist.">
+        Text kopieren</button>
+      <span class="fb-mail">waldsprenger@gmail.com</span>
+    </div>
+    <p class="hint" id="fb-status"></p>
+  </section>
+
 </main>
 
 <footer class="site-footer">

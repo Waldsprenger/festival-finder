@@ -835,6 +835,82 @@
     return li;
   }
 
+  /* ---------------- Rückmeldung ----------------
+     Die veröffentlichte Fassung darf keine fremden Server aufrufen, ein
+     Formularversand scheidet damit aus. Der Text wird stattdessen lokal
+     zusammengesetzt und an das E-Mail-Programm übergeben; abgeschickt wird
+     erst dort. Wer keines eingerichtet hat, kopiert den Text. */
+
+  const FEEDBACK_MAIL = 'waldsprenger@gmail.com';
+
+  function feedbackText() {
+    const art = $('fb-art').value;
+    const nachricht = $('fb-text').value.trim();
+    const kontakt = $('fb-kontakt').value.trim();
+    const zeilen = [nachricht];
+    if (kontakt) zeilen.push('', `Rückmeldeadresse: ${kontakt}`);
+    zeilen.push('', `— Datenstand ${fmtStand(D.generated)}`);
+    return { betreff: `Festival Finder: ${art}`, koerper: zeilen.join('\n'), nachricht };
+  }
+
+  function initFeedback() {
+    if (!$('fb-send')) return;
+    const status = $('fb-status');
+
+    const pruefen = () => {
+      const { nachricht } = feedbackText();
+      if (nachricht) return true;
+      status.className = 'hint err';
+      status.textContent = 'Bitte schreib noch kurz, worum es geht.';
+      $('fb-text').focus();
+      return false;
+    };
+
+    // Ein echter Link statt eines Sprungs per Skript: In der eingebetteten
+    // Fassung wird eine gesetzte Adresse geblockt, ein Klick auf mailto nicht.
+    const linkAktualisieren = () => {
+      const { betreff, koerper } = feedbackText();
+      $('fb-send').href = `mailto:${FEEDBACK_MAIL}` +
+        `?subject=${encodeURIComponent(betreff)}&body=${encodeURIComponent(koerper)}`;
+    };
+
+    $('fb-send').addEventListener('click', (e) => {
+      if (!pruefen()) { e.preventDefault(); return; }
+      linkAktualisieren();
+      status.className = 'hint ok';
+      status.textContent = 'Dein E-Mail-Programm sollte sich öffnen. Falls nicht, ' +
+        'nimm „Text kopieren“ und schicke die Nachricht von Hand.';
+    });
+
+    for (const id of ['fb-art', 'fb-text', 'fb-kontakt']) {
+      $(id).addEventListener('input', linkAktualisieren);
+      $(id).addEventListener('change', linkAktualisieren);
+    }
+    linkAktualisieren();
+
+    $('fb-copy').addEventListener('click', async () => {
+      if (!pruefen()) return;
+      const { betreff, koerper } = feedbackText();
+      const text = `An: ${FEEDBACK_MAIL}\nBetreff: ${betreff}\n\n${koerper}`;
+      try {
+        await navigator.clipboard.writeText(text);
+        status.className = 'hint ok';
+        status.textContent = 'Kopiert. Füge den Text in eine E-Mail an ' +
+          `${FEEDBACK_MAIL} ein.`;
+      } catch (_) {
+        status.className = 'hint err';
+        status.textContent = 'Kopieren hat nicht geklappt — bitte den Text ' +
+          'oben markieren und selbst kopieren.';
+      }
+    });
+
+    for (const id of ['fb-text', 'fb-kontakt']) {
+      $(id).addEventListener('input', () => {
+        if (status.textContent) { status.className = 'hint'; status.textContent = ''; }
+      });
+    }
+  }
+
   /* ---------------- Hilfetexte ----------------
      Auf Touchgeräten gibt es kein Mouseover, deshalb öffnet ein Klick auf das
      Fragezeichen den Text in einem Feld. Am Rechner bleibt zusätzlich der
@@ -1062,6 +1138,7 @@
     datumsHinweis(false);
     initMap();
     initHelp();
+    initFeedback();
     initLegal();
     renderBandResults();
     renderChosen();

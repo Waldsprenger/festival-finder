@@ -233,6 +233,55 @@ button.help.on { border-color: var(--amber); background: var(--amber); color: #1
 }
 .stat b { color: var(--amber); font-variant-numeric: tabular-nums; }
 
+/* ---------- Rückmeldung ---------- */
+
+select, textarea {
+  width: 100%;
+  padding: .65rem .75rem;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  color: var(--fg);
+  font: inherit;
+}
+
+textarea { resize: vertical; min-height: 6rem; line-height: 1.5; }
+select:focus, textarea:focus { outline: 2px solid var(--amber); outline-offset: 1px; }
+
+.opt { color: var(--mut); font-weight: 400; text-transform: none; letter-spacing: 0; }
+.feedback-text { margin-top: 1.2rem; }
+
+.feedback-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .6rem;
+  margin-top: 1rem;
+}
+
+/* Link, der wie ein Knopf aussieht - mailto braucht ein echtes a-Element */
+.btn-link {
+  display: inline-block;
+  font-weight: 700;
+  text-decoration: none;
+  border: 1px solid var(--red);
+  background: var(--red);
+  color: #fff !important;
+  padding: .6rem 1rem;
+  border-radius: 2px;
+}
+
+.btn-link:hover { background: #ff2f24; }
+.btn-link:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+
+.fb-mail {
+  color: var(--mut);
+  font-size: .85rem;
+  user-select: all;
+}
+
+#step-feedback .num { font-size: 1rem; }
+
 /* ---------- Karte ---------- */
 
 .map-wrap { margin: 1.5rem 0 0; padding: 0; }
