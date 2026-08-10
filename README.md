@@ -132,7 +132,12 @@ und ersetzt alle übrigen.
 - 311 Einträge haben kein Datum: festivalsunited führt sie ohne bestätigte Neuauflage.
   Das Feld `Hinweis` nennt dann die letzte gefundene Ausgabe.
 - Bei reinen Akronymen kann die Mehrheitsregel die falsche Variante wählen
-  (`GANS` → `Gans`), da sie gemischte Schreibweise bevorzugt.
+  (`GANS` → `Gans`), da sie gemischte Schreibweise bevorzugt. Ein Großbuchstabe
+  am Anfang hat Vorrang, damit nicht `b.o.s.c.h.` statt `B.O.S.C.H.` gewinnt.
+- Zwei festivalticker-Seiten reihen Bandnamen ohne jeden Trenner aneinander
+  (`Quincy Goldie 333 I Fire Schnuppe …`). Sie bleiben ohne Lineup: Eine
+  Aufteilung nach Leerzeichen würde raten und aus „Nebula Allstars" die Band
+  „Nebula" machen. Erfundene Bandnamen wären schlimmer als fehlende.
 - Preise sind Freitext in zehn Währungen. Als Preis zählt nur eine Zahl direkt an
   einer Währung, sonst würde „VVK 199 € (Stufe 2)" als 2 € gelesen. „Spende" und
   „Zahl was du willst" ergeben 0 €; ein solcher Hinweis nach einer Preisangabe

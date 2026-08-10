@@ -137,6 +137,9 @@ def festival_key(name: str) -> str:
     return re.sub(r"\s+", " ", v).strip() or _fold(name)
 
 
+BAND_DATE = re.compile(r"^\d{1,2}\.\s?\d{1,2}\.\d{2,4}\b")
+
+
 def valid_band(name: str) -> bool:
     n = clean(name)
     if len(n) < 2 or len(n) > 90:
@@ -144,6 +147,10 @@ def valid_band(name: str) -> bool:
     if BAND_NOISE.match(n):
         return False
     if not re.search(r"[A-Za-zÀ-ÿ0-9]", n):
+        return False
+    # Datumsangaben aus dem Fliesstext sind keine Bands:
+    # "26. 7.2026" oder "04.07.2026 Auch der zweite Festivaltag"
+    if BAND_DATE.match(n):
         return False
     return True
 
@@ -155,8 +162,11 @@ def canonical_band(variants: list[str]) -> str:
         counts[v] = counts.get(v, 0) + 1
     def score(item):
         name, cnt = item
+        # Grossbuchstabe am Anfang zuerst: sonst gewaenne bei Akronymen wie
+        # B.O.S.C.H. die durchgehend kleingeschriebene Variante.
+        beginnt_gross = name[:1].isupper()
         has_case = name != name.lower() and name != name.upper()
-        return (cnt, has_case, -name.count("."), len(name))
+        return (cnt, beginnt_gross, has_case, -name.count("."), len(name))
     return max(counts.items(), key=score)[0]
 
 
@@ -214,12 +224,52 @@ FT_LABELS = ["Stil", "Kategorie", "Preis", "Besucher", "Location", "Plz",
 
 FT_BANDS_END = re.compile(r"\s*(?:Neues zu:|Kommentare zu:|Zurück\b|Zum Festivalplaner)")
 
+# Fallback fuer Bandlisten ohne Komma, die stattdessen die Bauform
+# "Bandname (Stilbeschreibung)" aneinanderreihen.
+FT_BANDS_PAREN = re.compile(r"([^()]+?)\s*\(([^()]{2,60})\)")
+
+# ... oder als Ablaufplan "17:30 Band 19:45 Band" bzw. "18:00 Uhr Band"
+FT_BANDS_TIME = re.compile(r"\b\d{1,2}[:.]\d{2}\s*(?:Uhr)?\s*")
+
 
 def ft_split_bands(blob: str) -> list[str]:
     if not blob:
         return []
-    blob = FT_BANDS_END.split(blob)[0]
-    return [clean(p) for p in blob.split(",") if valid_band(p)]
+    blob = FT_BANDS_END.split(blob)[0].strip()
+    if not blob:
+        return []
+
+    if "," in blob:
+        return [clean(p) for p in blob.split(",") if valid_band(p)]
+
+    # Kein Komma: Die Klammer hinter jedem Namen dient als Trenner.
+    # Erst ab zwei Treffern ist das Muster belastbar.
+    paare = FT_BANDS_PAREN.findall(blob)
+    if len(paare) >= 2:
+        namen = [clean(n) for n, _ in paare]
+        rest = clean(blob[blob.rfind(")") + 1:])
+        if rest:
+            namen.append(rest)
+        namen = [n for n in namen if valid_band(n) and len(n) <= 60]
+        if len(namen) >= 2:
+            return namen
+
+    # Ablaufplan mit Uhrzeiten als Trenner
+    if len(FT_BANDS_TIME.findall(blob)) >= 2:
+        namen = [clean(t) for t in FT_BANDS_TIME.split(blob)]
+        namen = [n for n in namen if valid_band(n) and len(n) <= 60]
+        if len(namen) >= 2:
+            return namen
+
+    # Sonst gibt es keinen verlaesslichen Trenner. Eine Aufteilung nach
+    # Leerzeichen wuerde raten und aus "Nebula Allstars" die Band "Nebula"
+    # machen - lieber kein Lineup als ein erfundenes. Als einzelner Act gilt
+    # der Block nur, wenn er auch wie ein einzelner Name aussieht.
+    # "Deep Purple Manfred Mann's Earth Band" sind zwei Acts ohne Trenner -
+    # deshalb gilt der Block nur bei kurzer, namensartiger Form als ein Act.
+    if valid_band(blob) and len(blob) <= 30 and len(blob.split()) <= 4:
+        return [clean(blob)]
+    return []
 
 
 def ft_parse_detail(url: str, html: str, seed: dict | None = None) -> dict | None:
