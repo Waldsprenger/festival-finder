@@ -205,6 +205,24 @@ button.small { padding: .3rem .6rem; font-size: .8rem; }
 .hint { margin: .5rem 0 0; font-size: .82rem; color: var(--mut); }
 .hint.ok { color: var(--ok); }
 .hint.err { color: #ff7a70; }
+.hint.warn { color: var(--amber); }
+.hint:empty { margin: 0; }
+
+/* Infofeld der Fragezeichen - auf Touchgeräten der einzige Weg zum Hilfetext */
+.help-box {
+  position: absolute;
+  z-index: 50;
+  background: var(--bg2);
+  color: var(--fg);
+  border: 1px solid var(--amber);
+  border-radius: 3px;
+  padding: .7rem .85rem;
+  font-size: .86rem;
+  line-height: 1.45;
+  box-shadow: 0 12px 30px -12px #000;
+}
+
+button.help.on { border-color: var(--amber); background: var(--amber); color: #111; }
 
 .stat {
   margin: 1.2rem 0 0;

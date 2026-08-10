@@ -10,7 +10,7 @@ from __future__ import annotations
 import json
 import math
 import re
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 
 BASE = Path(__file__).resolve().parent.parent
@@ -206,7 +206,8 @@ def main() -> None:
     europe = json.loads(europe_path.read_text(encoding="utf-8")) if europe_path.exists() else []
 
     payload = {
-        "generated": date.today().isoformat(),
+        # mit Uhrzeit, damit auf der Seite steht, wie frisch die Daten sind
+        "generated": datetime.now().astimezone().strftime("%Y-%m-%dT%H:%M%z"),
         "bands": bands,
         "festivals": rows,
         "places": places,

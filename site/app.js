@@ -577,6 +577,15 @@
 
   /* ---------------- Treffer ---------------- */
 
+  /** Datenstand mit Uhrzeit: "10.08.2026 um 14:32 Uhr" */
+  function fmtStand(stamp) {
+    if (!stamp) return 'unbekannt';
+    const m = String(stamp).match(/^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}))?/);
+    if (!m) return stamp;
+    const datum = `${m[3]}.${m[2]}.${m[1]}`;
+    return m[4] ? `${datum} um ${m[4]}:${m[5]} Uhr` : datum;
+  }
+
   const fmtDate = (iso) => {
     if (!iso) return '';
     const [y, m, d] = iso.split('-');
@@ -789,6 +798,58 @@
     return li;
   }
 
+  /* ---------------- Hilfetexte ----------------
+     Auf Touchgeräten gibt es kein Mouseover, deshalb öffnet ein Klick auf das
+     Fragezeichen den Text in einem Feld. Am Rechner bleibt zusätzlich der
+     native Tooltip erhalten. */
+
+  function initHelp() {
+    const box = document.createElement('div');
+    box.className = 'help-box';
+    box.hidden = true;
+    box.setAttribute('role', 'status');
+    document.body.append(box);
+
+    let offen = null;
+
+    function schliessen() {
+      box.hidden = true;
+      if (offen) offen.classList.remove('on');
+      offen = null;
+    }
+
+    function oeffnen(btn) {
+      box.textContent = btn.getAttribute('title') || '';
+      box.hidden = false;
+      btn.classList.add('on');
+      offen = btn;
+
+      // unter dem Fragezeichen platzieren, aber im Fenster halten
+      const r = btn.getBoundingClientRect();
+      const breite = Math.min(320, window.innerWidth - 24);
+      box.style.width = breite + 'px';
+      let links = r.left + window.scrollX + r.width / 2 - breite / 2;
+      links = Math.max(12, Math.min(links, window.innerWidth - breite - 12));
+      box.style.left = links + 'px';
+      box.style.top = (r.bottom + window.scrollY + 8) + 'px';
+    }
+
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('button.help');
+      if (btn) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (offen === btn) schliessen(); else oeffnen(btn);
+        return;
+      }
+      if (!e.target.closest('.help-box')) schliessen();
+    });
+
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') schliessen(); });
+    window.addEventListener('resize', schliessen);
+    window.addEventListener('scroll', schliessen, { passive: true });
+  }
+
   /* ---------------- Rechtstexte ----------------
      Nur die gebündelte Einzelseite enthält Impressum und Datenschutz als
      Abschnitte. Dort bleiben sie eingeklappt, bis der Fußlink sie öffnet.
@@ -888,30 +949,59 @@
 
     // Die beiden Felder begrenzen sich gegenseitig, damit kein leerer
     // Zeitraum entstehen kann
+    const heute = today;
+
+    /** Erklärt, warum ein Datum zurückgezogen wurde, und warnt vor
+     *  Zeiträumen in der Vergangenheit. */
+    function datumsHinweis(zuFrueh) {
+      const el = $('date-hint');
+      const vergangen = (state.from && state.from < heute) ||
+                        (state.to && state.to < heute);
+      if (zuFrueh) {
+        el.className = 'hint err';
+        el.textContent =
+          `Früher als der ${fmtDate(state.minDate)} ist nicht möglich: Das ist der ` +
+          'Monatsanfang des zeitlich ersten Festivals im Datenbestand — davor liegen ' +
+          'keine Daten vor. Das Datum wurde auf diesen Tag gesetzt.';
+      } else if (vergangen) {
+        el.className = 'hint warn';
+        el.textContent =
+          'Der Zeitraum liegt teilweise in der Vergangenheit. Es werden deshalb auch ' +
+          'Festivals angezeigt, die bereits laufen oder schon vorbei sind.';
+      } else {
+        el.className = 'hint';
+        el.textContent = '';
+      }
+    }
+
     // Eingetippte Daten koennen die Untergrenze unterlaufen - der Kalender
     // selbst bietet sie gar nicht erst an
     const klemme = (wert) => (state.minDate && wert && wert < state.minDate)
       ? state.minDate : wert;
 
     $('from').addEventListener('change', (e) => {
-      e.target.value = klemme(e.target.value);
+      const eingabe = e.target.value;
+      e.target.value = klemme(eingabe);
       state.from = e.target.value;
       $('to').min = state.from || state.minDate || '';
       if (state.to && state.from && state.to < state.from) {
         state.to = state.from;
         $('to').value = state.to;
       }
+      datumsHinweis(eingabe && eingabe !== e.target.value);
       render();
     });
 
     $('to').addEventListener('change', (e) => {
-      e.target.value = klemme(e.target.value);
+      const eingabe = e.target.value;
+      e.target.value = klemme(eingabe);
       state.to = e.target.value;
       $('from').max = state.to || '';
       if (state.from && state.to && state.from > state.to) {
         state.from = state.to;
         $('from').value = state.from;
       }
+      datumsHinweis(eingabe && eingabe !== e.target.value);
       render();
     });
 
@@ -929,10 +1019,12 @@
     });
 
     $('build-info').textContent =
-      `Datenstand ${fmtDate(D.generated)} · ${F.length.toLocaleString('de-DE')} Festivals · ` +
+      `Datenstand ${fmtStand(D.generated)} · ${F.length.toLocaleString('de-DE')} Festivals · ` +
       `${BANDS.length.toLocaleString('de-DE')} Acts.`;
 
+    datumsHinweis(false);
     initMap();
+    initHelp();
     initLegal();
     renderBandResults();
     renderChosen();
