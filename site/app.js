@@ -185,7 +185,24 @@
     zoom: 1, center: null, drag: null, moved: false,
   };
 
-  const ZOOM_MIN = 0.25, ZOOM_MAX = 60;
+  const ZOOM_MIN = 0.02, ZOOM_MAX = 60;
+
+  // Umschließendes Rechteck je Polygonring, einmal berechnet und gemerkt
+  const bounds = new WeakMap();
+  function ringBounds(ring) {
+    let b = bounds.get(ring);
+    if (b) return b;
+    let lon0 = Infinity, lon1 = -Infinity, lat0 = Infinity, lat1 = -Infinity;
+    for (const [lon, lat] of ring) {
+      if (lon < lon0) lon0 = lon;
+      if (lon > lon1) lon1 = lon;
+      if (lat < lat0) lat0 = lat;
+      if (lat > lat1) lat1 = lat;
+    }
+    b = { lon0, lon1, lat0, lat1 };
+    bounds.set(ring, b);
+    return b;
+  }
 
   // Mittabstandstreue Zylinderprojektion, an der Bildmitte ausgerichtet.
   // Für Ausschnitte bis ~2000 km ist die Verzerrung vernachlässigbar.
@@ -245,9 +262,29 @@
     ctx.fillStyle = '#0e1116';
     ctx.fillRect(0, 0, w, h);
 
-    // Landmassen
+    // Landmassen. Ringe ausserhalb des Ausschnitts werden uebersprungen -
+    // die Weltkarte hat rund 90.000 Punkte, beim Hineinzoomen liegt das
+    // meiste davon weit weg.
+    const sicht = {
+      lon0: v.lon(-40), lon1: v.lon(w + 40),
+      lat0: v.lat(h + 40), lat1: v.lat(-40),
+    };
+
+    // Nah dran die feinen Umrisse, sonst die grobe Weltkarte: In der
+    // Weltansicht kostet jeder Punkt Zeichenzeit, in der Nahansicht fiele
+    // jede Vereinfachung als Kante auf.
+    const box = D.fineBox;
+    const nah = (baseSpan() / map.zoom) <= 1200;
+    const inEuropa = box && sicht.lon0 >= box[0] && sicht.lon1 <= box[1]
+                         && sicht.lat0 >= box[2] && sicht.lat1 <= box[3];
+    const umrisse = (nah && inEuropa && D.worldFine && D.worldFine.length)
+      ? D.worldFine : (D.world || []);
+
     ctx.beginPath();
-    for (const ring of (D.europe || [])) {
+    for (const ring of umrisse) {
+      const b = ringBounds(ring);
+      if (b.lon1 < sicht.lon0 || b.lon0 > sicht.lon1 ||
+          b.lat1 < sicht.lat0 || b.lat0 > sicht.lat1) continue;
       let started = false;
       for (const [lon, lat] of ring) {
         const px = v.x(lon), py = v.y(lat);

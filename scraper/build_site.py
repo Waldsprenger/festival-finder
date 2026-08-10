@@ -10,8 +10,12 @@ from __future__ import annotations
 import json
 import math
 import re
+import sys
 from datetime import date, datetime
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from festival_scraper import land_code  # noqa: E402  (Pfad muss vorher stehen)
 
 BASE = Path(__file__).resolve().parent.parent
 DATA = BASE / "data"
@@ -155,6 +159,8 @@ def main() -> None:
     festivals = json.loads((DATA / "festivals.json").read_text(encoding="utf-8"))
     geo_path = DATA / "geo.json"
     geo = json.loads(geo_path.read_text(encoding="utf-8")) if geo_path.exists() else {}
+    plz_path = DATA / "plz.json"
+    plz = json.loads(plz_path.read_text(encoding="utf-8")) if plz_path.exists() else []
 
     band_ix: dict[str, int] = {}
     bands: list[str] = []
@@ -165,12 +171,58 @@ def main() -> None:
             bands.append(name)
         return band_ix[name]
 
+    # Postleitzahl -> Koordinaten. Eine PLZ trifft den Zustellbereich, waehrend
+    # der Ortsname nur den Mittelpunkt der Gemeinde liefert - bei Flaechen-
+    # gemeinden sind das schnell zehn Kilometer Unterschied.
+    plz_index: dict[tuple[str, str], list] = {}
+    for code, ort, lat, lon, cc in plz:
+        plz_index.setdefault((code, cc), [lat, lon])
+
+    # Der Geo-Cache ist unter der urspruenglichen Landesschreibweise abgelegt
+    # ("Wacken|Deutschland"), die Festivals tragen inzwischen das Kuerzel.
+    # Ein normalisierter Index erspart das erneute Geokodieren aller Orte.
+    geo_index: dict[tuple[str, str], dict] = {}
+    geo_ort: dict[str, tuple[dict, str]] = {}
+    for schluessel, wert in geo.items():
+        if not wert:
+            continue
+        ort, _, land = schluessel.partition("|")
+        code = land_code(land)
+        geo_index.setdefault((ort.strip().casefold(), code), wert)
+        # Fehlt in der Quelle die Landesangabe, liefert sie der Geokodierer
+        # als letztes Glied seiner Adresse mit ("..., Deutschland").
+        if not code:
+            code = land_code((wert.get("display") or "").rsplit(",", 1)[-1])
+        geo_ort.setdefault(ort.strip().casefold(), (wert, code))
+
     rows = []
-    with_geo = 0
+    with_geo = aus_plz = 0
     for f in festivals:
         city, country = f["city"].strip(), f["country"].strip()
-        g = geo.get(f"{city}|{country}") or {}
-        lat, lon = (g.get("lat"), g.get("lon")) if g else (None, None)
+        code = (f.get("plz") or "").strip()
+        treffer = plz_index.get((code, country)) if code else None
+        if treffer is None and code:
+            # Land unbekannt oder abweichend notiert: eindeutige PLZ genuegt
+            kandidaten = [v for (c, _), v in plz_index.items() if c == code]
+            treffer = kandidaten[0] if len(kandidaten) == 1 else None
+
+        if treffer:
+            lat, lon = treffer
+            aus_plz += 1
+            if not country:
+                passend = [cc for (c, cc) in plz_index if c == code]
+                if len(set(passend)) == 1:
+                    country = passend[0]
+        else:
+            # Fehlt die Landesangabe, zaehlt der Ortstreffer samt nachgetragenem
+            # Kuerzel; sonst zuerst der genaue Treffer aus Ort und Land.
+            g = None if not country else geo_index.get((city.casefold(), country))
+            if g is None and city:
+                treffer_ort = geo_ort.get(city.casefold())
+                if treffer_ort:
+                    g, ergaenzt = treffer_ort
+                    country = country or ergaenzt
+            lat, lon = (g.get("lat"), g.get("lon")) if g else (None, None)
         if lat is not None:
             with_geo += 1
         rows.append([
@@ -199,11 +251,12 @@ def main() -> None:
         places = [[k.split("|")[0], v["lat"], v["lon"], ""]
                   for k, v in geo.items() if v and v.get("lat") is not None]
 
-    plz_path = DATA / "plz.json"
-    plz = json.loads(plz_path.read_text(encoding="utf-8")) if plz_path.exists() else []
+    def lade(name: str) -> list:
+        p = DATA / name
+        return json.loads(p.read_text(encoding="utf-8")) if p.exists() else []
 
-    europe_path = DATA / "europe.json"
-    europe = json.loads(europe_path.read_text(encoding="utf-8")) if europe_path.exists() else []
+    welt_grob = lade("welt_grob.json")
+    welt_fein = lade("welt_fein.json")
 
     payload = {
         # mit Uhrzeit, damit auf der Seite steht, wie frisch die Daten sind
@@ -212,7 +265,10 @@ def main() -> None:
         "festivals": rows,
         "places": places,
         "plz": plz,
-        "europe": europe,
+        "world": welt_grob,
+        "worldFine": welt_fein,
+        # Ausschnitt, für den feine Umrisse vorliegen: lon0, lon1, lat0, lat1
+        "fineBox": [-32.0, 46.0, 27.0, 72.0],
         "maxDistanceKm": max_distance_km(rows, plz),
         "maxPriceEur": max_price_eur(rows),
         "minDate": earliest_month(rows),
@@ -224,6 +280,7 @@ def main() -> None:
 
     priced = sum(1 for r in rows if r[6] is not None)
     print(f"{out}  ({out.stat().st_size / 1e6:.1f} MB)")
+    print(f"  Koordinaten aus Postleitzahl: {aus_plz}, aus Ortsname: {with_geo - aus_plz}")
     print(f"  Festivals {len(rows)} | mit Koordinaten {with_geo} | "
           f"mit Preis in EUR {priced} | Acts {len(bands)} | Orte {len(places)} | "
           f"PLZ {len(plz)}")

@@ -499,6 +499,34 @@ details.lineup .all mark { background: transparent; color: var(--ok); font-weigh
   margin-top: 2rem;
 }
 
+.support {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--amber);
+  border-radius: 3px;
+  padding: 1rem 1.15rem;
+  margin-bottom: 1.75rem;
+}
+
+.support-text { margin: 0; flex: 1 1 22rem; color: var(--mut); font-size: .9rem; }
+
+.paypal {
+  flex: none;
+  background: var(--amber);
+  color: #111 !important;
+  font-weight: 800;
+  text-decoration: none;
+  padding: .6rem 1.1rem;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+
+.paypal:hover { background: #ffc733; }
+.paypal:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+
 .site-footer nav { display: flex; gap: 1.25rem; margin-bottom: .9rem; }
 .site-footer a { color: var(--amber); }
 .src { color: var(--mut); font-size: .8rem; max-width: 70ch; margin: .4rem 0 0; }

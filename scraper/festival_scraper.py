@@ -393,6 +393,7 @@ def ft_parse_detail(url: str, html: str, seed: dict | None = None) -> dict | Non
         "city": fields.get("Ort", "") or seed.get("city", ""),
         "country": fields.get("Land", "") or seed.get("country", ""),
         "venue": fields.get("Location", ""),
+        "plz": fields.get("Plz", ""),
         "location": place or seed.get("city", ""),
         "price": fields.get("Preis", ""),
         "website": website,
@@ -521,7 +522,10 @@ def fa_parse_detail(url: str, html: str, seed: dict | None = None) -> dict | Non
         if wert and not FA_LEER.match(wert):
             feld[name_feld] = wert
 
-    ort = clean(re.sub(r"^\d{4,5}\s*", "", feld.get("stadt", "")))   # PLZ abtrennen
+    stadt_roh = feld.get("stadt", "")
+    plz_m = re.match(r"\s*(\d{4,5})\b", stadt_roh)
+    plz = plz_m.group(1) if plz_m else ""
+    ort = clean(re.sub(r"^\d{4,5}\s*", "", stadt_roh))
     preis = feld.get("preis", "")
     if preis:
         preis = clean(preis.replace("ca.", "").replace("€", "EUR"))
@@ -551,6 +555,7 @@ def fa_parse_detail(url: str, html: str, seed: dict | None = None) -> dict | Non
         "city": ort,
         "country": feld.get("land", ""),
         "venue": "",
+        "plz": plz,
         "location": ", ".join(x for x in [ort, feld.get("land", "")] if x),
         "price": preis,
         "website": website,
@@ -672,6 +677,7 @@ def fu_parse_detail(url: str, html: str) -> dict | None:
         "city": city,
         "country": country,
         "venue": "",
+        "plz": "",
         "location": ", ".join(x for x in [city, country] if x),
         "price": price,
         "website": website,
@@ -742,6 +748,65 @@ def ausser_europa(country: str) -> bool:
     return (country or "").strip().lower() in NICHT_EUROPA
 
 
+# Die Quellen schreiben Laender mal aus, mal als Kuerzel, mal umgangssprachlich.
+# Ausgeliefert wird einheitlich der ISO-Code.
+LAENDER = {
+    "deutschland": "DE", "germany": "DE", "de": "DE", "brd": "DE",
+    "oesterreich": "AT", "österreich": "AT", "austria": "AT", "at": "AT",
+    "schweiz": "CH", "switzerland": "CH", "suisse": "CH", "ch": "CH",
+    "niederlande": "NL", "holland": "NL", "netherlands": "NL", "nl": "NL",
+    "belgien": "BE", "belgium": "BE", "be": "BE",
+    "frankreich": "FR", "france": "FR", "fr": "FR",
+    "italien": "IT", "italy": "IT", "it": "IT",
+    "spanien": "ES", "spain": "ES", "es": "ES",
+    "portugal": "PT", "pt": "PT",
+    "england": "GB", "grossbritannien": "GB", "großbritannien": "GB",
+    "schottland": "GB", "wales": "GB", "nordirland": "GB", "uk": "GB",
+    "united kingdom": "GB", "great britain": "GB", "gb": "GB",
+    "vereinigtes königreich": "GB", "vereinigtes koenigreich": "GB",
+    "irland": "IE", "ireland": "IE", "ie": "IE",
+    "daenemark": "DK", "dänemark": "DK", "denmark": "DK", "dk": "DK",
+    "schweden": "SE", "sweden": "SE", "se": "SE",
+    "norwegen": "NO", "norway": "NO", "no": "NO",
+    "finnland": "FI", "finland": "FI", "fi": "FI",
+    "island": "IS", "iceland": "IS", "is": "IS",
+    "polen": "PL", "poland": "PL", "pl": "PL",
+    "tschechien": "CZ", "tschechische republik": "CZ", "czechia": "CZ", "cz": "CZ",
+    "slowakei": "SK", "sk": "SK", "slowenien": "SI", "si": "SI",
+    "ungarn": "HU", "hungary": "HU", "hu": "HU",
+    "kroatien": "HR", "croatia": "HR", "hr": "HR",
+    "serbien": "RS", "rs": "RS", "montenegro": "ME", "me": "ME",
+    "bosnien": "BA", "bosnien und herzegowina": "BA", "ba": "BA",
+    "nordmazedonien": "MK", "mazedonien": "MK", "mk": "MK",
+    "albanien": "AL", "al": "AL", "kosovo": "XK", "xk": "XK",
+    "griechenland": "GR", "greece": "GR", "gr": "GR",
+    "bulgarien": "BG", "bg": "BG", "rumaenien": "RO", "rumänien": "RO", "ro": "RO",
+    "moldawien": "MD", "md": "MD", "ukraine": "UA", "ua": "UA",
+    "estland": "EE", "ee": "EE", "lettland": "LV", "lv": "LV",
+    "litauen": "LT", "lt": "LT", "weissrussland": "BY", "belarus": "BY", "by": "BY",
+    "luxemburg": "LU", "luxembourg": "LU", "lu": "LU",
+    "liechtenstein": "LI", "li": "LI", "monaco": "MC", "mc": "MC",
+    "andorra": "AD", "ad": "AD", "san marino": "SM", "sm": "SM",
+    "malta": "MT", "mt": "MT", "zypern": "CY", "cyprus": "CY", "cy": "CY",
+    "tuerkei": "TR", "türkei": "TR", "turkey": "TR", "tr": "TR",
+    "vatikan": "VA", "va": "VA", "gibraltar": "GI", "gi": "GI",
+    "faeroeer": "FO", "färöer": "FO", "fo": "FO",
+}
+
+
+def land_code(country: str) -> str:
+    """Laenderkuerzel; unbekannte Angaben bleiben unveraendert."""
+    roh = clean(country)
+    if not roh:
+        return ""
+    code = LAENDER.get(roh.lower())
+    if code:
+        return code
+    if len(roh) == 2 and roh.isalpha():
+        return roh.upper()
+    return roh
+
+
 def city_key(value: str) -> str:
     v = re.sub(r"\b\d{4,6}\b", " ", value or "")       # PLZ entfernen
     return _fold(v)
@@ -768,8 +833,9 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
                 "date_from": rec["date_from"],
                 "date_to": rec["date_to"],
                 "city": rec["city"],
-                "country": rec["country"],
+                "country": land_code(rec["country"]),
                 "venue": rec["venue"],
+                "plz": rec.get("plz", ""),
                 "location": rec["location"],
                 "price": rec["price"],
                 "website": rec["website"],
@@ -784,10 +850,12 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
             }
             merged[key] = cur
         # laengerer/gefuellter Wert gewinnt
-        for field in ("date_from", "date_to", "city", "country", "venue",
+        for field in ("date_from", "date_to", "city", "venue", "plz",
                       "location", "price", "website", "genre", "visitors", "note"):
-            if not cur[field] and rec[field]:
+            if not cur[field] and rec.get(field):
                 cur[field] = rec[field]
+        if not cur["country"]:
+            cur["country"] = land_code(rec["country"])
         if len(rec["name"]) > len(cur["name"]) and rec["source"] == "festivalticker":
             cur["name"] = rec["name"]
         # Eine Absage aus einer Quelle genuegt
@@ -867,6 +935,8 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
     out = []
     for rec in merged.values():
         rec.pop("source_order", None)
+        # einheitliche Ortsangabe: Ortsname und Laenderkuerzel
+        rec["location"] = ", ".join(x for x in [rec["city"], rec["country"]] if x)
         lineup = sorted(set(rec.pop("_bands").values()), key=str.casefold)
         rec["lineup"] = lineup
         rec["lineup_count"] = len(lineup)
