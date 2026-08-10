@@ -1771,11 +1771,6 @@
   "lon": 13.7542811,
   "display": "Erkner, Oder-Spree, Brandenburg, Deutschland"
  },
- "Belfast|Irland": {
-  "lat": 31.8243809,
-  "lon": -81.2917727,
-  "display": "Belfast, Bryan County, Georgia, Vereinigte Staaten von Amerika"
- },
  "Mirow|Deutschland": {
   "lat": 53.2851568,
   "lon": 12.847677,
@@ -5320,11 +5315,6 @@
   "lon": -1.2433102,
   "display": "Hampshire, England, Vereinigtes Königreich"
  },
- "Rabat|": {
-  "lat": 34.0218454,
-  "lon": -6.8408929,
-  "display": "Rabat, باشوية الرباط, Préfecture de Rabat عمالة الرباط, Rabat-Sale-Kenitra, Marokko"
- },
  "Saint Malo|Frankreich": {
   "lat": 48.649518,
   "lon": -2.0260409,
@@ -5844,11 +5834,6 @@
   "lat": 47.8263058,
   "lon": -0.7066665,
   "display": "Château-Gontier, Château-Gontier-sur-Mayenne, Château-Gontier, Mayenne, Pays de la Loire, Metropolitanes Frankreich, 53200, Frankreich"
- },
- "Wimborne|": {
-  "lat": 51.8641037,
-  "lon": -113.5934071,
-  "display": "Wimborne, Kneehill County, Alberta, T0M 2G0, Kanada"
  },
  "Nattheim|Deutschland": {
   "lat": 48.6995114,
@@ -6619,11 +6604,6 @@
   "lat": 49.5976559,
   "lon": 8.8564245,
   "display": "Affolterbach, Wald-Michelbach, Kreis Bergstraße, Hessen, Deutschland"
- },
- "Newark|": {
-  "lat": 40.735657,
-  "lon": -74.1723667,
-  "display": "Newark, Essex County, New Jersey, Vereinigte Staaten von Amerika"
  },
  "Ludwigsahfen|Deutschland": {},
  "Solingen|": {
@@ -8602,11 +8582,6 @@
   "lon": 6.9525135,
   "display": "Emmen, Drente, Niederlande"
  },
- "Southhampton|GB": {
-  "lat": 36.8920884,
-  "lon": -76.388914,
-  "display": "Southhampton, Portsmouth, Virginia, 23703, Vereinigte Staaten von Amerika"
- },
  "Wedemark|": {
   "lat": 52.5576643,
   "lon": 9.7079557,
@@ -8796,11 +8771,6 @@
   "lat": 54.3227085,
   "lon": 10.135555,
   "display": "Kiel, Schleswig-Holstein, Deutschland"
- },
- "Hille|": {
-  "lat": 32.482245,
-  "lon": 44.4328131,
-  "display": "Hilla, ناحية مرکز قضاء الحلة, قضاء الحلة, Gouvernement Babil, 51115, Irak"
  },
  "Langkampfen|": {
   "lat": 47.5516301,
@@ -9721,5 +9691,31 @@
   "lon": 11.4250395,
   "display": "Ingolstadt, Bayern, Deutschland"
  },
- "Zuckerbrot & Peitsche Open Air 2023|DE": {}
+ "Zuckerbrot & Peitsche Open Air 2023|DE": {},
+ "Rabat|": {
+  "lat": 35.8818906,
+  "lon": 14.3988213,
+  "display": "Rabat, Reġjun tal-Punent, Malta"
+ },
+ "Wimborne|": {
+  "lat": 50.7995189,
+  "lon": -1.987339,
+  "display": "Wimborne Minster, Dorset, England, Vereinigtes Königreich"
+ },
+ "Newark|": {
+  "lat": 53.0736266,
+  "lon": -0.8005422,
+  "display": "Newark, Newark on Trent, Newark and Sherwood, Nottinghamshire, East Midlands, England, Vereinigtes Königreich"
+ },
+ "Hille|": {
+  "lat": 52.3360492,
+  "lon": 8.7452571,
+  "display": "Hille, Kreis Minden-Lübbecke, Nordrhein-Westfalen, 32479, Deutschland"
+ },
+ "Belfast|Irland": {
+  "lat": 54.6118457,
+  "lon": -5.9554682,
+  "display": "Lidl Electric Vehicle Charger, Crumlin Road, The Bone, Woodvale, Belfast, County Antrim, Nordirland, BT14 7EX, Vereinigtes Königreich"
+ },
+ "Southhampton|GB": {}
 }

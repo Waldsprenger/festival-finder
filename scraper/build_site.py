@@ -8,6 +8,7 @@ und nicht als JSON nachgeladen.
 from __future__ import annotations
 
 import json
+import math
 import re
 from datetime import date
 from pathlib import Path
@@ -85,6 +86,42 @@ def price_eur(text: str) -> float | None:
     return round(min(candidates), 2) if candidates else None
 
 
+# Bezugspunkt für die Obergrenze des Umkreisreglers
+REF_PLZ = "97209"
+
+LAT, LON, EURO = 9, 10, 6
+
+
+def nice_ceil(value: float) -> int:
+    """Auf die nächste runde Zahl aufrunden."""
+    step = 100 if value >= 1000 else 50 if value >= 200 else 10
+    return int(math.ceil(value / step) * step)
+
+
+def haversine(a_lat, a_lon, b_lat, b_lon) -> float:
+    r, rad = 6371.0, math.pi / 180
+    d_lat, d_lon = (b_lat - a_lat) * rad, (b_lon - a_lon) * rad
+    h = (math.sin(d_lat / 2) ** 2 +
+         math.cos(a_lat * rad) * math.cos(b_lat * rad) * math.sin(d_lon / 2) ** 2)
+    return 2 * r * math.asin(math.sqrt(h))
+
+
+def max_distance_km(rows: list, plz: list) -> int:
+    """Entfernung zum entferntesten Festival ab REF_PLZ, aufgerundet."""
+    ref = next((p for p in plz if p[0] == REF_PLZ), None)
+    if not ref:
+        return 3300
+    far = max((haversine(ref[2], ref[3], r[LAT], r[LON])
+               for r in rows if r[LAT] is not None), default=0)
+    return nice_ceil(far)
+
+
+def max_price_eur(rows: list) -> int:
+    """Teuerstes ausgelesenes Ticket, aufgerundet."""
+    top = max((r[EURO] for r in rows if r[EURO] is not None), default=0)
+    return nice_ceil(top)
+
+
 def iso(d: str) -> str:
     m = re.match(r"(\d{2})\.(\d{2})\.(\d{4})", d or "")
     return f"{m.group(3)}-{m.group(2)}-{m.group(1)}" if m else ""
@@ -137,6 +174,9 @@ def main() -> None:
         places = [[k.split("|")[0], v["lat"], v["lon"], ""]
                   for k, v in geo.items() if v and v.get("lat") is not None]
 
+    plz_path = DATA / "plz.json"
+    plz = json.loads(plz_path.read_text(encoding="utf-8")) if plz_path.exists() else []
+
     europe_path = DATA / "europe.json"
     europe = json.loads(europe_path.read_text(encoding="utf-8")) if europe_path.exists() else []
 
@@ -145,7 +185,10 @@ def main() -> None:
         "bands": bands,
         "festivals": rows,
         "places": places,
+        "plz": plz,
         "europe": europe,
+        "maxDistanceKm": max_distance_km(rows, plz),
+        "maxPriceEur": max_price_eur(rows),
     }
     out = SITE / "data.js"
     out.write_text("window.DATA = " + json.dumps(payload, ensure_ascii=False,
@@ -155,7 +198,10 @@ def main() -> None:
     priced = sum(1 for r in rows if r[6] is not None)
     print(f"{out}  ({out.stat().st_size / 1e6:.1f} MB)")
     print(f"  Festivals {len(rows)} | mit Koordinaten {with_geo} | "
-          f"mit Preis in EUR {priced} | Acts {len(bands)} | Orte {len(places)}")
+          f"mit Preis in EUR {priced} | Acts {len(bands)} | Orte {len(places)} | "
+          f"PLZ {len(plz)}")
+    print(f"  Reglergrenzen: Umkreis bis {payload['maxDistanceKm']} km "
+          f"(ab {REF_PLZ}), Preis bis {payload['maxPriceEur']} EUR")
 
 
 if __name__ == "__main__":

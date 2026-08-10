@@ -124,6 +124,29 @@ main { max-width: 1080px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
 
 .field output { color: var(--amber); font-variant-numeric: tabular-nums; }
 
+/* Fragezeichen: die Erklärung erscheint beim Zeigen darauf, nicht auf dem Feld */
+button.help {
+  width: 1.15rem;
+  height: 1.15rem;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--bg2);
+  color: var(--mut);
+  font-size: .72rem;
+  font-weight: 800;
+  line-height: 1;
+  cursor: help;
+  vertical-align: middle;
+  margin-left: .35em;
+}
+
+button.help:hover, button.help:focus-visible {
+  border-color: var(--amber);
+  background: var(--amber);
+  color: #111;
+}
+
 input[type=text], input[type=date] {
   width: 100%;
   padding: .65rem .75rem;

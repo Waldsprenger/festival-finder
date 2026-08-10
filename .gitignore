@@ -17,6 +17,7 @@ site/fonts.css
 # Zwischenstände, die sich lohnen zu behalten, stehen bewusst NICHT hier:
 #   data/geo.json       - erspart ~2000 Nominatim-Anfragen je Lauf
 #   data/gazetteer.json - Ortsverzeichnis, ändert sich kaum
+#   data/plz.json       - Postleitzahlen DE/AT/CH
 #   data/europe.json    - Kartengrenzen, statisch
 
 # lokale Werkzeug-Einstellungen, geraetespezifisch

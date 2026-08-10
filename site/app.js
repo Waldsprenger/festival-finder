@@ -67,18 +67,53 @@
     const q = query.trim();
     if (!q) return null;
 
-    // 1. Mitgeliefertes Ortsverzeichnis (GeoNames). Es ist nach Einwohnerzahl
-    //    sortiert, der erste Treffer ist also der bekannteste gleichen Namens.
+    // 1. Postleitzahl - die eindeutigste Eingabe. Erlaubt sind "97209",
+    //    "97209 Veitshöchheim" und "1010 AT" zur Trennung von AT und CH.
+    const pm = q.match(/^\s*(\d{4,5})\b\s*([A-Za-zÄÖÜäöü].*)?$/);
+    if (pm) {
+        const code = pm[1];
+        const rest = fold(pm[2] || '');
+        const hits = (D.plz || []).filter((p) => p[0] === code);
+        if (hits.length) {
+            let pick = hits[0];
+            if (rest) {
+                pick = hits.find((p) => fold(p[4]) === rest)
+                    || hits.find((p) => fold(p[1]).startsWith(rest))
+                    || pick;
+            }
+            const alt = hits.filter((p) => p[4] !== pick[4]).map((p) => p[4]);
+            return {
+                lat: pick[2], lon: pick[3],
+                label: `${pick[0]} ${pick[1]} (${pick[4]})`,
+                ambiguous: alt.length ? alt : null,
+            };
+        }
+        return { notFound: `Zur Postleitzahl ${code} gibt es keinen Eintrag.` };
+    }
+
+    // 2. Ortsverzeichnis (GeoNames), nach Einwohnerzahl sortiert - der erste
+    //    Treffer ist also der bekannteste Ort gleichen Namens.
     const needle = fold(q);
-    let prefix = null;
+    let exact = null, prefix = null, weitere = 0;
     for (const [name, lat, lon, cc] of D.places) {
       const f = fold(name);
-      if (f === needle) return { lat, lon, label: `${name} (${cc})`, online: false };
-      if (!prefix && f.startsWith(needle)) prefix = { lat, lon, label: `${name} (${cc})`, online: false };
+      if (f === needle) {
+        if (exact) { weitere++; continue; }
+        exact = { lat, lon, label: `${name} (${cc})` };
+      } else if (f.startsWith(needle)) {
+        if (prefix) { weitere++; continue; }
+        prefix = { lat, lon, label: `${name} (${cc})` };
+      }
     }
-    if (prefix) return prefix;
+    const treffer = exact || prefix;
+    if (treffer) {
+      // Ortsnamen sind mehrdeutig - darauf hinweisen statt stillschweigend zu raten
+      if (exact && prefix) weitere++;
+      if (weitere) treffer.ambiguousName = weitere;
+      return treffer;
+    }
 
-    // 2. Nur wenn lokal nichts passt: Nominatim (OpenStreetMap).
+    // 3. Nur wenn lokal nichts passt: Nominatim (OpenStreetMap).
     //    In der veroeffentlichten Fassung blockiert die Sicherheitsrichtlinie
     //    externe Aufrufe - dann bleibt es beim Ergebnis aus Schritt 1.
     try {
@@ -114,16 +149,26 @@
     status.className = 'hint';
     status.textContent = 'Suche Koordinaten …';
     const hit = await geocode(q);
-    if (!hit) {
+    if (!hit || hit.notFound) {
       state.home = null;
       status.className = 'hint err';
-      status.textContent = 'Ort nicht gefunden. Andere Schreibweise probieren.';
+      status.textContent = hit && hit.notFound
+        ? hit.notFound
+        : 'Ort nicht gefunden. Am sichersten ist die Postleitzahl, z. B. 97209.';
     } else {
       state.home = hit;
       status.className = 'hint ok';
-      status.textContent = `${hit.label} — Umkreissuche aktiv.`;
+      status.textContent = `${hit.label} — Umkreissuche aktiv.` +
+        (hit.ambiguous
+          ? ` Diese Postleitzahl gibt es auch in ${hit.ambiguous.join(', ')} — dann Land anhängen, z. B. „${q.trim().split(/\s+/)[0]} ${hit.ambiguous[0]}“.`
+          : '') +
+        (hit.ambiguousName
+          ? ` Achtung: Es gibt ${hit.ambiguousName} weitere${hit.ambiguousName === 1 ? 'n' : ''} Ort${hit.ambiguousName === 1 ? '' : 'e'} mit ähnlichem Namen — mit der Postleitzahl wird es eindeutig.`
+          : '');
     }
+    map.center = null;
     render();
+    drawMap();
   }
 
   /* ---------------- Karte ----------------
@@ -753,6 +798,16 @@
   /* ---------------- Verdrahtung ---------------- */
 
   function init() {
+    // Obergrenzen kommen aus den Daten: der Umkreis reicht bis zum entferntesten
+    // Festival, der Preis bis zum teuersten gefundenen Ticket.
+    const rad = $('radius'), pri = $('price');
+    if (D.maxDistanceKm) rad.max = String(D.maxDistanceKm);
+    if (D.maxPriceEur) pri.max = String(D.maxPriceEur);
+    state.radius = +rad.value;
+    state.maxPrice = +pri.value;
+    $('radius-out').textContent = `${state.radius.toLocaleString('de-DE')} km`;
+    $('price-out').textContent = `${state.maxPrice} €`;
+
     const today = new Date().toISOString().slice(0, 10);
     $('from').value = today;
     state.from = today;

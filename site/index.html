@@ -25,49 +25,68 @@
 
     <div class="grid">
       <div class="field">
-        <label for="home">Wohnort</label>
+        <label for="home">Postleitzahl oder Ort
+          <button type="button" class="help" aria-label="Erklärung zum Wohnort"
+                  title="Mittelpunkt der Umkreissuche und Basis aller Entfernungsangaben. Am sichersten ist die Postleitzahl: Ortsnamen gibt es mehrfach, „Seeheim“ etwa in Südhessen und in Bayern. Möglich sind 97209, 97209 Veitshöchheim oder nur der Ortsname. Enter genügt.">?</button>
+        </label>
         <div class="row">
-          <input type="text" id="home" placeholder="z. B. Mannheim" autocomplete="address-level2"
-                 title="Deine Stadt eingeben. Sie ist der Mittelpunkt der Umkreissuche und die Basis für alle Entfernungsangaben. Enter genügt.">
+          <input type="text" id="home" placeholder="z. B. 97209" inputmode="numeric"
+                 autocomplete="postal-code">
           <button type="button" id="locate" class="ghost"
-                  title="Sucht die Koordinaten deines Wohnorts im mitgelieferten Ortsverzeichnis (85.098 Orte) und aktiviert die Umkreissuche.">Suchen</button>
+                  title="Schlägt Postleitzahl oder Ort im mitgelieferten Verzeichnis nach und aktiviert die Umkreissuche.">Suchen</button>
         </div>
-        <p class="hint" id="home-status">Stadt eingeben und „Suchen“ drücken.</p>
-        <label class="check" title="Für einige Festivals liefert die Quelle keinen brauchbaren Ort. Ohne Haken bleiben sie bei gesetztem Wohnort außen vor, mit Haken erscheinen sie ohne Entfernungsangabe.">
+        <p class="hint" id="home-status">Postleitzahl eingeben und „Suchen“ drücken.</p>
+        <label class="check">
           <input type="checkbox" id="geo-unknown">
-          Festivals ohne Ortskoordinaten mitzeigen</label>
+          Festivals ohne Ortskoordinaten mitzeigen
+          <button type="button" class="help" aria-label="Erklärung zu Festivals ohne Ortskoordinaten"
+                  title="Für einige Festivals liefert die Quelle keinen brauchbaren Ort. Ohne Haken bleiben sie bei gesetztem Wohnort außen vor, mit Haken erscheinen sie ohne Entfernungsangabe.">?</button>
+        </label>
       </div>
 
       <div class="field">
-        <label for="radius">Umkreis <output id="radius-out">200 km</output></label>
-        <input type="range" id="radius" min="10" max="2000" step="10" value="200"
-               title="Wie weit du maximal fahren willst, in Luftlinie ab Wohnort. Der Kreis auf der Karte zeigt den Bereich sofort an.">
+        <label for="radius">Umkreis <output id="radius-out">200 km</output>
+          <button type="button" class="help" aria-label="Erklärung zum Umkreis"
+                  title="Wie weit du maximal fahren willst, in Luftlinie ab Wohnort. Der rote Kreis auf der Karte zeigt den Bereich sofort an. Das Maximum entspricht dem entferntesten Festival im Datenbestand.">?</button>
+        </label>
+        <input type="range" id="radius" min="10" max="3300" step="10" value="200">
         <p class="hint">Luftlinie ab Wohnort.</p>
       </div>
 
       <div class="field">
-        <label for="price">Ticket maximal <output id="price-out">150 €</output></label>
-        <input type="range" id="price" min="0" max="600" step="5" value="150"
-               title="Obergrenze für das günstigste Ticket. Preise aus anderen Währungen sind zum Vergleich in Euro umgerechnet.">
-        <label class="check" title="Für rund 270 Festivals nennt die Quelle keinen Preis. Mit Haken bleiben sie in der Liste, ohne Haken verschwinden sie.">
+        <label for="price">Ticket maximal <output id="price-out">150 €</output>
+          <button type="button" class="help" aria-label="Erklärung zum Ticketpreis"
+                  title="Obergrenze für das günstigste Ticket eines Festivals. Preise in anderen Währungen sind zum Vergleich in Euro umgerechnet. Das Maximum entspricht dem teuersten gefundenen Ticket.">?</button>
+        </label>
+        <input type="range" id="price" min="0" max="1600" step="10" value="150">
+        <label class="check">
           <input type="checkbox" id="price-unknown" checked>
-          Festivals ohne Preisangabe mitzeigen</label>
+          Festivals ohne Preisangabe mitzeigen
+          <button type="button" class="help" aria-label="Erklärung zu Festivals ohne Preisangabe"
+                  title="Für rund 270 Festivals nennt die Quelle keinen Preis. Mit Haken bleiben sie in der Liste, ohne Haken verschwinden sie.">?</button>
+        </label>
       </div>
 
       <div class="field">
-        <label for="from">Frühester Start</label>
-        <input type="date" id="from"
-               title="Festivals, die vor diesem Datum beginnen, werden ausgeblendet. Voreingestellt ist heute.">
-        <label class="check" title="Manche Festivals haben noch keinen bestätigten Termin für die nächste Ausgabe. Mit Haken erscheinen sie trotzdem, mit dem Hinweis auf die letzte bekannte Ausgabe.">
+        <label for="from">Frühester Start
+          <button type="button" class="help" aria-label="Erklärung zum frühesten Starttermin"
+                  title="Festivals, die vor diesem Datum beginnen, werden ausgeblendet. Voreingestellt ist heute.">?</button>
+        </label>
+        <input type="date" id="from">
+        <label class="check">
           <input type="checkbox" id="date-unknown">
-          Festivals ohne Termin mitzeigen</label>
+          Festivals ohne Termin mitzeigen
+          <button type="button" class="help" aria-label="Erklärung zu Festivals ohne Termin"
+                  title="Manche Festivals haben noch keinen bestätigten Termin für die nächste Ausgabe. Mit Haken erscheinen sie trotzdem, mit dem Hinweis auf die letzte bekannte Ausgabe.">?</button>
+        </label>
       </div>
     </div>
 
     <figure class="map-wrap">
-      <canvas id="map" width="1000" height="440"
-              title="Karte des Suchgebiets: Der rote Kreis zeigt deinen Umkreis, das Kreuz deinen Wohnort. Sobald Bands gewählt sind, erscheinen die passenden Festivals als Pins — Pin anklicken springt zum Eintrag."></canvas>
+      <canvas id="map" width="1000" height="440"></canvas>
       <div class="map-tools">
+        <button type="button" class="help" aria-label="Erklärung zur Karte"
+                title="Der rote Kreis zeigt deinen Umkreis, das grüne Kreuz deinen Wohnort. Nach der Bandauswahl erscheinen die passenden Festivals als Pins — gelb ab 50 Prozent Übereinstimmung. Mausrad zoomt, Ziehen verschiebt, ein Klick auf einen Pin springt zum Eintrag.">?</button>
         <button type="button" id="zoom-in" class="ghost small"
                 title="Näher heranzoomen. Am Mausrad geht es auch — der Punkt unter dem Zeiger bleibt dabei liegen.">+</button>
         <button type="button" id="zoom-out" class="ghost small"
@@ -88,9 +107,11 @@
       eine Band doppelt — sie zählt dann doppelt so stark für die Übereinstimmung.</p>
 
     <div class="field">
-      <label for="band-search">Band suchen</label>
-      <input type="text" id="band-search" placeholder="z. B. Powerwolf, Wolf Alice, Deichkind …"
-             title="Ab zwei Zeichen wird gesucht. Die Trefferliste zeigt, auf wie vielen Festivals eine Band insgesamt spielt — die häufigsten zuerst.">
+      <label for="band-search">Band suchen
+        <button type="button" class="help" aria-label="Erklärung zur Bandsuche"
+                title="Ab zwei Zeichen wird gesucht. Die Trefferliste zeigt, auf wie vielen Festivals eine Band insgesamt spielt — die häufigsten zuerst.">?</button>
+      </label>
+      <input type="text" id="band-search" placeholder="z. B. Powerwolf, Wolf Alice, Deichkind …">
       <p class="hint" id="band-hint"></p>
     </div>
 

@@ -55,6 +55,17 @@ COUNTRY = {
 }
 
 
+# Ohne Laenderfilter liefert Nominatim bei mehrdeutigen Namen den weltweit
+# bekanntesten Ort: "Newark" wurde New Jersey statt England, "Hille" wurde
+# Hilla im Irak. Deshalb bleibt jede Suche auf Europa beschraenkt.
+EU_CODES = ",".join(sorted({
+    "al", "ad", "at", "by", "be", "ba", "bg", "hr", "cy", "cz", "dk", "ee", "fo",
+    "fi", "fr", "de", "gi", "gr", "gg", "hu", "is", "ie", "im", "it", "je", "lv",
+    "li", "lt", "lu", "mt", "md", "mc", "me", "nl", "mk", "no", "pl", "pt", "ro",
+    "sm", "rs", "sk", "si", "es", "se", "ch", "ua", "gb", "va", "xk", "tr",
+}))
+
+
 def cc(country: str) -> str:
     return COUNTRY.get((country or "").strip().lower(), "")
 
@@ -68,8 +79,11 @@ def lookup(session: requests.Session, city: str, country: str) -> dict | None:
     attempts = []
     if code:
         attempts.append({"city": city, "countrycodes": code})
-        attempts.append({"q": f"{city}, {code.upper()}"})
-    attempts.append({"q": city})
+        # ebenfalls auf Europa begrenzt: bei falscher Landesangabe in der Quelle
+        # (Belfast steht dort unter Irland) darf nicht weltweit gesucht werden
+        attempts.append({"q": f"{city}, {code.upper()}", "countrycodes": EU_CODES})
+    attempts.append({"city": city, "countrycodes": EU_CODES})
+    attempts.append({"q": city, "countrycodes": EU_CODES})
 
     for params in attempts:
         params |= {"format": "jsonv2", "limit": 1, "accept-language": "de"}

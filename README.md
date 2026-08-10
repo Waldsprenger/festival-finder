@@ -47,6 +47,16 @@ als `data.js` vor und nicht als JSON. Alternativ lokal ausliefern:
 python -m http.server 8765 --directory site
 ```
 
+**Wohnort:** Die Postleitzahl ist der verlässliche Weg — Ortsnamen sind mehrdeutig,
+„Seeheim" gibt es in Südhessen und in Oberbayern. Erkannt werden `97209`,
+`97209 Veitshöchheim` und `1010 AT` (zur Trennung gleicher Codes in AT und CH),
+ebenso weiterhin reine Ortsnamen. Bei mehrdeutigen Namen weist die Seite darauf hin.
+
+**Reglergrenzen** stammen aus den Daten und werden bei jedem Build neu berechnet:
+der Umkreis reicht bis zum entferntesten Festival ab `REF_PLZ` in `build_site.py`
+(derzeit 97209 → 3.300 km), der Preis bis zum teuersten gefundenen Ticket
+(derzeit 1.600 €), jeweils aufgerundet.
+
 **Ablauf:** Wohnort → Umkreis → Ticketobergrenze → frühester Starttermin; danach Bands
 suchen und auswählen, optional pro Band auf `×2` stellen. Die Trefferquote ist die
 gewichtete Summe der gefundenen Bands geteilt durch die Summe aller gewählten Gewichte.

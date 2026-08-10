@@ -39,6 +39,7 @@ jobs:
             cache
             data/geo.json
             data/gazetteer.json
+            data/plz.json
             data/europe.json
           key: festival-cache-${{ github.run_id }}
           restore-keys: festival-cache-
