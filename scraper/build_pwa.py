@@ -84,8 +84,8 @@ def main() -> None:
     sw = """/* erzeugt von build_pwa.py */
 const CACHE = 'festival-finder-v__VERSION__';
 const DATEIEN = ['./', './index.html', './style.css', './fonts.css',
-                 './app.js', './data.js', './impressum.html', './datenschutz.html',
-                 './manifest.webmanifest'];
+                 './app.js', './i18n.js', './data.js', './impressum.html',
+                 './datenschutz.html', './manifest.webmanifest'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(DATEIEN)).then(() => self.skipWaiting()));

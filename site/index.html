@@ -20,16 +20,22 @@
 
 <header class="masthead">
   <div class="inner">
-    <h1><span class="bolt">⚡</span>Festival<span class="hl">Finder</span></h1>
-    <p class="tag">Dein Lineup. Dein Radius. Dein Wochenende.</p>
+    <div class="mast-top">
+      <h1><span class="bolt">⚡</span>Festival<span class="hl">Finder</span></h1>
+      <div class="lang">
+        <label for="lang" data-i18n="app.language">Sprache</label>
+        <select id="lang" data-i18n-title="app.languageTitle"
+                title="Stellt die Sprache der Oberfläche um. Festival- und Bandnamen bleiben, wie die Quellen sie schreiben."></select>
+      </div>
+    </div>
+    <p class="tag" data-i18n="app.tagline">Dein Lineup. Dein Radius. Dein Wochenende.</p>
 
-    <button type="button" id="install" hidden
+    <button type="button" id="install" hidden data-i18n="app.install"
+            data-i18n-title="app.installTitle"
             title="Legt die Seite als App auf deinen Startbildschirm. Sie startet dann ohne Browserleiste und funktioniert auch ohne Netz.">
       App installieren</button>
-    <p class="hint install-hint" id="install-hint" hidden>
-      Als App speichern: unten auf <b>Teilen</b> tippen, dann
-      <b>Zum Home-Bildschirm</b>. Danach startet die Suche ohne Browserleiste
-      und funktioniert auch ohne Netz.</p>
+    <p class="hint install-hint" id="install-hint" hidden data-i18n-html="app.installHintIos">
+      Als App speichern: unten auf <b>Teilen</b> tippen, dann <b>Zum Home-Bildschirm</b>.</p>
   </div>
 </header>
 
@@ -37,73 +43,74 @@
 
   <!-- ============ Schritt 1: Filter ============ -->
   <section class="panel" id="step-filter">
-    <h2><span class="num">1</span> Wo, wie weit, wie teuer, ab wann</h2>
+    <h2><span class="num">1</span> <span data-i18n="step1.title">Wo, wie weit, wie teuer, ab wann</span></h2>
 
     <div class="grid">
       <div class="field">
-        <label for="home">Postleitzahl oder Ort
-          <button type="button" class="help" aria-label="Erklärung zum Wohnort"
-                  title="Mittelpunkt der Umkreissuche und Basis aller Entfernungsangaben. Am sichersten ist die Postleitzahl, weil Ortsnamen mehrdeutig sind. Möglich sind 97209, 97209 Veitshöchheim oder nur der Ortsname. Enter genügt.">?</button>
+        <label for="home"><span data-i18n="home.label">Postleitzahl oder Ort</span>
+          <button type="button" class="help" aria-label="?" data-i18n-title="home.help"
+                  title="Mittelpunkt der Umkreissuche und Basis aller Entfernungsangaben. Am sichersten ist die Postleitzahl, weil Ortsnamen mehrdeutig sind. Möglich sind 97209, 97209 Veitshöchheim oder nur der Ortsname.">?</button>
         </label>
         <div class="row">
           <input type="text" id="home" placeholder="z. B. 97209" inputmode="numeric"
                  autocomplete="postal-code">
-          <button type="button" id="locate" class="ghost"
+          <button type="button" id="locate" class="ghost" data-i18n="home.search"
+                  data-i18n-title="home.searchTitle"
                   title="Schlägt Postleitzahl oder Ort im mitgelieferten Verzeichnis nach und aktiviert die Umkreissuche.">Suchen</button>
         </div>
-        <p class="hint" id="home-status">Postleitzahl eingeben und „Suchen“ drücken.</p>
+        <p class="hint" id="home-status" data-i18n="home.statusStart">Postleitzahl eingeben und „Suchen“ drücken.</p>
         <label class="check">
           <input type="checkbox" id="geo-unknown">
-          Festivals ohne Ortskoordinaten mitzeigen
-          <button type="button" class="help" aria-label="Erklärung zu Festivals ohne Ortskoordinaten"
+          <span data-i18n="geoUnknown.label">Festivals ohne Ortskoordinaten mitzeigen</span>
+          <button type="button" class="help" aria-label="?" data-i18n-title="geoUnknown.help"
                   title="Für einige Festivals liefert die Quelle keinen brauchbaren Ort. Ohne Haken bleiben sie bei gesetztem Wohnort außen vor, mit Haken erscheinen sie ohne Entfernungsangabe.">?</button>
         </label>
       </div>
 
       <div class="field">
-        <label for="radius">Umkreis <output id="radius-out">200 km</output>
-          <button type="button" class="help" aria-label="Erklärung zum Umkreis"
+        <label for="radius"><span data-i18n="radius.label">Umkreis</span> <output id="radius-out">200 km</output>
+          <button type="button" class="help" aria-label="?" data-i18n-title="radius.help"
                   title="Wie weit du maximal fahren willst, in Luftlinie ab Wohnort. Der rote Kreis auf der Karte zeigt den Bereich sofort an. Das Maximum entspricht dem entferntesten Festival im Datenbestand.">?</button>
         </label>
         <input type="range" id="radius" min="10" max="3300" step="10" value="200">
-        <p class="hint">Luftlinie ab Wohnort.</p>
+        <p class="hint" data-i18n="radius.hint">Luftlinie ab Wohnort.</p>
       </div>
 
       <div class="field">
-        <label for="price">Ticket maximal <output id="price-out">150 €</output>
-          <button type="button" class="help" aria-label="Erklärung zum Ticketpreis"
+        <label for="price"><span data-i18n="price.label">Ticket maximal</span> <output id="price-out">150 €</output>
+          <button type="button" class="help" aria-label="?" data-i18n-title="price.help"
                   title="Obergrenze für das günstigste Ticket eines Festivals. Preise in anderen Währungen sind zum Vergleich in Euro umgerechnet. Das Maximum entspricht dem teuersten gefundenen Ticket.">?</button>
         </label>
         <input type="range" id="price" min="0" max="1600" step="10" value="150">
         <label class="check">
           <input type="checkbox" id="price-unknown" checked>
-          Festivals ohne Preisangabe mitzeigen
-          <button type="button" class="help" aria-label="Erklärung zu Festivals ohne Preisangabe"
-                  title="Für rund 460 Festivals nennt die Quelle keinen Preis. Mit Haken bleiben sie in der Liste, ohne Haken verschwinden sie.">?</button>
+          <span data-i18n="priceUnknown.label">Festivals ohne Preisangabe mitzeigen</span>
+          <button type="button" class="help" aria-label="?" data-i18n-title="priceUnknown.help"
+                  title="Für rund 450 Festivals nennt die Quelle keinen Preis. Mit Haken bleiben sie in der Liste, ohne Haken verschwinden sie.">?</button>
         </label>
       </div>
 
       <div class="field">
-        <label for="from">Zeitraum
-          <button type="button" class="help" aria-label="Erklärung zum Zeitraum"
+        <label for="from"><span data-i18n="date.label">Zeitraum</span>
+          <button type="button" class="help" aria-label="?" data-i18n-title="date.help"
                   title="Angezeigt werden Festivals, die in diesem Zeitraum beginnen. Das Startdatum ist mit heute vorbelegt, das Enddatum bleibt offen, bis du eines setzt.">?</button>
         </label>
         <div class="row dates">
-          <input type="date" id="from" aria-label="Frühester Start">
-          <span class="bis">bis</span>
-          <input type="date" id="to" aria-label="Spätester Start"></div>
+          <input type="date" id="from" data-i18n-aria="date.from" aria-label="Frühester Start">
+          <span class="bis" data-i18n="date.between">bis</span>
+          <input type="date" id="to" data-i18n-aria="date.to" aria-label="Spätester Start"></div>
         <p class="hint" id="date-hint"></p>
         <label class="check">
           <input type="checkbox" id="date-unknown">
-          Festivals ohne Termin mitzeigen
-          <button type="button" class="help" aria-label="Erklärung zu Festivals ohne Termin"
+          <span data-i18n="dateUnknown.label">Festivals ohne Termin mitzeigen</span>
+          <button type="button" class="help" aria-label="?" data-i18n-title="dateUnknown.help"
                   title="Manche Festivals haben noch keinen bestätigten Termin für die nächste Ausgabe. Mit Haken erscheinen sie trotzdem, mit dem Hinweis auf die letzte bekannte Ausgabe.">?</button>
         </label>
         <label class="check">
           <input type="checkbox" id="show-cancelled">
-          Abgesagte Festivals mitzeigen
-          <button type="button" class="help" aria-label="Erklärung zu abgesagten Festivals"
-                  title="29 Ausgaben sind in den Quellen als abgesagt gemeldet. Sie bleiben standardmäßig ausgeblendet; mit Haken erscheinen sie deutlich gekennzeichnet.">?</button>
+          <span data-i18n="cancelled.label">Abgesagte Festivals mitzeigen</span>
+          <button type="button" class="help" aria-label="?" data-i18n-title="cancelled.help"
+                  title="Einige Ausgaben sind in den Quellen als abgesagt gemeldet. Sie bleiben standardmäßig ausgeblendet; mit Haken erscheinen sie deutlich gekennzeichnet.">?</button>
         </label>
       </div>
     </div>
@@ -111,16 +118,17 @@
     <figure class="map-wrap">
       <canvas id="map" width="1000" height="440"></canvas>
       <div class="map-tools">
-        <button type="button" class="help" aria-label="Erklärung zur Karte"
+        <button type="button" class="help" aria-label="?" data-i18n-title="map.help"
                 title="Der rote Kreis zeigt deinen Umkreis, das grüne Kreuz deinen Wohnort. Nach der Bandauswahl erscheinen die passenden Festivals als Pins — gelb ab 50 Prozent Übereinstimmung. Mausrad zoomt, Ziehen verschiebt, ein Klick auf einen Pin springt zum Eintrag.">?</button>
-        <button type="button" id="zoom-in" class="ghost small"
+        <button type="button" id="zoom-in" class="ghost small" data-i18n-title="map.zoomIn"
                 title="Näher heranzoomen. Am Mausrad geht es auch — der Punkt unter dem Zeiger bleibt dabei liegen.">+</button>
-        <button type="button" id="zoom-out" class="ghost small"
+        <button type="button" id="zoom-out" class="ghost small" data-i18n-title="map.zoomOut"
                 title="Weiter herauszoomen.">−</button>
-        <button type="button" id="zoom-reset" class="ghost small"
+        <button type="button" id="zoom-reset" class="ghost small" data-i18n="map.reset"
+                data-i18n-title="map.resetTitle"
                 title="Zurück zur Ausgangsansicht, in der der Suchradius genau ins Bild passt. Doppelklick auf die Karte tut dasselbe.">Ansicht zurücksetzen</button>
       </div>
-      <figcaption id="map-caption">Wohnort eingeben, um den Suchradius zu sehen.</figcaption>
+      <figcaption id="map-caption" data-i18n="map.captionNoHome">Wohnort eingeben, um den Suchradius zu sehen.</figcaption>
     </figure>
 
     <p class="stat" id="filter-stat">—</p>
@@ -128,24 +136,24 @@
 
   <!-- ============ Schritt 2: Bands ============ -->
   <section class="panel" id="step-bands">
-    <h2><span class="num">2</span> Bands wählen</h2>
+    <h2><span class="num">2</span> <span data-i18n="step2.title">Bands wählen</span></h2>
 
     <div class="toggle-row">
       <label class="switch" for="use-bands">
         <input type="checkbox" id="use-bands" checked role="switch">
         <span class="track"><span class="knob"></span></span>
-        <span class="switch-text">Nach Bands filtern</span>
+        <span class="switch-text" data-i18n="bands.toggle">Nach Bands filtern</span>
       </label>
-      <button type="button" class="help" aria-label="Erklärung zum Bandfilter"
+      <button type="button" class="help" aria-label="?" data-i18n-title="bands.toggleHelp"
               title="Eingeschaltet zeigt die Liste nur Festivals, die mindestens eine deiner Bands spielen, sortiert nach Übereinstimmung. Ausgeschaltet erscheinen alle Festivals, die zu Wohnort, Umkreis, Preis und Termin passen — dann ohne Prozentwert, sortiert nach Entfernung.">?</button>
     </div>
 
-    <p class="lead">Suchen, anklicken, auswählen. Ein zweiter Klick auf <b>×2</b> gewichtet
+    <p class="lead" data-i18n-html="bands.lead">Suchen, anklicken, auswählen. Ein zweiter Klick auf <b>×2</b> gewichtet
       eine Band doppelt — sie zählt dann doppelt so stark für die Übereinstimmung.</p>
 
     <div class="field">
-      <label for="band-search">Band suchen
-        <button type="button" class="help" aria-label="Erklärung zur Bandsuche"
+      <label for="band-search"><span data-i18n="bands.searchLabel">Band suchen</span>
+        <button type="button" class="help" aria-label="?" data-i18n-title="bands.searchHelp"
                 title="Ab zwei Zeichen wird gesucht. Die Trefferliste zeigt, auf wie vielen Festivals eine Band insgesamt spielt — die häufigsten zuerst.">?</button>
       </label>
       <input type="text" id="band-search" placeholder="z. B. Powerwolf, Wolf Alice, Deichkind …">
@@ -156,8 +164,9 @@
 
     <div class="chosen">
       <div class="chosen-head">
-        <h3>Ausgewählt <span class="badge" id="chosen-count">0</span></h3>
-        <button type="button" id="clear-bands" class="ghost small"
+        <h3><span data-i18n="bands.chosen">Ausgewählt</span> <span class="badge" id="chosen-count">0</span></h3>
+        <button type="button" id="clear-bands" class="ghost small" data-i18n="bands.clear"
+                data-i18n-title="bands.clearTitle"
                 title="Leert die komplette Bandauswahl und setzt die Trefferliste zurück.">Alle entfernen</button>
       </div>
       <ul class="chips" id="chosen-list"></ul>
@@ -166,48 +175,52 @@
 
   <!-- ============ Schritt 3: Treffer ============ -->
   <section class="panel" id="step-results">
-    <h2><span class="num">3</span> Deine Festivals</h2>
-    <p class="stat" id="result-stat">Wähle mindestens eine Band.</p>
+    <h2><span class="num">3</span> <span data-i18n="step3.title">Deine Festivals</span></h2>
+    <p class="stat" id="result-stat" data-i18n="res.needBand">Wähle mindestens eine Band.</p>
     <ol class="festivals" id="festival-list"></ol>
   </section>
 
   <!-- ============ Rückmeldung ============ -->
   <section class="panel" id="step-feedback">
-    <h2><span class="num">✉</span> Rückmeldung
-      <button type="button" class="help" aria-label="Erklärung zur Rückmeldung"
+    <h2><span class="num">✉</span> <span data-i18n="fb.title">Rückmeldung</span>
+      <button type="button" class="help" aria-label="?" data-i18n-title="fb.help"
               title="Fehlt ein Festival, stimmt ein Termin nicht, oder fehlt dir eine Funktion? Der Knopf öffnet dein E-Mail-Programm mit fertig vorbereitetem Text — abgeschickt wird erst dort von dir. Die Seite selbst verschickt nichts.">?</button>
     </h2>
-    <p class="lead">Fehlendes Festival, falscher Termin, Wunsch oder Kritik — alles willkommen.</p>
+    <p class="lead" data-i18n="fb.lead">Fehlendes Festival, falscher Termin, Wunsch oder Kritik — alles willkommen.</p>
 
     <div class="grid">
       <div class="field">
-        <label for="fb-art">Worum geht es?</label>
+        <label for="fb-art" data-i18n="fb.kind">Worum geht es?</label>
         <select id="fb-art">
-          <option>Fehlendes Festival</option>
-          <option>Falsche Angabe (Termin, Preis, Ort, Lineup)</option>
-          <option>Funktionswunsch</option>
-          <option>Fehler auf der Seite</option>
-          <option>Kritik oder Lob</option>
-          <option>Sonstiges</option>
+          <option data-i18n="fb.kind1">Fehlendes Festival</option>
+          <option data-i18n="fb.kind2">Falsche Angabe (Termin, Preis, Ort, Lineup)</option>
+          <option data-i18n="fb.kind3">Funktionswunsch</option>
+          <option data-i18n="fb.kind4">Fehler auf der Seite</option>
+          <option data-i18n="fb.kind5">Kritik oder Lob</option>
+          <option data-i18n="fb.kind6">Sonstiges</option>
         </select>
       </div>
       <div class="field">
-        <label for="fb-kontakt">Rückmeldeadresse <span class="opt">optional</span></label>
-        <input type="text" id="fb-kontakt" placeholder="nur falls du eine Antwort möchtest">
+        <label for="fb-kontakt"><span data-i18n="fb.contact">Rückmeldeadresse</span>
+          <span class="opt" data-i18n="fb.optional">optional</span></label>
+        <input type="text" id="fb-kontakt" data-i18n-ph="fb.contactPlaceholder"
+               placeholder="nur falls du eine Antwort möchtest">
       </div>
     </div>
 
     <div class="field feedback-text">
-      <label for="fb-text">Deine Nachricht</label>
-      <textarea id="fb-text" rows="5"
+      <label for="fb-text" data-i18n="fb.message">Deine Nachricht</label>
+      <textarea id="fb-text" rows="5" data-i18n-ph="fb.messagePlaceholder"
                 placeholder="Zum Beispiel: Das Festival XY am 12.07. in Musterstadt fehlt, Webseite ist xy.de"></textarea>
     </div>
 
     <div class="feedback-actions">
-      <a id="fb-send" class="btn-link" href="mailto:waldsprenger@gmail.com"
+      <a id="fb-send" class="btn-link" href="mailto:waldsprenger@gmail.com" data-i18n="fb.send"
+         data-i18n-title="fb.sendTitle"
          title="Öffnet dein E-Mail-Programm mit Betreff und Text. Abgeschickt wird erst dort von dir.">
         E-Mail-Programm öffnen</a>
-      <button type="button" id="fb-copy" class="ghost"
+      <button type="button" id="fb-copy" class="ghost" data-i18n="fb.copy"
+              data-i18n-title="fb.copyTitle"
               title="Kopiert Adresse und Nachricht in die Zwischenablage — praktisch, wenn kein E-Mail-Programm eingerichtet ist.">
         Text kopieren</button>
       <span class="fb-mail">waldsprenger@gmail.com</span>
@@ -220,17 +233,19 @@
 <footer class="site-footer">
   <div class="inner">
     <div class="support">
-      <p class="support-text">Diese Seite entsteht in Handarbeit und läuft ohne Werbung.
+      <p class="support-text" data-i18n="support.text">Diese Seite entsteht in Handarbeit und läuft ohne Werbung.
         Wenn sie dir das Suchen erspart, freue ich mich über einen Beitrag zu Pflege und Betrieb.</p>
       <a class="paypal" href="https://paypal.me/Waldsperger" target="_blank" rel="noopener"
+         data-i18n="support.button" data-i18n-title="support.buttonTitle"
          title="Öffnet paypal.me in einem neuen Tab. Der Betrag ist frei wählbar, die Seite bleibt in jedem Fall kostenlos und vollständig nutzbar.">
         Mit PayPal unterstützen</a>
     </div>
 
     <nav>
-      <a href="impressum.html">Impressum</a>
-      <a href="datenschutz.html">Datenschutz</a>
+      <a href="impressum.html" data-i18n="footer.imprint">Impressum</a>
+      <a href="datenschutz.html" data-i18n="footer.privacy">Datenschutz</a>
     </nav>
+    <p class="src" id="legal-note" hidden data-i18n="legal.germanOnly"></p>
     <p class="src">Festival- und Lineup-Daten zusammengetragen von
       <a href="https://www.festivalticker.de" target="_blank" rel="noopener">festivalticker.de</a>,
       <a href="https://www.festivalsunited.com" target="_blank" rel="noopener">festivalsunited.com</a> und
@@ -245,6 +260,7 @@
   </div>
 </footer>
 
+<script src="i18n.js"></script>
 <script src="data.js"></script>
 <script src="app.js"></script>
 </body>

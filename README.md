@@ -3,6 +3,25 @@
 Zusammengeführte Festival- und Lineup-Daten aus festivalticker.de,
 festivalsunited.com und festival-alarm.com.
 
+## Aufbau
+
+`scraper/gemeinsam.py` hält Pfade, Browserkennung und das Länderwissen — das lag
+vorher in drei Modulen nebeneinander. Die übrigen Skripte sind eigenständig
+ausführbar und bauen aufeinander auf:
+
+```
+festival_scraper.py  →  data/festivals.json + CSV-Ausgaben
+geocode.py           →  data/geo.json          (Ortskoordinaten)
+build_gazetteer.py   →  data/gazetteer.json + plz.json
+build_map.py         →  data/welt_grob.json + welt_fein.json
+fetch_fonts.py       →  site/fonts.css
+build_site.py        →  site/data.js
+build_pwa.py         →  site/manifest.webmanifest + sw.js + icons/
+build_overview.py    →  data/uebersicht.html
+build_artifact.py    →  site/artifact.html      (alles in einer Datei)
+daily_update.py      →  führt die Kette aus
+```
+
 ## Quellenerfassung
 
 Der Scraper enumeriert die Seiten vollständig statt einzelne Listen abzuklappern:
@@ -111,6 +130,21 @@ blockiert sind. Deshalb löst die Wohnortsuche primär über das mitgelieferte
 GeoNames-Verzeichnis auf (85.098 Orte, DE/AT/CH vollständig, übriges Europa ab
 15.000 Einwohnern); Nominatim wird nur in der lokalen Fassung und nur als
 Rückfall angefragt.
+
+## Sprachen
+
+Die Oberfläche gibt es auf Deutsch, Englisch, Französisch, Spanisch,
+Italienisch, Niederländisch, Polnisch und Portugiesisch. Alle Texte stehen in
+[site/i18n.js](site/i18n.js); die Seite wählt beim ersten Besuch die
+Browsersprache und merkt sich eine spätere Auswahl lokal.
+
+Eine Sprache ergänzen: Kürzel in `SPRACHEN` eintragen und in jedem Eintrag von
+`TEXTE` eine Zeile hinzufügen. Fehlt eine Übersetzung, greift Deutsch — die
+Seite bleibt also auch bei unvollständiger Sprachdatei benutzbar.
+
+Impressum und Datenschutzerklärung bleiben bewusst auf Deutsch: Es sind
+rechtsverbindliche Texte, bei denen eine ungenaue Übersetzung schlechter wäre
+als keine. In den anderen Sprachen weist die Fußzeile darauf hin.
 
 ## Als App auf dem Startbildschirm
 

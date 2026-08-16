@@ -15,12 +15,8 @@ from datetime import date, datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from festival_scraper import land_code  # noqa: E402  (Pfad muss vorher stehen)
+from gemeinsam import DATA, SITE, land_code  # noqa: E402  (Pfad muss vorher stehen)
 
-BASE = Path(__file__).resolve().parent.parent
-DATA = BASE / "data"
-SITE = BASE / "site"
-SITE.mkdir(exist_ok=True)
 
 # Naeherungswerte, nur fuer Filter und Sortierung - keine Tagesaktualitaet noetig.
 RATES = {"EUR": 1.0, "€": 1.0, "CHF": 1.06, "GBP": 1.17, "USD": 0.92,

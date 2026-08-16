@@ -15,6 +15,65 @@
 
   const $ = (id) => document.getElementById(id);
 
+  /* ---------------- Sprache ----------------
+     Die Texte stehen in i18n.js. Fehlt eine Übersetzung, greift Deutsch;
+     die Seite bleibt damit auch bei unvollständiger Sprachdatei benutzbar. */
+
+  const I18N = window.I18N || { SPRACHEN: { de: 'Deutsch' }, TEXTE: {} };
+  const SPEICHER = 'ff.sprache';
+
+  function startSprache() {
+    try {
+      const gemerkt = localStorage.getItem(SPEICHER);
+      if (gemerkt && I18N.SPRACHEN[gemerkt]) return gemerkt;
+    } catch (_) { /* Speicher gesperrt - dann eben die Browsersprache */ }
+    for (const wunsch of (navigator.languages || [navigator.language || 'de'])) {
+      const kurz = String(wunsch).slice(0, 2).toLowerCase();
+      if (I18N.SPRACHEN[kurz]) return kurz;
+    }
+    return 'de';
+  }
+
+  let sprache = startSprache();
+
+  /** Übersetzt einen Schlüssel und ersetzt {platzhalter}. */
+  function t(schluessel, werte) {
+    const eintrag = I18N.TEXTE[schluessel];
+    let text = eintrag ? (eintrag[sprache] ?? eintrag.de ?? '') : schluessel;
+    if (werte) {
+      for (const [k, v] of Object.entries(werte)) {
+        text = text.split('{' + k + '}').join(String(v));
+      }
+    }
+    return text;
+  }
+
+  /** Trägt alle ausgezeichneten Texte im Dokument neu ein. */
+  function spracheAnwenden() {
+    document.documentElement.lang = sprache;
+    for (const el of document.querySelectorAll('[data-i18n]')) {
+      el.textContent = t(el.dataset.i18n);
+    }
+    for (const el of document.querySelectorAll('[data-i18n-html]')) {
+      el.innerHTML = t(el.dataset.i18nHtml);
+    }
+    for (const el of document.querySelectorAll('[data-i18n-title]')) {
+      el.title = t(el.dataset.i18nTitle);
+    }
+    for (const el of document.querySelectorAll('[data-i18n-ph]')) {
+      el.placeholder = t(el.dataset.i18nPh);
+    }
+    for (const el of document.querySelectorAll('[data-i18n-aria]')) {
+      el.setAttribute('aria-label', t(el.dataset.i18nAria));
+    }
+    const titel = t('html.title');
+    if (titel) document.title = titel;
+
+    // Rechtstexte bleiben auf Deutsch - der Hinweis erscheint nur, wenn nötig
+    const hinweis = $('legal-note');
+    if (hinweis) hinweis.hidden = !t('legal.germanOnly');
+  }
+
   const state = {
     home: null,              // {lat, lon, label}
     radius: 200,
@@ -92,7 +151,7 @@
                 ambiguous: alt.length ? alt : null,
             };
         }
-        return { notFound: `Zur Postleitzahl ${code} gibt es keinen Eintrag.` };
+        return { notFound: code };
     }
 
     // 2. Ortsverzeichnis (GeoNames), nach Einwohnerzahl sortiert - der erste
@@ -146,29 +205,30 @@
     if (!q.trim()) {
       state.home = null;
       status.className = 'hint';
-      status.textContent = 'Stadt eingeben und „Suchen“ drücken.';
+      status.textContent = t('home.statusStart');
       render();
       return;
     }
     status.className = 'hint';
-    status.textContent = 'Suche Koordinaten …';
+    status.textContent = t('home.statusSearching');
     const hit = await geocode(q);
     if (!hit || hit.notFound) {
       state.home = null;
       status.className = 'hint err';
       status.textContent = hit && hit.notFound
-        ? hit.notFound
-        : 'Ort nicht gefunden. Am sichersten ist die Postleitzahl, z. B. 97209.';
+        ? t('home.statusPlzUnknown', { code: hit.notFound })
+        : t('home.statusNotFound');
     } else {
       state.home = hit;
       status.className = 'hint ok';
-      status.textContent = `${hit.label} — Umkreissuche aktiv.` +
+      status.textContent = t('home.statusActive', { ort: hit.label }) +
         (hit.ambiguous
-          ? ` Diese Postleitzahl gibt es auch in ${hit.ambiguous.join(', ')} — dann Land anhängen, z. B. „${q.trim().split(/\s+/)[0]} ${hit.ambiguous[0]}“.`
+          ? t('home.ambiguousPlz', {
+              laender: hit.ambiguous.join(', '),
+              beispiel: `${q.trim().split(/\s+/)[0]} ${hit.ambiguous[0]}`,
+            })
           : '') +
-        (hit.ambiguousName
-          ? ` Achtung: Es gibt ${hit.ambiguousName} weitere${hit.ambiguousName === 1 ? 'n' : ''} Ort${hit.ambiguousName === 1 ? '' : 'e'} mit ähnlichem Namen — mit der Postleitzahl wird es eindeutig.`
-          : '');
+        (hit.ambiguousName ? t('home.ambiguousName', { n: hit.ambiguousName }) : '');
     }
     map.center = null;
     render();
@@ -358,22 +418,22 @@
     // Hinweistext unter der Karte
     const cap = $('map-caption');
     const zoomInfo = map.zoom !== 1 || map.center
-      ? ` · Ansicht ${map.zoom.toFixed(1)}×`
-      : ' · Mausrad zoomt, Ziehen verschiebt';
+      ? t('map.view', { zoom: map.zoom.toFixed(1) })
+      : t('map.zoomHint');
     const hovered = map.hover >= 0 ? map.pins[map.hover] : null;
+    const km = state.radius.toLocaleString(sprache);
 
     if (hovered) {
-      cap.textContent = `${hovered.name} — ${hovered.pct.toFixed(0)} % Übereinstimmung` +
-        (hovered.dist === null ? '' : `, ${hovered.dist.toLocaleString('de-DE')} km`);
+      cap.textContent = `${hovered.name} — ${hovered.pct === null ? '' : hovered.pct.toFixed(0) + ' % '}` +
+        (hovered.pct === null ? '' : t('card.match')) +
+        (hovered.dist === null ? '' : `, ${hovered.dist.toLocaleString(sprache)} km`);
     } else if (!state.home) {
-      cap.textContent = 'Wohnort eingeben, um den Suchradius zu sehen.' + zoomInfo;
+      cap.textContent = t('map.captionNoHome') + zoomInfo;
     } else if (!map.pins.length) {
-      cap.textContent = `Umkreis ${state.radius.toLocaleString('de-DE')} km um ${state.home.label}. ` +
-        'Nach der Bandauswahl erscheinen hier die passenden Festivals.' + zoomInfo;
+      cap.textContent = t('map.captionRadius', { km, ort: state.home.label }) + zoomInfo;
     } else {
-      cap.textContent = `${map.pins.length} Festival${map.pins.length === 1 ? '' : 's'} im Umkreis von ` +
-        `${state.radius.toLocaleString('de-DE')} km um ${state.home.label}. Pin anklicken springt zum Eintrag.` +
-        zoomInfo;
+      cap.textContent = t(map.pins.length === 1 ? 'map.captionPin1' : 'map.captionPins',
+        { n: map.pins.length, km, ort: state.home.label }) + zoomInfo;
     }
   }
 
@@ -521,7 +581,7 @@
     list.innerHTML = '';
 
     if (term.length < 2) {
-      hint.textContent = `${BANDS.length.toLocaleString('de-DE')} Acts in der Datenbank — mindestens zwei Zeichen eingeben.`;
+      hint.textContent = t('bands.hintMin', { n: BANDS.length.toLocaleString(sprache) });
       return;
     }
 
@@ -533,12 +593,15 @@
       if (starts.length > 400) break;
     }
     const hits = starts.concat(contains);
-    hits.sort((a, b) => bandFreq[b] - bandFreq[a] || BANDS[a].localeCompare(BANDS[b], 'de'));
+    hits.sort((a, b) => bandFreq[b] - bandFreq[a] || BANDS[a].localeCompare(BANDS[b], sprache));
     const show = hits.slice(0, 80);
 
     hint.textContent = hits.length
-      ? `${hits.length} Treffer${hits.length > show.length ? `, die ersten ${show.length} angezeigt` : ''}.`
-      : 'Keine Band mit diesem Namen gefunden.';
+      ? t('bands.hintHits', {
+          n: hits.length,
+          rest: hits.length > show.length ? t('bands.hintShown', { m: show.length }) : '',
+        })
+      : t('bands.hintNone');
 
     const frag = document.createDocumentFragment();
     for (const i of show) {
@@ -547,15 +610,14 @@
       label.textContent = BANDS[i];
       const cnt = document.createElement('span');
       cnt.className = 'cnt';
-      cnt.textContent = `${bandFreq[i]} Festival${bandFreq[i] === 1 ? '' : 's'}`;
+      cnt.textContent = bandFreq[i] === 1
+        ? t('bands.festival1') : t('bands.festivals', { n: bandFreq[i] });
       const btn = document.createElement('button');
       const chosen = state.selected.has(i);
-      btn.textContent = chosen ? 'gewählt' : 'wählen';
+      btn.textContent = chosen ? t('bands.chosenBtn') : t('bands.choose');
       btn.disabled = chosen;
       btn.className = chosen ? 'ghost' : '';
-      btn.title = chosen
-        ? `${BANDS[i]} steht bereits in deiner Auswahl.`
-        : `${BANDS[i]} zur Auswahl hinzufügen — die Trefferliste aktualisiert sich sofort.`;
+      btn.title = t(chosen ? 'bands.chosenTitle' : 'bands.chooseTitle', { band: BANDS[i] });
       btn.addEventListener('click', () => { state.selected.set(i, 1); renderBandResults(); renderChosen(); render(); });
       const left = document.createElement('div');
       left.append(label, document.createTextNode(' '), cnt);
@@ -573,13 +635,13 @@
     if (!state.selected.size) {
       const li = document.createElement('li');
       li.className = 'hint';
-      li.textContent = 'Noch keine Band gewählt.';
+      li.textContent = t('bands.empty');
       list.append(li);
       return;
     }
 
     const entries = [...state.selected.entries()]
-      .sort((a, b) => BANDS[a[0]].localeCompare(BANDS[b[0]], 'de'));
+      .sort((a, b) => BANDS[a[0]].localeCompare(BANDS[b[0]], sprache));
 
     for (const [i, weight] of entries) {
       const li = document.createElement('li');
@@ -591,8 +653,7 @@
       const w = document.createElement('button');
       w.className = 'w';
       w.textContent = weight === 2 ? '×2' : '×1';
-      w.title = weight === 2 ? 'Doppelte Gewichtung aktiv — klicken für einfach'
-                             : 'Einfache Gewichtung — klicken für doppelt';
+      w.title = t(weight === 2 ? 'bands.weightDouble' : 'bands.weightSingle');
       w.addEventListener('click', () => {
         state.selected.set(i, weight === 2 ? 1 : 2);
         renderChosen(); render();
@@ -601,7 +662,7 @@
       const x = document.createElement('button');
       x.className = 'x';
       x.textContent = '×';
-      x.title = 'Entfernen';
+      x.title = t('bands.remove');
       x.addEventListener('click', () => {
         state.selected.delete(i);
         renderChosen(); renderBandResults(); render();
@@ -620,7 +681,7 @@
     const m = String(stamp).match(/^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}))?/);
     if (!m) return stamp;
     const datum = `${m[3]}.${m[2]}.${m[1]}`;
-    return m[4] ? `${datum} um ${m[4]}:${m[5]} Uhr` : datum;
+    return m[4] ? t('stand.at', { datum, zeit: `${m[4]}:${m[5]}` }) : datum;
   }
 
   const fmtDate = (iso) => {
@@ -630,18 +691,19 @@
   };
 
   function dateLabel(row) {
-    if (!row[FROM]) return row[NOTE] || 'Termin offen';
+    if (!row[FROM]) return row[NOTE] || t('card.dateOpen');
     return row[TO] && row[TO] !== row[FROM]
       ? `${fmtDate(row[FROM])} – ${fmtDate(row[TO])}`
       : fmtDate(row[FROM]);
   }
 
   function priceLabel(row) {
-    if (row[EUR] === 0) return 'Eintritt frei';
-    if (row[EUR] == null) return row[PRICE_RAW] || 'Preis unbekannt';
-    const eur = `${row[EUR].toLocaleString('de-DE', { minimumFractionDigits: 2 })} €`;
+    if (row[EUR] === 0) return t('card.free');
+    if (row[EUR] == null) return row[PRICE_RAW] || t('card.priceUnknown');
+    const eur = `${row[EUR].toLocaleString(sprache, { minimumFractionDigits: 2 })} €`;
     const raw = (row[PRICE_RAW] || '').trim();
-    return /^(ab )?(EUR|€)/i.test(raw) ? `ab ${eur}` : `ab ${eur} (${raw})`;
+    const ab = t('card.from');
+    return /^(ab )?(EUR|€)/i.test(raw) ? `${ab} ${eur}` : `${ab} ${eur} (${raw})`;
   }
 
   function render() {
@@ -650,15 +712,15 @@
       ? [...state.selected.values()].reduce((a, b) => a + b, 0) : 0;
 
     $('filter-stat').innerHTML =
-      `<b>${pool.length.toLocaleString('de-DE')}</b> von ${F.length.toLocaleString('de-DE')} Festivals passen zu Umkreis, Preis und Zeitraum.` +
-      (state.home ? '' : ' <i>Ohne Wohnort wird nicht nach Entfernung gefiltert.</i>');
+      t('filter.stat', { n: pool.length.toLocaleString(sprache),
+                         gesamt: F.length.toLocaleString(sprache) }) +
+      (state.home ? '' : t('filter.noHome'));
 
     const list = $('festival-list');
     list.innerHTML = '';
 
     if (state.useBands && !total) {
-      $('result-stat').textContent =
-        'Wähle mindestens eine Band — oder schalte den Bandfilter aus, um alle passenden Festivals zu sehen.';
+      $('result-stat').textContent = t('res.needBand');
       map.pins = [];
       map.hover = -1;
       drawMap();
@@ -687,21 +749,19 @@
       (a.dist ?? Infinity) - (b.dist ?? Infinity) ||
       (a.row[FROM] || '9999').localeCompare(b.row[FROM] || '9999') ||
       (a.row[EUR] ?? Infinity) - (b.row[EUR] ?? Infinity) ||
-      a.row[NAME].localeCompare(b.row[NAME], 'de'));
+      a.row[NAME].localeCompare(b.row[NAME], sprache));
 
+    const eins = scored.length === 1;
     if (!state.useBands) {
-      $('result-stat').innerHTML = scored.length
-        ? `<b>${scored.length}</b> ${scored.length === 1 ? 'Festival passt' : 'Festivals passen'} zu deinen Filtern. ` +
-          'Bandfilter ist aus — sortiert nach Entfernung, dann Termin, dann Preis.'
-        : 'Kein Festival passt zu diesen Filtern. Radius, Preis oder Zeitraum lockern.';
+      $('result-stat').innerHTML = !scored.length ? t('res.none')
+        : t(eins ? 'res.oneWithoutBands' : 'res.withoutBands', { n: scored.length });
     } else {
-      $('result-stat').innerHTML = scored.length
-        ? `<b>${scored.length}</b> ${scored.length === 1 ? 'Festival spielt' : 'Festivals spielen'} ` +
-          (state.selected.size === 1
-            ? 'deine gewählte Band'
-            : `mindestens eine deiner ${state.selected.size} Bands`) +
-          '. Sortiert nach Übereinstimmung, dann Entfernung, dann Preis.'
-        : 'Keines der gefilterten Festivals spielt eine deiner Bands. Radius, Preis oder Zeitraum lockern.';
+      const schluessel = !scored.length ? null
+        : eins ? (state.selected.size === 1 ? 'res.oneWithBand1' : 'res.oneWithBands')
+               : (state.selected.size === 1 ? 'res.withBands1' : 'res.withBands');
+      $('result-stat').innerHTML = schluessel
+        ? t(schluessel, { n: scored.length, b: state.selected.size })
+        : t('res.noneBands');
     }
 
     const shown = scored.slice(0, 300);
@@ -721,7 +781,7 @@
     if (scored.length > 300) {
       const li = document.createElement('li');
       li.className = 'empty';
-      li.textContent = `… ${scored.length - 300} weitere Treffer ausgeblendet. Filter enger stellen.`;
+      li.textContent = t('res.more', { n: scored.length - 300 });
       list.append(li);
     }
   }
@@ -741,8 +801,7 @@
       const a = document.createElement('a');
       a.href = row[WEB]; a.target = '_blank'; a.rel = 'noopener';
       a.textContent = row[NAME];
-      a.title = `Offizielle Seite von ${row[NAME]} in neuem Tab öffnen — dort stehen `
-              + 'die verbindlichen Termine, Preise und Tickets.';
+      a.title = t('card.websiteTitle', { name: row[NAME] });
       h3.append(a);
     } else h3.textContent = row[NAME];
 
@@ -750,8 +809,8 @@
     if (row[CANCELLED]) {
       const flag = document.createElement('span');
       flag.className = 'flag';
-      flag.textContent = 'Abgesagt';
-      flag.title = 'Diese Ausgabe wurde von der Quelle als abgesagt gemeldet.';
+      flag.textContent = t('card.cancelled');
+      flag.title = t('card.cancelledTitle');
       titleBox.append(flag);
     }
     titleBox.append(h3);
@@ -762,7 +821,7 @@
       pct.className = 'pct';
       pct.textContent = `${s.pct.toFixed(0)} %`;
       const small = document.createElement('small');
-      small.textContent = 'Übereinstimmung';
+      small.textContent = t('card.match');
       pct.append(small);
       head.append(pct);
     }
@@ -771,12 +830,12 @@
     facts.className = 'facts';
     const place = [row[VENUE], row[CITY], row[LAND]].filter(Boolean).join(', ');
     const items = [
-      ['Termin', dateLabel(row)],
-      ['Preis', priceLabel(row)],
-      ['Ort', place || 'unbekannt'],
-      ['Entfernung', s.dist === null
-        ? (state.home ? 'unbekannt' : '— (kein Wohnort gesetzt)')
-        : `${s.dist.toLocaleString('de-DE')} km`],
+      [t('card.date'), dateLabel(row)],
+      [t('card.price'), priceLabel(row)],
+      [t('card.place'), place || t('card.unknownPlace')],
+      [t('card.distance'), s.dist === null
+        ? (state.home ? t('card.unknownPlace') : t('card.noHomeSet'))
+        : `${s.dist.toLocaleString(sprache)} km`],
     ];
     for (const [k, v] of items) {
       const el = document.createElement('li');
@@ -788,8 +847,8 @@
       const el = document.createElement('li');
       const a = document.createElement('a');
       a.href = row[WEB]; a.target = '_blank'; a.rel = 'noopener';
-      a.textContent = 'Offizielle Webseite';
-      a.title = `Offizielle Seite von ${row[NAME]} in neuem Tab öffnen.`;
+      a.textContent = t('card.website');
+      a.title = t('card.websiteTitle', { name: row[NAME] });
       el.append(a);
       facts.append(el);
     }
@@ -798,15 +857,13 @@
     hits.className = 'hits';
     if (!s.hits.length) hits.hidden = true;
     const hitNames = s.hits
-      .sort((a, b) => b[1] - a[1] || BANDS[a[0]].localeCompare(BANDS[b[0]], 'de'));
-    hits.append(document.createTextNode('Deine Bands: '));
+      .sort((a, b) => b[1] - a[1] || BANDS[a[0]].localeCompare(BANDS[b[0]], sprache));
+    hits.append(document.createTextNode(t('card.yourBands')));
     hitNames.forEach(([b, w], n) => {
       const span = document.createElement('span');
       span.className = 'hit' + (w === 2 ? ' dbl' : '');
       span.textContent = BANDS[b];
-      span.title = w === 2
-        ? `${BANDS[b]} zählt doppelt (gelb hervorgehoben).`
-        : `${BANDS[b]} zählt einfach.`;
+      span.title = t(w === 2 ? 'card.bandDouble' : 'card.bandSingle', { band: BANDS[b] });
       hits.append(span);
       if (n < hitNames.length - 1) hits.append(document.createTextNode(', '));
     });
@@ -814,21 +871,20 @@
     const det = document.createElement('details');
     det.className = 'lineup';
     const sum = document.createElement('summary');
-    sum.textContent = `Komplettes Lineup (${row[LINEUP].length} Acts)`;
-    sum.title = 'Aufklappen zeigt alle bestätigten Acts dieses Festivals. '
-              + 'Deine gewählten Bands sind grün hervorgehoben.';
+    sum.textContent = t('card.lineup', { n: row[LINEUP].length });
+    sum.title = t('card.lineupTitle');
     const all = document.createElement('div');
     all.className = 'all';
     const chosenIdx = new Set(s.hits.map((h) => h[0]));
     const names = row[LINEUP].map((b) => [BANDS[b], chosenIdx.has(b)])
-      .sort((a, b) => a[0].localeCompare(b[0], 'de'));
+      .sort((a, b) => a[0].localeCompare(b[0], sprache));
     names.forEach(([n, isHit], k) => {
       const el = document.createElement(isHit ? 'mark' : 'span');
       el.textContent = n;
       all.append(el);
       if (k < names.length - 1) all.append(document.createTextNode(' · '));
     });
-    if (!names.length) all.textContent = 'Für dieses Festival ist noch kein Lineup veröffentlicht.';
+    if (!names.length) all.textContent = t('card.noLineup');
     det.append(sum, all);
 
     li.append(head, facts, hits, det);
@@ -908,7 +964,7 @@
       const { nachricht } = feedbackText();
       if (nachricht) return true;
       status.className = 'hint err';
-      status.textContent = 'Bitte schreib noch kurz, worum es geht.';
+      status.textContent = t('fb.needText');
       $('fb-text').focus();
       return false;
     };
@@ -925,8 +981,7 @@
       if (!pruefen()) { e.preventDefault(); return; }
       linkAktualisieren();
       status.className = 'hint ok';
-      status.textContent = 'Dein E-Mail-Programm sollte sich öffnen. Falls nicht, ' +
-        'nimm „Text kopieren“ und schicke die Nachricht von Hand.';
+      status.textContent = t('fb.opened');
     });
 
     for (const id of ['fb-art', 'fb-text', 'fb-kontakt']) {
@@ -942,12 +997,10 @@
       try {
         await navigator.clipboard.writeText(text);
         status.className = 'hint ok';
-        status.textContent = 'Kopiert. Füge den Text in eine E-Mail an ' +
-          `${FEEDBACK_MAIL} ein.`;
+        status.textContent = t('fb.copied', { mail: FEEDBACK_MAIL });
       } catch (_) {
         status.className = 'hint err';
-        status.textContent = 'Kopieren hat nicht geklappt — bitte den Text ' +
-          'oben markieren und selbst kopieren.';
+        status.textContent = t('fb.copyFailed');
       }
     });
 
@@ -1051,6 +1104,44 @@
     }
   }
 
+  function aktualisiereDatenstand() {
+    $('build-info').textContent = t('footer.build', {
+      stand: fmtStand(D.generated),
+      f: F.length.toLocaleString(sprache),
+      a: BANDS.length.toLocaleString(sprache),
+    });
+  }
+
+  /** Baut die Sprachauswahl und schaltet die gesamte Oberfläche um. */
+  function initSprache() {
+    const wahl = $('lang');
+    if (!wahl) return;
+    for (const [code, name] of Object.entries(I18N.SPRACHEN)) {
+      const o = document.createElement('option');
+      o.value = code;
+      o.textContent = name;
+      wahl.append(o);
+    }
+    wahl.value = sprache;
+
+    wahl.addEventListener('change', () => {
+      sprache = wahl.value;
+      try { localStorage.setItem(SPEICHER, sprache); } catch (_) { /* egal */ }
+      spracheAnwenden();
+      // alles neu zeichnen, was Text aus dem Skript enthält
+      renderBandResults();
+      renderChosen();
+      render();
+      aktualisiereDatenstand();
+      datumsHinweisNeu();
+    });
+
+    spracheAnwenden();
+  }
+
+  // wird in init() gesetzt, damit der Datumshinweis die Sprache mitbekommt
+  let datumsHinweisNeu = () => {};
+
   /* ---------------- Verdrahtung ---------------- */
 
   function init() {
@@ -1119,15 +1210,10 @@
                         (state.to && state.to < heute);
       if (zuFrueh) {
         el.className = 'hint err';
-        el.textContent =
-          `Früher als der ${fmtDate(state.minDate)} ist nicht möglich: Das ist der ` +
-          'Monatsanfang des zeitlich ersten Festivals im Datenbestand — davor liegen ' +
-          'keine Daten vor. Das Datum wurde auf diesen Tag gesetzt.';
+        el.textContent = t('date.tooEarly', { datum: fmtDate(state.minDate) });
       } else if (vergangen) {
         el.className = 'hint warn';
-        el.textContent =
-          'Der Zeitraum liegt teilweise in der Vergangenheit. Es werden deshalb auch ' +
-          'Festivals angezeigt, die bereits laufen oder schon vorbei sind.';
+        el.textContent = t('date.past');
       } else {
         el.className = 'hint';
         el.textContent = '';
@@ -1178,11 +1264,11 @@
       state.selected.clear(); renderChosen(); renderBandResults(); render();
     });
 
-    $('build-info').textContent =
-      `Datenstand ${fmtStand(D.generated)} · ${F.length.toLocaleString('de-DE')} Festivals · ` +
-      `${BANDS.length.toLocaleString('de-DE')} Acts.`;
+    aktualisiereDatenstand();
 
+    datumsHinweisNeu = () => datumsHinweis(false);
     datumsHinweis(false);
+    initSprache();
     initMap();
     initHelp();
     initPwa();

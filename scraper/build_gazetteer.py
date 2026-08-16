@@ -23,25 +23,22 @@ import sys
 import zipfile
 from pathlib import Path
 
+
 import requests
 
-BASE = Path(__file__).resolve().parent.parent
-DATA = BASE / "data"
-CACHE = BASE / "cache" / "geonames"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from gemeinsam import DATA, EUROPA_CODES, HEADERS  # noqa: E402
+
+CACHE = DATA.parent / "cache" / "geonames"
 CACHE.mkdir(parents=True, exist_ok=True)
 OUT = DATA / "gazetteer.json"
 OUT_PLZ = DATA / "plz.json"
 
-UA = {"User-Agent": "FestivalFinder/1.0 (privates Projekt)"}
+UA = HEADERS
 DUMP = "https://download.geonames.org/export/dump/"
 
 FULL = ["DE", "AT", "CH"]          # feine Aufloesung
-EUROPE = {
-    "AL", "AD", "AT", "BY", "BE", "BA", "BG", "HR", "CY", "CZ", "DK", "EE", "FO",
-    "FI", "FR", "DE", "GI", "GR", "GG", "HU", "IS", "IE", "IM", "IT", "JE", "LV",
-    "LI", "LT", "LU", "MT", "MD", "MC", "ME", "NL", "MK", "NO", "PL", "PT", "RO",
-    "SM", "RS", "SK", "SI", "ES", "SE", "CH", "UA", "GB", "VA", "XK",
-}
+EUROPE = set(EUROPA_CODES)
 
 # GeoNames-Spalten
 NAME, ASCII, ALT, LAT, LON, FCLASS, FCODE, CC, POP = 1, 2, 3, 4, 5, 6, 7, 8, 14

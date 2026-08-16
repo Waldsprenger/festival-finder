@@ -61,6 +61,7 @@ def article_of(html: str) -> str:
 def main() -> None:
     fonts = read("fonts.css")
     css = read("style.css")
+    i18n = read("i18n.js")
     data = read("data.js")
     app = read("app.js")
 
@@ -84,6 +85,7 @@ def main() -> None:
     css = html_ascii(css)
     data = js_ascii(data)
     app = js_ascii(app)
+    i18n = js_ascii(i18n)
 
     doc = f"""<title>Festival Finder &#8212; Lineup-Abgleich f&#252;r Europa</title>
 <style>
@@ -96,6 +98,9 @@ html, body {{ background: #0b0b0d; }}
 </style>
 {main_body}
 {legal}
+<script>
+{i18n}
+</script>
 <script>
 {data}
 </script>

@@ -26,17 +26,9 @@ from urllib.parse import urljoin, urlparse, parse_qs
 import requests
 from bs4 import BeautifulSoup
 
-BASE = Path(__file__).resolve().parent.parent
-CACHE = BASE / "cache"
-OUT = BASE / "data"
-CACHE.mkdir(exist_ok=True)
-OUT.mkdir(exist_ok=True)
-
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                  "(KHTML, like Gecko) Chrome/126.0 Safari/537.36",
-    "Accept-Language": "de-DE,de;q=0.9,en;q=0.8",
-}
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from gemeinsam import (  # noqa: E402  (Pfad muss vorher stehen)
+    BASE, CACHE, DATA as OUT, HEADERS, ausser_europa, land_code)
 
 FT = "https://www.festivalticker.de"
 FU = "https://www.festivalsunited.com"
@@ -68,8 +60,8 @@ FU_KEINE_DETAILS = {"calendar", "countries", "lists", "genres", "months",
                     "cities", "venues", "artists", "search", "upcoming",
                     "new", "top", "magazine"}
 
-# festival-alarm listet je Jahrgang eine Uebersichtsseite
-FA_LISTS = [f"{FA}/Festivals-{j}" for j in JAHRE]
+# festival-alarm listet je Jahrgang eine Uebersichtsseite, die Adressen baut
+# fa_collect_links selbst aus JAHRE.
 
 _throttle = threading.Semaphore(4)
 _session = threading.local()
@@ -143,7 +135,11 @@ def _fold(value: str) -> str:
     """Aggressiver Schluessel fuer den Namensvergleich."""
     v = unicodedata.normalize("NFKD", value.lower())
     v = "".join(c for c in v if not unicodedata.combining(c))
-    v = v.replace("ß", "ss").replace("ø", "o").replace("æ", "ae").replace("đ", "d")
+    # Buchstaben, die NFKD nicht zerlegt - sonst fielen sie ersatzlos weg und
+    # "Aħna" wuerde zu "Ana"
+    for a, b in (("ß", "ss"), ("ø", "o"), ("æ", "ae"), ("œ", "oe"), ("đ", "d"),
+                 ("ħ", "h"), ("ł", "l"), ("ı", "i"), ("þ", "th"), ("ð", "d")):
+        v = v.replace(a, b)
     for a, b in REPLACEMENTS.items():
         v = v.replace(a, b)
     v = re.sub(r"\b(feat|ft|featuring|vs|with|und|and)\b", " and ", v)
@@ -175,7 +171,13 @@ ALIAS_KEY, ALIAS_NAME = _lade_aliase()
 def band_key(name: str) -> str:
     k = _fold(name)
     ziel = ALIAS_KEY.get(k)
-    return _fold(ziel) if ziel else k
+    if ziel:
+        k = _fold(ziel)
+    # Getrennt- und Zusammenschreibung meint dieselbe Band ("1000 Mods" und
+    # "1000mods"). Bei kurzen Namen bleibt die Trennung erhalten, weil dort
+    # verschiedene Acts zusammenfielen ("B-One" und "Bone").
+    eng = k.replace(" ", "")
+    return eng if len(eng) >= 5 else k
 
 
 def festival_key(name: str) -> str:
@@ -755,81 +757,6 @@ def build_band_registry(records: list[dict]) -> tuple[dict[str, str], dict]:
     return registry, stats
 
 
-# festival-alarm fuehrt auch Ueberseefestivals. Das Projekt sammelt Europa,
-# und die Geokodierung ist ohnehin auf europaeische Laender begrenzt.
-NICHT_EUROPA = {
-    "usa", "vereinigte staaten", "united states", "kanada", "canada", "mexiko",
-    "brasilien", "argentinien", "chile", "kolumbien", "peru", "uruguay",
-    "australien", "neuseeland", "japan", "china", "indien", "indonesien",
-    "thailand", "vietnam", "philippinen", "singapur", "suedafrika", "südafrika",
-    "aegypten", "ägypten", "marokko", "tunesien", "israel", "katar",
-    "vereinigte arabische emirate", "us", "ca", "au", "nz", "jp", "br", "mx",
-}
-
-
-def ausser_europa(country: str) -> bool:
-    return (country or "").strip().lower() in NICHT_EUROPA
-
-
-# Die Quellen schreiben Laender mal aus, mal als Kuerzel, mal umgangssprachlich.
-# Ausgeliefert wird einheitlich der ISO-Code.
-LAENDER = {
-    "deutschland": "DE", "germany": "DE", "de": "DE", "brd": "DE",
-    "oesterreich": "AT", "österreich": "AT", "austria": "AT", "at": "AT",
-    "schweiz": "CH", "switzerland": "CH", "suisse": "CH", "ch": "CH",
-    "niederlande": "NL", "holland": "NL", "netherlands": "NL", "nl": "NL",
-    "belgien": "BE", "belgium": "BE", "be": "BE",
-    "frankreich": "FR", "france": "FR", "fr": "FR",
-    "italien": "IT", "italy": "IT", "it": "IT",
-    "spanien": "ES", "spain": "ES", "es": "ES",
-    "portugal": "PT", "pt": "PT",
-    "england": "GB", "grossbritannien": "GB", "großbritannien": "GB",
-    "schottland": "GB", "wales": "GB", "nordirland": "GB", "uk": "GB",
-    "united kingdom": "GB", "great britain": "GB", "gb": "GB",
-    "vereinigtes königreich": "GB", "vereinigtes koenigreich": "GB",
-    "irland": "IE", "ireland": "IE", "ie": "IE",
-    "daenemark": "DK", "dänemark": "DK", "denmark": "DK", "dk": "DK",
-    "schweden": "SE", "sweden": "SE", "se": "SE",
-    "norwegen": "NO", "norway": "NO", "no": "NO",
-    "finnland": "FI", "finland": "FI", "fi": "FI",
-    "island": "IS", "iceland": "IS", "is": "IS",
-    "polen": "PL", "poland": "PL", "pl": "PL",
-    "tschechien": "CZ", "tschechische republik": "CZ", "czechia": "CZ", "cz": "CZ",
-    "slowakei": "SK", "sk": "SK", "slowenien": "SI", "si": "SI",
-    "ungarn": "HU", "hungary": "HU", "hu": "HU",
-    "kroatien": "HR", "croatia": "HR", "hr": "HR",
-    "serbien": "RS", "rs": "RS", "montenegro": "ME", "me": "ME",
-    "bosnien": "BA", "bosnien und herzegowina": "BA", "ba": "BA",
-    "nordmazedonien": "MK", "mazedonien": "MK", "mk": "MK",
-    "albanien": "AL", "al": "AL", "kosovo": "XK", "xk": "XK",
-    "griechenland": "GR", "greece": "GR", "gr": "GR",
-    "bulgarien": "BG", "bg": "BG", "rumaenien": "RO", "rumänien": "RO", "ro": "RO",
-    "moldawien": "MD", "md": "MD", "ukraine": "UA", "ua": "UA",
-    "estland": "EE", "ee": "EE", "lettland": "LV", "lv": "LV",
-    "litauen": "LT", "lt": "LT", "weissrussland": "BY", "belarus": "BY", "by": "BY",
-    "luxemburg": "LU", "luxembourg": "LU", "lu": "LU",
-    "liechtenstein": "LI", "li": "LI", "monaco": "MC", "mc": "MC",
-    "andorra": "AD", "ad": "AD", "san marino": "SM", "sm": "SM",
-    "malta": "MT", "mt": "MT", "zypern": "CY", "cyprus": "CY", "cy": "CY",
-    "tuerkei": "TR", "türkei": "TR", "turkey": "TR", "tr": "TR",
-    "vatikan": "VA", "va": "VA", "gibraltar": "GI", "gi": "GI",
-    "faeroeer": "FO", "färöer": "FO", "fo": "FO",
-}
-
-
-def land_code(country: str) -> str:
-    """Laenderkuerzel; unbekannte Angaben bleiben unveraendert."""
-    roh = clean(country)
-    if not roh:
-        return ""
-    code = LAENDER.get(roh.lower())
-    if code:
-        return code
-    if len(roh) == 2 and roh.isalpha():
-        return roh.upper()
-    return roh
-
-
 def city_key(value: str) -> str:
     v = re.sub(r"\b\d{4,6}\b", " ", value or "")       # PLZ entfernen
     return _fold(v)
@@ -945,10 +872,16 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
                     continue
                 if not (set(ka[0].split()) & set(kb[0].split())):
                     continue
-                # gleiche Stadt oder eine Schreibweise praezisiert die andere
-                sa, sb = ka[2], kb[2]
-                if not (sa == sb or sa.startswith(sb + " ") or sb.startswith(sa + " ")):
-                    continue
+                # Bei identischem Namensschluessel und identischem Starttermin
+                # aus verschiedenen Quellen ist es dieselbe Veranstaltung, auch
+                # wenn die Quellen den Ort verschieden benennen (Nachbarort,
+                # Gemeinde statt Ortsteil). Tourformate mit gleichem Namen am
+                # selben Tag stammen aus derselben Quelle und sind oben schon
+                # ausgeschlossen.
+                if ka[0] != kb[0]:
+                    sa, sb = ka[2], kb[2]
+                    if not (sa == sb or sa.startswith(sb + " ") or sb.startswith(sa + " ")):
+                        continue
                 keep, drop, drop_key = ((a, b, kb) if a["source_order"] <= b["source_order"]
                                         else (b, a, ka))
                 for field in ("date_from", "date_to", "city", "country", "venue",

@@ -15,59 +15,22 @@ from pathlib import Path
 
 import requests
 
-BASE = Path(__file__).resolve().parent.parent
-DATA = BASE / "data"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from gemeinsam import DATA, EU_CODES, LAENDER  # noqa: E402
+
 GEO = DATA / "geo.json"
 
+# Nominatim verlangt eine Kontaktangabe im User-Agent (Nutzungsrichtlinie)
 UA = "FestivalFinder/1.0 (privates Projekt; Kontakt: waldsprenger@gmail.com)"
 ENDPOINT = "https://nominatim.openstreetmap.org/search"
-
-# Laenderangaben der Quellen sind gemischt (deutsch, ISO2, umgangssprachlich)
-COUNTRY = {
-    "deutschland": "de", "de": "de", "germany": "de",
-    "oesterreich": "at", "österreich": "at", "at": "at", "austria": "at",
-    "schweiz": "ch", "ch": "ch", "switzerland": "ch",
-    "holland": "nl", "niederlande": "nl", "nl": "nl", "netherlands": "nl",
-    "frankreich": "fr", "fr": "fr", "france": "fr",
-    "belgien": "be", "be": "be", "belgium": "be",
-    "england": "gb", "gb": "gb", "uk": "gb", "grossbritannien": "gb",
-    "schottland": "gb", "wales": "gb", "nordirland": "gb",
-    "italien": "it", "it": "it", "italy": "it",
-    "spanien": "es", "es": "es", "spain": "es",
-    "portugal": "pt", "pt": "pt",
-    "daenemark": "dk", "dänemark": "dk", "dk": "dk", "denmark": "dk",
-    "schweden": "se", "se": "se", "sweden": "se",
-    "norwegen": "no", "no": "no", "norway": "no",
-    "finnland": "fi", "fi": "fi", "finland": "fi",
-    "polen": "pl", "pl": "pl", "poland": "pl",
-    "tschechien": "cz", "cz": "cz", "czechia": "cz",
-    "ungarn": "hu", "hu": "hu", "hungary": "hu",
-    "irland": "ie", "ie": "ie", "ireland": "ie",
-    "luxemburg": "lu", "lu": "lu",
-    "slowenien": "si", "si": "si", "slowakei": "sk", "sk": "sk",
-    "kroatien": "hr", "hr": "hr", "serbien": "rs", "rs": "rs",
-    "griechenland": "gr", "gr": "gr", "greece": "gr",
-    "rumaenien": "ro", "rumänien": "ro", "ro": "ro",
-    "bulgarien": "bg", "bg": "bg", "estland": "ee", "ee": "ee",
-    "lettland": "lv", "lv": "lv", "litauen": "lt", "lt": "lt",
-    "island": "is", "is": "is", "malta": "mt", "mt": "mt",
-    "liechtenstein": "li", "li": "li", "bosnien": "ba", "ba": "ba",
-}
 
 
 # Ohne Laenderfilter liefert Nominatim bei mehrdeutigen Namen den weltweit
 # bekanntesten Ort: "Newark" wurde New Jersey statt England, "Hille" wurde
-# Hilla im Irak. Deshalb bleibt jede Suche auf Europa beschraenkt.
-EU_CODES = ",".join(sorted({
-    "al", "ad", "at", "by", "be", "ba", "bg", "hr", "cy", "cz", "dk", "ee", "fo",
-    "fi", "fr", "de", "gi", "gr", "gg", "hu", "is", "ie", "im", "it", "je", "lv",
-    "li", "lt", "lu", "mt", "md", "mc", "me", "nl", "mk", "no", "pl", "pt", "ro",
-    "sm", "rs", "sk", "si", "es", "se", "ch", "ua", "gb", "va", "xk", "tr",
-}))
-
-
+# Hilla im Irak. Jede Suche bleibt deshalb auf Europa beschraenkt; die
+# Laenderzuordnung und EU_CODES stehen in gemeinsam.py.
 def cc(country: str) -> str:
-    return COUNTRY.get((country or "").strip().lower(), "")
+    return LAENDER.get((country or "").strip().lower(), "").lower()
 
 
 def key(city: str, country: str) -> str:

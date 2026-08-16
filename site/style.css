@@ -72,6 +72,26 @@ body {
 
 .install-hint b { color: var(--fg); }
 
+.mast-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.lang { display: flex; align-items: center; gap: .5rem; padding-top: .6rem; }
+
+.lang label {
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--mut);
+  font-weight: 700;
+}
+
+.lang select { width: auto; padding: .35rem .5rem; font-size: .85rem; }
+
 .tag {
   margin: .85rem 0 0;
   color: var(--mut);
@@ -311,9 +331,10 @@ select:focus, textarea:focus { outline: 2px solid var(--amber); outline-offset: 
   border: 1px solid var(--line);
   border-radius: 2px;
   background: #080b10;
+  cursor: grab;
+  touch-action: none;
 }
 
-.map-wrap canvas { cursor: grab; touch-action: none; }
 .map-wrap canvas:active { cursor: grabbing; }
 
 .map-tools { display: flex; gap: .4rem; margin-top: .5rem; }
