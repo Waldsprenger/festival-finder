@@ -112,6 +112,22 @@ GeoNames-Verzeichnis auf (85.098 Orte, DE/AT/CH vollständig, übriges Europa ab
 15.000 Einwohnern); Nominatim wird nur in der lokalen Fassung und nur als
 Rückfall angefragt.
 
+## Als App auf dem Startbildschirm
+
+`scraper/build_pwa.py` erzeugt Manifest, App-Symbole und einen Service Worker.
+Damit lässt sich die Seite unter Android und iOS installieren; sie startet dann
+ohne Browserleiste und funktioniert offline, weil die Festivaldaten lokal liegen.
+
+Wirksam wird das **nur bei eigener Auslieferung über HTTPS**, also in der
+GitHub-Pages-Fassung — ein Service Worker verlangt eine eigene sichere Adresse.
+In der eingebetteten claude.ai-Fassung bleibt die Registrierung wirkungslos;
+`app.js` prüft das und tut dort nichts.
+
+Der Service Worker holt immer zuerst aus dem Netz und fällt erst ohne
+Verbindung auf den Speicher zurück. Neue Festivaldaten kommen also an, sobald
+Netz da ist. Seine Version leitet sich vom Datenstand ab, damit nach jedem
+Tageslauf der alte Speicher verworfen wird.
+
 ## Veröffentlichen und täglich aktualisieren
 
 Die Seite ist statisch, deshalb ist **GitHub Pages + GitHub Actions** der passende

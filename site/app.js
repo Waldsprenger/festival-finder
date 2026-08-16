@@ -259,7 +259,7 @@
     const v = makeView(c.lat, c.lon, baseSpan() / map.zoom, w, h);
     map.view = v;
 
-    ctx.fillStyle = '#0e1116';
+    ctx.fillStyle = '#080b10';                 // Wasser
     ctx.fillRect(0, 0, w, h);
 
     // Landmassen. Ringe ausserhalb des Ausschnitts werden uebersprungen -
@@ -292,10 +292,10 @@
       }
       ctx.closePath();
     }
-    ctx.fillStyle = '#1c2029';
+    ctx.fillStyle = '#39424f';                 // Land, deutlich heller als Wasser
     ctx.fill('evenodd');
-    ctx.strokeStyle = '#333a47';
-    ctx.lineWidth = 0.7;
+    ctx.strokeStyle = '#7d8899';               // Küstenlinie
+    ctx.lineWidth = 0.9;
     ctx.stroke();
 
     // Radiuskreis. Die Projektion ist in beiden Achsen maßstabsgleich,
@@ -305,10 +305,10 @@
       const rPx = v.kmToPxY(state.radius);
       ctx.beginPath();
       ctx.ellipse(hx, hy, rPx, rPx, 0, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(226,35,26,.11)';
+      ctx.fillStyle = 'rgba(226,35,26,.16)';
       ctx.fill();
-      ctx.strokeStyle = '#e2231a';
-      ctx.lineWidth = 1.8;
+      ctx.strokeStyle = '#ff3b30';
+      ctx.lineWidth = 2.2;
       ctx.setLineDash([6, 5]);
       ctx.stroke();
       ctx.setLineDash([]);
@@ -835,6 +835,53 @@
     return li;
   }
 
+  /* ---------------- Installierbarkeit ----------------
+     Der Service Worker legt die Seite ab, damit sie vom Startbildschirm auch
+     ohne Netz startet. Er verlangt eine eigene Adresse über HTTPS; in der
+     eingebetteten Fassung ist das gesperrt, deshalb die Prüfungen. */
+
+  function initPwa() {
+    const eigenstaendig = window.top === window.self;
+    const sicher = location.protocol === 'https:' || location.hostname === 'localhost';
+    if ('serviceWorker' in navigator && eigenstaendig && sicher) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => { /* ohne ist es auch nutzbar */ });
+      });
+    }
+
+    const knopf = $('install');
+    if (!knopf) return;
+
+    // Android und Desktop-Chrome melden sich, wenn eine Installation möglich ist
+    let angebot = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      angebot = e;
+      knopf.hidden = false;
+    });
+
+    knopf.addEventListener('click', async () => {
+      if (!angebot) return;
+      angebot.prompt();
+      await angebot.userChoice;
+      angebot = null;
+      knopf.hidden = true;
+    });
+
+    window.addEventListener('appinstalled', () => { knopf.hidden = true; });
+
+    // iOS kennt kein Installationsangebot - dort führt der Weg über das
+    // Teilen-Menü, deshalb dort ein Hinweis statt eines Knopfes.
+    const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const schonInstalliert = window.matchMedia('(display-mode: standalone)').matches ||
+                             navigator.standalone === true;
+    if (iOS && !schonInstalliert && eigenstaendig) {
+      const hinweis = $('install-hint');
+      if (hinweis) hinweis.hidden = false;
+    }
+  }
+
   /* ---------------- Rückmeldung ----------------
      Die veröffentlichte Fassung darf keine fremden Server aufrufen, ein
      Formularversand scheidet damit aus. Der Text wird stattdessen lokal
@@ -1138,6 +1185,7 @@
     datumsHinweis(false);
     initMap();
     initHelp();
+    initPwa();
     initFeedback();
     initLegal();
     renderBandResults();

@@ -7,6 +7,14 @@
 <meta name="description" content="Finde Festivals nach Wohnort, Radius, Ticketpreis und deinen Lieblingsbands.">
 <link rel="stylesheet" href="fonts.css">
 <link rel="stylesheet" href="style.css">
+
+<!-- Installierbar auf dem Startbildschirm (Android und iOS) -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#e2231a">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Festival Finder">
 </head>
 <body>
 
@@ -14,6 +22,14 @@
   <div class="inner">
     <h1><span class="bolt">⚡</span>Festival<span class="hl">Finder</span></h1>
     <p class="tag">Dein Lineup. Dein Radius. Dein Wochenende.</p>
+
+    <button type="button" id="install" hidden
+            title="Legt die Seite als App auf deinen Startbildschirm. Sie startet dann ohne Browserleiste und funktioniert auch ohne Netz.">
+      App installieren</button>
+    <p class="hint install-hint" id="install-hint" hidden>
+      Als App speichern: unten auf <b>Teilen</b> tippen, dann
+      <b>Zum Home-Bildschirm</b>. Danach startet die Suche ohne Browserleiste
+      und funktioniert auch ohne Netz.</p>
   </div>
 </header>
 

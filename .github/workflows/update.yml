@@ -28,7 +28,7 @@ jobs:
           python-version: "3.12"
 
       - name: Abhängigkeiten
-        run: pip install requests beautifulsoup4
+        run: pip install requests beautifulsoup4 pillow
 
       # Der Seiten-Cache spart Abrufe bei den Quellen, der Geo-Cache spart
       # Nominatim-Anfragen. Ohne ihn liefe jeder Tag von vorn.
@@ -61,6 +61,7 @@ jobs:
         run: |
           python scraper/build_overview.py
           python scraper/build_site.py
+          python scraper/build_pwa.py
           python scraper/build_artifact.py
 
       - name: CSV- und JSON-Ausgaben mitveröffentlichen

@@ -13,6 +13,9 @@ data/failed.txt
 site/data.js
 site/artifact.html
 site/fonts.css
+site/manifest.webmanifest
+site/sw.js
+site/icons/
 
 # Zwischenstände, die sich lohnen zu behalten, stehen bewusst NICHT hier:
 #   data/geo.json       - erspart ~2000 Nominatim-Anfragen je Lauf

@@ -154,8 +154,28 @@ def _fold(value: str) -> str:
     return v.strip()
 
 
+# Abkuerzungen, die keine Normalisierung erkennen kann. Die Zuordnung steht in
+# data/band_aliase.json und laesst sich dort ohne Codeaenderung erweitern.
+# Vorsicht bei Kuerzeln: "TBS" ist hier belegt, weil das Zeltfestival Ruhr beide
+# Schreibweisen im selben Lineup fuehrt - anderswo kann dasselbe Kuerzel eine
+# andere Band meinen.
+def _lade_aliase() -> tuple[dict[str, str], dict[str, str]]:
+    pfad = OUT / "band_aliase.json"
+    if not pfad.exists():
+        return {}, {}
+    roh = json.loads(pfad.read_text(encoding="utf-8"))
+    schluessel = {_fold(k): v for k, v in roh.items()}
+    ziele = {_fold(v): v for v in roh.values()}
+    return schluessel, ziele
+
+
+ALIAS_KEY, ALIAS_NAME = _lade_aliase()
+
+
 def band_key(name: str) -> str:
-    return _fold(name)
+    k = _fold(name)
+    ziel = ALIAS_KEY.get(k)
+    return _fold(ziel) if ziel else k
 
 
 def festival_key(name: str) -> str:
@@ -721,7 +741,10 @@ def build_band_registry(records: list[dict]) -> tuple[dict[str, str], dict]:
     for rec in records:
         for b in rec["lineup"]:
             variants.setdefault(band_key(b), []).append(clean(b))
-    registry = {k: canonical_band(v) for k, v in variants.items() if k}
+    # Ein hinterlegter Alias schlaegt die Mehrheitsregel: sonst gewaenne bei
+    # gleicher Haeufigkeit die Abkuerzung statt des ausgeschriebenen Namens.
+    registry = {k: ALIAS_NAME.get(k) or canonical_band(v)
+                for k, v in variants.items() if k}
     distinct = {k: sorted(set(v)) for k, v in variants.items() if k}
     stats = {
         "roh_schreibweisen": sum(len(v) for v in distinct.values()),
@@ -899,10 +922,13 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
     # gleiche Stadt, gleicher Starttermin und ein gemeinsamer Namensbestandteil.
     # Der Starttermin ist der entscheidende Schutz: "Winter Wutzrock" im Februar
     # und "Wutzrock" im August teilen Stadt und Namen, sind aber zwei Feste.
-    slots: dict[tuple[str, str, str], list[tuple]] = {}
+    # Gruppiert wird nur nach Jahr und Starttermin; die Stadt wird anschliessend
+    # paarweise geprueft, damit auch "Oberndorf" und "Oberndorf am Neckar"
+    # zusammenfinden.
+    slots: dict[tuple[str, str], list[tuple]] = {}
     for key, rec in merged.items():
         if rec["date_from"] and rec["city"]:
-            slots.setdefault((rec["year"], key[2], rec["date_from"]), []).append((key, rec))
+            slots.setdefault((rec["year"], rec["date_from"]), []).append((key, rec))
 
     for group in slots.values():
         if len(group) < 2:
@@ -918,6 +944,10 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
                 if set(a["sources"]) & set(b["sources"]):
                     continue
                 if not (set(ka[0].split()) & set(kb[0].split())):
+                    continue
+                # gleiche Stadt oder eine Schreibweise praezisiert die andere
+                sa, sb = ka[2], kb[2]
+                if not (sa == sb or sa.startswith(sb + " ") or sb.startswith(sa + " ")):
                     continue
                 keep, drop, drop_key = ((a, b, kb) if a["source_order"] <= b["source_order"]
                                         else (b, a, ka))

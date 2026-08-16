@@ -28,6 +28,8 @@ STEPS = [
     ("Schrift", [sys.executable, "scraper/fetch_fonts.py"]),
     ("Uebersicht", [sys.executable, "scraper/build_overview.py"]),
     ("Webseite", [sys.executable, "scraper/build_site.py"]),
+    # nach build_site, weil der Service Worker den Datenstand als Version nutzt
+    ("App-Dateien", [sys.executable, "scraper/build_pwa.py"]),
     ("Artifact-Bundle", [sys.executable, "scraper/build_artifact.py"]),
 ]
 
