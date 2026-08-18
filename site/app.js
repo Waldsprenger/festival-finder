@@ -1005,12 +1005,13 @@
   /* ---------------- Zugriffszählung ----------------
      Eine statische Seite kann sich nicht selbst zählen. Ist in config.js eine
      GoatCounter-Kennung hinterlegt, meldet die Seite den Aufruf dorthin — ohne
-     Cookies, ohne Zugriff auf den Gerätespeicher. Die Zahlen sieht nur, wer
-     sich bei GoatCounter anmeldet. Ohne Kennung passiert gar nichts. */
+     Cookies, ohne Zugriff auf den Gerätespeicher. Ohne Kennung passiert gar
+     nichts.
 
-  // Zustand des Zählerstands, damit ein Sprachwechsel ihn mitnimmt
-  let zaehlerStand = null;              // {zustand: 'laedt'|'da'|'fehler', n}
-  let zaehlerStandNeu = () => {};
+     Die Seite selbst zeigt keinen Zählerstand, auch nicht auf Umwegen: Der
+     Stand steht ausschließlich im GoatCounter-Konto hinter der Anmeldung.
+     Eine Anzeige hier würde verlangen, die Zahlen bei GoatCounter öffentlich
+     zu schalten — und öffentlich soll der Stand zu keinem Zeitpunkt sein. */
 
   function initZaehler() {
     const code = ((window.CONFIG && window.CONFIG.zaehler) || '').trim();
@@ -1031,34 +1032,6 @@
     s.src = 'https://gc.zgo.at/count.js';
     s.dataset.goatcounter = `https://${code}.goatcounter.com/count`;
     document.head.append(s);
-
-    // Nur für dich: "#zaehler" an die Adresse hängen zeigt den Stand unten an
-    if (location.hash !== '#zaehler') return;
-    const feld = $('zaehler-stand');
-    if (!feld) return;
-    feld.hidden = false;
-    zaehlerStandNeu = () => {
-      if (!zaehlerStand) return;
-      feld.textContent = zaehlerStand.zustand === 'da'
-        ? t('counter.total', { n: zaehlerStand.n.toLocaleString(sprache) })
-        : t(zaehlerStand.zustand === 'laedt' ? 'counter.loading' : 'counter.failed');
-    };
-    zaehlerStand = { zustand: 'laedt' };
-    zaehlerStandNeu();
-
-    // GoatCounter liefert die Zahl englisch gesetzt ("1,234") und kennt keine
-    // rohe Form; deshalb die Ziffern herausziehen und selbst setzen, sonst
-    // stünde in der deutschen Fassung ein Komma als Tausenderzeichen.
-    // count_unique enthaelt denselben Wert und gilt als ueberholt.
-    fetch(`https://${code}.goatcounter.com/counter/TOTAL.json`)
-      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-      .then((d) => {
-        const ziffern = String(d.count ?? d.count_unique ?? '').replace(/\D/g, '');
-        zaehlerStand = ziffern ? { zustand: 'da', n: Number(ziffern) }
-                               : { zustand: 'fehler' };
-        zaehlerStandNeu();
-      })
-      .catch(() => { zaehlerStand = { zustand: 'fehler' }; zaehlerStandNeu(); });
   }
 
   /* ---------------- Installierbarkeit ----------------
@@ -1309,7 +1282,6 @@
       render();
       aktualisiereDatenstand();
       datumsHinweisNeu();
-      zaehlerStandNeu();
     });
 
     spracheAnwenden();

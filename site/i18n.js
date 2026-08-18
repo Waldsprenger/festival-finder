@@ -1286,28 +1286,6 @@ window.I18N = {
       pl: 'Ta strona liczy odwiedziny anonimowo przez GoatCounter — bez ciasteczek i bez dostępu do pamięci urządzenia. Szczegóły w polityce prywatności.',
       pt: 'Esta página conta as visitas de forma anónima com o GoatCounter — sem cookies e sem aceder ao armazenamento do teu dispositivo. Detalhes na política de privacidade.',
     },
-    'counter.loading': {
-      de: 'Zählerstand wird geladen …', en: 'Loading the counter …',
-      fr: 'Chargement du compteur …', es: 'Cargando el contador …',
-      it: 'Caricamento del contatore …', nl: 'Teller laden …',
-      pl: 'Wczytywanie licznika …', pt: 'A carregar o contador …',
-    },
-    'counter.total': {
-      de: 'Zugriffe insgesamt: {n}', en: 'Total visits: {n}',
-      fr: 'Visites au total : {n}', es: 'Visitas en total: {n}',
-      it: 'Visite totali: {n}', nl: 'Bezoeken totaal: {n}',
-      pl: 'Odwiedziny łącznie: {n}', pt: 'Visitas no total: {n}',
-    },
-    'counter.failed': {
-      de: 'Zählerstand nicht abrufbar — in GoatCounter unter „Settings“ die öffentliche Zählung erlauben, sonst stehen die Zahlen nur im Konto.',
-      en: 'Counter not available — enable public statistics in GoatCounter settings, otherwise the figures live in your account only.',
-      fr: 'Compteur indisponible — activez les statistiques publiques dans GoatCounter, sinon les chiffres restent dans votre compte.',
-      es: 'Contador no disponible: activa las estadísticas públicas en GoatCounter; si no, las cifras solo están en tu cuenta.',
-      it: 'Contatore non disponibile — abilita le statistiche pubbliche in GoatCounter, altrimenti i numeri restano nel tuo account.',
-      nl: 'Teller niet beschikbaar — zet publieke statistieken aan in GoatCounter, anders staan de cijfers alleen in je account.',
-      pl: 'Licznik niedostępny — włącz publiczne statystyki w GoatCounter, inaczej liczby są tylko na koncie.',
-      pt: 'Contador indisponível — ativa as estatísticas públicas no GoatCounter, senão os números ficam só na tua conta.',
-    },
     'stand.at': {
       de: '{datum} um {zeit} Uhr', en: '{datum} at {zeit}', fr: '{datum} à {zeit}',
       es: '{datum} a las {zeit}', it: '{datum} alle {zeit}', nl: '{datum} om {zeit}',

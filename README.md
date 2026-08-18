@@ -208,12 +208,13 @@ Gezählt wird nur, wo es auch wirklich funktioniert: eigene Auslieferung über H
 nicht eingebettet, nicht auf `localhost`. In der claude.ai-Fassung sperrt die
 Sicherheitsrichtlinie den Aufruf ohnehin, deshalb erscheint dort auch der
 Datenschutzhinweis nicht. GoatCounter setzt keine Cookies und rührt den
-Gerätespeicher nicht an; die Zahlen stehen nur im eigenen Konto.
+Gerätespeicher nicht an.
 
-Mit `#zaehler` am Ende der Adresse zeigt die Seite den Gesamtstand zusätzlich
-unten an — dafür muss in GoatCounter unter *Settings* das Einblenden von
-Besucherzahlen auf der eigenen Seite erlaubt sein, sonst antwortet der Dienst
-nicht.
+**Der Stand bleibt privat.** Die Zahlen stehen ausschließlich im GoatCounter-Konto
+hinter der Anmeldung; die Seite zeigt sie nirgends an, auch nicht über eine
+besondere Adresse. Eine Anzeige auf der Seite würde verlangen, die Statistik bei
+GoatCounter öffentlich zu schalten — deshalb gibt es sie nicht, und die
+öffentliche Statistik bleibt aus.
 
 ## Veröffentlichen und täglich aktualisieren
 
