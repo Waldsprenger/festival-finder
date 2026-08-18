@@ -119,8 +119,15 @@ entweder Bands oder Genre. Bei Bands: suchen, auswählen, optional pro Band auf 
 stellen — die Trefferquote ist die gewichtete Summe der gefundenen Bands geteilt durch
 die Summe aller gewählten Gewichte. Bei Genre: Oberbegriffe anklicken — die Trefferquote
 ist die Zahl der abgedeckten geteilt durch die Zahl der gewählten Oberbegriffe.
-Sortiert wird nach Übereinstimmung absteigend, bei Gleichstand nach Entfernung
-aufsteigend, dann nach Preis aufsteigend.
+
+**Sortierung** steht über der Trefferliste und richtet sich nach dem Filter: Mit
+Bandauswahl zählt zuerst die Übereinstimmung, mit Genreauswahl der Termin — ein
+Oberbegriff trifft auf Hunderte Festivals zu, da ordnet die Prozentzahl kaum noch.
+Ohne beide Filter entscheidet die Entfernung. Wählbar sind daneben Entfernung,
+Preis und Datum; bei Bands zusätzlich die Übereinstimmung. Jede Filterart merkt
+sich ihre eigene Wahl, ein Wechsel wirft sie also nicht weg. Gleichstand löst die
+jeweils nächste Größe auf, und Festivals ohne Angabe — kein Preis, kein Termin,
+kein Ort — stehen immer am Ende, weil ein fehlender Preis nicht der günstigste ist.
 
 **Bands oder Genre, nicht beides.** Der Umschalter über der Auswahl hat drei Stellungen
 (*Nach Bands*, *Nach Genre*, *Ohne beides*); es wirkt immer nur die aktive. Beide

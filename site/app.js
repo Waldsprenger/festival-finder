@@ -92,6 +92,8 @@
     allowUnknownDate: false,
     selected: new Map(),     // bandIndex -> Gewicht (1 oder 2)
     genres: new Set(),       // gewählte Oberbegriffe als Spaltenindex
+    // Sortierung je Filterart, damit ein Wechsel die eigene Wahl behält
+    sort: { bands: 'match', genre: 'date', off: 'distance' },
   };
 
   // Lineups als Set für schnelle Treffersuche
@@ -775,6 +777,64 @@
     return /^(ab )?(EUR|€)/i.test(raw) ? `${ab} ${eur}` : `${ab} ${eur} (${raw})`;
   }
 
+  /* ---------------- Sortierung ----------------
+     Die Voreinstellung folgt dem Filter: Mit Bandauswahl zählt zuerst die
+     Übereinstimmung, mit Genreauswahl der Termin — ein Genre trifft auf
+     Hunderte Festivals zu, da hilft die Prozentzahl beim Ordnen wenig.
+     Wählbar ist unabhängig davon Entfernung, Preis oder Datum. */
+
+  const SORTIERUNGEN = {
+    bands: ['match', 'distance', 'price', 'date'],
+    genre: ['date', 'distance', 'price'],
+    off: ['distance', 'date', 'price'],
+  };
+
+  /** Aktuell gewählte Sortierung; unbekannte Wahl fällt auf die erste zurück. */
+  function sortierung() {
+    const erlaubt = SORTIERUNGEN[state.mode];
+    const wahl = state.sort[state.mode];
+    return erlaubt.includes(wahl) ? wahl : erlaubt[0];
+  }
+
+  // Fehlende Angaben ans Ende, egal wonach sortiert wird: Ein Festival ohne
+  // Preis ist nicht das günstigste, eines ohne Termin nicht das nächste.
+  const km = (e) => e.dist ?? Infinity;
+  const eur = (e) => e.row[EUR] ?? Infinity;
+  const tag = (e) => e.row[FROM] || '9999-99-99';
+  const pct = (e) => (e.pct === null ? -1 : e.pct);
+
+  function vergleicher() {
+    const name = (a, b) => a.row[NAME].localeCompare(b.row[NAME], sprache);
+    const datum = (a, b) => tag(a).localeCompare(tag(b));
+    switch (sortierung()) {
+      case 'distance':
+        return (a, b) => km(a) - km(b) || datum(a, b) || eur(a) - eur(b) || name(a, b);
+      case 'price':
+        return (a, b) => eur(a) - eur(b) || km(a) - km(b) || datum(a, b) || name(a, b);
+      case 'date':
+        return (a, b) => datum(a, b) || km(a) - km(b) || eur(a) - eur(b) || name(a, b);
+      default:                                   // 'match'
+        return (a, b) => pct(b) - pct(a) || km(a) - km(b) || datum(a, b) ||
+                         eur(a) - eur(b) || name(a, b);
+    }
+  }
+
+  /** Baut die Auswahlliste passend zum Filter neu auf. */
+  function renderSortierung() {
+    const wahl = $('sort');
+    if (!wahl) return;
+    const aktiv = sortierung();
+    wahl.innerHTML = '';
+    for (const key of SORTIERUNGEN[state.mode]) {
+      const o = document.createElement('option');
+      o.value = key;
+      o.textContent = t('sort.' + key);
+      wahl.append(o);
+    }
+    wahl.value = aktiv;
+    state.sort[state.mode] = aktiv;
+  }
+
   function render() {
     const pool = filtered();
     const total = state.selected.size
@@ -828,16 +888,7 @@
       scored.push(eintrag);
     }
 
-    // Ohne Band- und Genrefilter gibt es keine Übereinstimmung, nach der sich
-    // sortieren ließe - dann entscheidet Entfernung, danach Termin und Preis.
-    // Beim Genrefilter stehen Festivals ohne Genreangabe (pct null) hinten.
-    const rang = (e) => (e.pct === null ? -1 : e.pct);
-    scored.sort((a, b) =>
-      (state.mode === 'off' ? 0 : rang(b) - rang(a)) ||
-      (a.dist ?? Infinity) - (b.dist ?? Infinity) ||
-      (a.row[FROM] || '9999').localeCompare(b.row[FROM] || '9999') ||
-      (a.row[EUR] ?? Infinity) - (b.row[EUR] ?? Infinity) ||
-      a.row[NAME].localeCompare(b.row[NAME], sprache));
+    scored.sort(vergleicher());
 
     const eins = scored.length === 1;
     if (state.mode === 'off') {
@@ -1279,6 +1330,7 @@
       renderBandResults();
       renderChosen();
       renderGenres();
+      renderSortierung();
       render();
       aktualisiereDatenstand();
       datumsHinweisNeu();
@@ -1347,9 +1399,15 @@
         if (!e.target.checked) return;
         state.mode = e.target.value;
         modusAnwenden();
+        renderSortierung();
         render();
       });
     }
+
+    $('sort').addEventListener('change', (e) => {
+      state.sort[state.mode] = e.target.value;
+      render();
+    });
 
     $('genre-unknown').addEventListener('change', (e) => {
       state.allowUnknownGenre = e.target.checked; render();
@@ -1437,6 +1495,7 @@
     initFeedback();
     initLegal();
     modusAnwenden();
+    renderSortierung();
     renderBandResults();
     renderChosen();
     renderGenres();
