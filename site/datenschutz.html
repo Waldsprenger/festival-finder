@@ -27,8 +27,9 @@
     vollständig mit der Seite ausgeliefert; sämtliche Filter, die Bandauswahl, die
     Gewichtung und die Entfernungsberechnung laufen ausschließlich lokal in Ihrem Browser.
     Diese Eingaben werden nicht an uns übertragen, nicht gespeichert und nicht ausgewertet.
-    Es werden keine Cookies gesetzt, keine Reichweitenmessung und kein Tracking eingesetzt.
-    Die einzige Ausnahme ist die gewählte Sprache, siehe unten.
+    Es werden keine Cookies gesetzt und kein Tracking eingesetzt; eine Wiedererkennung
+    einzelner Besucher findet nicht statt. Ausgenommen sind die gewählte Sprache und —
+    sofern eingeschaltet — die anonyme Reichweitenmessung, beides siehe unten.
   </p>
 
   <h2>Ortssuche</h2>
@@ -53,6 +54,36 @@
     In der über claude.ai veröffentlichten Fassung unterbindet die dortige
     Sicherheitsrichtlinie sämtliche Aufrufe fremder Server. Dort findet die Ortssuche
     ausnahmslos lokal statt, eine Übermittlung an Nominatim ist technisch ausgeschlossen.
+  </p>
+
+  <h2>Reichweitenmessung (nur bei aktivierter Zählung)</h2>
+  <p>
+    Ist in der Konfiguration der Seite eine Kennung für <b>GoatCounter</b> hinterlegt,
+    meldet Ihr Browser beim Aufruf einen anonymen Zählimpuls an
+    <a href="https://www.goatcounter.com" target="_blank" rel="noopener">goatcounter.com</a>
+    (Martin Tournoij, Irland). Übermittelt werden die aufgerufene Adresse, die verweisende
+    Seite und die Bildschirmgröße; aus IP-Adresse und Browserkennung leitet GoatCounter
+    zusätzlich Land, Browser, Betriebssystem und Sprache ab. Gespeichert werden diese
+    Angaben als stündliche Summen, nicht als einzelne Seitenaufrufe — deren zusätzlich
+    mögliche Erfassung bleibt abgeschaltet.
+  </p>
+  <p>
+    GoatCounter setzt auf dieser Seite keine Cookies, greift nicht auf den Speicher Ihres
+    Geräts zu und speichert Ihre IP-Adresse nicht. Um zusammengehörende Aufrufe zu
+    erkennen, bildet der Dienst aus Seitenkennung, IP-Adresse und Browserkennung eine
+    zufällige Kennung, die längstens acht Stunden im Arbeitsspeicher gehalten und nicht
+    dauerhaft gespeichert wird; ein Rückschluss auf Sie ist damit nicht möglich.
+    Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer
+    groben Reichweitenmessung ohne Personenbezug).
+    Einzelheiten: <a href="https://www.goatcounter.com/help/privacy" target="_blank" rel="noopener">Datenschutzhinweise von GoatCounter</a>.
+  </p>
+  <p>
+    Ist keine Kennung hinterlegt — der Auslieferungszustand —, findet keine
+    Reichweitenmessung statt und es wird kein fremder Server kontaktiert. Dasselbe gilt
+    unabhängig von der Konfiguration für die über claude.ai veröffentlichte Fassung:
+    Dort ist der Aufruf fremder Server durch die Sicherheitsrichtlinie gesperrt, eine
+    Zählung ist technisch ausgeschlossen. Der Hinweis im Seitenfuß erscheint deshalb
+    nur dort, wo tatsächlich gezählt wird.
   </p>
 
   <h2>Gespeicherte Spracheinstellung</h2>

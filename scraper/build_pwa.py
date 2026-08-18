@@ -84,8 +84,9 @@ def main() -> None:
     sw = """/* erzeugt von build_pwa.py */
 const CACHE = 'festival-finder-v__VERSION__';
 const DATEIEN = ['./', './index.html', './style.css', './fonts.css',
-                 './app.js', './i18n.js', './data.js', './impressum.html',
-                 './datenschutz.html', './manifest.webmanifest'];
+                 './app.js', './i18n.js', './config.js', './data.js',
+                 './impressum.html', './datenschutz.html',
+                 './manifest.webmanifest'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(DATEIEN)).then(() => self.skipWaiting()));
@@ -98,8 +99,11 @@ self.addEventListener('activate', (e) => {
 });
 
 // Erst das Netz, damit neue Festivaldaten ankommen; ohne Netz der Speicher.
+// Nur eigene Dateien: Ein Zaehlimpuls traegt bei jedem Aufruf eine neue Adresse
+// und wuerde den Speicher sonst Aufruf fuer Aufruf fuellen.
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
+  if (new URL(e.request.url).origin !== self.location.origin) return;
   e.respondWith(
     fetch(e.request)
       .then((res) => {

@@ -162,6 +162,24 @@ Verbindung auf den Speicher zurück. Neue Festivaldaten kommen also an, sobald
 Netz da ist. Seine Version leitet sich vom Datenstand ab, damit nach jedem
 Tageslauf der alte Speicher verworfen wird.
 
+## Zugriffszählung (freiwillig)
+
+Eine statische Seite kann sich nicht selbst zählen. `site/config.js` hält deshalb
+eine Kennung für [GoatCounter](https://www.goatcounter.com) bereit — den Teil vor
+`.goatcounter.com`. Leer heißt: keine Zählung, kein fremder Server, kein Hinweis
+im Seitenfuß. Das ist der Auslieferungszustand.
+
+Gezählt wird nur, wo es auch wirklich funktioniert: eigene Auslieferung über HTTPS,
+nicht eingebettet, nicht auf `localhost`. In der claude.ai-Fassung sperrt die
+Sicherheitsrichtlinie den Aufruf ohnehin, deshalb erscheint dort auch der
+Datenschutzhinweis nicht. GoatCounter setzt keine Cookies und rührt den
+Gerätespeicher nicht an; die Zahlen stehen nur im eigenen Konto.
+
+Mit `#zaehler` am Ende der Adresse zeigt die Seite den Gesamtstand zusätzlich
+unten an — dafür muss in GoatCounter unter *Settings* das Einblenden von
+Besucherzahlen auf der eigenen Seite erlaubt sein, sonst antwortet der Dienst
+nicht.
+
 ## Veröffentlichen und täglich aktualisieren
 
 Die Seite ist statisch, deshalb ist **GitHub Pages + GitHub Actions** der passende

@@ -618,7 +618,16 @@
       btn.disabled = chosen;
       btn.className = chosen ? 'ghost' : '';
       btn.title = t(chosen ? 'bands.chosenTitle' : 'bands.chooseTitle', { band: BANDS[i] });
-      btn.addEventListener('click', () => { state.selected.set(i, 1); renderBandResults(); renderChosen(); render(); });
+      btn.addEventListener('click', () => {
+        state.selected.set(i, 1);
+        // Feld leeren, damit sich die nächste Band ohne Umweg tippen lässt
+        const feld = $('band-search');
+        feld.value = '';
+        feld.focus();
+        renderBandResults();
+        renderChosen();
+        render();
+      });
       const left = document.createElement('div');
       left.append(label, document.createTextNode(' '), cnt);
       li.append(left, btn);
@@ -891,6 +900,65 @@
     return li;
   }
 
+  /* ---------------- Zugriffszählung ----------------
+     Eine statische Seite kann sich nicht selbst zählen. Ist in config.js eine
+     GoatCounter-Kennung hinterlegt, meldet die Seite den Aufruf dorthin — ohne
+     Cookies, ohne Zugriff auf den Gerätespeicher. Die Zahlen sieht nur, wer
+     sich bei GoatCounter anmeldet. Ohne Kennung passiert gar nichts. */
+
+  // Zustand des Zählerstands, damit ein Sprachwechsel ihn mitnimmt
+  let zaehlerStand = null;              // {zustand: 'laedt'|'da'|'fehler', n}
+  let zaehlerStandNeu = () => {};
+
+  function initZaehler() {
+    const code = ((window.CONFIG && window.CONFIG.zaehler) || '').trim();
+    const eigenstaendig = window.top === window.self;
+    const echteAdresse = location.protocol === 'https:' &&
+                         location.hostname !== 'localhost';
+    // Eingebettet sperrt die Sicherheitsrichtlinie den Aufruf, lokal zählt
+    // GoatCounter ohnehin nicht - dann unterbleibt auch der Hinweis, sonst
+    // stünde im Fuß eine Zählung, die gar nicht stattfindet.
+    const zaehlt = Boolean(code) && eigenstaendig && echteAdresse;
+
+    const hinweis = $('zaehler-hinweis');
+    if (hinweis) hinweis.hidden = !zaehlt;
+    if (!zaehlt) return;
+
+    const s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://gc.zgo.at/count.js';
+    s.dataset.goatcounter = `https://${code}.goatcounter.com/count`;
+    document.head.append(s);
+
+    // Nur für dich: "#zaehler" an die Adresse hängen zeigt den Stand unten an
+    if (location.hash !== '#zaehler') return;
+    const feld = $('zaehler-stand');
+    if (!feld) return;
+    feld.hidden = false;
+    zaehlerStandNeu = () => {
+      if (!zaehlerStand) return;
+      feld.textContent = zaehlerStand.zustand === 'da'
+        ? t('counter.total', { n: zaehlerStand.n.toLocaleString(sprache) })
+        : t(zaehlerStand.zustand === 'laedt' ? 'counter.loading' : 'counter.failed');
+    };
+    zaehlerStand = { zustand: 'laedt' };
+    zaehlerStandNeu();
+
+    // GoatCounter liefert die Zahl englisch gesetzt ("1,234") und kennt keine
+    // rohe Form; deshalb die Ziffern herausziehen und selbst setzen, sonst
+    // stünde in der deutschen Fassung ein Komma als Tausenderzeichen.
+    // count_unique enthaelt denselben Wert und gilt als ueberholt.
+    fetch(`https://${code}.goatcounter.com/counter/TOTAL.json`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((d) => {
+        const ziffern = String(d.count ?? d.count_unique ?? '').replace(/\D/g, '');
+        zaehlerStand = ziffern ? { zustand: 'da', n: Number(ziffern) }
+                               : { zustand: 'fehler' };
+        zaehlerStandNeu();
+      })
+      .catch(() => { zaehlerStand = { zustand: 'fehler' }; zaehlerStandNeu(); });
+  }
+
   /* ---------------- Installierbarkeit ----------------
      Der Service Worker legt die Seite ab, damit sie vom Startbildschirm auch
      ohne Netz startet. Er verlangt eine eigene Adresse über HTTPS; in der
@@ -1078,8 +1146,12 @@
       const back = document.createElement('button');
       back.type = 'button';
       back.className = 'ghost small legal-close';
-      back.textContent = '← zurück zur Suche';
-      back.title = 'Schließt den Rechtstext und kehrt zur Festivalsuche zurück.';
+      // Der Rechtstext bleibt deutsch, der Weg zurueck ist Oberflaeche -
+      // die Auszeichnung sorgt dafuer, dass ein Sprachwechsel ihn mitnimmt.
+      back.dataset.i18n = 'legal.back';
+      back.dataset.i18nTitle = 'legal.backTitle';
+      back.textContent = t('legal.back');
+      back.title = t('legal.backTitle');
       back.addEventListener('click', () => show(null));
       sec.append(back);
     }
@@ -1134,6 +1206,7 @@
       render();
       aktualisiereDatenstand();
       datumsHinweisNeu();
+      zaehlerStandNeu();
     });
 
     spracheAnwenden();
@@ -1272,6 +1345,7 @@
     initMap();
     initHelp();
     initPwa();
+    initZaehler();
     initFeedback();
     initLegal();
     renderBandResults();
