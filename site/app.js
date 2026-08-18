@@ -7,11 +7,13 @@
   const D = window.DATA;
   const F = D.festivals;
   const BANDS = D.bands;
+  // Schlüssel der Genre-Oberbegriffe; die Namen stehen übersetzt in i18n.js
+  const GENRES = D.genres || [];
 
   // Spaltenindizes von data.js
   const NAME = 0, FROM = 1, TO = 2, CITY = 3, LAND = 4, VENUE = 5,
         EUR = 6, PRICE_RAW = 7, WEB = 8, LAT = 9, LON = 10, LINEUP = 11,
-        GENRE = 12, NOTE = 13, CANCELLED = 14;
+        GENRE = 12, NOTE = 13, CANCELLED = 14, GENRE_IDS = 15;
 
   const $ = (id) => document.getElementById(id);
 
@@ -81,12 +83,15 @@
     allowUnknownPrice: true,
     allowUnknownGeo: false,
     showCancelled: false,
-    useBands: true,
+    // Gefiltert wird entweder nach Bands oder nach Genre: 'bands' | 'genre' | 'off'
+    mode: 'bands',
+    allowUnknownGenre: false,
     from: '',
     to: '',
     minDate: '',
     allowUnknownDate: false,
     selected: new Map(),     // bandIndex -> Gewicht (1 oder 2)
+    genres: new Set(),       // gewählte Oberbegriffe als Spaltenindex
   };
 
   // Lineups als Set für schnelle Treffersuche
@@ -95,6 +100,12 @@
   // Wie oft kommt eine Band insgesamt vor? (für die Suchergebnisse)
   const bandFreq = new Int32Array(BANDS.length);
   for (const r of F) for (const b of r[LINEUP]) bandFreq[b]++;
+
+  // Wie viele Festivals hat ein Oberbegriff? (für die Genreliste)
+  const genreFreq = new Int32Array(GENRES.length);
+  for (const r of F) for (const g of (r[GENRE_IDS] || [])) genreFreq[g]++;
+
+  const genreName = (i) => t('genre.' + GENRES[i]);
 
   const foldCache = new Map();
   const fold = (s) => {
@@ -673,6 +684,55 @@
     }
   }
 
+  /* ---------------- Genreauswahl ----------------
+     Die Quellen schreiben das Genre als Freitext (1.544 Schreibweisen).
+     scraper/genres.py fasst das zu Oberbegriffen zusammen; hier stehen nur
+     noch deren Spaltennummern. */
+
+  function renderGenres() {
+    const list = $('genre-list');
+    if (!list) return;
+    list.innerHTML = '';
+
+    const reihe = GENRES.map((_, i) => i)
+      .sort((a, b) => genreName(a).localeCompare(genreName(b), sprache));
+
+    const frag = document.createDocumentFragment();
+    for (const i of reihe) {
+      const li = document.createElement('li');
+      const btn = document.createElement('button');
+      const an = state.genres.has(i);
+      btn.className = 'genre-chip' + (an ? ' on' : '');
+      btn.setAttribute('aria-pressed', an ? 'true' : 'false');
+      btn.title = t(an ? 'genre.removeTitle' : 'genre.addTitle', { genre: genreName(i) });
+      const name = document.createElement('span');
+      name.textContent = genreName(i);
+      const cnt = document.createElement('span');
+      cnt.className = 'cnt';
+      cnt.textContent = genreFreq[i].toLocaleString(sprache);
+      btn.append(name, cnt);
+      btn.addEventListener('click', () => {
+        if (state.genres.has(i)) state.genres.delete(i); else state.genres.add(i);
+        renderGenres();
+        render();
+      });
+      li.append(btn);
+      frag.append(li);
+    }
+    list.append(frag);
+
+    $('genre-hint').textContent = !state.genres.size ? t('genre.empty')
+      : state.genres.size === 1 ? t('genre.chosen1')
+      : t('genre.chosen', { n: state.genres.size });
+  }
+
+  /** Zeigt den Block, nach dem gerade gefiltert wird. */
+  function modusAnwenden() {
+    $('band-block').hidden = state.mode === 'genre';
+    $('genre-block').hidden = state.mode !== 'genre';
+    $('step-bands').classList.toggle('bands-off', state.mode === 'off');
+  }
+
   /* ---------------- Treffer ---------------- */
 
   /** Datenstand mit Uhrzeit: "10.08.2026 um 14:32 Uhr" */
@@ -719,8 +779,15 @@
     const list = $('festival-list');
     list.innerHTML = '';
 
-    if (state.useBands && !total) {
+    if (state.mode === 'bands' && !total) {
       $('result-stat').textContent = t('res.needBand');
+      map.pins = [];
+      map.hover = -1;
+      drawMap();
+      return;
+    }
+    if (state.mode === 'genre' && !state.genres.size) {
+      $('result-stat').textContent = t('res.needGenre');
       map.pins = [];
       map.hover = -1;
       drawMap();
@@ -730,31 +797,50 @@
     const scored = [];
     for (const i of pool) {
       const row = F[i], set = sets[i];
-      const eintrag = { i, row, pct: null, hits: [], dist: distanceOf(row) };
-      if (state.useBands) {
+      const eintrag = { i, row, pct: null, hits: [], gHits: [], dist: distanceOf(row) };
+      if (state.mode === 'bands') {
         let weight = 0;
         for (const [b, w] of state.selected) {
           if (set.has(b)) { weight += w; eintrag.hits.push([b, w]); }
         }
         if (!weight) continue;                 // ohne Treffer nicht anzeigen
         eintrag.pct = (weight / total) * 100;
+      } else if (state.mode === 'genre') {
+        const eigene = row[GENRE_IDS] || [];
+        for (const g of eigene) if (state.genres.has(g)) eintrag.gHits.push(g);
+        if (eintrag.gHits.length) {
+          eintrag.pct = (eintrag.gHits.length / state.genres.size) * 100;
+        } else if (!eigene.length && state.allowUnknownGenre) {
+          eintrag.pct = null;                  // Genre unbekannt: ans Ende
+        } else {
+          continue;
+        }
       }
       scored.push(eintrag);
     }
 
-    // Ohne Bandfilter gibt es keine Übereinstimmung, nach der sich sortieren
-    // ließe - dann entscheidet Entfernung, danach Termin und Preis.
+    // Ohne Band- und Genrefilter gibt es keine Übereinstimmung, nach der sich
+    // sortieren ließe - dann entscheidet Entfernung, danach Termin und Preis.
+    // Beim Genrefilter stehen Festivals ohne Genreangabe (pct null) hinten.
+    const rang = (e) => (e.pct === null ? -1 : e.pct);
     scored.sort((a, b) =>
-      (state.useBands ? b.pct - a.pct : 0) ||
+      (state.mode === 'off' ? 0 : rang(b) - rang(a)) ||
       (a.dist ?? Infinity) - (b.dist ?? Infinity) ||
       (a.row[FROM] || '9999').localeCompare(b.row[FROM] || '9999') ||
       (a.row[EUR] ?? Infinity) - (b.row[EUR] ?? Infinity) ||
       a.row[NAME].localeCompare(b.row[NAME], sprache));
 
     const eins = scored.length === 1;
-    if (!state.useBands) {
+    if (state.mode === 'off') {
       $('result-stat').innerHTML = !scored.length ? t('res.none')
         : t(eins ? 'res.oneWithoutBands' : 'res.withoutBands', { n: scored.length });
+    } else if (state.mode === 'genre') {
+      const schluessel = !scored.length ? null
+        : eins ? (state.genres.size === 1 ? 'res.oneWithGenre1' : 'res.oneWithGenres')
+               : (state.genres.size === 1 ? 'res.withGenres1' : 'res.withGenres');
+      $('result-stat').innerHTML = schluessel
+        ? t(schluessel, { n: scored.length, g: state.genres.size })
+        : t('res.noneGenres');
     } else {
       const schluessel = !scored.length ? null
         : eins ? (state.selected.size === 1 ? 'res.oneWithBand1' : 'res.oneWithBands')
@@ -843,6 +929,22 @@
       el.querySelector('b').textContent = v;
       facts.append(el);
     }
+    // Genre-Oberbegriffe des Festivals; die gewählten sind hervorgehoben.
+    const genres = row[GENRE_IDS] || [];
+    if (genres.length) {
+      const el = document.createElement('li');
+      el.className = 'genre-line';
+      el.append(document.createTextNode(t('card.genre') + ': '));
+      const treffer = new Set(s.gHits);
+      genres.forEach((g, n) => {
+        const span = document.createElement(treffer.has(g) ? 'mark' : 'b');
+        span.textContent = genreName(g);
+        el.append(span);
+        if (n < genres.length - 1) el.append(document.createTextNode(' · '));
+      });
+      facts.append(el);
+    }
+
     if (row[WEB]) {
       const el = document.createElement('li');
       const a = document.createElement('a');
@@ -1131,6 +1233,7 @@
       // alles neu zeichnen, was Text aus dem Skript enthält
       renderBandResults();
       renderChosen();
+      renderGenres();
       render();
       aktualisiereDatenstand();
       datumsHinweisNeu();
@@ -1192,10 +1295,23 @@
       state.showCancelled = e.target.checked; render();
     });
 
-    $('use-bands').addEventListener('change', (e) => {
-      state.useBands = e.target.checked;
-      $('step-bands').classList.toggle('bands-off', !state.useBands);
-      render();
+    // Entweder Bands oder Genre - beide Auswahlen bleiben erhalten, es wirkt
+    // aber immer nur die des aktiven Modus.
+    for (const el of document.querySelectorAll('input[name="filter-mode"]')) {
+      el.addEventListener('change', (e) => {
+        if (!e.target.checked) return;
+        state.mode = e.target.value;
+        modusAnwenden();
+        render();
+      });
+    }
+
+    $('genre-unknown').addEventListener('change', (e) => {
+      state.allowUnknownGenre = e.target.checked; render();
+    });
+
+    $('clear-genres').addEventListener('click', () => {
+      state.genres.clear(); renderGenres(); render();
     });
 
     // Die beiden Felder begrenzen sich gegenseitig, damit kein leerer
@@ -1274,8 +1390,10 @@
     initPwa();
     initFeedback();
     initLegal();
+    modusAnwenden();
     renderBandResults();
     renderChosen();
+    renderGenres();
     render();
   }
 

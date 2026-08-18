@@ -11,6 +11,7 @@ ausführbar und bauen aufeinander auf:
 
 ```
 festival_scraper.py  →  data/festivals.json + CSV-Ausgaben
+genres.py            →  Genre-Oberbegriffe (Modul, von build_site.py genutzt)
 geocode.py           →  data/geo.json          (Ortskoordinaten)
 build_gazetteer.py   →  data/gazetteer.json + plz.json
 build_map.py         →  data/welt_grob.json + welt_fein.json
@@ -113,11 +114,34 @@ Jahrgänge in der Ausgabenliste — gewertet wird nur die dargestellte Ausgabe. 
 sind 29 Festivals betroffen; sie bleiben in der Webseite ausgeblendet, lassen sich per
 Haken einblenden und erscheinen dann durchgestrichen mit rotem Vermerk.
 
-**Ablauf:** Wohnort → Umkreis → Ticketobergrenze → frühester Starttermin; danach Bands
-suchen und auswählen, optional pro Band auf `×2` stellen. Die Trefferquote ist die
-gewichtete Summe der gefundenen Bands geteilt durch die Summe aller gewählten Gewichte.
+**Ablauf:** Wohnort → Umkreis → Ticketobergrenze → frühester Starttermin; danach
+entweder Bands oder Genre. Bei Bands: suchen, auswählen, optional pro Band auf `×2`
+stellen — die Trefferquote ist die gewichtete Summe der gefundenen Bands geteilt durch
+die Summe aller gewählten Gewichte. Bei Genre: Oberbegriffe anklicken — die Trefferquote
+ist die Zahl der abgedeckten geteilt durch die Zahl der gewählten Oberbegriffe.
 Sortiert wird nach Übereinstimmung absteigend, bei Gleichstand nach Entfernung
 aufsteigend, dann nach Preis aufsteigend.
+
+**Bands oder Genre, nicht beides.** Der Umschalter über der Auswahl hat drei Stellungen
+(*Nach Bands*, *Nach Genre*, *Ohne beides*); es wirkt immer nur die aktive. Beide
+Auswahlen bleiben beim Umschalten erhalten, damit ein Vergleich nichts kostet.
+
+**Genre-Oberbegriffe:** Die Quellen schreiben das Genre als Freitext — 17.994 Angaben in
+1.544 Schreibweisen, von „Rock“ bis „Psychedelic Minimal Techno“. Danach filtert
+niemand, deshalb bildet [scraper/genres.py](scraper/genres.py) sie auf 17 Oberbegriffe
+ab (Rock, Metal, Punk & Hardcore, Pop, Hip-Hop & Rap, Elektro/Techno & Dance, Reggae/Ska,
+Jazz/Blues, Soul/Funk, Folk/Country, Weltmusik, Klassik, Schlager/Volksmusik, Gothic/Wave,
+Mittelalter, Kultur & Bühne, Genreübergreifend). Eine Angabe darf mehrere Oberbegriffe
+ergeben: „Ska Punk“ zählt zu Punk *und* zu Reggae/Ska, sonst fände es nur die Hälfte der
+Suchenden. Vor der Stichwortsuche steht eine Liste von Sonderfällen, in denen ein Wort
+in die Irre führt — „Hardcore Techno“ ist kein Punk, „Classic Rock“ keine Klassik.
+Zugeordnet sind 3.535 der 4.349 Festivals; für 802 nennt keine Quelle eine Richtung, sie
+lassen sich per Haken einblenden. Nicht zugeordnet bleiben 0,2 % der Angaben, fast nur
+Tippfehler und Einzelstücke wie `Zapparesk`. Die Abdeckung prüft
+
+```bash
+python scraper/genres.py
+```
 
 Preise werden für Filter und Sortierung in Euro umgerechnet (Näherungskurse in
 `build_site.py`), angezeigt wird zusätzlich der Originaltext der Quelle.

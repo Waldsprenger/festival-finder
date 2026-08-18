@@ -391,6 +391,56 @@ select:focus, textarea:focus { outline: 2px solid var(--amber); outline-offset: 
 .results .cnt { color: var(--mut); font-size: .8rem; white-space: nowrap; }
 .results button { padding: .25rem .6rem; font-size: .8rem; }
 
+/* ---------- Umschalter Band- oder Genrefilter ---------- */
+
+/* Drei Zustaende schliessen einander aus, deshalb Radioknoepfe statt Schalter */
+.modes { display: flex; flex-wrap: wrap; gap: .4rem; }
+
+.mode { margin: 0; cursor: pointer; text-transform: none; letter-spacing: 0; }
+
+.mode input { position: absolute; opacity: 0; width: 0; height: 0; }
+
+.mode span {
+  display: inline-block;
+  padding: .35rem .8rem;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: var(--bg2);
+  color: var(--mut);
+  font-size: .9rem;
+  font-weight: 700;
+}
+
+.mode input:checked + span { background: rgba(226,35,26,.28); border-color: var(--red); color: var(--fg); }
+.mode input:focus-visible + span { outline: 2px solid var(--amber); outline-offset: 2px; }
+
+/* ---------- Genreauswahl ---------- */
+
+.genres { margin-top: 1rem; }
+
+.genre-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .5rem;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  padding: .35rem .7rem;
+  font-size: .88rem;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.genre-chip .cnt { color: var(--mut); font-size: .78rem; font-weight: 400; }
+.genre-chip.on { background: rgba(226,35,26,.28); border-color: var(--red); }
+.genre-chip.on .cnt { color: var(--fg); }
+
+.genre-actions { margin: 1rem 0 .3rem; }
+.genre-actions .hint { margin: 0; }
+
+.facts .genre-line b { font-weight: 700; }
+.facts .genre-line mark { background: var(--amber); color: #111; padding: 0 .2em; }
+
 /* ---------- Umschalter Bandfilter ---------- */
 
 .toggle-row { display: flex; align-items: center; gap: .1rem; margin: -.4rem 0 1rem; }
@@ -426,7 +476,7 @@ select:focus, textarea:focus { outline: 2px solid var(--amber); outline-offset: 
 .switch input:focus-visible + .track { outline: 2px solid var(--amber); outline-offset: 2px; }
 
 /* Bandauswahl bleibt bedienbar, tritt aber zurück, wenn der Filter aus ist */
-.bands-off .lead, .bands-off .field, .bands-off .results, .bands-off .chosen { opacity: .45; }
+.bands-off #band-block, .bands-off #genre-block { opacity: .45; }
 
 @media (prefers-reduced-motion: reduce) {
   .switch .track, .switch .knob { transition: none; }

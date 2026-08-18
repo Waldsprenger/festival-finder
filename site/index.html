@@ -134,42 +134,74 @@
     <p class="stat" id="filter-stat">—</p>
   </section>
 
-  <!-- ============ Schritt 2: Bands ============ -->
+  <!-- ============ Schritt 2: Bands oder Genre ============ -->
   <section class="panel" id="step-bands">
-    <h2><span class="num">2</span> <span data-i18n="step2.title">Bands wählen</span></h2>
+    <h2><span class="num">2</span> <span data-i18n="step2.title">Bands oder Genre wählen</span></h2>
 
     <div class="toggle-row">
-      <label class="switch" for="use-bands">
-        <input type="checkbox" id="use-bands" checked role="switch">
-        <span class="track"><span class="knob"></span></span>
-        <span class="switch-text" data-i18n="bands.toggle">Nach Bands filtern</span>
-      </label>
-      <button type="button" class="help" aria-label="?" data-i18n-title="bands.toggleHelp"
-              title="Eingeschaltet zeigt die Liste nur Festivals, die mindestens eine deiner Bands spielen, sortiert nach Übereinstimmung. Ausgeschaltet erscheinen alle Festivals, die zu Wohnort, Umkreis, Preis und Termin passen — dann ohne Prozentwert, sortiert nach Entfernung.">?</button>
-    </div>
-
-    <p class="lead" data-i18n-html="bands.lead">Suchen, anklicken, auswählen. Ein zweiter Klick auf <b>×2</b> gewichtet
-      eine Band doppelt — sie zählt dann doppelt so stark für die Übereinstimmung.</p>
-
-    <div class="field">
-      <label for="band-search"><span data-i18n="bands.searchLabel">Band suchen</span>
-        <button type="button" class="help" aria-label="?" data-i18n-title="bands.searchHelp"
-                title="Ab zwei Zeichen wird gesucht. Die Trefferliste zeigt, auf wie vielen Festivals eine Band insgesamt spielt — die häufigsten zuerst.">?</button>
-      </label>
-      <input type="text" id="band-search" placeholder="z. B. Powerwolf, Wolf Alice, Deichkind …">
-      <p class="hint" id="band-hint"></p>
-    </div>
-
-    <ul class="results" id="band-results"></ul>
-
-    <div class="chosen">
-      <div class="chosen-head">
-        <h3><span data-i18n="bands.chosen">Ausgewählt</span> <span class="badge" id="chosen-count">0</span></h3>
-        <button type="button" id="clear-bands" class="ghost small" data-i18n="bands.clear"
-                data-i18n-title="bands.clearTitle"
-                title="Leert die komplette Bandauswahl und setzt die Trefferliste zurück.">Alle entfernen</button>
+      <div class="modes" role="radiogroup" data-i18n-aria="mode.group" aria-label="Wonach gefiltert wird">
+        <label class="mode">
+          <input type="radio" name="filter-mode" value="bands" checked>
+          <span data-i18n="mode.bands">Nach Bands</span>
+        </label>
+        <label class="mode">
+          <input type="radio" name="filter-mode" value="genre">
+          <span data-i18n="mode.genre">Nach Genre</span>
+        </label>
+        <label class="mode">
+          <input type="radio" name="filter-mode" value="off">
+          <span data-i18n="mode.off">Ohne beides</span>
+        </label>
       </div>
-      <ul class="chips" id="chosen-list"></ul>
+      <button type="button" class="help" aria-label="?" data-i18n-title="mode.help"
+              title="Gefiltert wird entweder nach Bands oder nach Genre, nicht nach beidem. „Nach Bands“ zeigt Festivals mit deinen Acts, „Nach Genre“ solche mit passender Musikrichtung, jeweils sortiert nach Übereinstimmung. „Ohne beides“ zeigt alle Festivals, die zu Wohnort, Umkreis, Preis und Termin passen.">?</button>
+    </div>
+
+    <div id="band-block">
+      <p class="lead" data-i18n-html="bands.lead">Suchen, anklicken, auswählen. Ein zweiter Klick auf <b>×2</b> gewichtet
+        eine Band doppelt — sie zählt dann doppelt so stark für die Übereinstimmung.</p>
+
+      <div class="field">
+        <label for="band-search"><span data-i18n="bands.searchLabel">Band suchen</span>
+          <button type="button" class="help" aria-label="?" data-i18n-title="bands.searchHelp"
+                  title="Ab zwei Zeichen wird gesucht. Die Trefferliste zeigt, auf wie vielen Festivals eine Band insgesamt spielt — die häufigsten zuerst.">?</button>
+        </label>
+        <input type="text" id="band-search" placeholder="z. B. Powerwolf, Wolf Alice, Deichkind …">
+        <p class="hint" id="band-hint"></p>
+      </div>
+
+      <ul class="results" id="band-results"></ul>
+
+      <div class="chosen">
+        <div class="chosen-head">
+          <h3><span data-i18n="bands.chosen">Ausgewählt</span> <span class="badge" id="chosen-count">0</span></h3>
+          <button type="button" id="clear-bands" class="ghost small" data-i18n="bands.clear"
+                  data-i18n-title="bands.clearTitle"
+                  title="Leert die komplette Bandauswahl und setzt die Trefferliste zurück.">Alle entfernen</button>
+        </div>
+        <ul class="chips" id="chosen-list"></ul>
+      </div>
+    </div>
+
+    <div id="genre-block" hidden>
+      <p class="lead" data-i18n="genre.lead">Die Musikrichtungen der Quellen sind zu Oberbegriffen zusammengefasst.
+        Mehrere lassen sich anklicken — je mehr davon ein Festival abdeckt, desto weiter oben steht es.</p>
+
+      <ul class="chips genres" id="genre-list"></ul>
+
+      <div class="chosen-head genre-actions">
+        <p class="hint" id="genre-hint"></p>
+        <button type="button" id="clear-genres" class="ghost small" data-i18n="genre.clear"
+                data-i18n-title="genre.clearTitle"
+                title="Hebt die komplette Genreauswahl auf und setzt die Trefferliste zurück.">Alle entfernen</button>
+      </div>
+
+      <label class="check">
+        <input type="checkbox" id="genre-unknown">
+        <span data-i18n="genreUnknown.label">Festivals ohne Genreangabe mitzeigen</span>
+        <button type="button" class="help" aria-label="?" data-i18n-title="genreUnknown.help"
+                title="Für rund 800 Festivals nennt keine Quelle eine Musikrichtung. Ohne Haken bleiben sie beim Genrefilter außen vor, mit Haken erscheinen sie am Ende der Liste ohne Prozentwert.">?</button>
+      </label>
     </div>
   </section>
 

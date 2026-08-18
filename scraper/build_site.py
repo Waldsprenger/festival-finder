@@ -16,6 +16,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from gemeinsam import DATA, SITE, land_code  # noqa: E402  (Pfad muss vorher stehen)
+from genres import OBERBEGRIFFE, oberbegriffe  # noqa: E402
 
 
 # Naeherungswerte, nur fuer Filter und Sortierung - keine Tagesaktualitaet noetig.
@@ -158,6 +159,11 @@ def main() -> None:
     plz_path = DATA / "plz.json"
     plz = json.loads(plz_path.read_text(encoding="utf-8")) if plz_path.exists() else []
 
+    # Oberbegriffe als Spaltennummern - die Namen stehen auf der Seite in
+    # der jeweiligen Sprache, in den Daten steht nur der Index.
+    genre_keys = list(OBERBEGRIFFE)
+    genre_ix = {k: n for n, k in enumerate(genre_keys)}
+
     band_ix: dict[str, int] = {}
     bands: list[str] = []
 
@@ -236,6 +242,7 @@ def main() -> None:
             f["genre"][:70],                             # 12
             f.get("note", ""),                           # 13
             1 if f.get("cancelled") else 0,              # 14
+            [genre_ix[k] for k in oberbegriffe(f["genre"])],   # 15
         ])
 
     # Ortsverzeichnis fuer die Wohnortsuche. Die veroeffentlichte Fassung darf
@@ -258,6 +265,7 @@ def main() -> None:
         # mit Uhrzeit, damit auf der Seite steht, wie frisch die Daten sind
         "generated": datetime.now().astimezone().strftime("%Y-%m-%dT%H:%M%z"),
         "bands": bands,
+        "genres": genre_keys,
         "festivals": rows,
         "places": places,
         "plz": plz,
@@ -275,11 +283,13 @@ def main() -> None:
                    encoding="utf-8")
 
     priced = sum(1 for r in rows if r[6] is not None)
+    mit_genre = sum(1 for r in rows if r[15])
     print(f"{out}  ({out.stat().st_size / 1e6:.1f} MB)")
     print(f"  Koordinaten aus Postleitzahl: {aus_plz}, aus Ortsname: {with_geo - aus_plz}")
     print(f"  Festivals {len(rows)} | mit Koordinaten {with_geo} | "
           f"mit Preis in EUR {priced} | Acts {len(bands)} | Orte {len(places)} | "
           f"PLZ {len(plz)}")
+    print(f"  Genre-Oberbegriffe {len(genre_keys)} | Festivals zugeordnet {mit_genre}")
     print(f"  Reglergrenzen: Umkreis bis {payload['maxDistanceKm']} km "
           f"(ab {REF_PLZ}), Preis bis {payload['maxPriceEur']} EUR, "
           f"Kalender ab {payload['minDate'] or 'unbegrenzt'}")
