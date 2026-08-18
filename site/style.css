@@ -694,8 +694,103 @@ details.lineup .all mark { background: transparent; color: var(--ok); font-weigh
 .legal .back { display: inline-block; margin-bottom: 2rem; color: var(--mut); }
 .legal .legal-close { display: block; margin-top: 2.5rem; }
 
+.festivals .mehr { list-style: none; margin: .4rem 0 0; text-align: center; }
+.festivals .mehr button { width: 100%; max-width: 24rem; }
+
+/* ---------- Telefone ----------
+   Die Seite wird vor allem am Telefon benutzt. Deshalb hier: Tippziele ab
+   44 px (Daumenbreite), 16 px Schrift in allen Eingaben — darunter zoomt iOS
+   beim Antippen ungefragt die Seite —, schmalere Ränder für mehr Inhalt und
+   eine höhere Karte, die im Hochformat sonst zum Streifen schrumpft. */
+
 @media (max-width: 620px) {
+  .inner { padding: 0 1rem; }
+  main { padding: 1.25rem 1rem 3rem; }
+
+  /* Rand des Geräts freihalten (Kamera-Insel, Wischbalken) */
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  .site-footer { padding-bottom: env(safe-area-inset-bottom); }
+
+  .masthead { padding: 1.5rem 0 1.25rem; }
+  .masthead h1 { font-size: clamp(2.2rem, 12vw, 3rem); }
+  .tag { letter-spacing: .18em; font-size: .72rem; margin-top: .6rem; }
+  .lang { padding-top: 0; }
+
+  .panel { padding: 1.1rem .9rem; margin-bottom: 1.25rem; }
+  .panel h2 { font-size: 1.35rem; margin-bottom: .9rem; }
+
+  .grid { gap: 1.1rem; }
+
+  /* Eingaben: 16 px verhindert das Hineinzoomen beim Antippen unter iOS */
+  input[type=text], input[type=date], select, textarea {
+    font-size: 16px;
+    min-height: 2.75rem;
+  }
+  .lang select, .sort-row select { font-size: 16px; min-height: 2.75rem; }
+  button, .btn-link { min-height: 2.75rem; }
+  .ghost.small, .map-tools button { min-height: 2.5rem; }
+
+  /* Fragezeichen und Haken sind am Daumen sonst kaum zu treffen. Das
+     Fragezeichen bleibt klein - es steht mitten im Text -, bekommt aber eine
+     unsichtbar vergroesserte Trefferflaeche von rund 45 Pixeln. */
+  button.help { width: 1.7rem; height: 1.7rem; font-size: .9rem; min-height: 0;
+    position: relative; }
+  button.help::after { content: ''; position: absolute; inset: -9px -9px -9px -5px; }
+
+  .lineup summary { padding: .5rem 0; }
+  .check { gap: .6rem; align-items: flex-start; }
+  .check input[type=checkbox] { width: 1.4rem; height: 1.4rem; flex: none; accent-color: var(--red); }
+
+  /* Regler: der Griff bleibt klein, die Trefferfläche wächst */
+  input[type=range] { height: 2.75rem; }
+
+  .modes { width: 100%; gap: .35rem; }
+  .mode { flex: 1 1 0; }
+  .mode span { display: flex; align-items: center; justify-content: center;
+    height: 100%; min-height: 2.75rem; padding: .4rem .5rem; text-align: center; }
+
+  .genre-chip { min-height: 2.75rem; }
+  .chip { padding: .35rem .35rem .35rem .75rem; font-size: .92rem; }
+  .chip .w, .chip .x { min-width: 2.25rem; min-height: 2.25rem; }
+
+  .results { max-height: 60vh; }
+  .results li { padding: .65rem .75rem; gap: .5rem; }
+  .results button { min-height: 2.5rem; }
+
+  .sort-row { gap: .5rem; }
+  .sort-row select { flex: 1; min-width: 0; }
+
+  /* Im Hochformat ist ein 16:7-Streifen unbrauchbar - die Karte wird höher.
+     Die Höhe setzt drawMap(), hier steht nur, was das Bild umgibt. */
+  .map-wrap { margin-top: 1.1rem; }
+  .map-tools { flex-wrap: wrap; }
+  .map-tools button:first-child, .map-tools button:nth-child(2) { min-width: 2.75rem; }
+
+  .fest { padding: .9rem; }
   .fest-head { flex-direction: column-reverse; align-items: flex-start; gap: .4rem; }
+  .fest h3 { font-size: 1.25rem; }
   .pct { font-size: 1.6rem; }
   .pct small { display: inline; margin-left: .4rem; }
+  .facts { gap: .3rem .8rem; }
+  .lineup .all { max-height: 40vh; overflow-y: auto; }
+
+  .feedback-actions { flex-direction: column; align-items: stretch; }
+  .feedback-actions .btn-link, .feedback-actions button { text-align: center; }
+}
+
+/* Sehr schmale Geräte (iPhone SE): der Kopf darf nicht die halbe Seite füllen */
+@media (max-width: 380px) {
+  .masthead h1 { font-size: 2rem; }
+  .panel { padding: 1rem .75rem; }
+  .genre-chip { font-size: .84rem; }
+}
+
+/* Lange Trefferlisten scrollen flüssiger, wenn der Browser Karten außerhalb
+   des Bildes überspringen darf. Die Platzhalterhöhe verhindert Springen. */
+.fest {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 320px;
 }

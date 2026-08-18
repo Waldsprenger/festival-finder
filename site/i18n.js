@@ -413,6 +413,16 @@ window.I18N = {
       pl: '{n} festiwali w promieniu {km} km od {ort}. Kliknij pinezkę, aby przejść do wpisu.',
       pt: '{n} festivais num raio de {km} km de {ort}. Clica num pino para ir à ficha.',
     },
+    'map.zoomHintTouch': {
+      de: ' · zwei Finger zoomen und verschieben',
+      en: ' · two fingers zoom and pan',
+      fr: ' · deux doigts pour zoomer et déplacer',
+      es: ' · dos dedos para zoom y mover',
+      it: ' · due dita per zoom e spostamento',
+      nl: ' · twee vingers zoomen en verschuiven',
+      pl: ' · dwa palce przybliżają i przesuwają',
+      pt: ' · dois dedos para zoom e mover',
+    },
     'map.zoomHint': {
       de: ' · Mausrad zoomt, Ziehen verschiebt', en: ' · scroll to zoom, drag to pan',
       fr: ' · molette pour zoomer, glisser pour déplacer',
@@ -965,6 +975,16 @@ window.I18N = {
       nl: 'Geen festival past bij deze filters. Verruim straal, prijs of periode.',
       pl: 'Żaden festiwal nie pasuje. Poszerz promień, cenę lub okres.',
       pt: 'Nenhum festival corresponde. Alarga raio, preço ou período.',
+    },
+    'res.showMore': {
+      de: 'Weitere {n} anzeigen ({rest} übrig)',
+      en: 'Show {n} more ({rest} left)',
+      fr: 'Afficher {n} de plus ({rest} restants)',
+      es: 'Mostrar {n} más ({rest} restantes)',
+      it: 'Mostra altri {n} ({rest} rimasti)',
+      nl: 'Nog {n} tonen ({rest} over)',
+      pl: 'Pokaż kolejne {n} (zostało {rest})',
+      pt: 'Mostrar mais {n} ({rest} restantes)',
     },
     'res.more': {
       de: '… {n} weitere Treffer ausgeblendet. Filter enger stellen.',

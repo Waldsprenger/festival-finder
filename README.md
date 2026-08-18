@@ -129,6 +129,22 @@ sich ihre eigene Wahl, ein Wechsel wirft sie also nicht weg. Gleichstand löst d
 jeweils nächste Größe auf, und Festivals ohne Angabe — kein Preis, kein Termin,
 kein Ort — stehen immer am Ende, weil ein fehlender Preis nicht der günstigste ist.
 
+**Am Telefon zuerst.** Die Seite wird vor allem am Handy benutzt, deshalb sind
+Tippziele auf mindestens 44 Pixel gebracht (Fragezeichen behalten ihre kleine
+Darstellung, bekommen die Fläche aber unsichtbar dazu), alle Eingabefelder
+tragen 16 Pixel Schrift — darunter zoomt iOS beim Antippen ungefragt die ganze
+Seite —, und Ränder wie Kopfbereich sind schmaler. Die Karte ist im Hochformat
+fast quadratisch statt ein 16:7-Streifen und lässt sich mit zwei Fingern zoomen
+und verschieben; ein Finger bleibt fürs Weiterscrollen frei, ein Tipp wählt den
+nächsten Pin. Der Hinweis unter der Karte nennt je nach Gerät Mausrad oder
+Finger.
+
+**Trefferliste in Stapeln:** Alle 300 Karten auf einmal ergaben am Telefon eine
+Seite von 109.000 Pixeln Höhe. Gezeichnet werden jetzt 25 (am Rechner 50), der
+Rest kommt per Knopf nach — das kürzt die Aufbauzeit auf ein Viertel. Ein Klick
+auf einen Kartenpin holt den zugehörigen Eintrag selbst nach vorn, auch wenn er
+noch im Nachschub steckt.
+
 **Bands oder Genre, nicht beides.** Der Umschalter über der Auswahl hat drei Stellungen
 (*Nach Bands*, *Nach Genre*, *Ohne beides*); es wirkt immer nur die aktive. Beide
 Auswahlen bleiben beim Umschalten erhalten, damit ein Vergleich nichts kostet.

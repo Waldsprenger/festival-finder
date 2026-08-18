@@ -260,6 +260,10 @@
 
   const ZOOM_MIN = 0.02, ZOOM_MAX = 60;
 
+  // Am Finger gibt es kein Mausrad; der Hinweis unter der Karte richtet sich
+  // danach, womit die Seite gerade bedient wird.
+  const tippgeraet = window.matchMedia('(pointer: coarse)').matches;
+
   // Umschließendes Rechteck je Polygonring, einmal berechnet und gemerkt
   const bounds = new WeakMap();
   function ringBounds(ring) {
@@ -317,7 +321,9 @@
     const ctx = map.ctx;
     const dpr = window.devicePixelRatio || 1;
     const w = cv.clientWidth || 1000;
-    const h = Math.round(w * 0.44);
+    // Am Telefon ist das Bild schmal und hoch: Ein 16:7-Streifen wäre dort
+    // 120 Pixel hoch und zeigte vom Umkreis nichts Brauchbares.
+    const h = Math.round(w * (w < 520 ? 0.95 : w < 760 ? 0.65 : 0.44));
     if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) {
       cv.width = Math.round(w * dpr);
       cv.height = Math.round(h * dpr);
@@ -432,7 +438,7 @@
     const cap = $('map-caption');
     const zoomInfo = map.zoom !== 1 || map.center
       ? t('map.view', { zoom: map.zoom.toFixed(1) })
-      : t('map.zoomHint');
+      : t(tippgeraet ? 'map.zoomHintTouch' : 'map.zoomHint');
     const hovered = map.hover >= 0 ? map.pins[map.hover] : null;
     const km = state.radius.toLocaleString(sprache);
 
@@ -523,7 +529,7 @@
     map.canvas.addEventListener('click', () => {
       if (map.moved) { map.moved = false; return; }   // war ein Verschieben
       if (map.hover < 0) return;
-      const card = document.getElementById(map.pins[map.hover].cardId);
+      const card = karteZeigen(map.pins[map.hover].cardId);
       if (card) {
         card.scrollIntoView({ behavior: 'smooth', block: 'center' });
         card.classList.add('flash');
@@ -540,20 +546,51 @@
     $('zoom-reset').addEventListener('click', resetMapView);
 
     // Zwei Finger auf Touchgeräten
-    let pinch = 0;
+    // Zwei Finger zoomen und verschieben. Bewusst nicht ein Finger: Die Karte
+    // steht mitten im Seitenfluss, und wer mit dem Daumen weiterscrollen will,
+    // bliebe sonst darauf hängen. Ein Fingertipp wählt weiterhin einen Pin.
+    let pinch = 0, mitte = null;
     const spread = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+    const zentrum = (t) => ({ x: (t[0].clientX + t[1].clientX) / 2,
+                              y: (t[0].clientY + t[1].clientY) / 2 });
     map.canvas.addEventListener('touchstart', (e) => {
-      if (e.touches.length === 2) pinch = spread(e.touches);
+      if (e.touches.length === 2) {
+        pinch = spread(e.touches);
+        mitte = zentrum(e.touches);
+      }
     }, { passive: true });
     map.canvas.addEventListener('touchmove', (e) => {
-      if (e.touches.length !== 2 || !pinch) return;
+      if (e.touches.length !== 2 || !pinch || !map.view) return;
       e.preventDefault();
       const now = spread(e.touches);
       map.zoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, map.zoom * (now / pinch)));
       pinch = now;
+
+      const jetzt = zentrum(e.touches);
+      const v = map.view;
+      const c = mapCenter();
+      map.center = {
+        lat: c.lat + (v.lat(mitte.y) - v.lat(jetzt.y)),
+        lon: c.lon + (v.lon(mitte.x) - v.lon(jetzt.x)),
+      };
+      mitte = jetzt;
       drawMap();
     }, { passive: false });
-    map.canvas.addEventListener('touchend', () => { pinch = 0; });
+    map.canvas.addEventListener('touchend', () => { pinch = 0; mitte = null; });
+
+    // Ein Tipp auf einen Pin springt zum Eintrag - am Telefon gibt es kein
+    // Zeigen, deshalb wählt die Berührung den nächsten Pin selbst aus.
+    map.canvas.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1 || !map.pins.length) return;
+      const r = map.canvas.getBoundingClientRect();
+      const mx = e.touches[0].clientX - r.left, my = e.touches[0].clientY - r.top;
+      let found = -1, bestD = 26 * 26;          // großzügiger als mit der Maus
+      map.pins.forEach((p, i) => {
+        const d = (p.px - mx) ** 2 + (p.py - my) ** 2;
+        if (d < bestD) { bestD = d; found = i; }
+      });
+      if (found !== map.hover) { map.hover = found; drawMap(); }
+    }, { passive: true });
 
     window.addEventListener('resize', () => drawMap());
   }
@@ -910,12 +947,12 @@
         : t('res.noneBands');
     }
 
-    const shown = scored.slice(0, 300);
-    const frag = document.createDocumentFragment();
-    shown.forEach((s, n) => { s.cardId = `fest-${n}`; frag.append(card(s)); });
-    list.append(frag);
+    treffer = scored.slice(0, 300);
+    treffer.forEach((s, n) => { s.cardId = `fest-${n}`; });
+    gezeigt = stapel();
+    listeZeichnen();
 
-    map.pins = shown
+    map.pins = treffer
       .filter((s) => s.row[LAT] != null)
       .map((s) => ({
         lat: s.row[LAT], lon: s.row[LON], name: s.row[NAME],
@@ -930,6 +967,55 @@
       li.textContent = t('res.more', { n: scored.length - 300 });
       list.append(li);
     }
+  }
+
+  /* Nur die ersten Treffer zeichnen und auf Wunsch nachlegen. Alle 300 auf
+     einmal ergaben am Telefon eine Seite von 109.000 Pixeln Hoehe - über
+     hundert Bildschirme, die niemand durchwischt, und jede Karte kostet
+     Aufbauzeit. */
+  // Am Telefon ein kleinerer Stapel als am Rechner: dort zaehlt jede Karte
+  // Aufbauzeit und Wischweg, hier passt mehr auf einen Blick.
+  const stapel = () => (window.innerWidth < 620 ? 25 : 50);
+  let treffer = [];
+  let gezeigt = stapel();
+
+  function listeZeichnen() {
+    const list = $('festival-list');
+    const bisher = list.querySelectorAll('.fest').length;
+    const mehrKnopf = list.querySelector('.mehr');
+    if (mehrKnopf) mehrKnopf.remove();
+
+    const frag = document.createDocumentFragment();
+    for (let n = bisher; n < Math.min(gezeigt, treffer.length); n++) {
+      frag.append(card(treffer[n]));
+    }
+    list.append(frag);
+
+    if (gezeigt < treffer.length) {
+      const li = document.createElement('li');
+      li.className = 'mehr';
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'ghost';
+      btn.textContent = t('res.showMore', {
+        n: Math.min(stapel(), treffer.length - gezeigt),
+        rest: treffer.length - gezeigt,
+      });
+      btn.addEventListener('click', () => { gezeigt += stapel(); listeZeichnen(); });
+      li.append(btn);
+      list.append(li);
+    }
+  }
+
+  /** Sorgt dafuer, dass eine Karte gezeichnet ist - etwa nach einem Klick auf
+      einen Kartenpin, dessen Eintrag noch im Nachschub steckt. */
+  function karteZeigen(cardId) {
+    const stelle = treffer.findIndex((s) => s.cardId === cardId);
+    if (stelle >= gezeigt) {
+      gezeigt = Math.ceil((stelle + 1) / stapel()) * stapel();
+      listeZeichnen();
+    }
+    return $(cardId);
   }
 
   function card(s) {
