@@ -784,6 +784,42 @@ def genre_merge(*werte: str) -> str:
     return ", ".join(gesehen.values())
 
 
+def tag_zahl(datum: str) -> int:
+    """TT.MM.JJJJ als vergleichbare Zahl; 0, wenn nichts dasteht."""
+    m = re.match(r"(\d{2})\.(\d{2})\.(\d{4})", datum or "")
+    return int(m.group(3) + m.group(2) + m.group(1)) if m else 0
+
+
+def zeitraum_ueberlappt(a: dict, b: dict) -> bool:
+    """Ueberschneiden sich die beiden Termine?
+
+    Die Quellen zaehlen den Anreise- oder Warmup-Tag verschieden: Das Neuborn
+    Open Air steht bei festivalticker ab dem 27.08., bei den beiden anderen ab
+    dem 28.08. Ein Ueberlapp erfasst solche Faelle, ohne zwei Feste zu
+    verschmelzen, die Wochen auseinander liegen.
+    """
+    a0, b0 = tag_zahl(a["date_from"]), tag_zahl(b["date_from"])
+    if not a0 or not b0:
+        return False
+    a1, b1 = tag_zahl(a["date_to"]) or a0, tag_zahl(b["date_to"]) or b0
+    return a0 <= b1 and b0 <= a1
+
+
+def name_deckt_sich(ka: str, kb: str) -> bool:
+    """Strenger Namensvergleich fuer Termine, die nicht am selben Tag beginnen.
+
+    Ein gemeinsames Wort genuegt hier nicht: "METAStadt Open Air Wien" und
+    "Afrika Tage Wien" teilen sich die Stadt im Namen und sind zwei
+    Veranstaltungen. Verlangt wird, dass ein Name vollstaendig im anderen
+    steckt ("Neuborn" in "NOAF Neuborn") oder beide ohne Leerzeichen gleich
+    sind ("R.O.I. Rock On Isens" und "ROI Rock On Isens").
+    """
+    ta, tb = set(ka.split()), set(kb.split())
+    if ta and tb and (ta <= tb or tb <= ta):
+        return True
+    return ka.replace(" ", "") == kb.replace(" ", "")
+
+
 def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
     """Zusammenfuehren in zwei Stufen.
 
@@ -912,6 +948,57 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
                               "location", "price", "website", "visitors", "note"):
                     if not keep[field] and drop[field]:
                         keep[field] = drop[field]
+                keep["genre"] = genre_merge(keep["genre"], drop["genre"])
+                keep["cancelled"] = keep["cancelled"] or drop["cancelled"]
+                keep["sources"].update(drop["sources"])
+                keep["_bands"].update(drop["_bands"])
+                merged.pop(drop_key, None)
+                if drop_key == ka:
+                    break
+
+    # Stufe 4: dieselbe Veranstaltung, von den Quellen einen Tag versetzt datiert.
+    # Stufe 3 verlangt denselben Starttermin - daran scheiterte das Neuborn Open
+    # Air, das festivalticker ab dem 27.08. fuehrt und die beiden anderen Quellen
+    # ab dem 28.08.; uebrig blieben zwei Eintraege mit 17 und mit 4 Bands.
+    # Statt des Termins schuetzt hier der strengere Namensvergleich: gleiche
+    # Stadt, ueberlappender Zeitraum, verschiedene Quellen und ein Name, der
+    # vollstaendig im anderen steckt.
+    orte: dict[tuple[str, str], list[tuple]] = {}
+    for key, rec in merged.items():
+        if rec["date_from"] and rec["city"]:
+            orte.setdefault((rec["year"], city_key(rec["city"])), []).append((key, rec))
+
+    for group in orte.values():
+        if len(group) < 2:
+            continue
+        for i in range(len(group)):
+            ka, a = group[i]
+            if ka not in merged:
+                continue
+            for j in range(i + 1, len(group)):
+                kb, b = group[j]
+                if kb not in merged or ka not in merged:
+                    continue
+                if set(a["sources"]) & set(b["sources"]):
+                    continue
+                if not zeitraum_ueberlappt(a, b):
+                    continue
+                if not name_deckt_sich(ka[0], kb[0]):
+                    continue
+                keep, drop, drop_key = ((a, b, kb) if a["source_order"] <= b["source_order"]
+                                        else (b, a, ka))
+                for field in ("date_from", "date_to", "city", "country", "venue",
+                              "location", "price", "website", "visitors", "note"):
+                    if not keep[field] and drop[field]:
+                        keep[field] = drop[field]
+                # Der frueheste Beginn und das spaeteste Ende gelten: die Quellen
+                # nennen unterschiedliche Teile desselben Festivals.
+                if tag_zahl(drop["date_from"]) and (
+                        not tag_zahl(keep["date_from"])
+                        or tag_zahl(drop["date_from"]) < tag_zahl(keep["date_from"])):
+                    keep["date_from"] = drop["date_from"]
+                if tag_zahl(drop["date_to"]) > tag_zahl(keep["date_to"]):
+                    keep["date_to"] = drop["date_to"]
                 keep["genre"] = genre_merge(keep["genre"], drop["genre"])
                 keep["cancelled"] = keep["cancelled"] or drop["cancelled"]
                 keep["sources"].update(drop["sources"])

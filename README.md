@@ -228,12 +228,23 @@ Cron-Job, kein Serverdienst.
 
 ## Abgleich
 
-**Festivals** werden in drei Stufen zusammengeführt: exakt über Name + Jahr + Stadt,
-dann über eindeutige Quellenpaare zu Name + Jahr, zuletzt über gleiche Stadt +
+**Festivals** werden in vier Stufen zusammengeführt: exakt über Name + Jahr + Stadt,
+dann über eindeutige Quellenpaare zu Name + Jahr, dann über gleiche Stadt +
 gleichen Starttermin + gemeinsamen Namensbestandteil bei verschiedenen Quellen.
 Die dritte Stufe fängt Fälle wie „Kosmos Festival" gegen „Kosmos Festival Chemnitz"
 ab. Der Starttermin ist dabei der entscheidende Schutz: „Winter Wutzrock" im Februar
 und „Wutzrock" im August teilen Stadt und Namensteil, sind aber zwei Veranstaltungen.
+
+Die vierte Stufe greift, wenn die Quellen denselben Termin **verschieden datieren**:
+Das Neuborn Open Air steht bei festivalticker ab dem 27.08., bei den beiden anderen
+Quellen ab dem 28.08. — übrig blieben zwei Einträge, einer mit 17 und einer mit
+4 Bands. Statt des Starttermins genügt hier ein Überlapp der Zeiträume; den Schutz
+übernimmt ein strengerer Namensvergleich: Ein Name muss vollständig im anderen
+stecken („Neuborn" in „NOAF Neuborn") oder beide ohne Leerzeichen gleich sein
+(„R.O.I. Rock On Isens" und „ROI Rock On Isens"). Ein gemeinsames Wort allein reicht
+nicht, sonst verschmölzen „METAStadt Open Air Wien" und „Afrika Tage Wien" über die
+Stadt im Namen. Beim Verbinden gelten der früheste Beginn und das späteste Ende, weil
+die Quellen unterschiedliche Teile derselben Veranstaltung beschreiben.
 
 Die erste Stufe im Detail: Der Name wird dafür
 normalisiert (Umlaute, Artikel, Jahreszahl und die Wörter „Festival/Open Air" fallen weg).
