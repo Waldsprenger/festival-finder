@@ -124,8 +124,9 @@ STICHWORTE: dict[str, str] = {
               r"medicine music|community",
     "gemischt": r"genreuebergreifend|gemischt|sonstiges|\bcover|tribute|"
                 r"crossover|\bparty\b|\bcharts\b|\bdiverse|experimental|"
-                r"avantgarde|avant\b|\bmixed\b|\bangebot\b|\balternative$|"
-                r"^\d+(er|s)?$|neue musik|blockbuster|mash ?up|coveer",
+                r"avantgarde|avant\b|\bmixed\b|multi ?genre|"
+                r"\balternative$|^\d+(er|s)?$|neue musik|blockbuster|"
+                r"mash ?up|coveer|\buvm\b|querbeet|alles dabei",
 }
 
 _SPEZIAL = [(re.compile(muster), keys) for muster, keys in SPEZIAL]
@@ -153,7 +154,13 @@ def _zuordnen(teil: str) -> list[str]:
 
 
 def oberbegriffe(genre_text: str) -> list[str]:
-    """Oberbegriffe eines Genrefeldes, in der Reihenfolge von OBERBEGRIFFE."""
+    """Oberbegriffe eines Genrefeldes, in der Reihenfolge von OBERBEGRIFFE.
+
+    "Genreuebergreifend" ist der Rueckfall und faellt weg, sobald eine
+    Richtung erkennbar ist: Bei "Rock im Park" nennt eine Quelle
+    "Multi-Genre", die andere acht konkrete Stile - dann taugt die Sammelkiste
+    nicht mehr als Beschreibung, sie waere nur noch ein Ort zum Verlieren.
+    """
     treffer: set[str] = set()
     for angabe in (genre_text or "").split(","):
         roh = normalisiere(angabe)
@@ -163,6 +170,8 @@ def oberbegriffe(genre_text: str) -> list[str]:
             teil = teil.strip()
             if teil:
                 treffer.update(_zuordnen(teil))
+    if len(treffer) > 1:
+        treffer.discard("gemischt")
     return [k for k in OBERBEGRIFFE if k in treffer]
 
 

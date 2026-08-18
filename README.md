@@ -126,22 +126,33 @@ aufsteigend, dann nach Preis aufsteigend.
 (*Nach Bands*, *Nach Genre*, *Ohne beides*); es wirkt immer nur die aktive. Beide
 Auswahlen bleiben beim Umschalten erhalten, damit ein Vergleich nichts kostet.
 
-**Genre-Oberbegriffe:** Die Quellen schreiben das Genre als Freitext — 17.994 Angaben in
-1.544 Schreibweisen, von „Rock“ bis „Psychedelic Minimal Techno“. Danach filtert
-niemand, deshalb bildet [scraper/genres.py](scraper/genres.py) sie auf 17 Oberbegriffe
-ab (Rock, Metal, Punk & Hardcore, Pop, Hip-Hop & Rap, Elektro/Techno & Dance, Reggae/Ska,
-Jazz/Blues, Soul/Funk, Folk/Country, Weltmusik, Klassik, Schlager/Volksmusik, Gothic/Wave,
-Mittelalter, Kultur & Bühne, Genreübergreifend). Eine Angabe darf mehrere Oberbegriffe
-ergeben: „Ska Punk“ zählt zu Punk *und* zu Reggae/Ska, sonst fände es nur die Hälfte der
-Suchenden. Vor der Stichwortsuche steht eine Liste von Sonderfällen, in denen ein Wort
-in die Irre führt — „Hardcore Techno“ ist kein Punk, „Classic Rock“ keine Klassik.
-Zugeordnet sind 3.535 der 4.349 Festivals; für 802 nennt keine Quelle eine Richtung, sie
-lassen sich per Haken einblenden. Nicht zugeordnet bleiben 0,2 % der Angaben, fast nur
+**Genre-Oberbegriffe:** Die Quellen schreiben das Genre als Freitext — rund 17.400
+Angaben in 1.584 Schreibweisen, von „Rock“ bis „Psychedelic Minimal Techno“. Danach
+filtert niemand, deshalb bildet [scraper/genres.py](scraper/genres.py) sie auf 17
+Oberbegriffe ab (Rock, Metal, Punk & Hardcore, Pop, Hip-Hop & Rap, Elektro/Techno & Dance,
+Reggae/Ska, Jazz/Blues, Soul/Funk, Folk/Country, Weltmusik, Klassik, Schlager/Volksmusik,
+Gothic/Wave, Mittelalter, Kultur & Bühne, Genreübergreifend). Eine Angabe darf mehrere
+Oberbegriffe ergeben: „Ska Punk“ zählt zu Punk *und* zu Reggae/Ska, sonst fände es nur die
+Hälfte der Suchenden. Vor der Stichwortsuche steht eine Liste von Sonderfällen, in denen
+ein Wort in die Irre führt — „Hardcore Techno“ ist kein Punk, „Classic Rock“ keine Klassik.
+Zugeordnet sind 3.526 der 4.367 Festivals; für 804 nennt keine Quelle eine Richtung, sie
+lassen sich per Haken einblenden. Nicht zugeordnet bleiben 0,4 % der Angaben, fast nur
 Tippfehler und Einzelstücke wie `Zapparesk`. Die Abdeckung prüft
 
 ```bash
 python scraper/genres.py
 ```
+
+**Genreübergreifend ist der Rückfall, keine Sammelkiste.** Der Oberbegriff greift nur,
+solange keine Richtung erkennbar ist; sobald eine dazukommt, fällt er weg. Das hängt an
+zwei Stellen zusammen: Erstens sammelt der Scraper die Genres inzwischen aus *allen*
+Quellen (`genre_merge`), statt die erste gefüllte Angabe gewinnen zu lassen — bei „Rock im
+Park“ stand vorher nur das festivalsunited-Wort „genreübergreifendes“, während
+festival-alarm acht konkrete Richtungen nennt. Zweitens verdrängt jede konkrete Zuordnung
+den Sammelbegriff. Zusammen sank die Kategorie von 719 auf 459 Festivals; bei diesen sagen
+tatsächlich alle Quellen nur „genreübergreifendes“ oder „Gemischt“. Nicht als Genre zählt
+außerdem der Veranstalterhinweis „Angebot von …“, den festivalsunited im selben Satzmuster
+führt wie die Stilangabe.
 
 Preise werden für Filter und Sortierung in Euro umgerechnet (Näherungskurse in
 `build_site.py`), angezeigt wird zusätzlich der Originaltext der Quelle.

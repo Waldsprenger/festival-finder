@@ -684,9 +684,12 @@ def fu_parse_detail(url: str, html: str) -> dict | None:
 
     lineup = fu_extract_lineup(s)
 
+    # "... ist ein Rock Festival" nennt die Richtung, "... ist ein Angebot von
+    # Live Nation Festival" dagegen den Veranstalter. Ohne diese Grenze stand
+    # bei 14 Festivals der Anbieter als Genre.
     genre = ""
     gm = re.search(r"ist ein ([A-Za-zÄÖÜäöü&\- ]{3,40}?) Festival", text)
-    if gm:
+    if gm and not re.match(r"(?i)angebot\b", gm.group(1).strip()):
         genre = clean(gm.group(1))
 
     return {
@@ -762,6 +765,25 @@ def city_key(value: str) -> str:
     return _fold(v)
 
 
+def genre_merge(*werte: str) -> str:
+    """Genres aller Quellen sammeln; doppelte Angaben fallen weg.
+
+    Frueher gewann die erste gefuellte Quelle und die uebrigen verfielen. Bei
+    "Rock im Park" blieb so das festivalsunited-Wort "genreuebergreifendes"
+    stehen, waehrend festival-alarm acht konkrete Richtungen nennt. Die
+    Vereinigung ist naeher an der Wahrheit als jede Quelle allein - und der
+    Abgleich ohne Gross-/Kleinschreibung raeumt die Wiederholungen weg, die
+    einzelne Quellseiten in ihrer eigenen Aufzaehlung haben.
+    """
+    gesehen: dict[str, str] = {}
+    for wert in werte:
+        for teil in (wert or "").split(","):
+            teil = clean(teil)
+            if teil:
+                gesehen.setdefault(teil.casefold(), teil)
+    return ", ".join(gesehen.values())
+
+
 def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
     """Zusammenfuehren in zwei Stufen.
 
@@ -799,11 +821,12 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
                 "_bands": {},
             }
             merged[key] = cur
-        # laengerer/gefuellter Wert gewinnt
+        # laengerer/gefuellter Wert gewinnt; das Genre sammelt statt zu ersetzen
         for field in ("date_from", "date_to", "city", "venue", "plz",
-                      "location", "price", "website", "genre", "visitors", "note"):
+                      "location", "price", "website", "visitors", "note"):
             if not cur[field] and rec.get(field):
                 cur[field] = rec[field]
+        cur["genre"] = genre_merge(cur["genre"], rec.get("genre", ""))
         if not cur["country"]:
             cur["country"] = land_code(rec["country"])
         if len(rec["name"]) > len(cur["name"]) and rec["source"] == "festivalticker":
@@ -835,9 +858,10 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
         _, keep = group[0]
         for drop_key, drop in group[1:]:
             for field in ("date_from", "date_to", "city", "country", "venue",
-                          "location", "price", "website", "genre", "visitors", "note"):
+                          "location", "price", "website", "visitors", "note"):
                 if not keep[field] and drop[field]:
                     keep[field] = drop[field]
+            keep["genre"] = genre_merge(keep["genre"], drop["genre"])
             keep["cancelled"] = keep["cancelled"] or drop["cancelled"]
             keep["sources"].update(drop["sources"])
             keep["_bands"].update(drop["_bands"])
@@ -885,9 +909,10 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
                 keep, drop, drop_key = ((a, b, kb) if a["source_order"] <= b["source_order"]
                                         else (b, a, ka))
                 for field in ("date_from", "date_to", "city", "country", "venue",
-                              "location", "price", "website", "genre", "visitors", "note"):
+                              "location", "price", "website", "visitors", "note"):
                     if not keep[field] and drop[field]:
                         keep[field] = drop[field]
+                keep["genre"] = genre_merge(keep["genre"], drop["genre"])
                 keep["cancelled"] = keep["cancelled"] or drop["cancelled"]
                 keep["sources"].update(drop["sources"])
                 keep["_bands"].update(drop["_bands"])
