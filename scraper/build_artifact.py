@@ -17,8 +17,12 @@ SITE = BASE / "site"
 OUT = SITE / "artifact.html"
 
 
-def read(name: str) -> str:
-    return (SITE / name).read_text(encoding="utf-8")
+def read(name: str, pflicht: bool = True) -> str:
+    """Liest eine Datei aus site/. Nicht zwingende fehlen sang- und klanglos."""
+    pfad = SITE / name
+    if not pflicht and not pfad.exists():
+        return ""
+    return pfad.read_text(encoding="utf-8")
 
 
 def html_ascii(text: str) -> str:
@@ -62,6 +66,8 @@ def main() -> None:
     fonts = read("fonts.css")
     css = read("style.css")
     i18n = read("i18n.js")
+    # Ohne config.js laeuft die Seite ebenfalls - app.js prueft window.CONFIG
+    config = read("config.js", pflicht=False)
     data = read("data.js")
     app = read("app.js")
 
@@ -86,6 +92,7 @@ def main() -> None:
     data = js_ascii(data)
     app = js_ascii(app)
     i18n = js_ascii(i18n)
+    config = js_ascii(config)
 
     doc = f"""<title>Festival Finder &#8212; Lineup-Abgleich f&#252;r Europa</title>
 <style>
@@ -98,6 +105,9 @@ html, body {{ background: #0b0b0d; }}
 </style>
 {main_body}
 {legal}
+<script>
+{config}
+</script>
 <script>
 {i18n}
 </script>
