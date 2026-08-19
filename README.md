@@ -1,6 +1,22 @@
 # Festival-Übersicht Europa
 
-Zusammengeführte Festival- und Lineup-Daten aus acht Verzeichnissen.
+Acht Festivalverzeichnisse, zu einem Bestand zusammengeführt: **5.737 Festivals**
+in **42 Ländern** mit **40.511 Acts**, davon 1.568 Festivals aus mehr als einer
+Quelle. Dazu eine statische Webseite, die nach Band oder Genre filtert, und ein
+Datenlauf, der sich täglich selbst aktualisiert.
+
+Was sich wann geändert hat, steht in der
+[Änderungshistorie](https://github.com/Waldsprenger/festival-finder/commits/main);
+die Fußzeile der Webseite verlinkt sie ebenfalls.
+
+**Wegweiser**
+
+| Wenn du wissen willst … | Abschnitt |
+|---|---|
+| woraus die Daten kommen | [Quellenerfassung](#quellenerfassung), [Die acht Quellen im Vergleich](#die-acht-quellen-im-vergleich) |
+| wie doppelte Einträge verschwinden | [Zusammenführen](#zusammenführen) |
+| was in den Quellen fehlt und warum | [Was in den Quellen wirklich fehlt](#was-in-den-quellen-wirklich-fehlt), [Bekannte Grenzen](#bekannte-grenzen) |
+| wie die Seite gebaut und veröffentlicht wird | [Neu erzeugen](#neu-erzeugen), [Webseite](#webseite-site), [Veröffentlichen und täglich aktualisieren](#veröffentlichen-und-täglich-aktualisieren) |
 
 ## Aufbau
 
@@ -46,8 +62,9 @@ Länderseiten von festivalsunited sind 30 Detailseiten erreichbar, die in der
 Sitemap fehlen — darunter das Exit Festival in Novi Sad. Die Regionsseiten von
 festival-alarm bringen vier weitere, die Umsonst-Liste von festivalticker eine.
 Nicht erfasst werden die 5.000 Konzertseiten unter `sitemap-events`: Das sind
-Einzelkonzerte, keine Festivals. Sitemaps haben nur festivalsunited — bei den
-beiden anderen antwortet `/sitemap.xml` mit 404.
+Einzelkonzerte, keine Festivals. Eine Sitemap haben festivalsunited, festapp,
+wannafest und festivalhopper; bei festivalticker und festival-alarm antwortet
+`/sitemap.xml` mit 404, dort führen nur die Listenseiten zum Ziel.
 
 Die Jahresliste wächst automatisch mit: Die Obergrenze ist das laufende Jahr
 plus fünf, künftige Jahrgänge wie 2028 werden also ohne Codeänderung erfasst.
@@ -77,12 +94,12 @@ sondern darin, wie viele Festivals **nur** dort stehen:
 
 | Quelle | Einträge | nur dort | Besonderheit |
 |---|---|---|---|
-| festivalsunited | 2.952 | 1.714 | Lineups, Preise, Datenblatt je Seite |
-| festivalticker | 1.966 | 815 | dichteste Abdeckung für Deutschland |
-| wannafest | 1.061 | 818 | Elektronisches, Niederlande und Belgien |
-| festival-alarm | 921 | 215 | Spielstätte, Besucherzahl, Preise |
-| festapp | 739 | 379 | Frankreich, Italien, Spanien |
-| festivalhopper | 686 | 98 | Lineups als Einzelverweise, Kapazität |
+| festivalsunited | 2.770 | 1.523 | Lineups, Preise, Datenblatt je Seite |
+| festivalticker | 1.966 | 807 | dichteste Abdeckung für Deutschland |
+| wannafest | 1.061 | 805 | Elektronisches, Niederlande und Belgien |
+| festival-alarm | 921 | 211 | Spielstätte, Besucherzahl, Preise |
+| festapp | 739 | 375 | Frankreich, Italien, Spanien |
+| festivalhopper | 683 | 76 | Lineups als Einzelverweise, Kapazität |
 | festivalfinder | 400 | 372 | Klassik, Theater, Osteuropa |
 | festivalflyer | 1 | 0 | Großbritannien, nur was die Startseite zeigt |
 
@@ -117,35 +134,35 @@ Die Bandkarten liegen unter `/bands/karten/`, die Menüpunkte unter kürzeren
 
 festivalsunited legt jeder Detailseite ein maschinenlesbares Datenblatt bei
 (JSON-LD nach schema.org). Der Scraper liest es als **zweite** Quelle: Der
-Fliesstext beschreibt die dargestellte Ausgabe und hat Vorrang, das Datenblatt
-fuellt, was dort fehlt. Es liefert Land, Ort und Postleitzahl, die Spielstaette,
-Koordinaten, den Einstiegspreis, den Absagestatus und in Einzelfaellen den
+Fließtext beschreibt die dargestellte Ausgabe und hat Vorrang, das Datenblatt
+füllt, was dort fehlt. Es liefert Land, Ort und Postleitzahl, die Spielstätte,
+Koordinaten, den Einstiegspreis, den Absagestatus und in Einzelfällen den
 Termin.
 
-Dazu kommt der Kopfblock der Seite, der als Fliesstext nichts hergibt: Er nennt
-die Stile ausdruecklich („Multi-Genre: Rock, Metal, Punk UVM") und die Kapazitaet
-(„ca. 18.000"), waehrend der Beschreibungssatz nur „genreuebergreifendes
+Dazu kommt der Kopfblock der Seite, der als Fließtext nichts hergibt: Er nennt
+die Stile ausdrücklich („Multi-Genre: Rock, Metal, Punk UVM") und die Kapazität
+(„ca. 18.000"), während der Beschreibungssatz nur „genreübergreifendes
 Festival" sagt. Beim Reload Festival 2027 stand deshalb die Sammelkategorie, wo
-die Seite Rock, Metal und Punk auffuehrt.
+die Seite Rock, Metal und Punk aufführt.
 
-Der Gewinn war betraechtlich: Bei den damals 4.269 Festivals fehlte die
-Spielstaette zuvor 2.438-mal, danach nur noch 683-mal; ohne Genreangabe waren
-797 Eintraege, danach 322; ohne Besucherzahl 2.988, danach 1.585.
-Postleitzahlen kamen so oft dazu, dass die Zahl der ueber die
+Der Gewinn war beträchtlich: Bei den damals 4.269 Festivals fehlte die
+Spielstätte zuvor 2.438-mal, danach nur noch 683-mal; ohne Genreangabe waren
+797 Einträge, danach 322; ohne Besucherzahl 2.988, danach 1.585.
+Postleitzahlen kamen so oft dazu, dass die Zahl der über die
 Postleitzahl verorteten Festivals von 1.894 auf 2.923 stieg — das ist der
-genauere Weg, weil eine Postleitzahl den Zustellbereich trifft, waehrend ein
-Ortsname erst gefunden werden muss und in den Quellen auch mal „Madgeburg“
-heisst.
+genauere Weg, weil eine Postleitzahl den Zustellbereich trifft, während ein
+Ortsname erst gefunden werden muss und in den Quellen auch mal „Madgeburg"
+heißt.
 
-**Koordinaten nur nach Pruefung.** Fuer 2.476 Festivals nennt das Datenblatt
+**Koordinaten nur nach Prüfung.** Für 2.476 Festivals nennt das Datenblatt
 einen Punkt, und meist sitzt er genau — der Abstand zur bisher errechneten
-Koordinate liegt im Mittel bei 2,1 km. Bei 37 Eintraegen liegt er dagegen im
+Koordinate liegt im Mittel bei 2,1 km. Bei 37 Einträgen liegt er dagegen im
 falschen Land: Lugano landete in Buenos Aires, Basel und Budapest in Berlin,
 Andorra in Mexiko. Dreizehnmal steht 51,5/10,5 — der Mittelpunkt Deutschlands
-als Platzhalter, verteilt ueber Deutschland und die Schweiz. `build_site.py`
-uebernimmt einen Punkt deshalb nur, wenn er im Rahmen des Landes liegt
+als Platzhalter, verteilt über Deutschland und die Schweiz. `build_site.py`
+übernimmt einen Punkt deshalb nur, wenn er im Rahmen des Landes liegt
 (Landesgrenzen aus dem Ortsverzeichnis, ein Grad Toleranz) und nicht als
-Platzhalter auffaellt — erkennbar daran, dass dieselbe Koordinate fuer drei
+Platzhalter auffällt — erkennbar daran, dass dieselbe Koordinate für drei
 oder mehr verschiedene Orte herhalten muss. Und er greift erst, wenn
 Postleitzahl und Ortsname nichts hergeben.
 
@@ -157,24 +174,24 @@ python scraper/pruefe_offiziell.py --name Wacken
 ```
 
 Das Werkzeug holt die Festivalseite selbst und vergleicht den Starttermin.
-Belastbar ist dabei nur deren eigenes Datenblatt; blosse Datumsangaben im
-Fliesstext gehoeren genauso oft zu Nachrichten oder Nebenveranstaltungen.
-Verglichen wird ausserdem nur derselbe Jahrgang — die offizielle Seite zeigt
-die naechste Ausgabe, unser Bestand fuehrt jede einzeln.
+Belastbar ist dabei nur deren eigenes Datenblatt; bloße Datumsangaben im
+Fließtext gehören genauso oft zu Nachrichten oder Nebenveranstaltungen.
+Verglichen wird außerdem nur derselbe Jahrgang — die offizielle Seite zeigt
+die nächste Ausgabe, unser Bestand führt jede einzeln.
 
-Was eine Stichprobe von 60 Festivals ergab: **34 Seiten nennen ueberhaupt kein
+Was eine Stichprobe von 60 Festivals ergab: **34 Seiten nennen überhaupt kein
 Datum** in lesbarer Form (es steckt in Grafiken oder wird per Skript
-nachgeladen), 15 nur im Fliesstext, und lediglich **6 fuehren ein Datenblatt**.
-Davon bestaetigten vier unseren Termin; die zwei Abweichungen loesten sich beim
-Nachsehen auf — die Seiten zeigten bereits die naechste Ausgabe, die wir als
-eigenen Eintrag ebenfalls fuehren, mit uebereinstimmendem Datum.
+nachgeladen), 15 nur im Fließtext, und lediglich **6 führen ein Datenblatt**.
+Davon bestätigten vier unseren Termin; die zwei Abweichungen lösten sich beim
+Nachsehen auf — die Seiten zeigten bereits die nächste Ausgabe, die wir als
+eigenen Eintrag ebenfalls führen, mit übereinstimmendem Datum.
 
-Ein zweiter, groesserer Lauf ueber 120 Festivals bestaetigte das Bild: 83 Seiten
-nennen kein Datum des Jahrgangs, 8 waren nicht erreichbar, 7 bestaetigten
+Ein zweiter, größerer Lauf über 120 Festivals bestätigte das Bild: 83 Seiten
+nennen kein Datum des Jahrgangs, 8 waren nicht erreichbar, 7 bestätigten
 unseren Termin maschinenlesbar — und **kein einziges Datenblatt widersprach**.
-Die 18 Faelle, in denen nur der Fliesstext abweicht, sind ueberwiegend
+Die 18 Fälle, in denen nur der Fließtext abweicht, sind überwiegend
 Nebenwirkungen der Suche: Auf Veranstalterseiten stehen Vorverkaufsstarts,
-Nachrichten und Termine anderer Jahrgaenge im selben Text. Ebenfalls geprueft:
+Nachrichten und Termine anderer Jahrgänge im selben Text. Ebenfalls geprüft:
 Von 60 Festivals ohne Preis nannten nur zwei offizielle Seiten einen Preis in
 maschinenlesbarer Form.
 
@@ -182,7 +199,7 @@ Daraus folgt: Ein automatischer Abgleich taugt **nicht** als Datenquelle, weil
 neun von zehn Veranstalterseiten nichts Maschinenlesbares anbieten. Hinzu
 kommt, dass die Datumsangaben dort oft gar nicht das Festival selbst meinen,
 sondern Vorverkaufsstarts, Nebenveranstaltungen oder Nachrichten. **Bei einer
-Abweichung gilt deshalb der Bestand, nicht die Veranstalterseite** - das Skript
+Abweichung gilt deshalb der Bestand, nicht die Veranstalterseite** — das Skript
 liegt als Stichprobe zur Kontrolle bei, seine Meldungen sind Hinweise zum
 Nachsehen und keine Korrekturen.
 
@@ -192,9 +209,10 @@ Nachsehen und keine Korrekturen.
 python scraper/festival_scraper.py && python scraper/build_overview.py
 ```
 
-Alle Seiten liegen unter `cache/` — ein erneuter Lauf ist dadurch in ~90 s durch,
-ohne die Quellseiten nochmals abzurufen. Für frische Daten `cache/` löschen
-(Erstlauf ca. 7–8 Minuten, 4 parallele Verbindungen).
+Alle Seiten liegen unter `cache/` — ein erneuter Lauf ist dadurch in gut vier
+Minuten durch, ohne die Quellseiten nochmals abzurufen. Für frische Daten
+`--frisch` setzen oder `cache/` löschen (Erstlauf rund 25 Minuten für 11.300
+Detailseiten, 4 parallele Verbindungen).
 
 ## Dateien in `data/`
 
@@ -423,7 +441,7 @@ schläft auf dem kostenlosen Tarif nach Inaktivität ein. Pages hat keine
 Schlafphase, keine Laufzeitkosten und die Aktualisierung ist ohnehin ein
 Cron-Job, kein Serverdienst.
 
-## Abgleich
+## Zusammenführen
 
 **Festivals** werden in sechs Stufen zusammengeführt: exakt über Name + Jahr + Stadt,
 dann über eindeutige Quellenpaare zu Name + Jahr, dann über gleiche Stadt +
@@ -499,26 +517,29 @@ oft auf den Seiten verschiedener Quellen und treffen sich erst beim Zusammenfüh
 
 ## Was in den Quellen wirklich fehlt
 
-Eine Prüfung über alle 4.269 Festivals, Feld für Feld gegen die
-zwischengespeicherten Quellseiten: Bei jedem fehlenden Wert wurde die Seite
-nach einem Beleg durchsucht.
+Feld für Feld gegen die zwischengespeicherten Quellseiten geprüft: Bei jedem
+fehlenden Wert wurde die Seite nach einem Beleg durchsucht. Die Spalte „fehlt"
+nennt den heutigen Bestand von 5.737 Festivals, die Spalte daneben das Ergebnis
+der Nachsuche.
 
 | Feld | fehlt | steht doch auf der Seite |
 |---|---|---|
-| Besucherzahl | 3.072 | 0 |
-| Lineup | 2.872 | — die Quelle führt keins |
-| Postleitzahl | 2.120 | 0 |
-| Genre | 1.906 | 0 |
-| Preis | 1.911 | 2 |
-| Spielstätte | 1.150 | 129-mal nur der Festivalname selbst |
-| Termin | 491 | nur Termine *vergangener* Ausgaben |
-| Webseite | 369 | 0 — die Seiten verlinken nur Bildnachweise und Werbung |
+| Besucherzahl | 2.921 | 0 |
+| Lineup | 2.748 | — die Quelle führt keins |
+| Postleitzahl | 1.920 | 0 |
+| Preis | 1.880 | 2 |
+| Genre | 1.824 | 0 |
+| Spielstätte | 944 | 129-mal nur der Festivalname selbst |
+| Webseite | 360 | 0 — die Seiten verlinken nur Bildnachweise und Werbung |
+| Termin | 291 | nur Termine *vergangener* Ausgaben |
 | Ort | 247 | 16 |
+| Land | 0 | — |
 
-Die Prüfung stammt vom Stand mit drei Quellen (4.269 Festivals); die Zahlen
-oben nennen den heutigen Bestand mit acht. Gestiegen sind sie, weil die fünf
-neuen Verzeichnisse schlanker sind: festivalfinder etwa nennt weder Preis noch
-Lineup, wannafest keine Postleitzahl.
+Die Nachsuche selbst lief auf dem damaligen Stand mit drei Quellen (4.269
+Festivals); an ihrem Ergebnis ändert der Zuwachs nichts, denn sie fragt, ob ein
+Wert auf der Quellseite steht und nur nicht gelesen wurde. Die fünf neuen
+Verzeichnisse sind schlanker als die ersten drei: festivalfinder nennt weder
+Preis noch Lineup, wannafest keine Postleitzahl.
 
 Zwei Zahlen sind gegenüber der ersten Prüfung gefallen, weil zwei Auslesefehler
 gefunden wurden: Das Preismuster bei festivalsunited kannte `EUR` und `CHF`,
@@ -527,7 +548,7 @@ Und das Feld „Örtlichkeit" bei festival-alarm wurde nie gelesen, obwohl es di
 Spielstätte nennt (Arena Wien, Waschhaus Potsdam).
 
 Die Quellen sind damit ausgeschöpft. Zwei Punkte sind erklärungsbedürftig:
-Die 459 Einträge ohne Termin nennen auf ihrer Seite sehr wohl ein Datum — das
+Die Einträge ohne Termin nennen auf ihrer Seite sehr wohl ein Datum — das
 der **letzten** Ausgabe. Der Scraper übernimmt es bewusst nicht, sondern
 vermerkt es als Hinweis, sonst stünden vergangene Termine als kommende in der
 Liste. Und die 129 unterdrückten Spielstätten tragen im Datenblatt nur den
@@ -546,7 +567,7 @@ letzte gefundene Ausgabe.
 
 - festivalticker listet unter *alle-festivals* nur 2026 plus die separate 2027-Seite;
   die Archivjahrgänge (2006–2025) haben eigene URLs und sind nicht enthalten.
-- 491 Einträge haben kein Datum: die Quellen führen sie ohne bestätigte Neuauflage.
+- 291 Einträge haben kein Datum: die Quellen führen sie ohne bestätigte Neuauflage.
   Das Feld `Hinweis` nennt dann die letzte gefundene Ausgabe.
 - Bei reinen Akronymen kann die Mehrheitsregel die falsche Variante wählen
   (`GANS` → `Gans`), da sie gemischte Schreibweise bevorzugt. Ein Großbuchstabe
