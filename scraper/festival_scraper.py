@@ -184,6 +184,12 @@ def festival_key(name: str) -> str:
     v = _fold(name)
     v = re.sub(r"\b(19|20)\d{2}\b", " ", v)
     v = re.sub(r"\b(festival|fest|open air|openair|open|air)\b", " ", v)
+    # Angehaengt und zusammengeschrieben meint dasselbe: "Reloadfestival" stand
+    # als eigener Eintrag neben "Reload Festival", weil nur das freistehende
+    # Wort wegfiel. Der Rumpf muss dabei vier Zeichen behalten, sonst wuerde
+    # aus "Festa" ein leerer Schluessel.
+    v = re.sub(r"(?<=\w{4})(festival|openair|fest)\b", " ", v)
+    v = re.sub(r"\b(festival|openair)(?=\w{4})", " ", v)
     return re.sub(r"\s+", " ", v).strip() or _fold(name)
 
 
@@ -764,6 +770,22 @@ def fu_parse_detail(url: str, html: str) -> dict | None:
     if gm and not re.match(r"(?i)angebot\b", gm.group(1).strip()):
         genre = clean(gm.group(1))
 
+    # Der Kopfblock nennt die Stile ausdruecklich ("Multi-Genre: Rock, Metal,
+    # Punk UVM"), waehrend der Fliesstext nur "genreuebergreifendes Festival"
+    # sagt. Beim Reload Festival 2027 blieb deshalb nur die Sammelkategorie
+    # stehen, obwohl die Seite Rock, Metal und Punk auffuehrt.
+    km = re.search(r"(?:Multi-Genre|Genre)\s*<[^>]*>([^<]{3,120})<", html)
+    if km:
+        stile = re.sub(r"(?i)\s*\bUVM\.?\s*$", "", clean(km.group(1)))
+        if stile:
+            genre = genre_merge(stile, genre)
+
+    # "Kapazitaet: ca. 18.000" steht im selben Block
+    visitors = ""
+    bm = re.search(r"Kapazit\u00e4t:\s*(?:ca\.?\s*)?([\d.\s]{3,12})", html)
+    if bm:
+        visitors = re.sub(r"\D", "", bm.group(1))
+
     return {
         "source": "festivalsunited",
         "source_url": url,
@@ -781,7 +803,7 @@ def fu_parse_detail(url: str, html: str) -> dict | None:
         "price": price,
         "website": website,
         "genre": genre,
-        "visitors": "",
+        "visitors": visitors,
         "note": note,
         "cancelled": cancelled,
         "lineup": lineup,
@@ -944,6 +966,12 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
         if not cur["country"]:
             cur["country"] = land_code(rec["country"])
         if len(rec["name"]) > len(cur["name"]) and rec["source"] == "festivalticker":
+            cur["name"] = rec["name"]
+        # Bei gleicher Schreibung gewinnt die getrennte: festivalticker fuehrt
+        # das Reload Festival als "Reloadfestival", und so stand es dann auch
+        # auf der Seite.
+        if (_fold(rec["name"]).replace(" ", "") == _fold(cur["name"]).replace(" ", "")
+                and rec["name"].count(" ") > cur["name"].count(" ")):
             cur["name"] = rec["name"]
         # Eine Absage aus einer Quelle genuegt
         cur["cancelled"] = cur["cancelled"] or bool(rec.get("cancelled"))

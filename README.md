@@ -64,8 +64,15 @@ fuellt, was dort fehlt. Es liefert Land, Ort und Postleitzahl, die Spielstaette,
 Koordinaten, den Einstiegspreis, den Absagestatus und in Einzelfaellen den
 Termin.
 
+Dazu kommt der Kopfblock der Seite, der als Fliesstext nichts hergibt: Er nennt
+die Stile ausdruecklich („Multi-Genre: Rock, Metal, Punk UVM") und die Kapazitaet
+(„ca. 18.000"), waehrend der Beschreibungssatz nur „genreuebergreifendes
+Festival" sagt. Beim Reload Festival 2027 stand deshalb die Sammelkategorie, wo
+die Seite Rock, Metal und Punk auffuehrt.
+
 Der Gewinn ist betraechtlich: Die Spielstaette fehlte bei 2.438 Festivals,
-jetzt bei 898. Postleitzahlen kamen so oft dazu, dass die Zahl der ueber die
+jetzt bei 892; ohne Genreangabe waren 797 Festivals, jetzt 320; ohne
+Besucherzahl 2.988, jetzt 1.583. Postleitzahlen kamen so oft dazu, dass die Zahl der ueber die
 Postleitzahl verorteten Festivals von 1.894 auf 2.923 stieg — das ist der
 genauere Weg, weil eine Postleitzahl den Zustellbereich trifft, waehrend ein
 Ortsname erst gefunden werden muss und in den Quellen auch mal „Madgeburg“
@@ -357,6 +364,13 @@ laufen unter einem Namen an 30 Orten und sind eigenständige Termine. In einem z
 Schritt werden Einträge quellenübergreifend verbunden, wenn es zu Name + Jahr in jeder
 Quelle genau einen Kandidaten gibt — so greift der Abgleich auch bei abweichender
 Ortsschreibweise, ohne Tourtermine zu verschmelzen.
+
+Der Namensschlüssel entfernt „Festival", „Fest" und „Open Air" auch dann, wenn
+sie **angehängt** sind: festivalticker führt das Reload Festival als
+„Reloadfestival", festivalsunited getrennt — ohne diese Regel standen beide
+nebeneinander, einer davon ohne Koordinaten. Der Rumpf muss dabei vier Zeichen
+behalten, sonst würde aus „Festa" ein leerer Schlüssel. Bei sonst gleicher
+Schreibung gewinnt für die Anzeige die getrennte Variante.
 
 **Bandnamen** laufen durch denselben Normalisierer (Groß-/Kleinschreibung, Akzente,
 `&`/`and`, führendes „The", Satzzeichen). Je Gruppe gewinnt die häufigste Schreibweise
