@@ -321,10 +321,22 @@ def main() -> None:
     welt_grob = lade("welt_grob.json")
     welt_fein = lade("welt_fein.json")
 
+    # Kuerzel und Zweitschreibweisen aus data/band_aliase.json. Der Scraper
+    # vereinheitlicht sie in den Daten; die Suche braucht sie trotzdem, sonst
+    # findet "TBS" nichts, obwohl der Act als The Butcher Sisters drinsteht.
+    alias_pfad = DATA / "band_aliase.json"
+    alias_paare = []
+    if alias_pfad.exists():
+        roh = json.loads(alias_pfad.read_text(encoding="utf-8"))
+        for kurz, voll in roh.items():
+            if voll in band_ix and kurz.casefold() != voll.casefold():
+                alias_paare.append([kurz, band_ix[voll]])
+
     payload = {
         # mit Uhrzeit, damit auf der Seite steht, wie frisch die Daten sind
         "generated": datetime.now().astimezone().strftime("%Y-%m-%dT%H:%M%z"),
         "bands": bands,
+        "bandAlias": alias_paare,
         "genres": genre_keys,
         "festivals": rows,
         "places": places,
@@ -350,7 +362,8 @@ def main() -> None:
     print(f"  Festivals {len(rows)} | mit Koordinaten {with_geo} | "
           f"mit Preis in EUR {priced} | Acts {len(bands)} | Orte {len(places)} | "
           f"PLZ {len(plz)}")
-    print(f"  Genre-Oberbegriffe {len(genre_keys)} | Festivals zugeordnet {mit_genre}")
+    print(f"  Genre-Oberbegriffe {len(genre_keys)} | Festivals zugeordnet {mit_genre}"
+          f" | Bandkuerzel {len(alias_paare)}")
     print(f"  Reglergrenzen: Umkreis bis {payload['maxDistanceKm']} km "
           f"(ab {REF_PLZ}), Preis bis {payload['maxPriceEur']} EUR, "
           f"Kalender ab {payload['minDate'] or 'unbegrenzt'}")

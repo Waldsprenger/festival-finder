@@ -107,6 +107,12 @@ Die drei gesperrten Seiten werden nicht umgangen. Ein Cloudflare-Schutz ist eine
 bewusste Entscheidung des Betreibers, und festicket benennt ClaudeBot sogar
 namentlich — daran hält sich der Scraper.
 
+**Bandverweise gegen Menüpunkte.** Bei festivalhopper stehen die Bands als
+einzelne Verweise auf der Seite — das Menü aber auch: „Bands", „Bands A-Z",
+„Bands Genres", „Bands Länder" und „Headliner" führten als Acts in 683 Lineups.
+Die Bandkarten liegen unter `/bands/karten/`, die Menüpunkte unter kürzeren
+`/bands/`-Adressen; danach unterscheidet der Scraper.
+
 ## Das Datenblatt der Quellseiten
 
 festivalsunited legt jeder Detailseite ein maschinenlesbares Datenblatt bei
@@ -419,7 +425,7 @@ Cron-Job, kein Serverdienst.
 
 ## Abgleich
 
-**Festivals** werden in vier Stufen zusammengeführt: exakt über Name + Jahr + Stadt,
+**Festivals** werden in sechs Stufen zusammengeführt: exakt über Name + Jahr + Stadt,
 dann über eindeutige Quellenpaare zu Name + Jahr, dann über gleiche Stadt +
 gleichen Starttermin + gemeinsamen Namensbestandteil bei verschiedenen Quellen.
 Die dritte Stufe fängt Fälle wie „Kosmos Festival" gegen „Kosmos Festival Chemnitz"
@@ -436,6 +442,27 @@ stecken („Neuborn" in „NOAF Neuborn") oder beide ohne Leerzeichen gleich sei
 nicht, sonst verschmölzen „METAStadt Open Air Wien" und „Afrika Tage Wien" über die
 Stadt im Namen. Beim Verbinden gelten der früheste Beginn und das späteste Ende, weil
 die Quellen unterschiedliche Teile derselben Veranstaltung beschreiben.
+
+Der Ort dieser Stufe ist nicht nur die Gemeinde, sondern auch die **Spielstätte**:
+Beim „Kein Bock auf Nazis Festival" nennt festivalhopper die Burg Lichtenberg als
+Ort, die drei anderen Quellen die Gemeinde Thallichtenberg — zusammen mit dem um
+einen Tag versetzten Termin fanden sich die Einträge sonst nie.
+
+Die fünfte Stufe fängt **abweichende Schreibweisen** desselben Namens ab
+(„Sonne Mond Sterne" gegen „SonneMondSterne", „Elb Riot" gegen „Elbriot"). Verlangt
+werden derselbe Ort, ein überlappender Zeitraum, getrennte Quellen und eine
+Ähnlichkeit von 82 % über den zusammengezogenen Namen; unter sechs Zeichen greift
+die Regel gar nicht, sonst zöge sie Kurznamen zusammen.
+
+Die sechste Stufe verbindet Einträge, zu denen eine Quelle **noch keinen Termin**
+kennt. Solche Einträge haben kein Jahr und können deshalb nicht nach Jahrgang
+gruppiert werden — gesucht wird über den zusammengezogenen Namen, und stehen
+mehrere Jahrgänge zur Wahl, gewinnt der früheste Termin. Die terminlose Seite trägt
+im Ortsfeld häufig die Spielstätte („Festung Rosenberg" statt Kronach), deshalb wird
+auch gegen die Spielstätte des datierten Eintrags verglichen. Die Quellen dürfen sich
+hier überschneiden: Eine terminlose Seite ist die Übersichtsseite des Festivals, kein
+zweites Fest am selben Ort. Bleiben mehrere terminlose Einträge desselben Festivals
+übrig, werden auch sie zusammengelegt.
 
 Die erste Stufe im Detail: Der Name wird dafür
 normalisiert (Umlaute, Artikel, Jahreszahl und die Wörter „Festival/Open Air" fallen weg).
@@ -455,6 +482,20 @@ Schreibung gewinnt für die Anzeige die getrennte Variante.
 **Bandnamen** laufen durch denselben Normalisierer (Groß-/Kleinschreibung, Akzente,
 `&`/`and`, führendes „The", Satzzeichen). Je Gruppe gewinnt die häufigste Schreibweise
 und ersetzt alle übrigen.
+
+**Kürzel** stehen in `data/band_aliase.json` (TBS → The Butcher Sisters, ADTR → A Day
+to Remember, SOAD → System of a Down …). Sie wirken an zwei Stellen: Beim Einlesen
+bekommt das Kürzel denselben Schlüssel wie der ausgeschriebene Name, sodass beide
+Schreibweisen zu einem Act verschmelzen; im Suchfeld der Seite findet zusätzlich jedes
+Kürzel seine Band, und der Treffer weist das Kürzel aus („auch TBS").
+
+Ein Kürzel kann aber selbst ein Bandname sein. Entscheidend ist deshalb nicht, ob es
+im Programm vorkommt, sondern ob Kürzel und ausgeschriebener Name je **auf demselben
+Festival** stehen: „TBS" und „The Butcher Sisters" teilen sich drei Plakate, das ist
+dieselbe Band. „LP" und Linkin Park teilen sich kein einziges — das ist die Sängerin
+LP, und für sie bleibt das Kürzel in den Daten unangetastet; die Suche zeigt dann
+beide. Geprüft wird je Festival, nicht je Quellseite: Die beiden Schreibweisen stehen
+oft auf den Seiten verschiedener Quellen und treffen sich erst beim Zusammenführen.
 
 ## Was in den Quellen wirklich fehlt
 

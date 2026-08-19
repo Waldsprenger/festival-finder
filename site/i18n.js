@@ -602,6 +602,12 @@ window.I18N = {
       ru: 'Ищи, нажимай, выбирай. Второй клик по <b>×2</b> удваивает вес группы — она считается вдвойне при подсчёте совпадения.',
       tr: 'Ara, tıkla, seç. <b>×2</b> üzerine ikinci tıklama grubu iki kat sayar — eşleşmede ağırlığı ikiye katlanır.',
     },
+    'bands.alsoKnown': {
+      de: ' · auch {kurz}', en: ' · also {kurz}', fr: ' · aussi {kurz}',
+      es: ' · también {kurz}', it: ' · anche {kurz}', nl: ' · ook {kurz}',
+      pl: ' · także {kurz}', pt: ' · também {kurz}', ru: ' · также {kurz}',
+      tr: ' · ayrıca {kurz}',
+    },
     'bands.searchLabel': {
       de: 'Band suchen', en: 'Search band', fr: 'Chercher un groupe',
       es: 'Buscar grupo', it: 'Cerca band', nl: 'Band zoeken',

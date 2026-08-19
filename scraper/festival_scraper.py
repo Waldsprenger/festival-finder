@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import concurrent.futures as cf
+import difflib
 import hashlib
 import json
 import re
@@ -184,13 +185,23 @@ def _fold(value: str) -> str:
 # Vorsicht bei Kuerzeln: "TBS" ist hier belegt, weil das Zeltfestival Ruhr beide
 # Schreibweisen im selben Lineup fuehrt - anderswo kann dasselbe Kuerzel eine
 # andere Band meinen.
+def _band_schluessel(name: str) -> str:
+    """Schluessel wie in band_key, aber ohne Aliasaufloesung (sonst kreist es)."""
+    k = _fold(name)
+    eng = k.replace(" ", "")
+    return eng if len(eng) >= 5 else k
+
+
 def _lade_aliase() -> tuple[dict[str, str], dict[str, str]]:
     pfad = OUT / "band_aliase.json"
     if not pfad.exists():
         return {}, {}
     roh = json.loads(pfad.read_text(encoding="utf-8"))
     schluessel = {_fold(k): v for k, v in roh.items()}
-    ziele = {_fold(v): v for v in roh.values()}
+    # Der Zielname muss unter demselben Schluessel stehen, den band_key
+    # spaeter bildet - sonst gewinnt bei "Linkin Park" wieder die
+    # Mehrheitsschreibweise statt der hinterlegten.
+    ziele = {_band_schluessel(v): v for v in roh.values()}
     return schluessel, ziele
 
 
@@ -960,10 +971,12 @@ def fh_parse_detail(url: str, html: str) -> dict | None:
     if preis and not re.search(r"\d", preis):
         preis = ""
 
-    # Bandnamen stehen als einzelne Verweise - kein Raten noetig
+    # Bandnamen stehen als einzelne Verweise - kein Raten noetig. Die
+    # Bandkarten liegen unter /bands/karten/; die kuerzeren /bands/-Adressen
+    # sind die Menuepunkte der Seite ("Bands A-Z", "Headliner").
     bands = []
     for a in s.find_all("a", href=True):
-        if "/bands/" in a["href"]:
+        if "/bands/karten/" in a["href"]:
             nm = clean(a.get_text())
             if valid_band(nm):
                 bands.append(nm)
@@ -1442,6 +1455,43 @@ def scrape(urls: list[str], parser, label: str, seeds: dict | None = None) -> li
     return results
 
 
+def alias_kollisionen(records: list[dict]) -> list[str]:
+    """Kuerzel abschalten, die eine andere Band meinen.
+
+    Steht ein Kuerzel selbst im Programm, gibt es zwei Moeglichkeiten. Bei
+    "TBS" fuehren alle drei betroffenen Festivals zugleich The Butcher Sisters
+    auf - dieselbe Band, zweimal geschrieben, das Kuerzel gehoert also
+    aufgeloest. "LP" dagegen teilt sich mit Linkin Park kein einziges Lineup:
+    Das ist die Saengerin LP, und ein Alias wuerde acht Eintraege umbenennen.
+
+    Entscheidend ist deshalb nicht das blosse Vorkommen, sondern ob Kuerzel und
+    ausgeschriebener Name je gemeinsam auf einem Plakat stehen. Fuer die Suche
+    auf der Webseite bleiben alle Kuerzel nutzbar - dort erscheinen dann beide.
+    """
+    # Nach Festival buendeln: Die beiden Schreibweisen stehen oft auf den
+    # Seiten verschiedener Quellen und treffen sich erst hier.
+    programme: dict[tuple[str, str], set[str]] = {}
+    for rec in records:
+        schluessel = (festival_key(rec["name"]), rec.get("year", ""))
+        programme.setdefault(schluessel, set()).update(_fold(b) for b in rec["lineup"])
+
+    kollidiert = []
+    for kurz, voll in list(ALIAS_KEY.items()):
+        voll_gefaltet = _fold(voll)
+        allein = zusammen = False
+        for namen in programme.values():
+            if kurz not in namen:
+                continue
+            if voll_gefaltet in namen:
+                zusammen = True
+                break
+            allein = True
+        if allein and not zusammen:
+            ALIAS_KEY.pop(kurz)
+            kollidiert.append(kurz)
+    return sorted(kollidiert)
+
+
 def build_band_registry(records: list[dict]) -> tuple[dict[str, str], dict]:
     variants: dict[str, list[str]] = {}
     for rec in records:
@@ -1504,6 +1554,51 @@ def zeitraum_ueberlappt(a: dict, b: dict) -> bool:
         return False
     a1, b1 = tag_zahl(a["date_to"]) or a0, tag_zahl(b["date_to"]) or b0
     return a0 <= b1 and b0 <= a1
+
+
+FELDER = ("date_from", "date_to", "city", "country", "venue", "plz",
+          "location", "price", "website", "visitors", "note")
+
+
+def verschmelzen(keep: dict, drop: dict, spanne: bool = False) -> None:
+    """Zwei Eintraege zu einem: fehlende Angaben, Genres, Quellen, Lineups.
+
+    Mit spanne=True gelten der frueheste Beginn und das spaeteste Ende - die
+    Quellen zaehlen Anreise- und Aufbautage verschieden.
+    """
+    for feld in FELDER:
+        if not keep.get(feld) and drop.get(feld):
+            keep[feld] = drop[feld]
+    if spanne:
+        if tag_zahl(drop["date_from"]) and (
+                not tag_zahl(keep["date_from"])
+                or tag_zahl(drop["date_from"]) < tag_zahl(keep["date_from"])):
+            keep["date_from"] = drop["date_from"]
+        if tag_zahl(drop["date_to"]) > tag_zahl(keep["date_to"]):
+            keep["date_to"] = drop["date_to"]
+    keep["genre"] = genre_merge(keep["genre"], drop["genre"])
+    if keep["lat"] is None and drop["lat"] is not None:
+        keep["lat"], keep["lon"] = drop["lat"], drop["lon"]
+    keep["cancelled"] = keep["cancelled"] or drop["cancelled"]
+    keep["sources"].update(drop["sources"])
+    keep["_bands"].update(drop["_bands"])
+
+
+def schreibweise_gleich(a: str, b: str) -> bool:
+    """Meinen zwei Namen dasselbe, nur anders geschrieben?
+
+    "Sonne Mond Sterne" und "SonneMondSterne", "Kunst!Rasen" und "Kunstrasen
+    Bonn", "Sziget" und "Szigit" - Leerzeichen, Satzzeichen und Tippfehler
+    trennen sonst Eintraege, die zusammengehoeren. Verglichen wird der
+    Namensschluessel ohne Leerzeichen; ein Rumpf von sechs Zeichen schuetzt
+    kurze Namen wie "Wutz" vor Zufallstreffern.
+    """
+    x, y = festival_key(a).replace(" ", ""), festival_key(b).replace(" ", "")
+    if len(x) < 6 or len(y) < 6:
+        return False
+    if x == y or x.startswith(y) or y.startswith(x):
+        return True
+    return difflib.SequenceMatcher(None, x, y).ratio() >= 0.82
 
 
 def name_deckt_sich(ka: str, kb: str) -> bool:
@@ -1609,16 +1704,7 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
         group = sorted(group, key=lambda kr: kr[1]["source_order"])
         _, keep = group[0]
         for drop_key, drop in group[1:]:
-            for field in ("date_from", "date_to", "city", "country", "venue",
-                          "location", "price", "website", "visitors", "note"):
-                if not keep[field] and drop[field]:
-                    keep[field] = drop[field]
-            keep["genre"] = genre_merge(keep["genre"], drop["genre"])
-            if keep["lat"] is None and drop["lat"] is not None:
-                keep["lat"], keep["lon"] = drop["lat"], drop["lon"]
-            keep["cancelled"] = keep["cancelled"] or drop["cancelled"]
-            keep["sources"].update(drop["sources"])
-            keep["_bands"].update(drop["_bands"])
+            verschmelzen(keep, drop)
             merged.pop(drop_key, None)
 
     # Stufe 3: gleiche Veranstaltung, unterschiedlich benannt.
@@ -1662,16 +1748,7 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
                         continue
                 keep, drop, drop_key = ((a, b, kb) if a["source_order"] <= b["source_order"]
                                         else (b, a, ka))
-                for field in ("date_from", "date_to", "city", "country", "venue",
-                              "location", "price", "website", "visitors", "note"):
-                    if not keep[field] and drop[field]:
-                        keep[field] = drop[field]
-                keep["genre"] = genre_merge(keep["genre"], drop["genre"])
-                if keep["lat"] is None and drop["lat"] is not None:
-                    keep["lat"], keep["lon"] = drop["lat"], drop["lon"]
-                keep["cancelled"] = keep["cancelled"] or drop["cancelled"]
-                keep["sources"].update(drop["sources"])
-                keep["_bands"].update(drop["_bands"])
+                verschmelzen(keep, drop)
                 merged.pop(drop_key, None)
                 if drop_key == ka:
                     break
@@ -1685,8 +1762,15 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
     # vollstaendig im anderen steckt.
     orte: dict[tuple[str, str], list[tuple]] = {}
     for key, rec in merged.items():
-        if rec["date_from"] and rec["city"]:
-            orte.setdefault((rec["year"], city_key(rec["city"])), []).append((key, rec))
+        if not (rec["date_from"] and rec["city"]):
+            continue
+        # Auch unter der Spielstaette einsortieren: Beim "Kein Bock auf Nazis
+        # Festival" nennt festivalhopper die Burg Lichtenberg als Ort, die
+        # anderen Quellen die Gemeinde Thallichtenberg - ohne diesen zweiten
+        # Schluessel treffen sich die beiden Eintraege nie.
+        for ort in {city_key(rec["city"]), city_key(rec["venue"])}:
+            if ort:
+                orte.setdefault((rec["year"], ort), []).append((key, rec))
 
     for group in orte.values():
         if len(group) < 2:
@@ -1707,27 +1791,112 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
                     continue
                 keep, drop, drop_key = ((a, b, kb) if a["source_order"] <= b["source_order"]
                                         else (b, a, ka))
-                for field in ("date_from", "date_to", "city", "country", "venue",
-                              "location", "price", "website", "visitors", "note"):
-                    if not keep[field] and drop[field]:
-                        keep[field] = drop[field]
-                # Der frueheste Beginn und das spaeteste Ende gelten: die Quellen
-                # nennen unterschiedliche Teile desselben Festivals.
-                if tag_zahl(drop["date_from"]) and (
-                        not tag_zahl(keep["date_from"])
-                        or tag_zahl(drop["date_from"]) < tag_zahl(keep["date_from"])):
-                    keep["date_from"] = drop["date_from"]
-                if tag_zahl(drop["date_to"]) > tag_zahl(keep["date_to"]):
-                    keep["date_to"] = drop["date_to"]
-                keep["genre"] = genre_merge(keep["genre"], drop["genre"])
-                if keep["lat"] is None and drop["lat"] is not None:
-                    keep["lat"], keep["lon"] = drop["lat"], drop["lon"]
-                keep["cancelled"] = keep["cancelled"] or drop["cancelled"]
-                keep["sources"].update(drop["sources"])
-                keep["_bands"].update(drop["_bands"])
+                verschmelzen(keep, drop, spanne=True)
                 merged.pop(drop_key, None)
                 if drop_key == ka:
                     break
+
+    # Stufe 5: derselbe Name, andere Schreibweise. "Sonne Mond Sterne" und
+    # "SonneMondSterne", "Kunst!Rasen" und "Kunstrasen Bonn", "Sziget" und
+    # "Szigit" - mit acht Quellen treffen solche Varianten regelmaessig
+    # aufeinander. Gefordert sind derselbe Ort, ein ueberlappender Zeitraum und
+    # getrennte Quellen; der Ortsvergleich haelt gleichnamige Feste in anderen
+    # Staedten auseinander.
+    orte2: dict[tuple[str, str], list[tuple]] = {}
+    for key, rec in merged.items():
+        teile = key[2].split()
+        if teile and rec["date_from"]:
+            orte2.setdefault((rec["year"], teile[0]), []).append((key, rec))
+
+    for group in orte2.values():
+        if len(group) < 2:
+            continue
+        for i in range(len(group)):
+            ka, a = group[i]
+            if ka not in merged:
+                continue
+            for j in range(i + 1, len(group)):
+                kb, b = group[j]
+                if kb not in merged or ka not in merged:
+                    continue
+                if set(a["sources"]) & set(b["sources"]):
+                    continue
+                sa, sb = ka[2], kb[2]
+                if not (sa == sb or sa.startswith(sb + " ") or sb.startswith(sa + " ")):
+                    continue
+                if not zeitraum_ueberlappt(a, b):
+                    continue
+                if not schreibweise_gleich(a["name"], b["name"]):
+                    continue
+                keep, drop, drop_key = ((a, b, kb) if a["source_order"] <= b["source_order"]
+                                        else (b, a, ka))
+                verschmelzen(keep, drop, spanne=True)
+                merged.pop(drop_key, None)
+                if drop_key == ka:
+                    break
+
+    # Stufe 6: eine Quelle kennt noch keinen Termin.
+    # Terminlose Eintraege haben kein Jahr, koennen also nicht nach Jahrgang mit
+    # ihrem datierten Zwilling gruppiert werden - genau daran blieben "Die
+    # Festung Rockt" und "Elbriot Festival" doppelt haengen. Gesucht wird
+    # deshalb ueber den zusammengezogenen Namen, und wenn mehrere Jahrgaenge in
+    # Frage kommen, gewinnt der fruehste Termin.
+    # Die Quellen duerfen sich hier ueberschneiden: Eine terminlose Seite ist
+    # die Uebersichtsseite des Festivals, kein zweites Fest am selben Ort.
+    def _ort_passt(mit: dict, ohne: dict) -> bool:
+        sa, sb = city_key(mit["city"]), city_key(ohne["city"])
+        if not sb:
+            return False
+        if sa and (sa == sb or sa in sb or sb in sa):
+            return True
+        # Die terminlose Seite traegt oft die Spielstaette im Ortsfeld
+        # ("Festung Rosenberg" statt Kronach).
+        v = city_key(mit["venue"])
+        return bool(v and (v == sb or v in sb or sb in v))
+
+    def _eng(k: str) -> str:
+        return k.replace(" ", "")
+
+    datiert: dict[str, list[tuple]] = {}
+    for key, rec in merged.items():
+        if rec["date_from"]:
+            datiert.setdefault(_eng(key[0])[:5], []).append((key, rec))
+
+    def _tag(rec: dict) -> str:
+        d = rec["date_from"]
+        return d[6:10] + d[3:5] + d[0:2]
+
+    for ohne_key in [k for k, r in merged.items() if not r["date_from"]]:
+        ohne = merged.get(ohne_key)
+        if ohne is None:
+            continue
+        eng = _eng(ohne_key[0])
+        treffer = [(k, r) for k, r in datiert.get(eng[:5], [])
+                   if k in merged
+                   and (_eng(k[0]) == eng or schreibweise_gleich(r["name"], ohne["name"]))
+                   and _ort_passt(r, ohne)]
+        if not treffer:
+            continue
+        _, mit = min(treffer, key=lambda kr: _tag(kr[1]))
+        verschmelzen(mit, ohne)
+        merged.pop(ohne_key, None)
+
+    # Bleiben mehrere terminlose Eintraege desselben Festivals uebrig - etwa
+    # weil noch kein Jahrgang datiert ist - werden auch sie zusammengelegt.
+    offen: dict[str, list[tuple]] = {}
+    for key, rec in merged.items():
+        if not rec["date_from"]:
+            offen.setdefault(_eng(key[0]), []).append((key, rec))
+
+    for group in offen.values():
+        if len(group) < 2:
+            continue
+        group = sorted(group, key=lambda kr: kr[1]["source_order"])
+        _, keep = group[0]
+        for drop_key, drop in group[1:]:
+            if city_key(keep["city"]) == city_key(drop["city"]):
+                verschmelzen(keep, drop)
+                merged.pop(drop_key, None)
 
     out = []
     for rec in merged.values():
@@ -1836,6 +2005,10 @@ def main() -> None:
     records += scrape(ff_links, ff_parse_detail, "festivalfinder")
     print(f"Datensaetze: {len(records)}", flush=True)
 
+    doppelt = alias_kollisionen(records)
+    if doppelt:
+        print(f"  Kuerzel als eigener Act im Programm, Alias bleibt aus: "
+              f"{', '.join(x.upper() for x in doppelt)}")
     registry, bstats = build_band_registry(records)
     festivals = merge(records, registry)
 

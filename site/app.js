@@ -122,6 +122,17 @@
   };
   const bandsFolded = BANDS.map(fold);
 
+  /* Kuerzel und Zweitschreibweisen: In den Daten steht der ausgeschriebene
+     Name, gesucht wird aber auch nach der Abkuerzung. "TBS" führt deshalb zu
+     The Butcher Sisters - angezeigt wird immer der ausgeschriebene Name, mit
+     dem Kürzel als Hinweis dahinter. */
+  const ALIAS = (D.bandAlias || []).map(([text, i]) => [fold(text), text, i]);
+  const aliasVonBand = new Map();
+  for (const [, text, i] of ALIAS) {
+    if (!aliasVonBand.has(i)) aliasVonBand.set(i, []);
+    aliasVonBand.get(i).push(text);
+  }
+
   /* ---------------- Entfernung ---------------- */
 
   function haversine(aLat, aLon, bLat, bLon) {
@@ -642,6 +653,14 @@
       else if (pos > 0) contains.push(i);
       if (starts.length > 400) break;
     }
+    // Kürzel zählen wie ein Namenstreffer, doppelte fallen weg
+    for (const [gefaltet, , i] of ALIAS) {
+      const pos = gefaltet.indexOf(term);
+      if (pos < 0) continue;
+      if (!starts.includes(i) && !contains.includes(i)) {
+        (pos === 0 ? starts : contains).push(i);
+      }
+    }
     const hits = starts.concat(contains);
     hits.sort((a, b) => bandFreq[b] - bandFreq[a] || BANDS[a].localeCompare(BANDS[b], sprache));
     const show = hits.slice(0, 80);
@@ -658,6 +677,12 @@
       const li = document.createElement('li');
       const label = document.createElement('span');
       label.textContent = BANDS[i];
+      if (aliasVonBand.has(i)) {
+        const kurz = document.createElement('span');
+        kurz.className = 'alias';
+        kurz.textContent = t('bands.alsoKnown', { kurz: aliasVonBand.get(i).join(', ') });
+        label.append(kurz);
+      }
       const cnt = document.createElement('span');
       cnt.className = 'cnt';
       cnt.textContent = bandFreq[i] === 1
