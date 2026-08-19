@@ -120,9 +120,12 @@ Von 60 Festivals ohne Preis nannten nur zwei offizielle Seiten einen Preis in
 maschinenlesbarer Form.
 
 Daraus folgt: Ein automatischer Abgleich taugt **nicht** als Datenquelle, weil
-neun von zehn Veranstalterseiten nichts Maschinenlesbares anbieten. Als
-Stichprobe zur Kontrolle ist er nuetzlich, und genau dafuer liegt das Skript
-bei.
+neun von zehn Veranstalterseiten nichts Maschinenlesbares anbieten. Hinzu
+kommt, dass die Datumsangaben dort oft gar nicht das Festival selbst meinen,
+sondern Vorverkaufsstarts, Nebenveranstaltungen oder Nachrichten. **Bei einer
+Abweichung gilt deshalb der Bestand, nicht die Veranstalterseite** - das Skript
+liegt als Stichprobe zur Kontrolle bei, seine Meldungen sind Hinweise zum
+Nachsehen und keine Korrekturen.
 
 ## Neu erzeugen
 
