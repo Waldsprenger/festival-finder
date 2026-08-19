@@ -110,6 +110,15 @@ Davon bestaetigten vier unseren Termin; die zwei Abweichungen loesten sich beim
 Nachsehen auf — die Seiten zeigten bereits die naechste Ausgabe, die wir als
 eigenen Eintrag ebenfalls fuehren, mit uebereinstimmendem Datum.
 
+Ein zweiter, groesserer Lauf ueber 120 Festivals bestaetigte das Bild: 83 Seiten
+nennen kein Datum des Jahrgangs, 8 waren nicht erreichbar, 7 bestaetigten
+unseren Termin maschinenlesbar — und **kein einziges Datenblatt widersprach**.
+Die 18 Faelle, in denen nur der Fliesstext abweicht, sind ueberwiegend
+Nebenwirkungen der Suche: Auf Veranstalterseiten stehen Vorverkaufsstarts,
+Nachrichten und Termine anderer Jahrgaenge im selben Text. Ebenfalls geprueft:
+Von 60 Festivals ohne Preis nannten nur zwei offizielle Seiten einen Preis in
+maschinenlesbarer Form.
+
 Daraus folgt: Ein automatischer Abgleich taugt **nicht** als Datenquelle, weil
 neun von zehn Veranstalterseiten nichts Maschinenlesbares anbieten. Als
 Stichprobe zur Kontrolle ist er nuetzlich, und genau dafuer liegt das Skript
@@ -375,6 +384,31 @@ Schreibung gewinnt für die Anzeige die getrennte Variante.
 **Bandnamen** laufen durch denselben Normalisierer (Groß-/Kleinschreibung, Akzente,
 `&`/`and`, führendes „The", Satzzeichen). Je Gruppe gewinnt die häufigste Schreibweise
 und ersetzt alle übrigen.
+
+## Was in den Quellen wirklich fehlt
+
+Eine Prüfung über alle 4.269 Festivals, Feld für Feld gegen die
+zwischengespeicherten Quellseiten: Bei jedem fehlenden Wert wurde die Seite
+nach einem Beleg durchsucht.
+
+| Feld | fehlt | steht doch auf der Seite |
+|---|---|---|
+| Besucherzahl | 1.583 | 0 |
+| Lineup | 1.453 | — Quelle führt keins |
+| Spielstätte | 892 | 129-mal nur der Festivalname selbst |
+| Postleitzahl | 522 | 0 |
+| Termin | 459 | nur Termine *vergangener* Ausgaben |
+| Preis | 357 | 2 |
+| Genre | 320 | 0 |
+| Ort | 248 | 16 |
+| Webseite | 38 | 0 — die Seiten verlinken nur Bildnachweise und Werbung |
+
+Die Quellen sind damit ausgeschöpft. Zwei Punkte sind erklärungsbedürftig:
+Die 459 Einträge ohne Termin nennen auf ihrer Seite sehr wohl ein Datum — das
+der **letzten** Ausgabe. Der Scraper übernimmt es bewusst nicht, sondern
+vermerkt es als Hinweis, sonst stünden vergangene Termine als kommende in der
+Liste. Und die 129 unterdrückten Spielstätten tragen im Datenblatt nur den
+Festivalnamen, sagen als Ortsangabe also nichts.
 
 ## Bekannte Grenzen
 
