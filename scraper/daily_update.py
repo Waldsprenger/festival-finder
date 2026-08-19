@@ -1,10 +1,16 @@
 """Taeglicher Datenlauf: scrapen, neue Orte geokodieren, Seite neu bauen.
 
-    python scraper/daily_update.py
+    python scraper/daily_update.py            # taeglich: nur Aelteres nachladen
+    python scraper/daily_update.py --frisch   # woechentlich: alles neu holen
 
-Schreibt ein Protokoll nach data/update.log. Der Scraper laedt nur Seiten neu,
-deren Cache aelter als 24 Stunden ist; die Geokodierung fragt ausschliesslich
-Orte an, die noch nicht im Cache stehen.
+Schreibt ein Protokoll nach data/update.log. Im Regelfall laedt der Scraper nur
+Seiten neu, deren Cache aelter als 24 Stunden ist; die Geokodierung fragt
+ausschliesslich Orte an, die noch nicht im Cache stehen.
+
+Mit --frisch wird jede Seite neu abgerufen und anschliessend geloescht, was der
+Lauf nicht angefasst hat. Das haelt den Zwischenspeicher aktuell: Stille
+Korrekturen der Quellen - ein verschobener Termin, ein nachgetragener Act -
+kaemen sonst erst an, wenn die Seite von sich aus wieder abgerufen wird.
 """
 
 from __future__ import annotations
@@ -18,8 +24,11 @@ from pathlib import Path
 BASE = Path(__file__).resolve().parent.parent
 LOG = BASE / "data" / "update.log"
 
+FRISCH = "--frisch" in sys.argv[1:]
+
 STEPS = [
-    ("Festivaldaten", [sys.executable, "scraper/festival_scraper.py", "--max-age", "24"]),
+    ("Festivaldaten", [sys.executable, "scraper/festival_scraper.py", "--max-age", "24"]
+                      + (["--frisch"] if FRISCH else [])),
     ("Ortskoordinaten", [sys.executable, "scraper/geocode.py"]),
     # Die folgenden drei Datensaetze aendern sich kaum und laufen aus dem Cache.
     # Sie stehen trotzdem hier, damit ein frischer Klon vollstaendig baut.
@@ -36,7 +45,8 @@ STEPS = [
 
 def main() -> int:
     started = datetime.now()
-    lines = [f"=== Lauf {started:%Y-%m-%d %H:%M} ==="]
+    art = "frischer Lauf" if FRISCH else "Lauf"
+    lines = [f"=== {art} {started:%Y-%m-%d %H:%M} ==="]
     failed = 0
 
     for label, cmd in STEPS:

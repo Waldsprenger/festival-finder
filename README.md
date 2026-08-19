@@ -161,7 +161,8 @@ python scraper/build_artifact.py  # erzeugt site/artifact.html (Einzeldatei)
 Täglicher Sammellauf für alle Schritte:
 
 ```bash
-python scraper/daily_update.py
+python scraper/daily_update.py            # nur Veraltetes nachladen
+python scraper/daily_update.py --frisch   # jede Seite neu holen
 ```
 
 Danach `site/index.html` im Browser öffnen — die Seite läuft ohne Server. Weil
@@ -338,9 +339,23 @@ git push -u origin main
 
 Danach im Repository unter **Settings → Pages → Source** den Eintrag
 *GitHub Actions* wählen. Der Workflow [.github/workflows/update.yml](.github/workflows/update.yml)
-läuft anschließend täglich um 03:17 UTC, lässt sich unter *Actions* aber auch
-jederzeit von Hand starten. Er hält Seiten- und Geo-Cache über Läufe hinweg,
-sodass pro Tag nur wirklich Geändertes neu abgerufen wird.
+hält Seiten- und Geo-Cache über Läufe hinweg und kennt zwei Zeitpläne:
+
+| Wann | Was |
+|---|---|
+| Mo–Sa 03:17 UTC | nur Seiten neu holen, deren Zwischenspeicher älter als 24 Stunden ist |
+| So 02:17 UTC | `--frisch`: **jede** Seite neu abrufen und verwaisten Cache löschen |
+
+Der wöchentliche Komplettabruf ist nötig, weil die Quellen still korrigieren:
+Ein verschobener Termin oder ein nachgetragener Act käme sonst erst an, wenn
+die Seite ohnehin wieder abgerufen wird. Anschließend fallen Cachedateien weg,
+die seit einer Woche niemand angefasst hat — sie gehören zu Festivals, die es
+in den Quellen nicht mehr gibt. Die Wochenfrist ist Absicht: Eine Seite, die
+an diesem Tag nicht antwortet, behält ihren alten Stand und fällt nicht gleich
+heraus.
+
+Von Hand startbar ist beides unter *Actions*; dort schaltet das Feld
+*Alles neu abrufen* den frischen Lauf ein.
 
 Warum nicht Streamlit: Streamlit Community Cloud ist für Python-Apps mit
 Serverprozess gedacht. Diese Seite ist reines HTML/JS, bräuchte also einen

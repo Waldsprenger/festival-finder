@@ -1,10 +1,22 @@
 name: Tägliche Aktualisierung
 
 # Läuft auf GitHub-Servern - unabhängig davon, ob der eigene Rechner an ist.
+#
+# Zwei Zeitpläne: Werktags werden nur Seiten neu geholt, deren Zwischenspeicher
+# älter als 24 Stunden ist. Sonntagnacht läuft derselbe Weg mit --frisch, holt
+# also jede Seite neu und löscht anschließend, was der Lauf nicht angefasst hat.
+# Ohne das blieben stille Korrekturen der Quellen unbemerkt und der Speicher
+# würde mit jedem verschwundenen Festival weiterwachsen.
 on:
   schedule:
-    - cron: "17 3 * * *"        # täglich 03:17 UTC (04:17 bzw. 05:17 deutscher Zeit)
+    - cron: "17 3 * * 1-6"      # Mo-Sa 03:17 UTC (04:17 bzw. 05:17 deutscher Zeit)
+    - cron: "17 2 * * 0"        # sonntags 02:17 UTC: kompletter Neuabruf
   workflow_dispatch:             # zusätzlich jederzeit von Hand startbar
+    inputs:
+      frisch:
+        description: "Alles neu abrufen statt nur Veraltetes"
+        type: boolean
+        default: false
   push:
     branches: [main]
 
@@ -45,8 +57,21 @@ jobs:
           key: festival-cache-${{ github.run_id }}
           restore-keys: festival-cache-
 
+      # Sonntags (oder auf Wunsch beim Handstart) jede Seite neu holen
+      - name: Laufart bestimmen
+        id: art
+        run: |
+          if [ "${{ github.event.schedule }}" = "17 2 * * 0" ] \
+             || [ "${{ inputs.frisch }}" = "true" ]; then
+            echo "frisch=--frisch" >> "$GITHUB_OUTPUT"
+            echo "Kompletter Neuabruf"
+          else
+            echo "frisch=" >> "$GITHUB_OUTPUT"
+            echo "Nur Veraltetes nachladen"
+          fi
+
       - name: Festivaldaten einsammeln
-        run: python scraper/festival_scraper.py --max-age 24
+        run: python scraper/festival_scraper.py --max-age 24 ${{ steps.art.outputs.frisch }}
 
       - name: Neue Orte geokodieren
         run: python scraper/geocode.py

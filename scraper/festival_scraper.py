@@ -78,13 +78,14 @@ def session() -> requests.Session:
 
 
 MAX_AGE_H = 24.0     # per --max-age gesetzt; aelterer Cache wird neu geladen
+FRISCH = False       # per --frisch: Cache beim Lesen uebergehen
 
 
 def fetch(url: str, retries: int = 3) -> str | None:
     """GET mit Plattencache; gibt None zurueck, wenn die Seite nicht ladbar ist."""
     key = hashlib.sha1(url.encode()).hexdigest() + ".html"
     path = CACHE / key
-    if path.exists() and path.stat().st_size > 0:
+    if not FRISCH and path.exists() and path.stat().st_size > 0:
         age_h = (time.time() - path.stat().st_mtime) / 3600
         if MAX_AGE_H <= 0 or age_h < MAX_AGE_H:
             return path.read_text(encoding="utf-8", errors="replace")
@@ -105,6 +106,25 @@ def fetch(url: str, retries: int = 3) -> str | None:
                 return None
             time.sleep(2.0 * (attempt + 1))
     return None
+
+
+def cache_aufraeumen(seit: float) -> tuple[int, float]:
+    """Cachedateien loeschen, die seit "seit" niemand angefasst hat.
+
+    Nach einem frischen Lauf ist jede noch verlinkte Seite gerade neu
+    geschrieben worden. Was deutlich aelter ist, gehoert zu Festivals, die es in
+    den Quellen nicht mehr gibt - der Speicher wuechse sonst mit jedem Jahrgang.
+    Die Frist von einer Woche ist Absicht: Eine Seite, die heute nicht
+    antwortet, behaelt ihren alten Stand und faellt nicht gleich heraus.
+    """
+    weg = 0
+    bytes_frei = 0.0
+    for datei in CACHE.glob("*.html"):
+        if datei.stat().st_mtime < seit:
+            bytes_frei += datei.stat().st_size
+            datei.unlink()
+            weg += 1
+    return weg, bytes_frei / 1e6
 
 
 def soup(html: str) -> BeautifulSoup:
@@ -1179,14 +1199,19 @@ def main() -> None:
     ap.add_argument("--limit", type=int, default=0, help="nur N Detailseiten je Quelle")
     ap.add_argument("--max-age", type=float, default=24.0,
                     help="Cache-Alter in Stunden, ab dem neu geladen wird (0 = nie)")
+    ap.add_argument("--frisch", action="store_true",
+                    help="jede Seite neu abrufen und verwaisten Cache loeschen")
     ap.add_argument("--since", type=int, default=date.today().year,
                     help="fruehester Jahrgang; 2006 holt das komplette Archiv")
     args = ap.parse_args()
 
-    global MAX_AGE_H
+    global MAX_AGE_H, FRISCH
     MAX_AGE_H = args.max_age
+    FRISCH = args.frisch
 
     t0 = time.time()
+    if FRISCH:
+        print("Frischer Lauf: der Seitencache wird uebergangen.", flush=True)
     print(f"Sammle Detail-Links ab Jahrgang {args.since} ...", flush=True)
     ft_seeds = ft_collect_seeds(args.since)
     ft_links = list(ft_seeds)
@@ -1223,6 +1248,12 @@ def main() -> None:
     if FAILED:
         print(f"Nicht ladbar: {len(FAILED)} Seiten (siehe data/failed.txt)")
         (OUT / "failed.txt").write_text("\n".join(FAILED), encoding="utf-8")
+    if FRISCH and not args.limit:
+        # Alles Verlinkte wurde soeben geschrieben; was seit einer Woche
+        # niemand angefasst hat, ist verwaist. Bei --limit wird nichts
+        # geloescht - dann war der Lauf ja absichtlich unvollstaendig.
+        weg, mb = cache_aufraeumen(t0 - 7 * 24 * 3600)
+        print(f"Cache aufgeraeumt: {weg} verwaiste Seiten geloescht ({mb:.1f} MB)")
     print(f"Dauer: {time.time() - t0:.0f}s -> {OUT}")
 
 
