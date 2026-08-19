@@ -11,7 +11,7 @@ import json
 import math
 import re
 import sys
-from datetime import date, datetime
+from datetime import datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -300,10 +300,9 @@ def main() -> None:
             f["website"],                                # 8
             lat, lon,                                    # 9, 10
             sorted(bid(b) for b in f["lineup"]),         # 11
-            f["genre"][:70],                             # 12
-            f.get("note", ""),                           # 13
-            1 if f.get("cancelled") else 0,              # 14
-            [genre_ix[k] for k in oberbegriffe(f["genre"])],   # 15
+            f.get("note", ""),                           # 12
+            1 if f.get("cancelled") else 0,              # 13
+            [genre_ix[k] for k in oberbegriffe(f["genre"])],   # 14
         ])
 
     # Ortsverzeichnis fuer die Wohnortsuche. Die veroeffentlichte Fassung darf
@@ -344,7 +343,7 @@ def main() -> None:
                    encoding="utf-8")
 
     priced = sum(1 for r in rows if r[6] is not None)
-    mit_genre = sum(1 for r in rows if r[15])
+    mit_genre = sum(1 for r in rows if r[14])
     print(f"{out}  ({out.stat().st_size / 1e6:.1f} MB)")
     print(f"  Koordinaten aus Postleitzahl: {aus_plz}, aus Ortsname: "
           f"{with_geo - aus_plz - aus_quelle}, aus der Quellseite: {aus_quelle}")

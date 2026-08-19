@@ -28,11 +28,19 @@ daily_update.py      →  führt die Kette aus
 
 Der Scraper enumeriert die Seiten vollständig statt einzelne Listen abzuklappern:
 
-| Quelle | Weg | Umfang |
-|---|---|---|
-| festivalticker.de | alle Listenseiten: Jahres-, Monats-, Länder- und Statusarchive | 2.720 Detailseiten insgesamt |
-| festivalsunited.com | `sitemap.xml` mit Unterkarten je Jahrgang | 16.044 Detailseiten insgesamt |
-| festival-alarm.com | Jahresseiten `/Festivals-JAHR` | 4.750 Detailseiten insgesamt |
+| Quelle | Weg |
+|---|---|
+| festivalticker.de | alle Listenseiten: Jahres-, Monats-, Länder- und Statusarchive plus „Umsonst und draußen" |
+| festivalsunited.com | `sitemap.xml` mit Unterkarten je Jahrgang **und** die 35 europäischen Länderseiten |
+| festival-alarm.com | Jahresseiten `/Festivals-JAHR` **und** die Regionsseiten je Land und Jahr |
+
+Die zweiten Wege sind nicht geraten, sondern nachgemessen: Über die
+Länderseiten von festivalsunited sind 30 Detailseiten erreichbar, die in der
+Sitemap fehlen — darunter das Exit Festival in Novi Sad. Die Regionsseiten von
+festival-alarm bringen vier weitere, die Umsonst-Liste von festivalticker eine.
+Nicht erfasst werden die 5.000 Konzertseiten unter `sitemap-events`: Das sind
+Einzelkonzerte, keine Festivals. Sitemaps haben nur festivalsunited — bei den
+beiden anderen antwortet `/sitemap.xml` mit 404.
 
 Die Jahresliste wächst automatisch mit: Die Obergrenze ist das laufende Jahr
 plus fünf, künftige Jahrgänge wie 2028 werden also ohne Codeänderung erfasst.
@@ -71,8 +79,8 @@ Festival" sagt. Beim Reload Festival 2027 stand deshalb die Sammelkategorie, wo
 die Seite Rock, Metal und Punk auffuehrt.
 
 Der Gewinn ist betraechtlich: Die Spielstaette fehlte bei 2.438 Festivals,
-jetzt bei 892; ohne Genreangabe waren 797 Festivals, jetzt 320; ohne
-Besucherzahl 2.988, jetzt 1.583. Postleitzahlen kamen so oft dazu, dass die Zahl der ueber die
+jetzt bei 683; ohne Genreangabe waren 797 Festivals, jetzt 322; ohne
+Besucherzahl 2.988, jetzt 1.585. Postleitzahlen kamen so oft dazu, dass die Zahl der ueber die
 Postleitzahl verorteten Festivals von 1.894 auf 2.923 stieg — das ist der
 genauere Weg, weil eine Postleitzahl den Zustellbereich trifft, waehrend ein
 Ortsname erst gefunden werden muss und in den Quellen auch mal „Madgeburg“
@@ -411,15 +419,21 @@ nach einem Beleg durchsucht.
 
 | Feld | fehlt | steht doch auf der Seite |
 |---|---|---|
-| Besucherzahl | 1.583 | 0 |
-| Lineup | 1.453 | — Quelle führt keins |
-| Spielstätte | 892 | 129-mal nur der Festivalname selbst |
+| Besucherzahl | 1.585 | 0 |
+| Lineup | 1.455 | — Quelle führt keins |
+| Spielstätte | 683 | 129-mal nur der Festivalname selbst |
 | Postleitzahl | 522 | 0 |
 | Termin | 459 | nur Termine *vergangener* Ausgaben |
-| Preis | 357 | 2 |
-| Genre | 320 | 0 |
+| Preis | 283 | 2 |
+| Genre | 322 | 0 |
 | Ort | 248 | 16 |
 | Webseite | 38 | 0 — die Seiten verlinken nur Bildnachweise und Werbung |
+
+Zwei Zahlen sind gegenüber der ersten Prüfung gefallen, weil zwei Auslesefehler
+gefunden wurden: Das Preismuster bei festivalsunited kannte `EUR` und `CHF`,
+aber nicht das Eurozeichen — dabei schreibt die Seite überwiegend „ab € 85,00".
+Und das Feld „Örtlichkeit" bei festival-alarm wurde nie gelesen, obwohl es die
+Spielstätte nennt (Arena Wien, Waschhaus Potsdam).
 
 Die Quellen sind damit ausgeschöpft. Zwei Punkte sind erklärungsbedürftig:
 Die 459 Einträge ohne Termin nennen auf ihrer Seite sehr wohl ein Datum — das
@@ -427,6 +441,15 @@ der **letzten** Ausgabe. Der Scraper übernimmt es bewusst nicht, sondern
 vermerkt es als Hinweis, sonst stünden vergangene Termine als kommende in der
 Liste. Und die 129 unterdrückten Spielstätten tragen im Datenblatt nur den
 Festivalnamen, sagen als Ortsangabe also nichts.
+
+## Vergangene Ausgaben
+
+Manche Quellseiten zeigen die **letzte** Ausgabe, wenn die nächste nicht
+bestätigt ist — die Seite des Exit Festivals etwa den Jahrgang 2025. Solche
+Einträge fallen nach dem Zusammenführen heraus, sobald ihr Termin älter ist als
+`--since`. Einträge ganz ohne Termin bleiben dagegen drin: Das sind
+angekündigte Festivals ohne bestätigtes Datum, erkennbar am Hinweis auf die
+letzte gefundene Ausgabe.
 
 ## Bekannte Grenzen
 

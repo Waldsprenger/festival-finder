@@ -28,7 +28,7 @@ from bs4 import BeautifulSoup
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from gemeinsam import (  # noqa: E402  (Pfad muss vorher stehen)
-    BASE, CACHE, DATA as OUT, HEADERS, ausser_europa, land_code)
+    CACHE, DATA as OUT, EUROPA_CODES, HEADERS, ausser_europa, land_code)
 
 FT = "https://www.festivalticker.de"
 FU = "https://www.festivalsunited.com"
@@ -46,7 +46,8 @@ MONATE = ["januar", "februar", "maerz", "april", "mai", "juni", "juli", "august"
 FT_LISTS = (
     [f"{FT}/alle-festivals/", f"{FT}/alle-festivals-ab-jetzt/",
      f"{FT}/festivals-in-deutschland/", f"{FT}/internationale-festivals/",
-     f"{FT}/laufende-festivals/", f"{FT}/neue-festivals/"]
+     f"{FT}/laufende-festivals/", f"{FT}/neue-festivals/",
+     f"{FT}/umsonst-und-draussen/"]
     + [f"{FT}/festivals-{m}/" for m in MONATE]
     + [f"{FT}/festivals-{j}/" for j in JAHRE]
     + [f"{FT}/{j}/" for j in JAHRE]
@@ -499,14 +500,42 @@ def fu_collect_links(since: int) -> list[str]:
             continue
         for loc in re.findall(r"<loc>([^<]+)</loc>", html):
             # nur Detailseiten, keine Magazinartikel und keine Buchstabenlisten
+            # "/festivals/name", "/festivals/name/2026" und die seltene
+            # Zweitausgabe "/festivals/name/2026/2"
             m = re.fullmatch(r"https://www\.festivalsunited\.com/festivals/"
-                             r"([a-z0-9\-]+)(?:/\d{4})?", loc)
+                             r"([a-z0-9\-]+)(?:/\d{4}(?:/\d)?)?", loc)
             # "/festivals/calendar/2026" sieht wie eine Detailseite aus, ist aber
             # eine Uebersicht - sonst landet ein Festival namens "Festivals" in
             # den Daten
             if m and m.group(1) not in FU_KEINE_DETAILS:
                 links[loc] = None
+
+    # Die Sitemap ist nicht vollstaendig: Ueber die Laenderseiten tauchen
+    # Festivals auf, die dort fehlen. Sie kosten je Land einen Abruf.
+    for land in fu_laender():
+        html = fetch(land)
+        if not html:
+            continue
+        for loc in set(re.findall(
+                r"https://www\.festivalsunited\.com/festivals/"
+                r"[a-z0-9\-]+(?:/\d{4}(?:/\d)?)?", html)):
+            name = loc.rsplit("/festivals/", 1)[1].split("/")[0]
+            if name not in FU_KEINE_DETAILS:
+                links.setdefault(loc, None)
     return list(links)
+
+
+def fu_laender() -> list[str]:
+    """Adressen der Laenderseiten - europaeische zuerst, aussereuropaeische
+    bleiben weg, weil ihre Festivals ohnehin verworfen werden."""
+    index = fetch(f"{FU}/sitemap-listings.xml") or ""
+    seiten = re.findall(r"<loc>(https://www\.festivalsunited\.com/festivals/"
+                        r"countries/[a-z\-]+)</loc>", index)
+    fremd = {"usa", "canada", "brazil", "argentina", "chile", "colombia",
+             "paraguay", "ecuador", "costa-rica", "mexico", "india",
+             "indonesia", "china", "south-korea", "south-africa", "kazakhstan",
+             "new-zealand", "australia", "japan", "thailand", "international"}
+    return [u for u in seiten if u.rsplit("/", 1)[1] not in fremd]
 
 
 # --------------------------------------------------------------------------
@@ -523,6 +552,19 @@ def fa_collect_links(since: int) -> list[str]:
             continue
         for href in re.findall(rf'href="(/Festivals-{jahr}/[^"]+)"', html):
             links[urljoin(FA, href)] = None
+
+        # Die Jahresseite laesst einzelne Eintraege aus; die Regionsseiten
+        # fangen sie auf. Nur europaeische Laender, der Rest wird ohnehin
+        # verworfen.
+        for pfad, code in set(re.findall(
+                rf'href="(/festival/region/[^"]+/{jahr}/([A-Z]{{2}}))"', html)):
+            if code not in EUROPA_CODES:
+                continue
+            seite = fetch(urljoin(FA, pfad))
+            if not seite:
+                continue
+            for href in re.findall(rf'href="(/Festivals-{jahr}/[^"]+)"', seite):
+                links.setdefault(urljoin(FA, href), None)
     return list(links)
 
 
@@ -535,6 +577,9 @@ FA_FELDER = {
     "land":      r"\bLand:\s*(.*?)\s*(?:Veranstaltungsplatz|Wo:|Örtlichkeit|Camping)",
     "genre":     r"Genres:\s*(.*?)\s*(?:Gründung|Festivalausgabe|Besucher)",
     "besucher":  r"Besucher:\s*(.*?)\s*(?:Sonstiges|Weiterführende|Webseite)",
+    # "Veranstaltungsplatz ... Oertlichkeit: Waldbuehne" - die Spielstaette
+    # stand bisher ungenutzt auf der Seite.
+    "ort_name":  r"Örtlichkeit:\s*(.*?)\s*(?:Camping|Künstler|Anreise)",
     "acts":      r"Künstler:\s*(.*?)\s*(?:Anreise|Wie komme)",
 }
 
@@ -602,7 +647,7 @@ def fa_parse_detail(url: str, html: str, seed: dict | None = None) -> dict | Non
         "year": date_from[-4:] if date_from else "",
         "city": ort,
         "country": feld.get("land", ""),
-        "venue": "",
+        "venue": feld.get("ort_name", ""),
         "plz": plz,
         "location": ", ".join(x for x in [ort, feld.get("land", "")] if x),
         "price": preis,
@@ -682,7 +727,10 @@ def fu_parse_detail(url: str, html: str) -> dict | None:
     if not year and date_from:
         year = date_from[-4:]
 
-    pm = re.search(r"(?:ab|kosten(?:ten)?\s+ab)\s+((?:EUR|CHF|GBP|USD|DKK|SEK|NOK|PLN|HUF|CZK)\s*[\d.,]+)",
+    # "Tickets ab 85,00 EUR" und "Tickets ab \u20ac 85,00" - das Eurozeichen
+    # fehlte im Muster, obwohl die Seite es ueberwiegend verwendet.
+    pm = re.search(r"\bab\s+((?:\u20ac|EUR|CHF|GBP|DKK|SEK|NOK|PLN|HUF|CZK)\s*[\d.,]+"
+                   r"|[\d.,]+\s*(?:\u20ac|EUR|CHF|GBP|DKK|SEK|NOK|PLN|HUF|CZK))",
                    text, re.I)
     price = clean(pm.group(1)).rstrip(".,;") if pm else ""
     if price:
@@ -1231,6 +1279,16 @@ def main() -> None:
 
     registry, bstats = build_band_registry(records)
     festivals = merge(records, registry)
+
+    # Vergangene Ausgaben aussortieren: Ueber die Laenderseiten tauchen Seiten
+    # auf, deren letzte Ausgabe Jahre zurueckliegt ("Weekend Festival Baltic
+    # 2018"). Eintraege ohne Termin bleiben - das sind angekuendigte Festivals
+    # ohne bestaetigtes Datum, nicht vergangene.
+    vorher = len(festivals)
+    festivals = [f for f in festivals
+                 if not f["date_from"] or int(f["date_from"][-4:]) >= args.since]
+    if vorher != len(festivals):
+        print(f"  {vorher - len(festivals)} Eintraege aelter als {args.since} verworfen")
     write_outputs(festivals)
     (OUT / "band_normalisierung.json").write_text(
         json.dumps(bstats, ensure_ascii=False, indent=2), encoding="utf-8")

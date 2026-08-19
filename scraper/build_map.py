@@ -5,7 +5,8 @@ die Sicherheitsrichtlinie blockiert. Die Karte wird deshalb aus mitgelieferten
 Vektorgrenzen selbst gezeichnet.
 
 Quelle: Natural Earth (gemeinfrei), Aufloesung 1:50 Mio.
-Ergebnis: data/welt.json -> [[[lon, lat], ...], ...]  (Polygonringe)
+Ergebnis: data/welt_grob.json (ganze Welt) und data/welt_fein.json
+(Europa, fuer die Nahansicht) -> [[[lon, lat], ...], ...]  (Polygonringe)
 """
 
 from __future__ import annotations

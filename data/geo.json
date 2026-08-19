@@ -19652,5 +19652,25 @@
  },
  "Foire Aux Vins Festival 2020|FR": {},
  "Lovebox Festival 2020|GB": {},
- "Winterthurer Musikfestwochen 2025|CH": {}
+ "Winterthurer Musikfestwochen 2025|CH": {},
+ "Pärnu|EE": {
+  "lat": 58.3870659,
+  "lon": 24.5026059,
+  "display": "Pärnu, Pärnu linn, Kreis Pärnu, Estland"
+ },
+ "Reykjavík|IS": {
+  "lat": 64.145981,
+  "lon": -21.9422367,
+  "display": "Reykjavik, Höfuðborgarsvæðið, Island"
+ },
+ "Novi Sad|RS": {
+  "lat": 45.2551338,
+  "lon": 19.8451756,
+  "display": "Novi Sad, Stadt Neusatz, Bezirk Südliche Batschka, Wojwodina, Serbien"
+ },
+ "Westernach|DE": {
+  "lat": 49.1966572,
+  "lon": 9.6862506,
+  "display": "Westernach, Kupferzell, GVV Hohenloher Ebene, Hohenlohekreis, Baden-Württemberg, Deutschland"
+ }
 }

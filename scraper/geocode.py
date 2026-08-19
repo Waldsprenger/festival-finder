@@ -69,15 +69,15 @@ def main() -> None:
     festivals = json.loads((DATA / "festivals.json").read_text(encoding="utf-8"))
     geo = json.loads(GEO.read_text(encoding="utf-8")) if GEO.exists() else {}
 
-    todo = []
+    offen: dict[str, tuple[str, str, str]] = {}
     for f in festivals:
         city = (f.get("city") or "").strip()
         if not city:
             continue
         k = key(city, f.get("country", ""))
-        if k not in geo and k not in [t[0] for t in todo[-1:]]:
-            todo.append((k, city, f.get("country", "")))
-    todo = list({k: (k, c, l) for k, c, l in todo}.values())
+        if k not in geo:
+            offen.setdefault(k, (k, city, f.get("country", "")))
+    todo = list(offen.values())
 
     print(f"{len(geo)} im Cache, {len(todo)} offen "
           f"(~{len(todo) * 1.2 / 60:.0f} min)", flush=True)

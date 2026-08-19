@@ -24,6 +24,11 @@ def main() -> None:
         band_count.update(f["lineup"])
     shared = [(b, c) for b, c in band_count.most_common(40) if c > 1]
 
+    # Kuerzel je Quelle - "s[:2]" ergab dreimal "FE", weil alle drei Namen mit
+    # "festival" beginnen.
+    KUERZEL = {"festivalticker": "FT", "festivalsunited": "FU",
+               "festivalalarm": "FA"}
+
     rows = []
     for i, f in enumerate(festivals):
         lineup = f["lineup"]
@@ -39,8 +44,9 @@ def main() -> None:
         web = f["website"]
         weblink = f'<a href="{esc(web)}" target="_blank" rel="noopener">Website</a>' if web else "–"
         srcs = " ".join(
-            f'<a class="src" href="{esc(u)}" target="_blank" rel="noopener">{esc(s[:2].upper())}</a>'
-            for s, u in f["sources"].items())
+            f'<a class="src" href="{esc(u)}" target="_blank" rel="noopener">'
+            f'{KUERZEL.get(quelle, quelle[:2].upper())}</a>'
+            for quelle, u in f["sources"].items())
         multi = " multi" if len(f["sources"]) > 1 else ""
         more = (f'<span class="rest" id="r{i}" hidden>, {esc(rest)}</span>'
                 f'<button class="more" data-t="r{i}">+{len(lineup) - 8}</button>') if rest else ""

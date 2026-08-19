@@ -13,7 +13,7 @@
   // Spaltenindizes von data.js
   const NAME = 0, FROM = 1, TO = 2, CITY = 3, LAND = 4, VENUE = 5,
         EUR = 6, PRICE_RAW = 7, WEB = 8, LAT = 9, LON = 10, LINEUP = 11,
-        GENRE = 12, NOTE = 13, CANCELLED = 14, GENRE_IDS = 15;
+        NOTE = 12, CANCELLED = 13, GENRE_IDS = 14;
 
   const $ = (id) => document.getElementById(id);
 
