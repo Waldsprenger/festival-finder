@@ -152,6 +152,35 @@ def iso(d: str) -> str:
     return f"{m.group(3)}-{m.group(2)}-{m.group(1)}" if m else ""
 
 
+def laender_rahmen(places: list) -> dict[str, tuple[float, float, float, float]]:
+    """Grobe Umrisse je Land aus dem Ortsverzeichnis: (lat0, lat1, lon0, lon1)."""
+    rahmen: dict[str, list[float]] = {}
+    for name, lat, lon, cc in places:
+        if not cc:
+            continue
+        r = rahmen.setdefault(cc, [90.0, -90.0, 180.0, -180.0])
+        r[0], r[1] = min(r[0], lat), max(r[1], lat)
+        r[2], r[3] = min(r[2], lon), max(r[3], lon)
+    return {cc: tuple(r) for cc, r in rahmen.items()}
+
+
+def platzhalter(festivals: list) -> set[tuple[float, float]]:
+    """Koordinaten, die fuer mehrere verschiedene Orte herhalten muessen.
+
+    Die Quelle setzt bei unbekanntem Ort gern den Landesmittelpunkt ein -
+    51.5/10.5 steht dreizehnmal da, quer durch Deutschland und die Schweiz.
+    Ein echter Veranstaltungsort taucht zwar auch mehrfach auf, dann aber
+    immer mit demselben Ortsnamen.
+    """
+    orte: dict[tuple[float, float], set[str]] = {}
+    for f in festivals:
+        if f.get("lat") is None:
+            continue
+        schluessel = (round(f["lat"], 4), round(f["lon"], 4))
+        orte.setdefault(schluessel, set()).add((f.get("city") or "").casefold())
+    return {k for k, v in orte.items() if len(v) >= 3}
+
+
 def main() -> None:
     festivals = json.loads((DATA / "festivals.json").read_text(encoding="utf-8"))
     geo_path = DATA / "geo.json"
@@ -197,8 +226,35 @@ def main() -> None:
             code = land_code((wert.get("display") or "").rsplit(",", 1)[-1])
         geo_ort.setdefault(ort.strip().casefold(), (wert, code))
 
+    # Ortsverzeichnis fuer die Landesgrenzen; weiter unten wird es erneut
+    # gebraucht und dort aus derselben Datei gelesen.
+    gaz_datei = DATA / "gazetteer.json"
+    rahmen = laender_rahmen(
+        json.loads(gaz_datei.read_text(encoding="utf-8")) if gaz_datei.exists() else [])
+    verdaechtig = platzhalter(festivals)
+
+    def quellkoordinate(f: dict, country: str):
+        """Koordinate der Quellseite, sofern sie zum Land passt.
+
+        Das Datenblatt der Quelle liefert fuer 2.482 Festivals einen Punkt.
+        Meist sitzt er genau: Der Abstand zur bisher errechneten Koordinate
+        liegt im Mittel bei 2 km. Bei 37 Eintraegen liegt er dagegen im
+        falschen Land - Lugano landete in Buenos Aires, Basel in Berlin.
+        Deshalb zaehlt er nur innerhalb der Landesgrenzen, mit einem Grad
+        Toleranz fuer Randlagen.
+        """
+        lat, lon = f.get("lat"), f.get("lon")
+        if lat is None or lon is None:
+            return None, None
+        if (round(lat, 4), round(lon, 4)) in verdaechtig:
+            return None, None
+        r = rahmen.get(country)
+        if r and not (r[0] - 1 <= lat <= r[1] + 1 and r[2] - 1 <= lon <= r[3] + 1):
+            return None, None
+        return lat, lon
+
     rows = []
-    with_geo = aus_plz = 0
+    with_geo = aus_plz = aus_quelle = 0
     for f in festivals:
         city, country = f["city"].strip(), f["country"].strip()
         code = (f.get("plz") or "").strip()
@@ -225,6 +281,11 @@ def main() -> None:
                     g, ergaenzt = treffer_ort
                     country = country or ergaenzt
             lat, lon = (g.get("lat"), g.get("lon")) if g else (None, None)
+            if lat is None:
+                # Letzter Weg: der Punkt aus dem Datenblatt der Quellseite
+                lat, lon = quellkoordinate(f, country)
+                if lat is not None:
+                    aus_quelle += 1
         if lat is not None:
             with_geo += 1
         rows.append([
@@ -285,7 +346,8 @@ def main() -> None:
     priced = sum(1 for r in rows if r[6] is not None)
     mit_genre = sum(1 for r in rows if r[15])
     print(f"{out}  ({out.stat().st_size / 1e6:.1f} MB)")
-    print(f"  Koordinaten aus Postleitzahl: {aus_plz}, aus Ortsname: {with_geo - aus_plz}")
+    print(f"  Koordinaten aus Postleitzahl: {aus_plz}, aus Ortsname: "
+          f"{with_geo - aus_plz - aus_quelle}, aus der Quellseite: {aus_quelle}")
     print(f"  Festivals {len(rows)} | mit Koordinaten {with_geo} | "
           f"mit Preis in EUR {priced} | Acts {len(bands)} | Orte {len(places)} | "
           f"PLZ {len(plz)}")

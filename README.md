@@ -12,6 +12,7 @@ ausführbar und bauen aufeinander auf:
 ```
 festival_scraper.py  →  data/festivals.json + CSV-Ausgaben
 genres.py            →  Genre-Oberbegriffe (Modul, von build_site.py genutzt)
+pruefe_offiziell.py  →  Stichprobe gegen die offiziellen Festivalseiten
 geocode.py           →  data/geo.json          (Ortskoordinaten)
 build_gazetteer.py   →  data/gazetteer.json + plz.json
 build_map.py         →  data/welt_grob.json + welt_fein.json
@@ -53,6 +54,59 @@ notfalls aus der eingebetteten Adresse oder dem Länderlink der Seite. Ohne das
 zweite stand etwa das Suwannee Hulaween aus Florida ganz ohne Land in der Datei
 und blieb damit drin. Zusammen fielen 67 Einträge weg; seither trägt jedes
 Festival ein Land, vorher waren 834 ohne.
+
+## Das Datenblatt der Quellseiten
+
+festivalsunited legt jeder Detailseite ein maschinenlesbares Datenblatt bei
+(JSON-LD nach schema.org). Der Scraper liest es als **zweite** Quelle: Der
+Fliesstext beschreibt die dargestellte Ausgabe und hat Vorrang, das Datenblatt
+fuellt, was dort fehlt. Es liefert Land, Ort und Postleitzahl, die Spielstaette,
+Koordinaten, den Einstiegspreis, den Absagestatus und in Einzelfaellen den
+Termin.
+
+Der Gewinn ist betraechtlich: Die Spielstaette fehlte bei 2.438 Festivals,
+jetzt bei 898. Postleitzahlen kamen so oft dazu, dass die Zahl der ueber die
+Postleitzahl verorteten Festivals von 1.894 auf 2.923 stieg — das ist der
+genauere Weg, weil eine Postleitzahl den Zustellbereich trifft, waehrend ein
+Ortsname erst gefunden werden muss und in den Quellen auch mal „Madgeburg“
+heisst.
+
+**Koordinaten nur nach Pruefung.** Fuer 2.476 Festivals nennt das Datenblatt
+einen Punkt, und meist sitzt er genau — der Abstand zur bisher errechneten
+Koordinate liegt im Mittel bei 2,1 km. Bei 37 Eintraegen liegt er dagegen im
+falschen Land: Lugano landete in Buenos Aires, Basel und Budapest in Berlin,
+Andorra in Mexiko. Dreizehnmal steht 51,5/10,5 — der Mittelpunkt Deutschlands
+als Platzhalter, verteilt ueber Deutschland und die Schweiz. `build_site.py`
+uebernimmt einen Punkt deshalb nur, wenn er im Rahmen des Landes liegt
+(Landesgrenzen aus dem Ortsverzeichnis, ein Grad Toleranz) und nicht als
+Platzhalter auffaellt — erkennbar daran, dass dieselbe Koordinate fuer drei
+oder mehr verschiedene Orte herhalten muss. Und er greift erst, wenn
+Postleitzahl und Ortsname nichts hergeben.
+
+## Abgleich mit den offiziellen Seiten
+
+```bash
+python scraper/pruefe_offiziell.py 40          # Zufallsstichprobe
+python scraper/pruefe_offiziell.py --name Wacken
+```
+
+Das Werkzeug holt die Festivalseite selbst und vergleicht den Starttermin.
+Belastbar ist dabei nur deren eigenes Datenblatt; blosse Datumsangaben im
+Fliesstext gehoeren genauso oft zu Nachrichten oder Nebenveranstaltungen.
+Verglichen wird ausserdem nur derselbe Jahrgang — die offizielle Seite zeigt
+die naechste Ausgabe, unser Bestand fuehrt jede einzeln.
+
+Was eine Stichprobe von 60 Festivals ergab: **34 Seiten nennen ueberhaupt kein
+Datum** in lesbarer Form (es steckt in Grafiken oder wird per Skript
+nachgeladen), 15 nur im Fliesstext, und lediglich **6 fuehren ein Datenblatt**.
+Davon bestaetigten vier unseren Termin; die zwei Abweichungen loesten sich beim
+Nachsehen auf — die Seiten zeigten bereits die naechste Ausgabe, die wir als
+eigenen Eintrag ebenfalls fuehren, mit uebereinstimmendem Datum.
+
+Daraus folgt: Ein automatischer Abgleich taugt **nicht** als Datenquelle, weil
+neun von zehn Veranstalterseiten nichts Maschinenlesbares anbieten. Als
+Stichprobe zur Kontrolle ist er nuetzlich, und genau dafuer liegt das Skript
+bei.
 
 ## Neu erzeugen
 

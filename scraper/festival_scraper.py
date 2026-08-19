@@ -671,6 +671,27 @@ def fu_parse_detail(url: str, html: str) -> dict | None:
         city = city or clean(cm.group(1))
         country = cm.group(2).upper()
 
+    # Dieselbe eingebettete Adresse nennt bei 83 Festivals auch Ort und
+    # Postleitzahl, die im Fliesstext fehlen. Die Postleitzahl ist der bessere
+    # Weg: Sie trifft den Zustellbereich, waehrend ein Ortsname erst noch
+    # gefunden werden muss - und in den Quellen schon mal "Madgeburg" heisst.
+    ort_m = re.search(r'"addressLocality"\s*:\s*"([^"]{2,60})"', html)
+    plz_m = re.search(r'"postalCode"\s*:\s*"([^"]{2,12})"', html)
+    plz = clean(plz_m.group(1)).replace(" ", "") if plz_m else ""
+    if not city and ort_m:
+        city = clean(ort_m.group(1))
+
+    # "Verschiedene Orte" ist kein Ort, sondern der Hinweis auf eine Reihe an
+    # wechselnden Spielstaetten - als Ortsname faende ihn keine Suche.
+    if re.fullmatch(r"(?i)verschiedene orte|diverse orte|mehrere orte", city.strip()):
+        city = ""
+
+    # Manche Eintraege tragen die Postleitzahl im Ortsfeld ("55116 Mainz").
+    vorn = re.match(r"^\s*(\d{4,5})\s+([A-Za-zÄÖÜäöü].*)$", city)
+    if vorn:
+        plz = plz or vorn.group(1)
+        city = clean(vorn.group(2))
+
     # Der Fliesstext nennt das Land nur bei europaeischen Ausgaben zuverlaessig.
     # Zwei stille Quellen auf derselben Seite sagen es immer: die eingebettete
     # Adresse und der Link auf die Laenderliste. Ohne sie stand das Suwannee
@@ -701,6 +722,40 @@ def fu_parse_detail(url: str, html: str) -> dict | None:
 
     lineup = fu_extract_lineup(s)
 
+    # Die Seite traegt ein maschinenlesbares Datenblatt (JSON-LD). Was der
+    # Fliesstext nicht hergibt, steht oft dort: Spielstaette, Koordinaten,
+    # Einstiegspreis und der Absagestatus. Ergaenzt wird nur, was fehlt -
+    # der Fliesstext bleibt die erste Quelle, weil er die dargestellte
+    # Ausgabe beschreibt und das Datenblatt gelegentlich veraltet.
+    venue = ""
+    vm = re.search(r'"@type"\s*:\s*"Place"\s*,\s*"name"\s*:\s*"([^"]{2,80})"', html)
+    if vm and clean(vm.group(1)).casefold() != name.casefold():
+        # Traegt die Spielstaette denselben Namen wie das Festival, sagt sie nichts
+        venue = clean(vm.group(1))
+
+    lat = lon = None
+    gm2 = re.search(r'"latitude"\s*:\s*(-?\d+\.?\d*)\s*,\s*"longitude"\s*:\s*(-?\d+\.?\d*)', html)
+    if gm2:
+        lat, lon = float(gm2.group(1)), float(gm2.group(2))
+
+    if not price:
+        pm2 = re.search(r'"price"\s*:\s*"([\d.]+)"\s*,\s*"priceCurrency"\s*:\s*"([A-Z]{3})"', html)
+        if pm2:
+            betrag = f"{float(pm2.group(1)):.2f}".replace(".", ",")
+            price = f"ab {pm2.group(2)} {betrag}"
+
+    if not date_from:
+        sm = re.search(r'"startDate"\s*:\s*"(\d{4})-(\d{2})-(\d{2})"', html)
+        if sm and (not year or sm.group(1) == year):
+            date_from = f"{sm.group(3)}.{sm.group(2)}.{sm.group(1)}"
+            em = re.search(r'"endDate"\s*:\s*"(\d{4})-(\d{2})-(\d{2})"', html)
+            date_to = f"{em.group(3)}.{em.group(2)}.{em.group(1)}" if em else date_from
+            note = ""
+            year = year or sm.group(1)
+
+    if not cancelled and re.search(r'"eventStatus"\s*:\s*"[^"]*EventCancelled"', html):
+        cancelled = True
+
     # "... ist ein Rock Festival" nennt die Richtung, "... ist ein Angebot von
     # Live Nation Festival" dagegen den Veranstalter. Ohne diese Grenze stand
     # bei 14 Festivals der Anbieter als Genre.
@@ -718,8 +773,10 @@ def fu_parse_detail(url: str, html: str) -> dict | None:
         "year": year,
         "city": city,
         "country": country,
-        "venue": "",
-        "plz": "",
+        "venue": venue,
+        "plz": plz,
+        "lat": lat,
+        "lon": lon,
         "location": ", ".join(x for x in [city, country] if x),
         "price": price,
         "website": website,
@@ -861,6 +918,8 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
                 "country": land_code(rec["country"]),
                 "venue": rec["venue"],
                 "plz": rec.get("plz", ""),
+                "lat": rec.get("lat"),
+                "lon": rec.get("lon"),
                 "location": rec["location"],
                 "price": rec["price"],
                 "website": rec["website"],
@@ -880,6 +939,8 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
             if not cur[field] and rec.get(field):
                 cur[field] = rec[field]
         cur["genre"] = genre_merge(cur["genre"], rec.get("genre", ""))
+        if cur["lat"] is None and rec.get("lat") is not None:
+            cur["lat"], cur["lon"] = rec["lat"], rec["lon"]
         if not cur["country"]:
             cur["country"] = land_code(rec["country"])
         if len(rec["name"]) > len(cur["name"]) and rec["source"] == "festivalticker":
@@ -915,6 +976,8 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
                 if not keep[field] and drop[field]:
                     keep[field] = drop[field]
             keep["genre"] = genre_merge(keep["genre"], drop["genre"])
+            if keep["lat"] is None and drop["lat"] is not None:
+                keep["lat"], keep["lon"] = drop["lat"], drop["lon"]
             keep["cancelled"] = keep["cancelled"] or drop["cancelled"]
             keep["sources"].update(drop["sources"])
             keep["_bands"].update(drop["_bands"])
@@ -966,6 +1029,8 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
                     if not keep[field] and drop[field]:
                         keep[field] = drop[field]
                 keep["genre"] = genre_merge(keep["genre"], drop["genre"])
+                if keep["lat"] is None and drop["lat"] is not None:
+                    keep["lat"], keep["lon"] = drop["lat"], drop["lon"]
                 keep["cancelled"] = keep["cancelled"] or drop["cancelled"]
                 keep["sources"].update(drop["sources"])
                 keep["_bands"].update(drop["_bands"])
@@ -1017,6 +1082,8 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
                 if tag_zahl(drop["date_to"]) > tag_zahl(keep["date_to"]):
                     keep["date_to"] = drop["date_to"]
                 keep["genre"] = genre_merge(keep["genre"], drop["genre"])
+                if keep["lat"] is None and drop["lat"] is not None:
+                    keep["lat"], keep["lon"] = drop["lat"], drop["lon"]
                 keep["cancelled"] = keep["cancelled"] or drop["cancelled"]
                 keep["sources"].update(drop["sources"])
                 keep["_bands"].update(drop["_bands"])
