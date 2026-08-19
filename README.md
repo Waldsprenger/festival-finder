@@ -45,7 +45,14 @@ Vergangene Jahrgänge werden von der Webseite ohnehin herausgefiltert.
 Zwei Grenzen der Quellen: festivalticker zeigt für vergangene Jahre nur je 40
 Einträge, mehr gibt die Seite nicht her. Und festival-alarm führt bei den
 meisten Festivals kein Lineup („keine Daten") — es liefert vor allem zusätzliche
-Termine, Preise und Orte. Außereuropäische Einträge werden verworfen.
+Termine, Preise und Orte. Außereuropäische Einträge werden verworfen — und zwar an zwei Stellen, die
+beide nötig sind: Die Prüfung erkennt jedes gültige Länderkürzel, das nicht zu
+Europa gehört (die frühere Namensliste kannte „usa“, aber nicht IN, CL, PY, CO,
+ZA, ID, KR, KZ, CR, CN oder TH), und der festivalsunited-Leser holt das Land
+notfalls aus der eingebetteten Adresse oder dem Länderlink der Seite. Ohne das
+zweite stand etwa das Suwannee Hulaween aus Florida ganz ohne Land in der Datei
+und blieb damit drin. Zusammen fielen 67 Einträge weg; seither trägt jedes
+Festival ein Land, vorher waren 834 ohne.
 
 ## Neu erzeugen
 
@@ -192,7 +199,8 @@ Rückfall angefragt.
 ## Sprachen
 
 Die Oberfläche gibt es auf Deutsch, Englisch, Französisch, Spanisch,
-Italienisch, Niederländisch, Polnisch und Portugiesisch. Alle Texte stehen in
+Italienisch, Niederländisch, Polnisch, Portugiesisch, Russisch und Türkisch.
+Alle Texte stehen in
 [site/i18n.js](site/i18n.js); die Seite wählt beim ersten Besuch die
 Browsersprache und merkt sich eine spätere Auswahl lokal.
 

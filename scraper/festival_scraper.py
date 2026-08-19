@@ -671,6 +671,23 @@ def fu_parse_detail(url: str, html: str) -> dict | None:
         city = city or clean(cm.group(1))
         country = cm.group(2).upper()
 
+    # Der Fliesstext nennt das Land nur bei europaeischen Ausgaben zuverlaessig.
+    # Zwei stille Quellen auf derselben Seite sagen es immer: die eingebettete
+    # Adresse und der Link auf die Laenderliste. Ohne sie stand das Suwannee
+    # Hulaween aus Florida ohne Land in der Datei - und blieb damit drin,
+    # obwohl nur Europa gesammelt wird.
+    if not country:
+        jm = re.search(r'"addressCountry"\s*:\s*"([^"]{2,40})"', html)
+        if jm:
+            country = land_code(clean(jm.group(1)))
+    if not country:
+        # "europe" und "international" sind Sammelseiten, keine Laender
+        for km in re.finditer(r'/festivals/countries/([a-z\-]{2,30})"', html):
+            slug = km.group(1).replace("-", " ")
+            if slug not in ("europe", "international"):
+                country = land_code(slug)
+                break
+
     website = ""
     for a in s.find_all("a", href=True):
         href = a["href"]

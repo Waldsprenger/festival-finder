@@ -69,6 +69,11 @@ LAENDER = {
     "tuerkei": "TR", "türkei": "TR", "turkey": "TR", "tr": "TR",
     "vatikan": "VA", "va": "VA", "gibraltar": "GI", "gi": "GI",
     "faeroeer": "FO", "färöer": "FO", "fo": "FO",
+    # Schreibweisen aus den Laenderlinks von festivalsunited
+    "czech republic": "CZ", "romania": "RO", "slovakia": "SK", "serbia": "RS",
+    "bulgaria": "BG", "slovenia": "SI", "albania": "AL", "estonia": "EE",
+    "latvia": "LV", "lithuania": "LT", "faroe islands": "FO",
+    "north macedonia": "MK", "bosnia and herzegovina": "BA",
 }
 
 # Alle in LAENDER vorkommenden Codes plus Inselgebiete ohne eigene Schreibweise
@@ -86,6 +91,11 @@ NICHT_EUROPA = {
     "thailand", "vietnam", "philippinen", "singapur", "suedafrika", "südafrika",
     "aegypten", "ägypten", "marokko", "tunesien", "israel", "katar",
     "vereinigte arabische emirate", "us", "ca", "au", "nz", "jp", "br", "mx",
+    # ebenfalls aus den Laenderlinks von festivalsunited
+    "brazil", "argentina", "chile", "colombia", "paraguay", "ecuador",
+    "costa rica", "mexico", "india", "indonesia", "china", "south korea",
+    "south africa", "kazakhstan", "new zealand", "australia", "japan",
+    "canada", "thailand",
 }
 
 
@@ -103,4 +113,19 @@ def land_code(country: str) -> str:
 
 
 def ausser_europa(country: str) -> bool:
-    return (country or "").strip().lower() in NICHT_EUROPA
+    """Liegt das Land ausserhalb Europas?
+
+    Die Namensliste allein genuegte nicht: Sie kannte "usa", aber nicht die
+    Kuerzel IN, CL, PY, CO, ZA, ID, KR, KZ, CR, CN oder TH, die in den Quellen
+    ebenso vorkommen. Deshalb zaehlt zusaetzlich jedes gueltige Zweibuchstaben-
+    kuerzel, das nicht zu Europa gehoert. Laengere unbekannte Angaben
+    ("Bayern", "Region Hannover") bleiben ausdruecklich drin - sie sind keine
+    Laender, und ein Rauswurf auf Verdacht kostet echte Festivals.
+    """
+    roh = (country or "").strip().lower()
+    if not roh:
+        return False
+    if roh in NICHT_EUROPA:
+        return True
+    code = land_code(country)
+    return len(code) == 2 and code.isalpha() and code.upper() not in EUROPA_CODES
