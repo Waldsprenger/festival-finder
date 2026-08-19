@@ -1,7 +1,6 @@
 # Festival-Übersicht Europa
 
-Zusammengeführte Festival- und Lineup-Daten aus festivalticker.de,
-festivalsunited.com und festival-alarm.com.
+Zusammengeführte Festival- und Lineup-Daten aus acht Verzeichnissen.
 
 ## Aufbau
 
@@ -28,11 +27,19 @@ daily_update.py      →  führt die Kette aus
 
 Der Scraper enumeriert die Seiten vollständig statt einzelne Listen abzuklappern:
 
-| Quelle | Weg |
-|---|---|
-| festivalticker.de | alle Listenseiten: Jahres-, Monats-, Länder- und Statusarchive plus „Umsonst und draußen" |
-| festivalsunited.com | `sitemap.xml` mit Unterkarten je Jahrgang **und** die 35 europäischen Länderseiten |
-| festival-alarm.com | Jahresseiten `/Festivals-JAHR` **und** die Regionsseiten je Land und Jahr |
+| Quelle | Weg | Seiten |
+|---|---|---|
+| festivalsunited.com | `sitemap.xml` je Jahrgang **und** die 35 europäischen Länderseiten | 3.226 |
+| festapp.io | Sitemaps der Festivals und der einzelnen Ausgaben | 2.973 |
+| festivalfinder.eu | Trefferliste der European Festivals Association, geblättert über `/p2`, `/p3` … | 2.071 |
+| wannafest.com | `sitemaps/festivals-1.xml` | 2.093 |
+| festivalticker.de | alle Listenseiten: Jahres-, Monats-, Länder- und Statusarchive plus „Umsonst und draußen" | 1.971 |
+| festival-alarm.com | Jahresseiten `/Festivals-JAHR` **und** die Regionsseiten je Land und Jahr | 935 |
+| festivalhopper.de | `sitemap-festivals.xml`, Jahrgang steht in der Adresse | 728 |
+| festivalflyer.com | die Startseite, mehr ist nicht erreichbar | 12 |
+
+Die fünf zuletzt genannten kamen später dazu. Was sie beitragen, steht weiter
+unten unter „Die acht Quellen im Vergleich".
 
 Die zweiten Wege sind nicht geraten, sondern nachgemessen: Über die
 Länderseiten von festivalsunited sind 30 Detailseiten erreichbar, die in der
@@ -63,6 +70,43 @@ zweite stand etwa das Suwannee Hulaween aus Florida ganz ohne Land in der Datei
 und blieb damit drin. Zusammen fielen 67 Einträge weg; seither trägt jedes
 Festival ein Land, vorher waren 834 ohne.
 
+## Die acht Quellen im Vergleich
+
+Jede Quelle bringt Eigenes mit — der Wert steckt nicht in der Zahl der Seiten,
+sondern darin, wie viele Festivals **nur** dort stehen:
+
+| Quelle | Einträge | nur dort | Besonderheit |
+|---|---|---|---|
+| festivalsunited | 2.952 | 1.714 | Lineups, Preise, Datenblatt je Seite |
+| festivalticker | 1.966 | 815 | dichteste Abdeckung für Deutschland |
+| wannafest | 1.061 | 818 | Elektronisches, Niederlande und Belgien |
+| festival-alarm | 921 | 215 | Spielstätte, Besucherzahl, Preise |
+| festapp | 739 | 379 | Frankreich, Italien, Spanien |
+| festivalhopper | 686 | 98 | Lineups als Einzelverweise, Kapazität |
+| festivalfinder | 400 | 372 | Klassik, Theater, Osteuropa |
+| festivalflyer | 1 | 0 | Großbritannien, nur was die Startseite zeigt |
+
+**wannafest wird gefiltert.** Die Seite führt weit überwiegend Clubabende: In
+einer Stichprobe von 400 Einträgen waren 359 als „Indoor" ausgewiesen, darunter
+Sachen wie „Bootshaus DJ Contest". Ungefiltert hätten rund 1.800 Clubnächte die
+Festivalliste geflutet. Übernommen wird deshalb nur, was sich als Festival zu
+erkennen gibt: am Namen oder daran, dass es draußen stattfindet.
+
+**Nicht erfasste Seiten.** Fünf der vorgeschlagenen Verzeichnisse liefern keine
+Daten:
+
+| Seite | Grund |
+|---|---|
+| festicket.com | die `robots.txt` untersagt ClaudeBot ausdrücklich das Sammeln; zusätzlich Cloudflare-Sperre |
+| de.concerty.com | Cloudflare-Sperre, selbst die `robots.txt` antwortet mit 403 |
+| musicfestivalwizard.com | dieselbe Cloudflare-Sperre |
+| bachtrack.com | Festivalliste wird im Browser zusammengesetzt; die Sitemap führt Kritiken und Einzelkonzerte der Klassik |
+| festivalnetworks.com, musicfestadvisor.com, festivalcalendars.com | Listenartikel statt Datenbank, keine auslesbaren Detailseiten |
+
+Die drei gesperrten Seiten werden nicht umgangen. Ein Cloudflare-Schutz ist eine
+bewusste Entscheidung des Betreibers, und festicket benennt ClaudeBot sogar
+namentlich — daran hält sich der Scraper.
+
 ## Das Datenblatt der Quellseiten
 
 festivalsunited legt jeder Detailseite ein maschinenlesbares Datenblatt bei
@@ -78,9 +122,10 @@ die Stile ausdruecklich („Multi-Genre: Rock, Metal, Punk UVM") und die Kapazit
 Festival" sagt. Beim Reload Festival 2027 stand deshalb die Sammelkategorie, wo
 die Seite Rock, Metal und Punk auffuehrt.
 
-Der Gewinn ist betraechtlich: Die Spielstaette fehlte bei 2.438 Festivals,
-jetzt bei 683; ohne Genreangabe waren 797 Festivals, jetzt 322; ohne
-Besucherzahl 2.988, jetzt 1.585. Postleitzahlen kamen so oft dazu, dass die Zahl der ueber die
+Der Gewinn war betraechtlich: Bei den damals 4.269 Festivals fehlte die
+Spielstaette zuvor 2.438-mal, danach nur noch 683-mal; ohne Genreangabe waren
+797 Eintraege, danach 322; ohne Besucherzahl 2.988, danach 1.585.
+Postleitzahlen kamen so oft dazu, dass die Zahl der ueber die
 Postleitzahl verorteten Festivals von 1.894 auf 2.923 stieg — das ist der
 genauere Weg, weil eine Postleitzahl den Zustellbereich trifft, waehrend ein
 Ortsname erst gefunden werden muss und in den Quellen auch mal „Madgeburg“
@@ -200,7 +245,7 @@ dem Hinweis „wurde abgesagt" (festivalticker) beziehungsweise am Status im Kop
 und dem Klartext „&lt;Name&gt; wurde abgesagt" (festivalsunited). Wichtig ist die enge
 Fassung: Bei festivalsunited steht „Abgesagt" auf 416 Seiten als Hinweis auf *andere*
 Jahrgänge in der Ausgabenliste — gewertet wird nur die dargestellte Ausgabe. Derzeit
-sind 29 Festivals betroffen; sie bleiben in der Webseite ausgeblendet, lassen sich per
+sind 72 Festivals betroffen; sie bleiben in der Webseite ausgeblendet, lassen sich per
 Haken einblenden und erscheinen dann durchgestrichen mit rotem Vermerk.
 
 **Ablauf:** Wohnort → Umkreis → Ticketobergrenze → frühester Starttermin; danach
@@ -247,7 +292,7 @@ Gothic/Wave, Mittelalter, Kultur & Bühne, Genreübergreifend). Eine Angabe darf
 Oberbegriffe ergeben: „Ska Punk“ zählt zu Punk *und* zu Reggae/Ska, sonst fände es nur die
 Hälfte der Suchenden. Vor der Stichwortsuche steht eine Liste von Sonderfällen, in denen
 ein Wort in die Irre führt — „Hardcore Techno“ ist kein Punk, „Classic Rock“ keine Klassik.
-Zugeordnet sind 3.526 der 4.367 Festivals; für 804 nennt keine Quelle eine Richtung, sie
+Zugeordnet sind 4.060 der 5.969 Festivals; für 1.906 nennt keine Quelle eine Richtung, sie
 lassen sich per Haken einblenden. Nicht zugeordnet bleiben 0,4 % der Angaben, fast nur
 Tippfehler und Einzelstücke wie `Zapparesk`. Die Abdeckung prüft
 
@@ -419,15 +464,20 @@ nach einem Beleg durchsucht.
 
 | Feld | fehlt | steht doch auf der Seite |
 |---|---|---|
-| Besucherzahl | 1.585 | 0 |
-| Lineup | 1.455 | — Quelle führt keins |
-| Spielstätte | 683 | 129-mal nur der Festivalname selbst |
-| Postleitzahl | 522 | 0 |
-| Termin | 459 | nur Termine *vergangener* Ausgaben |
-| Preis | 283 | 2 |
-| Genre | 322 | 0 |
-| Ort | 248 | 16 |
-| Webseite | 38 | 0 — die Seiten verlinken nur Bildnachweise und Werbung |
+| Besucherzahl | 3.072 | 0 |
+| Lineup | 2.872 | — die Quelle führt keins |
+| Postleitzahl | 2.120 | 0 |
+| Genre | 1.906 | 0 |
+| Preis | 1.911 | 2 |
+| Spielstätte | 1.150 | 129-mal nur der Festivalname selbst |
+| Termin | 491 | nur Termine *vergangener* Ausgaben |
+| Webseite | 369 | 0 — die Seiten verlinken nur Bildnachweise und Werbung |
+| Ort | 247 | 16 |
+
+Die Prüfung stammt vom Stand mit drei Quellen (4.269 Festivals); die Zahlen
+oben nennen den heutigen Bestand mit acht. Gestiegen sind sie, weil die fünf
+neuen Verzeichnisse schlanker sind: festivalfinder etwa nennt weder Preis noch
+Lineup, wannafest keine Postleitzahl.
 
 Zwei Zahlen sind gegenüber der ersten Prüfung gefallen, weil zwei Auslesefehler
 gefunden wurden: Das Preismuster bei festivalsunited kannte `EUR` und `CHF`,
@@ -455,7 +505,7 @@ letzte gefundene Ausgabe.
 
 - festivalticker listet unter *alle-festivals* nur 2026 plus die separate 2027-Seite;
   die Archivjahrgänge (2006–2025) haben eigene URLs und sind nicht enthalten.
-- 311 Einträge haben kein Datum: festivalsunited führt sie ohne bestätigte Neuauflage.
+- 491 Einträge haben kein Datum: die Quellen führen sie ohne bestätigte Neuauflage.
   Das Feld `Hinweis` nennt dann die letzte gefundene Ausgabe.
 - Bei reinen Akronymen kann die Mehrheitsregel die falsche Variante wählen
   (`GANS` → `Gans`), da sie gemischte Schreibweise bevorzugt. Ein Großbuchstabe

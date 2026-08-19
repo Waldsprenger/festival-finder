@@ -34,6 +34,14 @@ FT = "https://www.festivalticker.de"
 FU = "https://www.festivalsunited.com"
 FA = "https://www.festival-alarm.com"
 
+# Drei weitere Verzeichnisse. Sie liefern vor allem Ueberschneidungen - genau
+# das ist der Zweck: Was eine Quelle verschweigt, ergaenzt die naechste.
+FH = "https://www.festivalhopper.de"     # deutschsprachiges Verzeichnis
+FP = "https://festapp.io"                # weltweit, mit Datenblatt je Ausgabe
+WF = "https://wannafest.com"             # Europa, Schwerpunkt elektronisch
+FL = "https://festivalflyer.com"         # Grossbritannien und Irland
+FF = "https://www.festivalfinder.eu"     # European Festivals Association
+
 # Jahrgaenge, die abgeklopft werden. Die Obergrenze waechst mit der Zeit mit,
 # damit kuenftige Jahre (2028, 2029 ...) ohne Codeaenderung erfasst werden.
 JAHR_HEUTE = date.today().year
@@ -882,6 +890,535 @@ def fu_parse_detail(url: str, html: str) -> dict | None:
 # Zusammenfuehren
 # --------------------------------------------------------------------------
 
+# --------------------------------------------------------------------------
+# festivalhopper.de
+# --------------------------------------------------------------------------
+
+def fh_collect_links(since: int) -> list[str]:
+    """Detailseiten aus der Sitemap; der Jahrgang steht in der Adresse."""
+    xml = fetch(f"{FH}/sitemap-festivals.xml")
+    if not xml:
+        print("  ! festivalhopper: Sitemap nicht ladbar", file=sys.stderr)
+        return []
+    links: dict[str, None] = {}
+    for loc in re.findall(r"<loc>([^<]+)</loc>", xml):
+        m = re.fullmatch(rf"{FH}/festival/([a-z0-9\-]+?)-((?:19|20)\d{{2}})", loc)
+        if m and int(m.group(2)) >= since:
+            links[loc] = None
+    return list(links)
+
+
+# "28. Summer Breeze 18.08.2027 (Mi) - 21.08.2027 (Sa)"
+FH_TERMIN = re.compile(r"(\d{2}\.\d{2}\.\d{4})\s*\(\w{2}\)\s*-\s*"
+                       r"(\d{2}\.\d{2}\.\d{4})")
+FH_FELDER = {
+    "genre":    r"Musikart:[^A-Za-z0-9]*(.*?)\s*(?:Region:|Festivalort:|Besucher:)",
+    "region":   r"Region:[^A-Za-z0-9]*(.*?)\s*(?:Festivalort:|Besucher:|Tickets:)",
+    "ort":      r"Festivalort:[^A-Za-z0-9]*(.*?)\s*(?:Besucher:|Tickets:|Infos)",
+    "besucher": r"Besucher:[^0-9]*([\d.]+)",
+    "preis":    r"Tickets:[^A-Za-z0-9]*(.*?)\s*(?:Infos zum|Anfahrt|Lineup)",
+}
+
+
+def fh_parse_detail(url: str, html: str) -> dict | None:
+    s = soup(html)
+    h1 = s.find("h1")
+    roh = clean(h1.get_text()) if h1 else ""
+    if not roh:
+        return None
+    jm = re.search(r"\b(20\d{2})\b", roh)
+    year = jm.group(1) if jm else ""
+    name = re.sub(r"\s*\b20\d{2}\b\s*$", "", roh).strip()
+    if not name:
+        return None
+
+    flach = clean(s.get_text(" ", strip=True))
+    tm = FH_TERMIN.search(flach)
+    date_from, date_to = (tm.group(1), tm.group(2)) if tm else ("", "")
+
+    feld = {}
+    for schluessel, muster in FH_FELDER.items():
+        m = re.search(muster, flach, re.S)
+        wert = clean(m.group(1)) if m else ""
+        if wert and wert.lower() not in ("unbekannt", "keine angabe", "-"):
+            feld[schluessel] = wert
+
+    # "Bayern , \U0001F1E9\U0001F1EA Deutschland" - das Land steht hinten, mit
+    # Flaggenzeichen davor, das kein Buchstabe ist.
+    land_roh = feld.get("region", "").split(",")[-1]
+    land = land_code(clean(re.sub(r"[^\w ÄÖÜäöüß-]", " ", land_roh)))
+    # "91550 Dinkelsbuehl", aber auch "CH-8152 Glattbrugg" oder "A-1010 Wien"
+    ort_roh = feld.get("ort", "")
+    plz_m = re.match(r"\s*(?:[A-Z]{1,2}-)?(\d{4,5})\b\s*(.*)$", ort_roh)
+    plz = plz_m.group(1) if plz_m else ""
+    city = clean(plz_m.group(2)) if plz_m else ort_roh
+
+    if land and land not in EUROPA_CODES:
+        return None                       # nur Europa wird gesammelt
+
+    preis = feld.get("preis", "")
+    if preis and not re.search(r"\d", preis):
+        preis = ""
+
+    # Bandnamen stehen als einzelne Verweise - kein Raten noetig
+    bands = []
+    for a in s.find_all("a", href=True):
+        if "/bands/" in a["href"]:
+            nm = clean(a.get_text())
+            if valid_band(nm):
+                bands.append(nm)
+
+    website = ""
+    for a in s.find_all("a", href=True):
+        ziel = a["href"].strip()
+        if not ziel.startswith("http") or "festivalhopper" in ziel:
+            continue
+        if re.search(r"(?i)openstreetmap|facebook|instagram|youtube|twitter|ticket",
+                     ziel):
+            continue
+        if clean(a.get_text()).lower().replace("www.", "") in ziel.lower():
+            website = ziel
+            break
+
+    return {
+        "source": "festivalhopper",
+        "source_url": url,
+        "name": name,
+        "date_from": date_from,
+        "date_to": date_to or date_from,
+        "year": year or (date_from[-4:] if date_from else ""),
+        "city": city,
+        "country": land,
+        "venue": "",
+        "plz": plz,
+        "lat": None,
+        "lon": None,
+        "location": ", ".join(x for x in [city, land] if x),
+        "price": preis,
+        "website": website,
+        "genre": feld.get("genre", ""),
+        "visitors": re.sub(r"\D", "", feld.get("besucher", "")),
+        "note": "" if date_from else "Termin noch nicht veröffentlicht",
+        "cancelled": False,
+        "lineup": bands,
+    }
+
+
+# --------------------------------------------------------------------------
+# festapp.io und wannafest.com
+# --------------------------------------------------------------------------
+
+def json_ld_events(html: str) -> list[dict]:
+    """Alle Veranstaltungsbloecke aus dem Datenblatt einer Seite (schema.org)."""
+    treffer = []
+    for m in re.finditer(r"<script[^>]*application/ld\+json[^>]*>(.*?)</script>",
+                         html, re.S):
+        try:
+            daten = json.loads(m.group(1).strip())
+        except Exception:
+            continue
+        stapel = daten if isinstance(daten, list) else [daten]
+        while stapel:
+            d = stapel.pop()
+            if not isinstance(d, dict):
+                continue
+            if isinstance(d.get("@graph"), list):
+                stapel.extend(d["@graph"])
+            if str(d.get("@type", "")).lower() in ("event", "festival", "musicevent",
+                                                   "musicfestival"):
+                treffer.append(d)
+    return treffer
+
+
+def _iso_datum(wert: str) -> str:
+    m = re.match(r"(\d{4})-(\d{2})-(\d{2})", str(wert or ""))
+    return f"{m.group(3)}.{m.group(2)}.{m.group(1)}" if m else ""
+
+
+def fp_collect_links(since: int) -> list[str]:
+    """festapp fuehrt je Festival eine Uebersicht und je Ausgabe eine Seite."""
+    links: dict[str, None] = {}
+    for karte in (f"{FP}/editions/sitemap/0.xml", f"{FP}/festivals/sitemap/0.xml"):
+        xml = fetch(karte)
+        if not xml:
+            print(f"  ! festapp: {karte} nicht ladbar", file=sys.stderr)
+            continue
+        for loc in re.findall(r"<loc>([^<]+)</loc>", xml):
+            m = re.fullmatch(r"https://festapp\.io/festivals/[a-z0-9\-]+(?:/(\d{4}))?",
+                             loc)
+            if not m:
+                continue
+            if m.group(1) and int(m.group(1)) < since:
+                continue          # vergangene Ausgabe, gar nicht erst holen
+            links[loc] = None
+    return list(links)
+
+
+def fp_parse_detail(url: str, html: str) -> dict | None:
+    ereignisse = json_ld_events(html)
+    if not ereignisse:
+        return None
+    d = ereignisse[0]
+    roh = clean(str(d.get("name", "")))
+    if not roh:
+        return None
+    jm = re.search(r"\b(20\d{2})\b", roh)
+    year = jm.group(1) if jm else ""
+    name = re.sub(r"\s*\b20\d{2}\b\s*$", "", roh).strip() or roh
+
+    date_from = _iso_datum(d.get("startDate"))
+    date_to = _iso_datum(d.get("endDate")) or date_from
+    if not year and date_from:
+        year = date_from[-4:]
+
+    ort = d.get("location") or {}
+    adresse = ort.get("address") or {} if isinstance(ort, dict) else {}
+    stadt_land = clean(str(adresse.get("addressLocality", "")))
+    # "Dorfstrasse 22, 3457 Sumiswald, Switzerland": Die Anschrift beginnt oft
+    # mit der Strasse, deshalb zaehlt der Ortsname aus location.name. Das Land
+    # steht zuverlaessig am Ende.
+    teile = [t.strip() for t in stadt_land.split(",") if t.strip()]
+    city = clean(str(ort.get("name", ""))) if isinstance(ort, dict) else ""
+    if not city and teile:
+        # ohne location.name der vorletzte Teil, ohne fuehrende Postleitzahl
+        city = re.sub(r"^[A-Z]{0,2}[-\s]?\d[\w\s-]*?\s+", "",
+                      teile[-2] if len(teile) > 1 else teile[0])
+    country = land_code(teile[-1]) if len(teile) > 1 else ""
+    if country not in EUROPA_CODES:
+        return None                       # nur Europa wird gesammelt
+
+    preis = ""
+    angebot = d.get("offers") or {}
+    if isinstance(angebot, list):
+        angebot = angebot[0] if angebot else {}
+    if isinstance(angebot, dict) and angebot.get("price"):
+        waehrung = angebot.get("priceCurrency", "EUR")
+        try:
+            preis = f"ab {waehrung} {float(angebot['price']):.2f}".replace(".", ",")
+        except (TypeError, ValueError):
+            preis = ""
+
+    lineup = []
+    for act in (d.get("performer") or []):
+        nm = clean(str(act.get("name", ""))) if isinstance(act, dict) else clean(str(act))
+        if valid_band(nm):
+            lineup.append(nm)
+
+    return {
+        "source": "festapp",
+        "source_url": url,
+        "name": name,
+        "date_from": date_from,
+        "date_to": date_to,
+        "year": year,
+        "city": city,
+        "country": country,
+        "venue": clean(str(ort.get("name", ""))) if isinstance(ort, dict) else "",
+        "plz": clean(str(adresse.get("postalCode", ""))),
+        "lat": None,
+        "lon": None,
+        "location": ", ".join(x for x in [city, country] if x),
+        "price": preis,
+        "website": clean(str(angebot.get("url", ""))) if isinstance(angebot, dict) else "",
+        "genre": "",
+        "visitors": "",
+        "note": "",
+        "cancelled": str(d.get("eventStatus", "")).endswith("EventCancelled"),
+        "lineup": lineup,
+    }
+
+
+def wf_collect_links(since: int) -> list[str]:
+    """Die Sitemap nennt die Serveradresse statt des Namens - deshalb ersetzt."""
+    xml = fetch(f"{WF}/sitemaps/festivals-1.xml")
+    if not xml:
+        print("  ! wannafest: Sitemap nicht ladbar", file=sys.stderr)
+        return []
+    links: dict[str, None] = {}
+    for loc in re.findall(r"<loc>([^<]+)</loc>", xml):
+        pfad = re.sub(r"^https?://[^/]+", "", loc)
+        if re.fullmatch(r"/festivals/[a-z0-9\-]+", pfad):
+            links[WF + pfad] = None
+    return list(links)
+
+
+# "Austria Festivalterrein Salzburgring": Das Land steht vorn und kann aus
+# mehreren Woertern bestehen ("United Kingdom"), dahinter folgt die Spielstaette.
+def _wf_land_und_ort(rest: str) -> tuple[str, str]:
+    woerter = rest.split()
+    for laenge in (3, 2, 1):
+        code = land_code(" ".join(woerter[:laenge]))
+        if code in EUROPA_CODES:
+            return code, clean(" ".join(woerter[laenge:]))
+    return (land_code(" ".join(woerter[:2])) if woerter else ""), ""
+
+
+WF_DRAUSSEN = {"outdoor", "buiten", "draussen", "draußen", "strand", "beach",
+               "boot", "park"}
+WF_FESTIVALWORT = re.compile(r"(?i)festival|open ?air|openair|\bfest\b|"
+                             r"weekender|\bdagen\b|\bdays\b|\bfestivals\b")
+
+WF_MONATE = {m: i for i, m in enumerate(
+    ["January", "February", "March", "April", "May", "June", "July", "August",
+     "September", "October", "November", "December"], 1)}
+
+
+def _wf_datum(text: str) -> str:
+    m = re.match(r"(\w+)\s+(\d{1,2}),\s*(\d{4})", text.strip())
+    if not m or m.group(1) not in WF_MONATE:
+        return ""
+    return f"{int(m.group(2)):02d}.{WF_MONATE[m.group(1)]:02d}.{m.group(3)}"
+
+
+def wf_parse_detail(url: str, html: str) -> dict | None:
+    s = soup(html)
+    titel = clean(s.title.get_text()) if s.title else ""
+    name = re.sub(r"\s*[-–|]\s*WannaFest\s*$", "", titel).strip()
+    if not name:
+        return None
+
+    flach = clean(s.get_text(" ", strip=True))
+    dm = re.search(r"Date\s+(\w+ \d{1,2}, \d{4})[^A-Za-z]*(?:to\s+(\w+ \d{1,2}, \d{4}))?",
+                   flach)
+    date_from = _wf_datum(dm.group(1)) if dm else ""
+    date_to = _wf_datum(dm.group(2)) if dm and dm.group(2) else date_from
+
+    # "Location Plainfeld, Austria Festivalterrein Salzburgring Place Type"
+    lm = re.search(r"Location\s+([^,]{2,40}),\s*(.*?)\s*"
+                   r"(?:Place Type|Website|Past events)", flach)
+    city = clean(lm.group(1)) if lm else ""
+    country, venue = _wf_land_und_ort(clean(lm.group(2))) if lm else ("", "")
+    if country not in EUROPA_CODES:
+        return None                       # nur Europa wird gesammelt
+
+    # Die Seite fuehrt weit ueberwiegend Clubabende: In einer Stichprobe von 400
+    # Eintraegen waren 359 "Indoor". Uebernommen wird deshalb nur, was sich als
+    # Festival zu erkennen gibt - am Namen oder daran, dass es draussen liegt.
+    art = re.search(r"Place Type\s+([A-Za-zÄÖÜäöü]+)", flach)
+    draussen = (art.group(1).casefold() in WF_DRAUSSEN) if art else False
+    if not draussen and not WF_FESTIVALWORT.search(name):
+        return None
+
+    website = ""
+    for a in s.find_all("a", href=True):
+        if "official" in clean(a.get_text()).lower() and a["href"].startswith("http"):
+            website = a["href"].strip()
+            break
+
+    return {
+        "source": "wannafest",
+        "source_url": url,
+        "name": name,
+        "date_from": date_from,
+        "date_to": date_to,
+        "year": date_from[-4:] if date_from else "",
+        "city": city,
+        "country": country,
+        "venue": venue if len(venue) <= 60 else "",
+        "plz": "",
+        "lat": None,
+        "lon": None,
+        "location": ", ".join(x for x in [city, country] if x),
+        "price": "",
+        "website": website,
+        "genre": "",
+        "visitors": "",
+        "note": "",
+        "cancelled": False,
+        "lineup": [],
+    }
+
+
+# --------------------------------------------------------------------------
+# festivalflyer.com
+# --------------------------------------------------------------------------
+
+def fl_collect_links(since: int) -> list[str]:
+    """Nur die Veranstaltungen, die die Startseite gerade fuehrt.
+
+    Mehr ist nicht erreichbar: Die Sitemap enthaelt ausschliesslich Artikel
+    (30.937 Stueck), die Uebersicht unter /events/ wird im Browser
+    zusammengesetzt, und die Detailseiten verweisen nur aufeinander. Die
+    Startseite nennt dafuer ein Dutzend kommende Festivals mit vollem
+    Datenblatt - ueber das Jahr wechseln sie durch.
+    """
+    html = fetch(f"{FL}/")
+    if not html:
+        print("  ! festivalflyer: Startseite nicht ladbar", file=sys.stderr)
+        return []
+    links = {u.rstrip("/") + "/": None for u in
+             re.findall(rf"{FL}/events/[a-z0-9\-]+/", html)}
+    return list(links)
+
+
+def fl_parse_detail(url: str, html: str) -> dict | None:
+    ereignisse = json_ld_events(html)
+    if not ereignisse:
+        return None
+    d = ereignisse[0]
+    roh = clean(str(d.get("name", "")))
+    if not roh:
+        return None
+    jm = re.search(r"\b(20\d{2})\b", roh)
+    year = jm.group(1) if jm else ""
+    name = re.sub(r"\s*\b20\d{2}\b\s*$", "", roh).strip() or roh
+
+    # "2026-8-19T11:00+1:00" - Monat und Tag stehen teils ohne fuehrende Null
+    def datum(wert):
+        m = re.match(r"(\d{4})-(\d{1,2})-(\d{1,2})", str(wert or ""))
+        return f"{int(m.group(3)):02d}.{int(m.group(2)):02d}.{m.group(1)}" if m else ""
+
+    date_from = datum(d.get("startDate"))
+    date_to = datum(d.get("endDate")) or date_from
+    if not year and date_from:
+        year = date_from[-4:]
+    # Vergangene Jahrgaenge sortiert main() nach dem Zusammenfuehren aus
+
+    # "Fernhill Farm, Cheddar Road, BS40 6LD Compton Martin, United Kingdom"
+    ort = d.get("location")
+    if isinstance(ort, list):
+        ort = ort[0] if ort else {}
+    anschrift = clean(str(ort.get("name", ""))) if isinstance(ort, dict) else ""
+    teile = [t.strip() for t in anschrift.split(",") if t.strip()]
+    country = land_code(teile[-1]) if len(teile) > 1 else ""
+    if country not in EUROPA_CODES:
+        return None
+    stadt_roh = teile[-2] if len(teile) > 1 else ""
+    # britische Postleitzahlen stehen vor dem Ort: "BS40 6LD Compton Martin"
+    city = clean(re.sub(r"^[A-Z]{1,2}\d{1,2}[A-Z]?\s*\d?[A-Z]{0,2}\s+", "", stadt_roh))
+    venue = teile[0] if len(teile) > 2 else ""
+
+    # Die Beschreibung fuehrt das Lineup, mit Schraegstrich getrennt
+    beschreibung = re.sub(r"<[^>]+>", " ", str(d.get("description", "")))
+    bands = []
+    if "/" in beschreibung:
+        for teil in beschreibung.split("/"):
+            nm = clean(teil).strip("*").strip()
+            nm = re.sub(r"(?i)^(line ?up so far\.?|lineup:?)\s*", "", nm)
+            if valid_band(nm) and len(nm) <= 60:
+                bands.append(nm)
+
+    return {
+        "source": "festivalflyer",
+        "source_url": url,
+        "name": name,
+        "date_from": date_from,
+        "date_to": date_to,
+        "year": year,
+        "city": city,
+        "country": country,
+        "venue": venue if len(venue) <= 60 else "",
+        "plz": "",
+        "lat": None,
+        "lon": None,
+        "location": ", ".join(x for x in [city, country] if x),
+        "price": "",
+        "website": "",
+        "genre": "",
+        "visitors": "",
+        "note": "",
+        "cancelled": str(d.get("eventStatus", "")).endswith("EventCancelled"),
+        "lineup": bands,
+    }
+
+
+# --------------------------------------------------------------------------
+# festivalfinder.eu
+# --------------------------------------------------------------------------
+
+FF_LISTE = re.compile(r'href="(/find-festival-organisations/[a-z0-9\-]+)"')
+
+# "21 Aug 2026 - 30 Nov 2026", danach "Didymoteicho, Greece"
+FF_TERMIN = re.compile(r"(\d{1,2} [A-Z][a-z]{2} \d{4})\s*[-–]\s*(\d{1,2} [A-Z][a-z]{2} \d{4})")
+FF_MONATE = {m: i for i, m in enumerate(
+    ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], 1)}
+
+
+def ff_collect_links(since: int) -> list[str]:
+    """Die Trefferliste blaettert ueber den Pfad: /p2, /p3 und so fort.
+
+    Der Filter artDisciplines=music entspricht der Suche auf der Seite; ohne
+    ihn kaemen Film-, Tanz- und Theaterfestivals mit. Geblaettert wird, bis
+    eine Seite nichts Neues mehr bringt.
+    """
+    links: dict[str, None] = {}
+    for seite in range(1, 260):
+        pfad = f"{FF}/find-festival-organisations" + ("" if seite == 1 else f"/p{seite}")
+        html = fetch(f"{pfad}?query&country&daterange&artDisciplines%5B0%5D=music")
+        if not html:
+            break
+        neu = {FF + t for t in FF_LISTE.findall(html) if t.rstrip("/") !=
+               "/find-festival-organisations"} - set(links)
+        if not neu:
+            break
+        links.update(dict.fromkeys(neu))
+    return list(links)
+
+
+def _ff_datum(wert: str) -> str:
+    m = re.match(r"(\d{1,2}) ([A-Z][a-z]{2}) (\d{4})", wert.strip())
+    if not m or m.group(2) not in FF_MONATE:
+        return ""
+    return f"{int(m.group(1)):02d}.{FF_MONATE[m.group(2)]:02d}.{m.group(3)}"
+
+
+def ff_parse_detail(url: str, html: str) -> dict | None:
+    s = soup(html)
+    # Die ersten beiden <h1> gehoeren dem Cookie-Hinweis, deshalb der Titel.
+    titel = clean(s.title.get_text()) if s.title else ""
+    name = re.sub(r"\s*[-–|]\s*European Festivals Association\s*$", "", titel)
+    if not name or name.lower().startswith("we could not find"):
+        return None
+    name = re.sub(r"\s*\b20\d{2}\b\s*$", "", name).strip() or name
+
+    flach = clean(s.get_text(" ", strip=True))
+    tm = FF_TERMIN.search(flach)
+    date_from = _ff_datum(tm.group(1)) if tm else ""
+    date_to = _ff_datum(tm.group(2)) if tm else date_from
+
+    # Hinter dem Termin stehen Ort und Land: "Didymoteicho, Greece"
+    city = country = ""
+    if tm:
+        rest = flach[tm.end():tm.end() + 120]
+        om = re.match(r"\s*([^,]{2,40}),\s*([A-Za-zÄÖÜäöü' \-]{3,40}?)\s+"
+                      r"(?:Visit|facebook|instagram|X\b|youtube|The |This )", rest)
+        if om:
+            city = clean(om.group(1))
+            country = land_code(clean(om.group(2)))
+    if country not in EUROPA_CODES:
+        return None
+
+    website = ""
+    for a in s.find_all("a", href=True):
+        if "visit website" in clean(a.get_text()).lower():
+            website = a["href"].strip()
+            break
+
+    return {
+        "source": "festivalfinder",
+        "source_url": url,
+        "name": name,
+        "date_from": date_from,
+        "date_to": date_to,
+        "year": date_from[-4:] if date_from else "",
+        "city": city,
+        "country": country,
+        "venue": "",
+        "plz": "",
+        "lat": None,
+        "lon": None,
+        "location": ", ".join(x for x in [city, country] if x),
+        "price": "",
+        "website": website,
+        "genre": "",
+        "visitors": "",
+        "note": "" if date_from else "Termin noch nicht veröffentlicht",
+        "cancelled": False,
+        "lineup": [],
+    }
+
+
 def scrape(urls: list[str], parser, label: str, seeds: dict | None = None) -> list[dict]:
     results: list[dict] = []
     done = 0
@@ -1018,8 +1555,13 @@ def merge(records: list[dict], registry: dict[str, str]) -> list[dict]:
                 "note": rec.get("note", ""),
                 "cancelled": bool(rec.get("cancelled")),
                 "sources": {},
-                "source_order": {"festivalticker": 0, "festivalsunited": 1}
-                                .get(rec["source"], 2),
+                # Reihenfolge bestimmt, wessen Schreibweise gewinnt: die
+                # drei gepflegten Verzeichnisse zuerst, die Ergaenzungen danach.
+                "source_order": {"festivalticker": 0, "festivalsunited": 1,
+                                 "festivalalarm": 2, "festivalhopper": 3,
+                                 "festapp": 4, "wannafest": 5,
+                                 "festivalflyer": 6, "festivalfinder": 7}
+                                .get(rec["source"], 8),
                 "_bands": {},
             }
             merged[key] = cur
@@ -1265,16 +1807,33 @@ def main() -> None:
     ft_links = list(ft_seeds)
     fu_links = fu_collect_links(args.since)
     fa_links = fa_collect_links(args.since)
+    fh_links = fh_collect_links(args.since)
+    fp_links = fp_collect_links(args.since)
+    wf_links = wf_collect_links(args.since)
+    fl_links = fl_collect_links(args.since)
+    ff_links = ff_collect_links(args.since)
     print(f"  festivalticker {len(ft_links)} | festivalsunited {len(fu_links)} | "
-          f"festival-alarm {len(fa_links)}", flush=True)
+          f"festival-alarm {len(fa_links)} | festivalhopper {len(fh_links)} | "
+          f"festapp {len(fp_links)} | wannafest {len(wf_links)} | "
+          f"festivalflyer {len(fl_links)} | festivalfinder {len(ff_links)}", flush=True)
     if args.limit:
         ft_links = ft_links[:args.limit]
         fu_links = fu_links[:args.limit]
         fa_links = fa_links[:args.limit]
+        fh_links = fh_links[:args.limit]
+        fp_links = fp_links[:args.limit]
+        wf_links = wf_links[:args.limit]
+        fl_links = fl_links[:args.limit]
+        ff_links = ff_links[:args.limit]
 
     records = scrape(ft_links, ft_parse_detail, "festivalticker", ft_seeds)
     records += scrape(fu_links, fu_parse_detail, "festivalsunited")
     records += scrape(fa_links, fa_parse_detail, "festival-alarm")
+    records += scrape(fh_links, fh_parse_detail, "festivalhopper")
+    records += scrape(fp_links, fp_parse_detail, "festapp")
+    records += scrape(wf_links, wf_parse_detail, "wannafest")
+    records += scrape(fl_links, fl_parse_detail, "festivalflyer")
+    records += scrape(ff_links, ff_parse_detail, "festivalfinder")
     print(f"Datensaetze: {len(records)}", flush=True)
 
     registry, bstats = build_band_registry(records)

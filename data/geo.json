@@ -19672,5 +19672,3998 @@
   "lat": 49.1966572,
   "lon": 9.6862506,
   "display": "Westernach, Kupferzell, GVV Hohenloher Ebene, Hohenlohekreis, Baden-Württemberg, Deutschland"
+ },
+ "Logroño|ES": {
+  "lat": 42.4661196,
+  "lon": -2.4396676,
+  "display": "Logroño, La Rioja, Spanien"
+ },
+ "West Sussex|GB": {
+  "lat": 51.0,
+  "lon": -0.416667,
+  "display": "West Sussex, England, Vereinigtes Königreich"
+ },
+ "Breda|NL": {
+  "lat": 51.5887845,
+  "lon": 4.7760237,
+  "display": "Breda, Nordbrabant, Niederlande"
+ },
+ "Sumiswald|CH": {
+  "lat": 47.0285646,
+  "lon": 7.7449828,
+  "display": "Sumiswald, Verwaltungskreis Emmental, Verwaltungsregion Emmental-Oberaargau, Bern, Schweiz"
+ },
+ "Mangualde|PT": {
+  "lat": 40.60354,
+  "lon": -7.7656,
+  "display": "Mangualde, Viseu, Portugal"
+ },
+ "Amer|ES": {
+  "lat": 42.0092186,
+  "lon": 2.6030327,
+  "display": "Amer, la Selva, Girona, Katalonien, 17170, Spanien"
+ },
+ "Glasgow City|GB": {
+  "lat": 55.8555116,
+  "lon": -4.2262307,
+  "display": "Glasgow City, Schottland, Vereinigtes Königreich"
+ },
+ "Praag|CZ": {
+  "lat": 50.0874654,
+  "lon": 14.4212535,
+  "display": "Prag, Tschechien"
+ },
+ "Wateringen|NL": {
+  "lat": 52.0235098,
+  "lon": 4.2745855,
+  "display": "Wateringen, Westland, Südholland, Niederlande"
+ },
+ "Entrevaux|FR": {
+  "lat": 43.9500304,
+  "lon": 6.8100877,
+  "display": "Entrevaux, Castellane, Alpes-de-Haute-Provence, Provence-Alpes-Côte d'Azur, Metropolitanes Frankreich, 04320, Frankreich"
+ },
+ "Mons|BE": {
+  "lat": 50.4549568,
+  "lon": 3.951958,
+  "display": "Bergen, Hennegau, Wallonien, Belgien"
+ },
+ "Alblasserdam|NL": {
+  "lat": 51.865799,
+  "lon": 4.6653953,
+  "display": "Alblasserdam, Südholland, Niederlande"
+ },
+ "Civray|FR": {
+  "lat": 46.9668969,
+  "lon": 2.1740773,
+  "display": "Civray, Bourges, Cher, Zentrum-Loiretal, Metropolitanes Frankreich, 18290, Frankreich"
+ },
+ "Rethymno|GR": {
+  "lat": 35.3676472,
+  "lon": 24.4736079,
+  "display": "Rethymnon, Provinz Rethymnon, Regionalbezirk Rethymno, Region Kreta, 741 32, Griechenland"
+ },
+ "Saalfeld, Meininger Hof|DE": {
+  "lat": 50.650788,
+  "lon": 11.3541548,
+  "display": "Meininger Hof, 1, Alte Freiheit, Köditz, Graba, Saalfeld/Saale, Kamsdorf, Landkreis Saalfeld-Rudolstadt, Thüringen, 07318, Deutschland"
+ },
+ "Kortenhoef|NL": {
+  "lat": 52.2401304,
+  "lon": 5.1130009,
+  "display": "Kortenhoef, Wijdemeren, Nordholland, Niederlande"
+ },
+ "Pau|FR": {
+  "lat": 43.2957547,
+  "lon": -0.3685668,
+  "display": "Pau, Pyrenäen-Atlantik, Neu-Aquitanien, Metropolitanes Frankreich, 64000, Frankreich"
+ },
+ "Zevenhuizen|NL": {
+  "lat": 53.1254057,
+  "lon": 6.349367,
+  "display": "Zevenhuizen, Westerkwartier, Groningen, Niederlande"
+ },
+ "Bergschenhoek|NL": {
+  "lat": 51.98934,
+  "lon": 4.5016775,
+  "display": "Bergschenhoek, Lansingerland, Südholland, Niederlande"
+ },
+ "Tours|FR": {
+  "lat": 47.3900474,
+  "lon": 0.6889268,
+  "display": "Tours, Indre-et-Loire, Zentrum-Loiretal, Metropolitanes Frankreich, Frankreich"
+ },
+ "'s-Hertogenbosch|NL": {
+  "lat": 51.6889387,
+  "lon": 5.303116,
+  "display": "Herzogenbusch, Nordbrabant, Niederlande"
+ },
+ "Kokkola|FI": {
+  "lat": 63.8391421,
+  "lon": 23.1336845,
+  "display": "Kokkola, Kokkolan seutukunta, Mittelösterbotten, Festland-Finnland, Finnland"
+ },
+ "Annecy|FR": {
+  "lat": 45.8992348,
+  "lon": 6.1288847,
+  "display": "Annecy, Hochsavoyen, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, Frankreich"
+ },
+ "Ljubljana|SI": {
+  "lat": 46.0500268,
+  "lon": 14.5069289,
+  "display": "Laibach, Upravna Enota Ljubljana, 1000, Slowenien"
+ },
+ "Noisiel|FR": {
+  "lat": 48.8457347,
+  "lon": 2.6200032,
+  "display": "Noisiel, Torcy, Seine-et-Marne, Île-de-France, Metropolitanes Frankreich, 77186, Frankreich"
+ },
+ "Salt|ES": {
+  "lat": 41.9741672,
+  "lon": 2.7949886,
+  "display": "Salt, Gironès, Girona, Katalonien, 17190, Spanien"
+ },
+ "Burley|GB": {
+  "lat": 50.8266,
+  "lon": -1.70164,
+  "display": "Burley, New Forest, Hampshire, England, Vereinigtes Königreich"
+ },
+ "Enkhuizen|NL": {
+  "lat": 52.7036282,
+  "lon": 5.2901222,
+  "display": "Enkhuizen, Nordholland, Niederlande"
+ },
+ "Anthisnes|BE": {
+  "lat": 50.481662,
+  "lon": 5.5225261,
+  "display": "Anthisnes, Huy, Lüttich, Wallonien, Belgien"
+ },
+ "Antwerp|BE": {
+  "lat": 51.2211097,
+  "lon": 4.3997081,
+  "display": "Antwerpen, Flandern, Belgien"
+ },
+ "Alphen aan den Rijn|NL": {
+  "lat": 52.1130693,
+  "lon": 4.6408057,
+  "display": "Alphen am Rhein, Südholland, Niederlande"
+ },
+ "Clonmel|IE": {
+  "lat": 52.355,
+  "lon": -7.703889,
+  "display": "Clonmel, County Tipperary, Munster, Irland"
+ },
+ "L'Hospitalet de Llobregat|ES": {
+  "lat": 41.3595118,
+  "lon": 2.0996318,
+  "display": "l'Hospitalet de Llobregat, Barcelonès, Barcelona, Katalonien, Spanien"
+ },
+ "Aix-en-Provence|FR": {
+  "lat": 43.5298424,
+  "lon": 5.4474738,
+  "display": "Aix-en-Provence, Bouches-du-Rhône, Provence-Alpes-Côte d'Azur, Metropolitanes Frankreich, Frankreich"
+ },
+ "Oostende|BE": {
+  "lat": 51.2258565,
+  "lon": 2.919496,
+  "display": "Ostende, Westflandern, Flandern, 8400, Belgien"
+ },
+ "Denain|FR": {
+  "lat": 50.3270926,
+  "lon": 3.3943729,
+  "display": "Denain, Valenciennes, Nord, Nordfrankreich, Metropolitanes Frankreich, 59220, Frankreich"
+ },
+ "Hengelo|NL": {
+  "lat": 52.2523195,
+  "lon": 6.7955256,
+  "display": "Hengelo, Oberyssel, Niederlande"
+ },
+ "Kelmis|BE": {
+  "lat": 50.7154957,
+  "lon": 6.013341,
+  "display": "Kelmis, Verviers, Lüttich, Wallonien, Belgien"
+ },
+ "Viborg|DK": {
+  "lat": 56.4469128,
+  "lon": 9.4059354,
+  "display": "Viborg, Viborg Kommune, Region Mitteljütland, 8800, Dänemark"
+ },
+ "Funchal|PT": {
+  "lat": 32.6496497,
+  "lon": -16.9086783,
+  "display": "Funchal, Madeira, Portugal"
+ },
+ "Châteauneuf-sur-Isère|FR": {
+  "lat": 45.0148392,
+  "lon": 4.9391394,
+  "display": "Châteauneuf-sur-Isère, Valence, Drôme, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 26300, Frankreich"
+ },
+ "Greater London|GB": {
+  "lat": 51.5074456,
+  "lon": -0.1277653,
+  "display": "Groß-London, England, Vereinigtes Königreich"
+ },
+ "Русе|BG": {
+  "lat": 43.8350657,
+  "lon": 25.9579915,
+  "display": "Русе, Russe, Oblast Russe, Bulgarien"
+ },
+ "Grenoble|FR": {
+  "lat": 45.1875602,
+  "lon": 5.7357819,
+  "display": "Grenoble, Isère, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, Frankreich"
+ },
+ "America|NL": {
+  "lat": 51.4371483,
+  "lon": 5.9799001,
+  "display": "America, Horst aan de Maas, Limburg, Niederlande"
+ },
+ "Sala Baganza|IT": {
+  "lat": 44.7139495,
+  "lon": 10.2263338,
+  "display": "Sala Baganza, Parma, Emilia-Romagna, 43038, Italien"
+ },
+ "București|RO": {
+  "lat": 44.4361414,
+  "lon": 26.102684,
+  "display": "Bukarest, Rumänien"
+ },
+ "Corbeyrier|CH": {
+  "lat": 46.3495001,
+  "lon": 6.9597544,
+  "display": "Corbeyrier, District d'Aigle, Waadt, 1856, Schweiz"
+ },
+ "Floriana|MT": {
+  "lat": 35.8929838,
+  "lon": 14.5052716,
+  "display": "Il-Furjana, Reġjun tal-Port, Malta"
+ },
+ "Sankt Moritz|CH": {
+  "lat": 46.4978958,
+  "lon": 9.8392428,
+  "display": "St. Moritz, Maloja, Graubünden, 7500, Schweiz"
+ },
+ "Löhne|DE": {
+  "lat": 52.1990346,
+  "lon": 8.7141587,
+  "display": "Löhne, Kreis Herford, Nordrhein-Westfalen, 32584, Deutschland"
+ },
+ "Gubbio|IT": {
+  "lat": 43.3517605,
+  "lon": 12.5772959,
+  "display": "Gubbio, Perugia, Umbrien, 06024, Italien"
+ },
+ "Gliwice|PL": {
+  "lat": 50.294113,
+  "lon": 18.6657306,
+  "display": "Gleiwitz, Metropole GZM, Woiwodschaft Schlesien, Polen"
+ },
+ "Hoofddorp|NL": {
+  "lat": 52.305554,
+  "lon": 4.6926644,
+  "display": "Hoofddorp, Haarlemmermeer, Nordholland, Niederlande"
+ },
+ "Warsaw|PL": {
+  "lat": 52.2319581,
+  "lon": 21.0067249,
+  "display": "Warschau, Woiwodschaft Masowien, Polen"
+ },
+ "Ponta Delgada|PT": {
+  "lat": 37.7393398,
+  "lon": -25.6689503,
+  "display": "Ponta Delgada, Azoren, Portugal"
+ },
+ "Chamonix|FR": {
+  "lat": 45.9230969,
+  "lon": 6.8700009,
+  "display": "Chamonix-Mont-Blanc, Bonneville, Hochsavoyen, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 74400, Frankreich"
+ },
+ "AIX-EN-PROVENCE|FR": {
+  "lat": 43.5298424,
+  "lon": 5.4474738,
+  "display": "Aix-en-Provence, Bouches-du-Rhône, Provence-Alpes-Côte d'Azur, Metropolitanes Frankreich, Frankreich"
+ },
+ "Peal de Becerro|ES": {
+  "lat": 37.9121397,
+  "lon": -3.1240597,
+  "display": "Peal de Becerro, Jaén, Andalusien, Spanien"
+ },
+ "North Yorkshire|GB": {
+  "lat": 54.1345328,
+  "lon": -1.4986285,
+  "display": "North Yorkshire, England, Vereinigtes Königreich"
+ },
+ "Zaandam|NL": {
+  "lat": 52.4424926,
+  "lon": 4.8298607,
+  "display": "Zaandam, Zaanstad, Nordholland, Niederlande"
+ },
+ "Gorinchem|NL": {
+  "lat": 51.8296133,
+  "lon": 4.9738743,
+  "display": "Gorinchem, Südholland, Niederlande"
+ },
+ "Kraków|PL": {
+  "lat": 50.0619474,
+  "lon": 19.9368564,
+  "display": "Krakau, Woiwodschaft Kleinpolen, Polen"
+ },
+ "Mulhouse|FR": {
+  "lat": 47.7467233,
+  "lon": 7.3389937,
+  "display": "Mülhausen, Oberelsass, Collectivité européenne d'Alsace, Grand Est, Metropolitanes Frankreich, Frankreich"
+ },
+ "Lecce|IT": {
+  "lat": 40.3570373,
+  "lon": 18.1718482,
+  "display": "Lecce, Apulien, 73100, Italien"
+ },
+ "Bruxelles|BE": {
+  "lat": 50.8467372,
+  "lon": 4.352493,
+  "display": "Brüssel, Brüssel-Hauptstadt, Belgien"
+ },
+ "Sheffield City Centre|GB": {
+  "lat": 53.4118997,
+  "lon": -1.3964881,
+  "display": "119 BAWTRY ROAD, SHEFFIELD, S9 1UF, GB, Bawtry Road, Tinsley Shopping Centre, Tinsley, Sheffield, South Yorkshire, England, S9 1UF, Vereinigtes Königreich"
+ },
+ "Ankara|TR": {
+  "lat": 39.9207759,
+  "lon": 32.8540497,
+  "display": "Ankara, Çankaya, Ankara, Zentralanatolien, 06420, Türkei"
+ },
+ "Villefranche-sur-Saone|FR": {
+  "lat": 45.9864749,
+  "lon": 4.726611,
+  "display": "Villefranche-sur-Saône, Rhône, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 69400, Frankreich"
+ },
+ "Stockton-on-Tees|GB": {
+  "lat": 54.564094,
+  "lon": -1.3129164,
+  "display": "Stockton-on-Tees, Tees Valley, England, Vereinigtes Königreich"
+ },
+ "Apeldoorn|NL": {
+  "lat": 52.1795738,
+  "lon": 5.9300775,
+  "display": "Apeldoorn, Geldern, Niederlande"
+ },
+ "Bloemendaal aan zee|NL": {
+  "lat": 52.4026223,
+  "lon": 4.5449103,
+  "display": "Bloemendaal aan Zee, Overveen, Bloemendaal, Nordholland, Niederlande, 2041 KZ, Niederlande"
+ },
+ "Elst|NL": {
+  "lat": 51.9187914,
+  "lon": 5.8452555,
+  "display": "Elst, Overbetuwe, Geldern, Niederlande"
+ },
+ "Scharwoude|NL": {
+  "lat": 52.622457,
+  "lon": 5.0132636,
+  "display": "Scharwoude, Koggenland, Nordholland, Niederlande"
+ },
+ "Costa da Caparica|PT": {
+  "lat": 38.6445165,
+  "lon": -9.2336068,
+  "display": "Costa da Caparica, Almada, Setúbal, Portugal"
+ },
+ "Prievidza|SK": {
+  "lat": 48.7718361,
+  "lon": 18.6234916,
+  "display": "Priwitz, Bezirk Priwitz, Trentschiner Landschaftsverband, Slowakei"
+ },
+ "Guimarães|PT": {
+  "lat": 41.4417677,
+  "lon": -8.2955712,
+  "display": "Guimarães, Braga, Portugal"
+ },
+ "Praha 1|CZ": {
+  "lat": 50.0855166,
+  "lon": 14.4106698,
+  "display": "Prag 1, Stadtbezirk Prag 1, Prag, Tschechien"
+ },
+ "Cieszyn|PL": {
+  "lat": 49.7488623,
+  "lon": 18.6334308,
+  "display": "Teschen, powiat cieszyński, Woiwodschaft Schlesien, 43-400, Polen"
+ },
+ "Scheveningen|NL": {
+  "lat": 52.1067449,
+  "lon": 4.2736937,
+  "display": "Scheveningen, Den Haag, Südholland, Niederlande"
+ },
+ "Delft|NL": {
+  "lat": 52.0114017,
+  "lon": 4.35839,
+  "display": "Delft, Südholland, Niederlande"
+ },
+ "Scharsterbrug|NL": {
+  "lat": 52.9451345,
+  "lon": 5.7797885,
+  "display": "Scharsterbrug, De Fryske Marren, Friesland, Niederlande"
+ },
+ "Les Belleville|FR": {
+  "lat": 45.3830517,
+  "lon": 6.503499,
+  "display": "Les Belleville, Albertville, Savoyen, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 73440, Frankreich"
+ },
+ "Gijón|ES": {
+  "lat": 43.5449422,
+  "lon": -5.66275,
+  "display": "Gijón, Asturien, Spanien"
+ },
+ "Sint Annaland|NL": {
+  "lat": 51.6003889,
+  "lon": 4.1023311,
+  "display": "Sint-Annaland, Tholen, Seeland, Niederlande"
+ },
+ "East Riding of Yorkshire|GB": {
+  "lat": 53.8735965,
+  "lon": -0.5347788,
+  "display": "East Riding of Yorkshire, England, Vereinigtes Königreich"
+ },
+ "York|GB": {
+  "lat": 53.9590555,
+  "lon": -1.0815361,
+  "display": "York, York and North Yorkshire, England, YO1 8SG, Vereinigtes Königreich"
+ },
+ "Obertrum am See|AT": {
+  "lat": 47.9380101,
+  "lon": 13.0752378,
+  "display": "Obertrum am See, Bezirk Salzburg-Umgebung, Salzburg, 5162, Österreich"
+ },
+ "Malmö|SE": {
+  "lat": 55.6052931,
+  "lon": 13.0001566,
+  "display": "Malmö, Malmö kommun, Provinz Schonen, Schweden"
+ },
+ "Woodbridge|GB": {
+  "lat": 52.0941323,
+  "lon": 1.3199383,
+  "display": "Woodbridge, East Suffolk, Suffolk, England, Vereinigtes Königreich"
+ },
+ "Kharkiv|UA": {
+  "lat": 49.9923181,
+  "lon": 36.2310146,
+  "display": "Charkiw, Харківська міська громада, Rajon Charkiw, Oblast Charkiw, Ukraine"
+ },
+ "Nové Mesto|SK": {
+  "lat": 48.630219,
+  "lon": 21.5240372,
+  "display": "Slanské Nové Mesto, Okres Košice-okolie, Košický kraj, 044 18, Slowakei"
+ },
+ "Bad Reichenhall|DE": {
+  "lat": 47.7222676,
+  "lon": 12.8760923,
+  "display": "Bad Reichenhall, Landkreis Berchtesgadener Land, Bayern, 83435, Deutschland"
+ },
+ "Mouzillon|FR": {
+  "lat": 47.1413424,
+  "lon": -1.2839318,
+  "display": "Mouzillon, Nantes, Loire-Atlantique, Pays de la Loire, Metropolitanes Frankreich, 44330, Frankreich"
+ },
+ "Val Thorens|NL": {
+  "lat": 45.2979109,
+  "lon": 6.5822693,
+  "display": "Val Thorens, Les Belleville, Albertville, Savoyen, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 73440, Frankreich"
+ },
+ "Writtle|GB": {
+  "lat": 51.7284758,
+  "lon": 0.4115666,
+  "display": "Writtle, Chelmsford, Essex, England, Vereinigtes Königreich"
+ },
+ "Keulen|DE": {
+  "lat": 50.938361,
+  "lon": 6.959974,
+  "display": "Köln, Nordrhein-Westfalen, Deutschland"
+ },
+ "Milan|IT": {
+  "lat": 45.4641943,
+  "lon": 9.1896346,
+  "display": "Mailand, Rodano, Mailand, Lombardei, Italien"
+ },
+ "Doetinchem|NL": {
+  "lat": 51.9585348,
+  "lon": 6.2814551,
+  "display": "Doetinchem, Geldern, Niederlande"
+ },
+ "Villarrobledo|ES": {
+  "lat": 39.2681742,
+  "lon": -2.6042132,
+  "display": "Villarrobledo, Albacete, Kastilien-La Mancha, 02600, Spanien"
+ },
+ "Rovereto - TN|IT": {
+  "lat": 45.8940032,
+  "lon": 11.0450226,
+  "display": "Museo di arte moderna e contemporanea di Trento e Rovereto, 43, Corso Bettini, Santa Maria, Rovereto, Comunità della Vallagarina, Autonome Provinz Trient, Trentino-Südtirol, 38068, Italien"
+ },
+ "Cáceres‎|ES": {
+  "lat": 39.4745175,
+  "lon": -6.3716761,
+  "display": "Cáceres, Extremadura, Spanien"
+ },
+ "Praha 6|CZ": {
+  "lat": 50.1065562,
+  "lon": 14.3637235,
+  "display": "Prag 6, Stadtbezirk Prag 6, Prag, Tschechien"
+ },
+ "Trezzo sull'Adda|IT": {
+  "lat": 45.6095134,
+  "lon": 9.5193394,
+  "display": "Trezzo sull'Adda, Rodano, Mailand, Lombardei, 20056, Italien"
+ },
+ "Venezia|IT": {
+  "lat": 45.4371908,
+  "lon": 12.3345898,
+  "display": "Venedig, Venezia, Venetien, 30121-30176, Italien"
+ },
+ "Brighton and Hove|GB": {
+  "lat": 50.8454126,
+  "lon": -0.1497239,
+  "display": "Brighton and Hove, England, Vereinigtes Königreich"
+ },
+ "Gjesdal|NO": {
+  "lat": 58.8312089,
+  "lon": 6.2770851,
+  "display": "Gjesdal, Rogaland, Norwegen"
+ },
+ "Praha 9|CZ": {
+  "lat": 50.1089281,
+  "lon": 14.5065701,
+  "display": "Prag 9, Stadtbezirk Prag 9, Prag, Tschechien"
+ },
+ "Marsaskala|MT": {
+  "lat": 35.8629162,
+  "lon": 14.5591879,
+  "display": "Wied il-Għajn, Reġjun tan-Nofsinhar, Malta"
+ },
+ "Molina de Segura|ES": {
+  "lat": 38.0572339,
+  "lon": -1.2095298,
+  "display": "Molina de Segura, Vega Media del Segura, Region Murcia, Murcia, Spanien"
+ },
+ "Izegem|BE": {
+  "lat": 50.9198305,
+  "lon": 3.215435,
+  "display": "Izegem, Roeselare, Westflandern, Flandern, 8870, Belgien"
+ },
+ "Grijpskerke|NL": {
+  "lat": 51.5341554,
+  "lon": 3.5613136,
+  "display": "Grijpskerke, Veere, Seeland, Niederlande"
+ },
+ "South Ayrshire|GB": {
+  "lat": 55.299818,
+  "lon": -4.6459884,
+  "display": "South Ayrshire, Schottland, Vereinigtes Königreich"
+ },
+ "Wageningen|NL": {
+  "lat": 51.9663016,
+  "lon": 5.6662814,
+  "display": "Wageningen, Geldern, Niederlande"
+ },
+ "Lugo|ES": {
+  "lat": 42.9913123,
+  "lon": -7.5908294,
+  "display": "Lugo, Galicien, Spanien"
+ },
+ "Valletta|MT": {
+  "lat": 35.8989979,
+  "lon": 14.5136607,
+  "display": "Valletta, Reġjun tal-Port, Malta"
+ },
+ "Highland Council|GB": {
+  "lat": 56.8380353,
+  "lon": -5.0705349,
+  "display": "Highland Council TEC Services Yard, Camaghael, Lochyside, Highland, Schottland, PH33 6TL, Vereinigtes Königreich"
+ },
+ "Bergen op Zoom|NL": {
+  "lat": 51.4944756,
+  "lon": 4.2871541,
+  "display": "Bergen op Zoom, Nordbrabant, Niederlande"
+ },
+ "Reusel|NL": {
+  "lat": 51.3614392,
+  "lon": 5.1615312,
+  "display": "Reusel, Reusel-De Mierden, Nordbrabant, Niederlande"
+ },
+ "Kaatsheuvel|NL": {
+  "lat": 51.6598038,
+  "lon": 5.0319484,
+  "display": "Kaatsheuvel, Loon op Zand, Nordbrabant, Niederlande"
+ },
+ "Hoeilaart|BE": {
+  "lat": 50.7674846,
+  "lon": 4.474407,
+  "display": "Hoeilaart, Halle-Vilvoorde, Flämisch-Brabant, Flandern, 1560, Belgien"
+ },
+ "Catania|IT": {
+  "lat": 37.5023612,
+  "lon": 15.0873718,
+  "display": "Catania, Sizilien, Italien"
+ },
+ "Budel|NL": {
+  "lat": 51.2744706,
+  "lon": 5.5744905,
+  "display": "Budel, Cranendonck, Nordbrabant, Niederlande"
+ },
+ "Cres|HR": {
+  "lat": 44.9603333,
+  "lon": 14.4078895,
+  "display": "Grad Cres, Gespanschaft Küstenland-Bergland, Kroatien"
+ },
+ "Tartu|EE": {
+  "lat": 58.3779528,
+  "lon": 26.7290023,
+  "display": "Tartu, Tartu linn, Kreis Tartu, Estland"
+ },
+ "Firenze|IT": {
+  "lat": 43.7697955,
+  "lon": 11.2556404,
+  "display": "Florenz, Firenze, Toskana, Italien"
+ },
+ "Montanejos|ES": {
+  "lat": 40.0693656,
+  "lon": -0.5389255,
+  "display": "Montanejos, El Alto Mijares, Castelló / Castellón, Valencianische Gemeinschaft, 12448, Spanien"
+ },
+ "Brugge|BE": {
+  "lat": 51.2085526,
+  "lon": 3.226772,
+  "display": "Brügge, Westflandern, Flandern, Belgien"
+ },
+ "Heerenveen|NL": {
+  "lat": 52.9984742,
+  "lon": 5.9231488,
+  "display": "Heerenveen, Friesland, Niederlande"
+ },
+ "Deinze|BE": {
+  "lat": 50.9841863,
+  "lon": 3.5270391,
+  "display": "Deinze, Gent, Ostflandern, Flandern, Belgien"
+ },
+ "Renfrewshire|GB": {
+  "lat": 55.833333,
+  "lon": -4.5,
+  "display": "Renfrewshire, Schottland, Vereinigtes Königreich"
+ },
+ "England|GB": {
+  "lat": 52.5310214,
+  "lon": -1.2649062,
+  "display": "England, Vereinigtes Königreich"
+ },
+ "Hoek van Holland|NL": {
+  "lat": 51.9771615,
+  "lon": 4.1314526,
+  "display": "Hoek van Holland, Rotterdam, Südholland, Niederlande"
+ },
+ "Boechout|BE": {
+  "lat": 51.1635604,
+  "lon": 4.4963921,
+  "display": "Boechout, Antwerpen, Flandern, Belgien"
+ },
+ "Hyvinkää|FI": {
+  "lat": 60.6311481,
+  "lon": 24.8603615,
+  "display": "Hyvinkää, Verwaltungsgemeinschaft Helsinki, Uusimaa, Festland-Finnland, Finnland"
+ },
+ "Ulft|NL": {
+  "lat": 51.8909559,
+  "lon": 6.384324,
+  "display": "Ulft, Oude IJsselstreek, Geldern, Niederlande"
+ },
+ "Olomouc|CZ": {
+  "lat": 49.5940567,
+  "lon": 17.251143,
+  "display": "Olmütz, Bezirk Olmütz, Olmützer Region, Tschechien"
+ },
+ "Seville|ES": {
+  "lat": 37.3886303,
+  "lon": -5.9953403,
+  "display": "Sevilla, Andalusien, Spanien"
+ },
+ "Bretignolles-sur-Mer|FR": {
+  "lat": 46.6286111,
+  "lon": -1.8538889,
+  "display": "Bretignolles-sur-Mer, Les Sables-d'Olonne, Vendée, Pays de la Loire, Metropolitanes Frankreich, 85470, Frankreich"
+ },
+ "Brno|CZ": {
+  "lat": 49.1922443,
+  "lon": 16.6113382,
+  "display": "Brünn, Bezirk Brünn-Stadt, Südmährische Region, Tschechien"
+ },
+ "Attard|MT": {
+  "lat": 35.8909172,
+  "lon": 14.4430093,
+  "display": "Ħ'Attard, Reġjun tat-Tramuntana, Malta"
+ },
+ "Ipsden|GB": {
+  "lat": 51.5652652,
+  "lon": -1.0691247,
+  "display": "Ipsden, South Oxfordshire, Oxfordshire, England, Vereinigtes Königreich"
+ },
+ "Escañuela|ES": {
+  "lat": 37.8787752,
+  "lon": -4.0334742,
+  "display": "Escañuela, Jaén, Andalusien, Spanien"
+ },
+ "Lochristi|BE": {
+  "lat": 51.1366583,
+  "lon": 3.8597813,
+  "display": "Lochristi, Gent, Ostflandern, Flandern, Belgien"
+ },
+ "Wormerveer|NL": {
+  "lat": 52.4952218,
+  "lon": 4.7876566,
+  "display": "Wormerveer, Zaanstad, Nordholland, Niederlande"
+ },
+ "Deurne|NL": {
+  "lat": 51.4283287,
+  "lon": 5.8279653,
+  "display": "Deurne, Nordbrabant, Niederlande"
+ },
+ "Affligem|BE": {
+  "lat": 50.9035063,
+  "lon": 4.1174675,
+  "display": "Affligem, Halle-Vilvoorde, Flämisch-Brabant, Flandern, 1790, Belgien"
+ },
+ "Sittard|NL": {
+  "lat": 50.9974235,
+  "lon": 5.8666627,
+  "display": "Sittard, Sittard-Geleen, Limburg, Niederlande"
+ },
+ "Naxxar|MT": {
+  "lat": 35.9133396,
+  "lon": 14.4432851,
+  "display": "In-Naxxar, Reġjun tat-Tramuntana, Malta"
+ },
+ "Catton|GB": {
+  "lat": 54.1978072,
+  "lon": -1.4344919,
+  "display": "Catton, North Yorkshire, York and North Yorkshire, England, Vereinigtes Königreich"
+ },
+ "Tirana|AL": {
+  "lat": 41.3281482,
+  "lon": 19.8184435,
+  "display": "Tirana, Qark Tirana, 1001-1028, Albanien"
+ },
+ "Belfort|FR": {
+  "lat": 47.6379599,
+  "lon": 6.8628942,
+  "display": "Belfort, Territoire-de-Belfort, Bourgogne-Franche-Comté, Metropolitanes Frankreich, 90000, Frankreich"
+ },
+ "Laval|FR": {
+  "lat": 48.0706687,
+  "lon": -0.7734022,
+  "display": "Laval, Mayenne, Pays de la Loire, Metropolitanes Frankreich, 53000, Frankreich"
+ },
+ "São Miguel D'Acha|PT": {
+  "lat": 40.0157136,
+  "lon": -7.3222605,
+  "display": "São Miguel de Acha, Idanha-a-Nova, Castelo Branco, 6060-511, Portugal"
+ },
+ "Le Bourget|FR": {
+  "lat": 48.9351403,
+  "lon": 2.4258354,
+  "display": "Le Bourget, Le Raincy, Seine-Saint-Denis, Île-de-France, Metropolitanes Frankreich, 93350, Frankreich"
+ },
+ "Plozévet|FR": {
+  "lat": 47.9859232,
+  "lon": -4.4258889,
+  "display": "Plozévet, Quimper, Finistère, Bretagne, Metropolitanes Frankreich, 29710, Frankreich"
+ },
+ "Kenilworth|GB": {
+  "lat": 52.3450526,
+  "lon": -1.5816028,
+  "display": "Kenilworth, Warwick, Warwickshire, England, Vereinigtes Königreich"
+ },
+ "Luttenberg|NL": {
+  "lat": 52.4063996,
+  "lon": 6.3654828,
+  "display": "Luttenberg, Raalte, Oberyssel, Niederlande"
+ },
+ "Nantua|FR": {
+  "lat": 46.1534255,
+  "lon": 5.6058987,
+  "display": "Nantua, Ain, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, Frankreich"
+ },
+ "Ourense|ES": {
+  "lat": 42.3438932,
+  "lon": -7.8571773,
+  "display": "Ourense, Galicien, Spanien"
+ },
+ "Dundee City Council|GB": {
+  "lat": 56.4606527,
+  "lon": -2.9686583,
+  "display": "Adolescent Team, Dundee City Council, 21, Castle Street, Central Waterfront, City Centre, Dundee, Dundee City, Schottland, DD1 3AD, Vereinigtes Königreich"
+ },
+ "Leek|NL": {
+  "lat": 53.1632327,
+  "lon": 6.377119,
+  "display": "Leek, Westerkwartier, Groningen, Niederlande"
+ },
+ "Beaumont-de-Pertuis|FR": {
+  "lat": 43.7373472,
+  "lon": 5.6893982,
+  "display": "Beaumont-de-Pertuis, Apt, Vaucluse, Provence-Alpes-Côte d'Azur, Metropolitanes Frankreich, 84120, Frankreich"
+ },
+ "West Midlands|GB": {
+  "lat": 52.505432,
+  "lon": -1.9646782,
+  "display": "West Midlands, Warwickshire, West Midlands, England, Vereinigtes Königreich"
+ },
+ "Bielsko-Biala|PL": {
+  "lat": 49.822118,
+  "lon": 19.0448936,
+  "display": "Bielitz-Biala, Woiwodschaft Schlesien, Polen"
+ },
+ "Krimpen aan den IJssel|NL": {
+  "lat": 51.914403,
+  "lon": 4.5887889,
+  "display": "Krimpen aan den IJssel, Südholland, Niederlande"
+ },
+ "Montagny|FR": {
+  "lat": 45.4562,
+  "lon": 6.59111,
+  "display": "Montagny, Albertville, Savoyen, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 73350, Frankreich"
+ },
+ "Raalte|NL": {
+  "lat": 52.3874327,
+  "lon": 6.3078482,
+  "display": "Raalte, Oberyssel, Niederlande"
+ },
+ "Valkenburg|NL": {
+  "lat": 50.8647531,
+  "lon": 5.8312518,
+  "display": "Falkenburg, Falkenburg an der Göhl, Limburg, Niederlande"
+ },
+ "Nieuw Vennep|NL": {
+  "lat": 52.2646243,
+  "lon": 4.6340331,
+  "display": "Nieuw-Vennep, Haarlemmermeer, Nordholland, Niederlande"
+ },
+ "Zandvoort|NL": {
+  "lat": 52.3719838,
+  "lon": 4.5302209,
+  "display": "Zandvoort, Nordholland, Niederlande"
+ },
+ "Erp|NL": {
+  "lat": 51.6004767,
+  "lon": 5.6064592,
+  "display": "Erp, Meierijstad, Nordbrabant, Niederlande"
+ },
+ "Steenwijksmoer|NL": {
+  "lat": 52.6702856,
+  "lon": 6.6992513,
+  "display": "Steenwijksmoer, Coevorden, Drente, Niederlande, 7741 PC, Niederlande"
+ },
+ "Houthalen|BE": {
+  "lat": 51.031137,
+  "lon": 5.3720755,
+  "display": "Houthalen, Houthalen-Helchteren, Maaseik, Limburg, Flandern, 3530, Belgien"
+ },
+ "Amersfoort|NL": {
+  "lat": 52.1637703,
+  "lon": 5.4088845,
+  "display": "Amersfoort, Utrecht, Niederlande"
+ },
+ "Asten|NL": {
+  "lat": 51.3869026,
+  "lon": 5.7914467,
+  "display": "Asten, Nordbrabant, Niederlande"
+ },
+ "Prague|CZ": {
+  "lat": 50.0874654,
+  "lon": 14.4212535,
+  "display": "Prag, Tschechien"
+ },
+ "Oranjewoud|NL": {
+  "lat": 52.950123,
+  "lon": 5.9622367,
+  "display": "Oranjewoud, Heerenveen, Friesland, Niederlande"
+ },
+ "MERIDA|ES": {
+  "lat": 38.9174665,
+  "lon": -6.3443977,
+  "display": "Mérida, Badajoz, Extremadura, 06800, Spanien"
+ },
+ "Scampton|GB": {
+  "lat": 53.3021398,
+  "lon": -0.5752487,
+  "display": "Scampton CP, West Lindsey, Lincolnshire, Greater Lincolnshire, England, Vereinigtes Königreich"
+ },
+ "Niš|RS": {
+  "lat": 43.3211301,
+  "lon": 21.8959232,
+  "display": "Niš, Stadt Nisch, Нишавски управни округ, Zentralserbien, Serbien"
+ },
+ "Euston Hall|GB": {
+  "lat": 52.3730487,
+  "lon": 0.786688,
+  "display": "Euston Hall, The Park, Euston, West Suffolk, Suffolk, England, IP24 2QW, Vereinigtes Königreich"
+ },
+ "San Pawl il-Baħar|MT": {
+  "lat": 35.9480742,
+  "lon": 14.3973929,
+  "display": "San Pawl il-Baħar, Reġjun tat-Tramuntana, Malta"
+ },
+ "Flughafen Magdeburg|DE": {
+  "lat": 51.8559128,
+  "lon": 11.4159357,
+  "display": "Magdeburg Cochstedt, Altmarkstraße, Schneidlingen, Hecklingen, Salzlandkreis, Sachsen-Anhalt, 39444, Deutschland"
+ },
+ "Pamplona|ES": {
+  "lat": 42.815686,
+  "lon": -1.6522353,
+  "display": "Pamplona / Iruña, Iruñerria, Navarra, Spanien"
+ },
+ "Zaragoza|ES": {
+  "lat": 41.6915847,
+  "lon": -0.9101268,
+  "display": "Saragossa, Zaragoza, Saragossa, Aragonien, Spanien"
+ },
+ "Ovezande|NL": {
+  "lat": 51.4285139,
+  "lon": 3.8224077,
+  "display": "Ovezande, Borsele, Seeland, Niederlande"
+ },
+ "Schkopau|DE": {
+  "lat": 51.3902906,
+  "lon": 11.9854347,
+  "display": "Schkopau, Saalekreis, Sachsen-Anhalt, 06258, Deutschland"
+ },
+ "Boyle|IE": {
+  "lat": 53.9711202,
+  "lon": -8.3052313,
+  "display": "Boyle, Boyle Municipal District, County Roscommon, Connacht, Irland"
+ },
+ "Saint-Hilaire-les-Places|FR": {
+  "lat": 45.6450393,
+  "lon": 1.1588513,
+  "display": "Saint-Hilaire-les-Places, Limoges, Haute-Vienne, Neu-Aquitanien, Metropolitanes Frankreich, 87800, Frankreich"
+ },
+ "Nis|RS": {
+  "lat": 43.3162736,
+  "lon": 21.9212335,
+  "display": "Ниш (Медијана), Градска општина Медијана, Stadt Nisch, Нишавски управни округ, Zentralserbien, Serbien"
+ },
+ "Montauroux|FR": {
+  "lat": 43.617944,
+  "lon": 6.765164,
+  "display": "Montauroux, Draguignan, Var, Provence-Alpes-Côte d'Azur, Metropolitanes Frankreich, 83440, Frankreich"
+ },
+ "Elvaston|GB": {
+  "lat": 52.8900577,
+  "lon": -1.3914852,
+  "display": "Elvaston, South Derbyshire, Derbyshire, East Midlands, England, DE72 3EQ, Vereinigtes Königreich"
+ },
+ "Gloucestershire|GB": {
+  "lat": 51.7643786,
+  "lon": -2.1880662,
+  "display": "Gloucestershire, England, Vereinigtes Königreich"
+ },
+ "Zeewolde|NL": {
+  "lat": 52.3451194,
+  "lon": 5.4580775,
+  "display": "Zeewolde, Flevoland, Niederlande"
+ },
+ "Puurs|BE": {
+  "lat": 51.0762086,
+  "lon": 4.2817075,
+  "display": "Puurs, Puurs-Sint-Amands, Mecheln, Antwerpen, Flandern, 2870, Belgien"
+ },
+ "Bovenkarspel|NL": {
+  "lat": 52.6988258,
+  "lon": 5.2497934,
+  "display": "Bovenkarspel, Stede Broec, Nordholland, Niederlande"
+ },
+ "Fuengirola|ES": {
+  "lat": 36.5388398,
+  "lon": -4.6233974,
+  "display": "Fuengirola, Costa del Sol Occidental, Málaga, Andalusien, 29640, Spanien"
+ },
+ "Rasquert|NL": {
+  "lat": 53.3686618,
+  "lon": 6.5166867,
+  "display": "Rasquert, Het Hogeland, Groningen, Niederlande"
+ },
+ "Dudelange|LU": {
+  "lat": 49.4799132,
+  "lon": 6.0893963,
+  "display": "Düdelingen, Kanton Esch an der Alzette, Luxemburg"
+ },
+ "Varna|BG": {
+  "lat": 43.2073873,
+  "lon": 27.9166653,
+  "display": "Warna, Одесос, Gemeinde Warna, Oblast Warna, Bulgarien"
+ },
+ "Merkine|LT": {
+  "lat": 54.4585426,
+  "lon": 25.4703715,
+  "display": "Merkinė, Turgelių seniūnija, Šalčininkų rajono savivaldybė, Bezirk Vilnius, 17278, Litauen"
+ },
+ "Como|IT": {
+  "lat": 45.8115623,
+  "lon": 9.0830353,
+  "display": "Como, Lombardei, 22100, Italien"
+ },
+ "El Colmenar|ES": {
+  "lat": 36.5406287,
+  "lon": -5.3862884,
+  "display": "El Colmenar, Cortes de la Frontera, Serranía de Ronda, Málaga, Andalusien, Spanien"
+ },
+ "İzmir|TR": {
+  "lat": 38.4192537,
+  "lon": 27.128469,
+  "display": "Izmir, Konak, Izmir, Ägäisregion, 35250, Türkei"
+ },
+ "Lezha|AL": {
+  "lat": 41.7816638,
+  "lon": 19.6433538,
+  "display": "Lezhë, Bashkia Lezhë, Qark Lezha, 4501, Albanien"
+ },
+ "Astudillo|ES": {
+  "lat": 42.1927215,
+  "lon": -4.2938662,
+  "display": "Astudillo, Palencia, Kastilien und León, Spanien"
+ },
+ "Västerbottens län|SE": {
+  "lat": 64.7282044,
+  "lon": 18.5534514,
+  "display": "Provinz Westbottnien, Schweden"
+ },
+ "Cerknica|SI": {
+  "lat": 45.7982741,
+  "lon": 14.3447917,
+  "display": "Cerknica, Slowenien"
+ },
+ "Orte|IT": {
+  "lat": 42.4605984,
+  "lon": 12.3856056,
+  "display": "Orte, Viterbo, Latium, Italien"
+ },
+ "Mérida|ES": {
+  "lat": 38.9174665,
+  "lon": -6.3443977,
+  "display": "Mérida, Badajoz, Extremadura, Spanien"
+ },
+ "Thira|GR": {
+  "lat": 36.4149227,
+  "lon": 25.4324527,
+  "display": "Φηρά, Δημοτική Ενότητα Θήρας, Δήμος Θήρας, Regionalbezirk Thira, Region Südliche Ägäis, Ägäis, 847 00, Griechenland"
+ },
+ "Stavanger|NO": {
+  "lat": 58.9699675,
+  "lon": 5.7318101,
+  "display": "Stavanger, Rogaland, Norwegen"
+ },
+ "Kranenburg Zyfflich|DE": {
+  "lat": 51.8240634,
+  "lon": 5.9711739,
+  "display": "Ferienwohnung \"de Duffeltse Dames\", 11, Zum Querdamm, Zyfflich, Kranenburg, Bedburg-Hau, Kreis Kleve, Nordrhein-Westfalen, 47559, Deutschland"
+ },
+ "Brussel|BE": {
+  "lat": 50.8467372,
+  "lon": 4.352493,
+  "display": "Brüssel, Brüssel-Hauptstadt, Belgien"
+ },
+ "Brunico|IT": {
+  "lat": 46.7963194,
+  "lon": 11.9355121,
+  "display": "Bruneck, Pustertal, Bozen, Trentino-Südtirol, 39031, Italien"
+ },
+ "Oegstgeest|NL": {
+  "lat": 52.185433,
+  "lon": 4.4738856,
+  "display": "Oegstgeest, Südholland, Niederlande"
+ },
+ "Lugo|IT": {
+  "lat": 44.4765987,
+  "lon": 11.89807,
+  "display": "Lugo, Unione dei comuni della Bassa Romagna, Ravenna, Emilia-Romagna, 48022, Italien"
+ },
+ "Chimay|BE": {
+  "lat": 50.0356458,
+  "lon": 4.3212573,
+  "display": "Chimay, Thuin, Hennegau, Wallonien, Belgien"
+ },
+ "Uga|ES": {
+  "lat": 28.95016,
+  "lon": -13.744138,
+  "display": "Uga, Yaiza, Las Palmas, Kanarische Inseln, Spanien"
+ },
+ "Bussloo|NL": {
+  "lat": 52.1975589,
+  "lon": 6.1309705,
+  "display": "Bussloo, Voorst, Geldern, Niederlande, 7383 AG, Niederlande"
+ },
+ "Hellevoetsluis|NL": {
+  "lat": 51.833921,
+  "lon": 4.1436739,
+  "display": "Hellevoetsluis, Voorne aan Zee, Südholland, Niederlande"
+ },
+ "Amstelveen|NL": {
+  "lat": 52.3028209,
+  "lon": 4.8596844,
+  "display": "Amstelveen, Nordholland, Niederlande"
+ },
+ "ST REMY LES CHEVREUSE|FR": {
+  "lat": 48.7054888,
+  "lon": 2.071109,
+  "display": "Saint-Rémy-lès-Chevreuse, Rambouillet, Yvelines, Île-de-France, Metropolitanes Frankreich, 78470, Frankreich"
+ },
+ "Stekene|BE": {
+  "lat": 51.2062265,
+  "lon": 4.0396925,
+  "display": "Stekene, Sint-Niklaas, Ostflandern, Flandern, 9190, Belgien"
+ },
+ "'t Goy|NL": {
+  "lat": 52.000794,
+  "lon": 5.2242101,
+  "display": "'t Goy, Houten, Utrecht, Niederlande"
+ },
+ "Rovigo|IT": {
+  "lat": 45.0698171,
+  "lon": 11.7888083,
+  "display": "Rovigo, Venetien, 45100, Italien"
+ },
+ "Molesey|GB": {
+  "lat": 51.4029006,
+  "lon": -0.3713094,
+  "display": "Molesey, Elmbridge, Surrey, England, Vereinigtes Königreich"
+ },
+ "Pennabilli|IT": {
+  "lat": 43.8171097,
+  "lon": 12.2652492,
+  "display": "Pennabilli, Unione di comuni Valmarecchia, Rimini, Emilia-Romagna, 47864, Italien"
+ },
+ "Condeixa-a-Nova|PT": {
+  "lat": 40.1138729,
+  "lon": -8.4986318,
+  "display": "Condeixa-a-Nova, Coimbra, Portugal"
+ },
+ "Marienbad|CZ": {
+  "lat": 49.9739518,
+  "lon": 12.703319,
+  "display": "Marienbad, Bezirk Eger, Karlsbader Region, Tschechien"
+ },
+ "Talence|FR": {
+  "lat": 44.8088438,
+  "lon": -0.5879629,
+  "display": "Talence, Bordeaux, Gironde, Neu-Aquitanien, Metropolitanes Frankreich, 33400, Frankreich"
+ },
+ "Zamora|ES": {
+  "lat": 41.5162772,
+  "lon": -5.7736011,
+  "display": "Zamora, Kastilien und León, Spanien"
+ },
+ "Lanusei|IT": {
+  "lat": 39.8792127,
+  "lon": 9.5411469,
+  "display": "Lanusè/Lanusei, Ogliastra, Sardinien, 08045, Italien"
+ },
+ "Rai|FR": {
+  "lat": 48.750752,
+  "lon": 0.581478,
+  "display": "Rai, Mortagne-au-Perche, Orne, Normandie, Metropolitanes Frankreich, 61270, Frankreich"
+ },
+ "Leiden|NL": {
+  "lat": 52.1594747,
+  "lon": 4.4908843,
+  "display": "Leiden, Südholland, Niederlande"
+ },
+ "Friedrichroda|DE": {
+  "lat": 50.8568766,
+  "lon": 10.567901,
+  "display": "Friedrichroda, Landkreis Gotha, Thüringen, 99894, Deutschland"
+ },
+ "Saint-Prouant|FR": {
+  "lat": 46.7591667,
+  "lon": -0.9558333,
+  "display": "Saint-Prouant, La Roche-sur-Yon, Vendée, Pays de la Loire, Metropolitanes Frankreich, 85110, Frankreich"
+ },
+ "Penmarch|FR": {
+  "lat": 47.8126044,
+  "lon": -4.3377655,
+  "display": "Penmarc'h, Quimper, Finistère, Bretagne, Metropolitanes Frankreich, 29760, Frankreich"
+ },
+ "Holmfirth|GB": {
+  "lat": 53.5703517,
+  "lon": -1.7870301,
+  "display": "Holmfirth, Kirklees, West Yorkshire, England, HD9 7DE, Vereinigtes Königreich"
+ },
+ "Udine|IT": {
+  "lat": 46.0634632,
+  "lon": 13.2358377,
+  "display": "Udine, Friaul-Julisch Venetien, 33100, Italien"
+ },
+ "Assendelft|NL": {
+  "lat": 52.4681109,
+  "lon": 4.7449605,
+  "display": "Assendelft, Zaanstad, Nordholland, Niederlande"
+ },
+ "Alkmaar|NL": {
+  "lat": 52.6008538,
+  "lon": 4.8170994,
+  "display": "Alkmaar, Nordholland, Niederlande"
+ },
+ "Lathum|NL": {
+  "lat": 51.9868128,
+  "lon": 6.0195839,
+  "display": "Lathum, Zevenaar, Geldern, Niederlande"
+ },
+ "Pyrbaum|DE": {
+  "lat": 49.2844684,
+  "lon": 11.2728816,
+  "display": "Pyrbaum, Landkreis Neumarkt in der Oberpfalz, Bayern, 90602, Deutschland"
+ },
+ "Lanaken|BE": {
+  "lat": 50.8892784,
+  "lon": 5.6513208,
+  "display": "Lanaken, Tongern, Limburg, Flandern, Belgien"
+ },
+ "Etten-Leur|NL": {
+  "lat": 51.5759371,
+  "lon": 4.6432216,
+  "display": "Etten-Leur, Nordbrabant, Niederlande"
+ },
+ "Oschatz|DE": {
+  "lat": 51.2979627,
+  "lon": 13.1081103,
+  "display": "Oschatz, Nordsachsen, Sachsen, Deutschland"
+ },
+ "Waalwijk|NL": {
+  "lat": 51.6873372,
+  "lon": 5.0173079,
+  "display": "Waalwijk, Nordbrabant, Niederlande"
+ },
+ "Baarlo|NL": {
+  "lat": 52.7348319,
+  "lon": 5.9430631,
+  "display": "Baarlo, Steenwijkerland, Oberyssel, Niederlande"
+ },
+ "Schagen|NL": {
+  "lat": 52.7882213,
+  "lon": 4.7413568,
+  "display": "Schagen, Nordholland, Niederlande"
+ },
+ "Drachten|NL": {
+  "lat": 53.1091111,
+  "lon": 6.0948102,
+  "display": "Drachten, Smallingerland, Friesland, Niederlande"
+ },
+ "Genova|IT": {
+  "lat": 44.40726,
+  "lon": 8.9338624,
+  "display": "Genua, Ligurien, Italien"
+ },
+ "Athens|GR": {
+  "lat": 37.9755648,
+  "lon": 23.7348324,
+  "display": "Athen, Δήμος Αθηναίων, Regionalbezirk Athen-Zentrum, Region Attika, Attika, 105 57, Griechenland"
+ },
+ "Trieste|IT": {
+  "lat": 45.6496485,
+  "lon": 13.7772781,
+  "display": "Triest, Friaul-Julisch Venetien, 34121-34151, Italien"
+ },
+ "Siljan|NO": {
+  "lat": 59.3098991,
+  "lon": 9.6894157,
+  "display": "Siljan, Telemark, 3748, Norwegen"
+ },
+ "Sant Adrià de Besòs|ES": {
+  "lat": 41.4304832,
+  "lon": 2.2182775,
+  "display": "Sant Adrià de Besòs, Barcelonès, Barcelona, Katalonien, 08930, Spanien"
+ },
+ "Gräfenhainichen - Ferropolis|DE": {
+  "lat": 51.758181,
+  "lon": 12.4459096,
+  "display": "Gräfenhainichen Ferropolis, Ferropolisstraße, Gremmin, Gräfenhainichen, Wittenberg, Sachsen-Anhalt, 06773, Deutschland"
+ },
+ "Soverato|IT": {
+  "lat": 38.687717,
+  "lon": 16.5500442,
+  "display": "Soverato, Catanzaro, Kalabrien, 88068, Italien"
+ },
+ "Vielsalm|BE": {
+  "lat": 50.2842154,
+  "lon": 5.9162783,
+  "display": "Vielsalm, Bastnach, Luxemburg, Wallonien, Belgien"
+ },
+ "Merseyside|GB": {
+  "lat": 53.4953602,
+  "lon": -2.973938,
+  "display": "Merseyside, Liverpool City Region, England, Vereinigtes Königreich"
+ },
+ "Cerdanyola del Vallès|ES": {
+  "lat": 41.4909972,
+  "lon": 2.1405506,
+  "display": "Cerdanyola del Vallès, Vallès Occidental, Barcelona, Katalonien, Spanien"
+ },
+ "Capriva del Friuli|IT": {
+  "lat": 45.9475362,
+  "lon": 13.5122247,
+  "display": "Capriva del Friuli, Gorizia / Gurize / Gorica, Friaul-Julisch Venetien, 34070, Italien"
+ },
+ "Kuusamo|FI": {
+  "lat": 65.9645637,
+  "lon": 29.1883283,
+  "display": "Kuusamo, Koillismaan seutukunta, Nordösterbotten, Festland-Finnland, Finnland"
+ },
+ "From Ghent to Antwerp along the river|BE": {},
+ "Cambridgeshire|GB": {
+  "lat": 52.333333,
+  "lon": 0.083333,
+  "display": "Cambridgeshire, Cambridgeshire and Peterborough, England, Vereinigtes Königreich"
+ },
+ "Deurne|BE": {
+  "lat": 51.20849,
+  "lon": 4.4719297,
+  "display": "Deurne, Antwerpen, Flandern, 2100, Belgien"
+ },
+ "Montendre|FR": {
+  "lat": 45.285404,
+  "lon": -0.4095433,
+  "display": "Montendre, Jonzac, Charente-Maritime, Neu-Aquitanien, Metropolitanes Frankreich, 17130, Frankreich"
+ },
+ "gieselwind|DE": {},
+ "Grolloo|NL": {
+  "lat": 52.936205,
+  "lon": 6.6727367,
+  "display": "Grolloo, Aa en Hunze, Drente, Niederlande"
+ },
+ "Fredrikstad|NO": {
+  "lat": 59.1862013,
+  "lon": 10.8680241,
+  "display": "Fredrikstad, Østfold, Norwegen"
+ },
+ "Podhradie okres Topoľćany|SK": {
+  "lat": 48.6593718,
+  "lon": 18.0528358,
+  "display": "Podhradie, Bezirk Topoltschan, Neutraer Landschaftsverband, Slowakei"
+ },
+ "Lleida|ES": {
+  "lat": 41.6147605,
+  "lon": 0.6267842,
+  "display": "Lleida, Segrià, Lleida, Katalonien, Spanien"
+ },
+ "Waldfrieden - Stemwede|DE": {
+  "lat": 52.4406047,
+  "lon": 8.44347,
+  "display": "Waldfrieden, Wehdem, Westrup, Stemwede, Kreis Minden-Lübbecke, Nordrhein-Westfalen, 32351, Deutschland"
+ },
+ "Negushevo|BG": {
+  "lat": 42.7277577,
+  "lon": 23.7054352,
+  "display": "Негушево, Горна Малина, Oblast Sofia, Bulgarien"
+ },
+ "'s-Heer-Hendrikskinderen|NL": {
+  "lat": 51.5017248,
+  "lon": 3.8622919,
+  "display": "'s-Heer Hendrikskinderen, Goes, Seeland, Niederlande"
+ },
+ "Barcelona|NL": {
+  "lat": 52.376762,
+  "lon": 4.9434055,
+  "display": "Albertcomplex, Barcelonaplein, KNSM-eiland, Östliches Hafengebiet, Oost, Schellingwoude, Amsterdam, Nordholland, Niederlande, 1019 LZ, Niederlande"
+ },
+ "Julianadorp|NL": {
+  "lat": 52.8907035,
+  "lon": 4.7446131,
+  "display": "Julianadorp, Den Helder, Nordholland, Niederlande"
+ },
+ "Beringen|BE": {
+  "lat": 51.0489641,
+  "lon": 5.2266869,
+  "display": "Beringen, Heusden-Zolder, Hasselt, Limburg, Flandern, Belgien"
+ },
+ "Zschopau|DE": {
+  "lat": 50.7397278,
+  "lon": 13.0854632,
+  "display": "Zschopau, Erzgebirgskreis, Sachsen, Deutschland"
+ },
+ "Neer|NL": {
+  "lat": 51.2620493,
+  "lon": 5.9883704,
+  "display": "Neer, Leudal, Limburg, Niederlande"
+ },
+ "Uden|NL": {
+  "lat": 51.6590888,
+  "lon": 5.6148605,
+  "display": "Uden, Maashorst, Nordbrabant, Niederlande"
+ },
+ "Mijdrecht|NL": {
+  "lat": 52.2060181,
+  "lon": 4.8648168,
+  "display": "Mijdrecht, De Ronde Venen, Utrecht, Niederlande"
+ },
+ "Aurich|DE": {
+  "lat": 53.4695604,
+  "lon": 7.4823808,
+  "display": "Aurich, Landkreis Aurich, Niedersachsen, Deutschland"
+ },
+ "Gornja Radgona|SI": {
+  "lat": 46.6361208,
+  "lon": 15.9666848,
+  "display": "Gornja Radgona, Slowenien"
+ },
+ "Nantes|FR": {
+  "lat": 47.2186371,
+  "lon": -1.5541362,
+  "display": "Nantes, Loire-Atlantique, Pays de la Loire, Metropolitanes Frankreich, Frankreich"
+ },
+ "Oudenbosch|NL": {
+  "lat": 51.5889415,
+  "lon": 4.5278916,
+  "display": "Oudenbosch, Halderberge, Nordbrabant, Niederlande"
+ },
+ "Schaesberg|NL": {
+  "lat": 50.8916477,
+  "lon": 6.0159785,
+  "display": "Schaesberg, Landgraaf, Limburg, Niederlande, 6372 AT, Niederlande"
+ },
+ "Viöl|DE": {
+  "lat": 54.5696327,
+  "lon": 9.1716016,
+  "display": "Viöl, Kreis Nordfriesland, Schleswig-Holstein, Deutschland"
+ },
+ "Hengevelde|NL": {
+  "lat": 52.1995378,
+  "lon": 6.6382793,
+  "display": "Hengevelde, Hof van Twente, Oberyssel, Niederlande"
+ },
+ "Blainville-Crevon|FR": {
+  "lat": 49.5031963,
+  "lon": 1.3011014,
+  "display": "Blainville-Crevon, Rouen, Seine-Maritime, Normandie, Metropolitanes Frankreich, 76116, Frankreich"
+ },
+ "Loulé|PT": {
+  "lat": 37.1399532,
+  "lon": -8.023324,
+  "display": "Loulé, Faro, Portugal"
+ },
+ "Vienne|FR": {
+  "lat": 45.52524,
+  "lon": 4.87477,
+  "display": "Vienne, Isère, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 38200, Frankreich"
+ },
+ "Varniai|LT": {
+  "lat": 55.7429028,
+  "lon": 22.3707318,
+  "display": "Varniai, Varnių seniūnija, Telšių rajono savivaldybė, Bezirk Telšiai, 88050, Litauen"
+ },
+ "Overveen|NL": {
+  "lat": 52.3934144,
+  "lon": 4.6115554,
+  "display": "Overveen, Bloemendaal, Nordholland, Niederlande"
+ },
+ "Montauban|FR": {
+  "lat": 44.0175835,
+  "lon": 1.3549991,
+  "display": "Montauban, Tarn-et-Garonne, Okzitanien, Metropolitanes Frankreich, 82000, Frankreich"
+ },
+ "Trollhättan|SE": {
+  "lat": 58.2827931,
+  "lon": 12.2908612,
+  "display": "Trollhättan, Gemeinde Trollhättan, Provinz Västra Götaland, 461 83, Schweden"
+ },
+ "Óbidos|PT": {
+  "lat": 39.3619514,
+  "lon": -9.157153,
+  "display": "Óbidos, Leiria, Portugal"
+ },
+ "Náchod|CZ": {
+  "lat": 50.4167025,
+  "lon": 16.1622871,
+  "display": "Nachod, Bezirk Nachod, Königgrätzer Region, Tschechien"
+ },
+ "Trélivan|FR": {
+  "lat": 48.4321718,
+  "lon": -2.1193713,
+  "display": "Trélivan, Dinan, Côtes-d'Armor, Bretagne, Metropolitanes Frankreich, 22100, Frankreich"
+ },
+ "Valladolid|ES": {
+  "lat": 41.6200024,
+  "lon": -4.7259906,
+  "display": "Valladolid, Kastilien und León, Spanien"
+ },
+ "Upravna enota Maribor|SI": {
+  "lat": 46.5625369,
+  "lon": 15.6497599,
+  "display": "Mestna občina Maribor, 1, Ulica heroja Staneta, Lent, Center, Marburg, Maribor, 2000, Slowenien"
+ },
+ "Chaves|PT": {
+  "lat": 41.7399003,
+  "lon": -7.4715213,
+  "display": "Chaves, Vila Real, Portugal"
+ },
+ "Turda|RO": {
+  "lat": 46.5685214,
+  "lon": 23.7853643,
+  "display": "Thorenburg, Turda, Klausenburg, 401100, Rumänien"
+ },
+ "Ojén|ES": {
+  "lat": 36.5645156,
+  "lon": -4.8565007,
+  "display": "Ojén, Sierra de las Nieves, Málaga, Andalusien, 29610, Spanien"
+ },
+ "Tilloloy|FR": {
+  "lat": 49.6445464,
+  "lon": 2.7490099,
+  "display": "Tilloloy, Montdidier, Somme, Nordfrankreich, Metropolitanes Frankreich, 80700, Frankreich"
+ },
+ "София|BG": {
+  "lat": 42.6977028,
+  "lon": 23.3217359,
+  "display": "Sofia, Sredez, Столична, Oblast Sofia-Stadt, Bulgarien"
+ },
+ "Gardone Riviera|IT": {
+  "lat": 45.6400581,
+  "lon": 10.558525,
+  "display": "Gardone Riviera, Comunità Montana Parco Alto Garda bresciano, Brescia, Lombardei, 25083, Italien"
+ },
+ "Napoli|IT": {
+  "lat": 40.8358846,
+  "lon": 14.2487679,
+  "display": "Neapel, Metropolitanstadt Neapel, Kampanien, Italien"
+ },
+ "Zwinderen|NL": {
+  "lat": 52.7274317,
+  "lon": 6.6768343,
+  "display": "Zwinderen, Coevorden, Drente, Niederlande"
+ },
+ "Wierden|NL": {
+  "lat": 52.3579925,
+  "lon": 6.5921844,
+  "display": "Wierden, Oberyssel, Niederlande"
+ },
+ "Capelle aan den IJssel|NL": {
+  "lat": 51.9312552,
+  "lon": 4.5883596,
+  "display": "Capelle aan den IJssel, Südholland, Niederlande"
+ },
+ "Hem|NL": {
+  "lat": 52.6607793,
+  "lon": 5.1835446,
+  "display": "Hem, Drechterland, Nordholland, Niederlande"
+ },
+ "Kortemark|BE": {
+  "lat": 51.028529,
+  "lon": 3.0441144,
+  "display": "Kortemark, Diksmuide, Westflandern, Flandern, 8610, Belgien"
+ },
+ "Palermo|IT": {
+  "lat": 38.1112268,
+  "lon": 13.3524434,
+  "display": "Palermo, Sizilien, Italien"
+ },
+ "Wiltz|LU": {
+  "lat": 49.9666914,
+  "lon": 5.9321021,
+  "display": "Wiltz, Kanton Wiltz, Luxemburg"
+ },
+ "Wommelgem|BE": {
+  "lat": 51.2031044,
+  "lon": 4.5238022,
+  "display": "Wommelgem, Malle, Antwerpen, Flandern, 2160, Belgien"
+ },
+ "Laren|NL": {
+  "lat": 52.2565894,
+  "lon": 5.2251925,
+  "display": "Laren, Nordholland, Niederlande"
+ },
+ "Velsen-Noord|NL": {
+  "lat": 52.4738528,
+  "lon": 4.6379311,
+  "display": "Velsen-Noord, Velsen, Nordholland, Niederlande"
+ },
+ "Vlaardingen|NL": {
+  "lat": 51.9097536,
+  "lon": 4.3402639,
+  "display": "Vlaardingen, Südholland, Niederlande"
+ },
+ "Pergine Valsugana|IT": {
+  "lat": 46.0605291,
+  "lon": 11.2406747,
+  "display": "Fersen im Suganertal, Comunità Alta Valsugana e Bersntol, Autonome Provinz Trient, Trentino-Südtirol, Italien"
+ },
+ "Douai|FR": {
+  "lat": 50.3675677,
+  "lon": 3.0804641,
+  "display": "Douai, Nord, Nordfrankreich, Metropolitanes Frankreich, 59500, Frankreich"
+ },
+ "Noordwijk aan Zee|NL": {
+  "lat": 52.2484451,
+  "lon": 4.4344787,
+  "display": "Noordwijk aan Zee, Noordwijk, Südholland, Niederlande, 2202 PA, Niederlande"
+ },
+ "Zundert|NL": {
+  "lat": 51.4858784,
+  "lon": 4.6542458,
+  "display": "Zundert, Nordbrabant, Niederlande"
+ },
+ "Berchem|BE": {
+  "lat": 50.8649231,
+  "lon": 4.2946734,
+  "display": "Berchem-Sainte-Agathe - Sint-Agatha-Berchem, Brüssel-Hauptstadt, 1082, Belgien"
+ },
+ "Handel|NL": {
+  "lat": 51.5794077,
+  "lon": 5.7135574,
+  "display": "Handel, Gemert-Bakel, Nordbrabant, Niederlande"
+ },
+ "favignana|IT": {
+  "lat": 37.9314018,
+  "lon": 12.3274291,
+  "display": "Favignana, Trapani, Sizilien, 91023, Italien"
+ },
+ "Genk|BE": {
+  "lat": 50.9654864,
+  "lon": 5.5001456,
+  "display": "Genk, Hasselt, Limburg, Flandern, 3600, Belgien"
+ },
+ "Beusichem|NL": {
+  "lat": 51.9486044,
+  "lon": 5.2923487,
+  "display": "Beusichem, Buren, Geldern, Niederlande"
+ },
+ "Braamt|NL": {
+  "lat": 51.9245379,
+  "lon": 6.2654688,
+  "display": "Braamt, Montferland, Geldern, Niederlande"
+ },
+ "Lille|BE": {
+  "lat": 51.238218,
+  "lon": 4.8242404,
+  "display": "Lille, Turnhout, Antwerpen, Flandern, 2275, Belgien"
+ },
+ "Marbella|ES": {
+  "lat": 36.5074781,
+  "lon": -4.8047219,
+  "display": "Marbella, Costa del Sol Occidental, Málaga, Andalusien, Spanien"
+ },
+ "Viitasaari|FI": {
+  "lat": 63.0837203,
+  "lon": 25.8528349,
+  "display": "Viitasaari, Saarijärvi-Viitasaaren seutukunta, Mittelfinnland, Festland-Finnland, Finnland"
+ },
+ "Budva|ME": {
+  "lat": 42.2885656,
+  "lon": 18.8419505,
+  "display": "Budva, Gemeinde Budva, Montenegro"
+ },
+ "Lugano-Figino|CH": {
+  "lat": 45.950098,
+  "lon": 8.9060193,
+  "display": "Figino, Barbengo, Lugano, Kreis Lugano West, Bezirk Lugano, Tessin, 6918, Schweiz"
+ },
+ "Calahorra|ES": {
+  "lat": 42.3035212,
+  "lon": -1.9648758,
+  "display": "Calahorra, La Rioja, 26500, Spanien"
+ },
+ "PL-81-389 Gdynia|PL": {
+  "lat": 54.5120777,
+  "lon": 18.5396178,
+  "display": "81-389, Śródmieście, Gdingen, Woiwodschaft Pommern, Polen"
+ },
+ "Salzburg|AT": {
+  "lat": 47.7981346,
+  "lon": 13.0464806,
+  "display": "Salzburg, Österreich"
+ },
+ "Kavala|GR": {
+  "lat": 40.9369224,
+  "lon": 24.4122766,
+  "display": "Kavala, Δήμος Καβάλας, Regionalbezirk Kavala, Region Ostmakedonien und Thrakien, Makedonien - Thrakien, 653 02, Griechenland"
+ },
+ "Samothrace|GR": {
+  "lat": 40.4744351,
+  "lon": 25.5248138,
+  "display": "Σαμοθράκη (Χώρα), Δήμος Σαμοθράκης, Regionalbezirk Evros, Region Ostmakedonien und Thrakien, Makedonien - Thrakien, 680 02, Griechenland"
+ },
+ "Dalarnas län|SE": {
+  "lat": 61.0603779,
+  "lon": 14.2151224,
+  "display": "Provinz Dalarna, Schweden"
+ },
+ "Anneyron|FR": {
+  "lat": 45.2695877,
+  "lon": 4.8844712,
+  "display": "Anneyron, Valence, Drôme, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 26140, Frankreich"
+ },
+ "Kloster Nimbschen|DE": {
+  "lat": 51.2148662,
+  "lon": 12.7428774,
+  "display": "Kloster Nimbschen, Nimbschener Landstraße, Nimbschen, Grimma, Landkreis Leipzig, Sachsen, 04668, Deutschland"
+ },
+ "Burg Lichtenberg|DE": {
+  "lat": 49.0134628,
+  "lon": 9.3266861,
+  "display": "Burg Lichtenberg, Oberstenfeld, Landkreis Ludwigsburg, Baden-Württemberg, 71720, Deutschland"
+ },
+ "Nice|FR": {
+  "lat": 43.7009358,
+  "lon": 7.2683912,
+  "display": "Nizza, Alpes-Maritimes, Provence-Alpes-Côte d'Azur, Metropolitanes Frankreich, Frankreich"
+ },
+ "Leonidio|GR": {
+  "lat": 37.1663308,
+  "lon": 22.8604198,
+  "display": "Leonidio, Δημοτική Ενότητα Λεωνιδίου, Δήμος Νότιας Κυνουρίας, Regionalbezirk Arkadien, Region Peloponnes, Peloponnes, Westgriechenland und Ionische Inseln, 223 00, Griechenland"
+ },
+ "Barbastro|ES": {
+  "lat": 42.0366952,
+  "lon": 0.127238,
+  "display": "Barbastro, Somontano de Barbastro, Huesca, Aragonien, 22300, Spanien"
+ },
+ "Ashley|GB": {
+  "lat": 52.2274533,
+  "lon": 0.4853366,
+  "display": "Ashley, East Cambridgeshire, Cambridgeshire, Cambridgeshire and Peterborough, England, Vereinigtes Königreich"
+ },
+ "Sângeorgiu de Mureș|RO": {
+  "lat": 46.5764335,
+  "lon": 24.6042074,
+  "display": "Sângeorgiu de Mureș, Zona Metropolitană Târgu Mureș, Mieresch, Rumänien"
+ },
+ "El Bonillo|ES": {
+  "lat": 38.9493033,
+  "lon": -2.5390599,
+  "display": "El Bonillo, Albacete, Kastilien-La Mancha, Spanien"
+ },
+ "Saint-Geoire-en-Valdaine|FR": {
+  "lat": 45.4563548,
+  "lon": 5.6355733,
+  "display": "Saint-Geoire-en-Valdaine, La Tour-du-Pin, Isère, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 38620, Frankreich"
+ },
+ "Calella de Palafrugell|ES": {
+  "lat": 41.8897233,
+  "lon": 3.1805917,
+  "display": "Calella de Palafrugell, Palafrugell, Niederampurien, Girona, Katalonien, 17210, Spanien"
+ },
+ "Taverny|FR": {
+  "lat": 49.0265888,
+  "lon": 2.2234971,
+  "display": "Taverny, Argenteuil, Val-d'Oise, Île-de-France, Metropolitanes Frankreich, 95150, Frankreich"
+ },
+ "Monteux|FR": {
+  "lat": 44.0349281,
+  "lon": 4.9968733,
+  "display": "Monteux, Carpentras, Vaucluse, Provence-Alpes-Côte d'Azur, Metropolitanes Frankreich, 84170, Frankreich"
+ },
+ "Chavanay|FR": {
+  "lat": 45.4140776,
+  "lon": 4.7297216,
+  "display": "Chavanay, Saint-Étienne, Loire, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 42410, Frankreich"
+ },
+ "Lisle-sur-Tarn|FR": {
+  "lat": 43.8526551,
+  "lon": 1.8100746,
+  "display": "Lisle-sur-Tarn, Albi, Tarn, Okzitanien, Metropolitanes Frankreich, 81310, Frankreich"
+ },
+ "Serpa|PT": {
+  "lat": 37.9436517,
+  "lon": -7.5966902,
+  "display": "Serpa, Beja, Portugal"
+ },
+ "Santarcangelo di Romagna|IT": {
+  "lat": 44.0634029,
+  "lon": 12.4467143,
+  "display": "Santarcangelo di Romagna, Unione di comuni Valmarecchia, Rimini, Emilia-Romagna, 47822, Italien"
+ },
+ "Woerdense Verlaat|NL": {
+  "lat": 52.1547365,
+  "lon": 4.8638607,
+  "display": "Woerdense Verlaat, Nieuwkoop, Südholland, Niederlande"
+ },
+ "Doornzele|BE": {
+  "lat": 51.1435738,
+  "lon": 3.7672073,
+  "display": "Doornzele, Evergem, Gent, Ostflandern, Flandern, 9940, Belgien"
+ },
+ "Vertiskos|GR": {
+  "lat": 40.8835821,
+  "lon": 23.2283081,
+  "display": "Βερτίσκος, Δήμος Λαγκαδά, Regionalbezirk Thessaloniki, Zentralmakedonien, Makedonien - Thrakien, Griechenland"
+ },
+ "Hämeenlinna|FI": {
+  "lat": 60.9966192,
+  "lon": 24.465141,
+  "display": "Hämeenlinna, Hämeenlinnan seutukunta, Eigentliche Häme, Festland-Finnland, Finnland"
+ },
+ "Baarn|NL": {
+  "lat": 52.2111182,
+  "lon": 5.2931841,
+  "display": "Baarn, Utrecht, Niederlande"
+ },
+ "Rheinmünster|DE": {
+  "lat": 48.7528211,
+  "lon": 8.0405324,
+  "display": "Rheinmünster, GVV Rheinmünster-Lichtenau, Landkreis Rastatt, Baden-Württemberg, 77836, Deutschland"
+ },
+ "Blois|FR": {
+  "lat": 47.5876861,
+  "lon": 1.3337639,
+  "display": "Blois, Loir-et-Cher, Zentrum-Loiretal, Metropolitanes Frankreich, 41000, Frankreich"
+ },
+ "Ninove|BE": {
+  "lat": 50.8214549,
+  "lon": 4.0037422,
+  "display": "Ninove, Aalst, Ostflandern, Flandern, Belgien"
+ },
+ "Wijk bij Duurstede|NL": {
+  "lat": 51.9751858,
+  "lon": 5.337435,
+  "display": "Wijk bij Duurstede, Utrecht, Niederlande"
+ },
+ "Schoten|BE": {
+  "lat": 51.2516344,
+  "lon": 4.4980446,
+  "display": "Schoten, Antwerpen, Flandern, 2900, Belgien"
+ },
+ "Surrey|GB": {
+  "lat": 51.2715316,
+  "lon": -0.3414524,
+  "display": "Surrey, England, Vereinigtes Königreich"
+ },
+ "Pirkkala|FI": {
+  "lat": 61.4661459,
+  "lon": 23.6462649,
+  "display": "Pirkkala, Tampereen seutukunta, Pirkanmaa, Festland-Finnland, Finnland"
+ },
+ "Oosterhout|NL": {
+  "lat": 51.6322376,
+  "lon": 4.8630424,
+  "display": "Oosterhout, Nordbrabant, Niederlande"
+ },
+ "SE Emmen|NL": {
+  "lat": 52.4979525,
+  "lon": 6.2311149,
+  "display": "Emmen, Hoonhorst, Dalfsen, Oberyssel, Niederlande, 7722 KX, Niederlande"
+ },
+ "Kleine-Brogel|BE": {
+  "lat": 51.1725458,
+  "lon": 5.4520263,
+  "display": "Kleine-Brogel, Peer, Hamont-Achel, Maaseik, Limburg, Flandern, Belgien"
+ },
+ "Storfors|SE": {
+  "lat": 59.55,
+  "lon": 14.333333,
+  "display": "Storfors kommun, Provinz Värmland, Schweden"
+ },
+ "Suvereto|IT": {
+  "lat": 43.079015,
+  "lon": 10.6786806,
+  "display": "Suvereto, Livorno, Toskana, 57028, Italien"
+ },
+ "Spijkenisse|NL": {
+  "lat": 51.8464881,
+  "lon": 4.3287681,
+  "display": "Spijkenisse, Nissewaard, Südholland, Niederlande"
+ },
+ "Terneuzen|NL": {
+  "lat": 51.298843,
+  "lon": 3.8422044,
+  "display": "Terneuzen, Seeland, Niederlande"
+ },
+ "Gouda|NL": {
+  "lat": 52.0114922,
+  "lon": 4.7106094,
+  "display": "Gouda, Südholland, Niederlande"
+ },
+ "Luik|BE": {
+  "lat": 50.6450944,
+  "lon": 5.5736112,
+  "display": "Lüttich, Wallonien, 4000, Belgien"
+ },
+ "Nes|NL": {
+  "lat": 53.3962371,
+  "lon": 6.048178,
+  "display": "Nes, Noardeast-Fryslân, Friesland, Niederlande"
+ },
+ "Oss|NL": {
+  "lat": 51.7783542,
+  "lon": 5.5320836,
+  "display": "Oss, Nordbrabant, Niederlande"
+ },
+ "Vorselaar|BE": {
+  "lat": 51.2023448,
+  "lon": 4.769482,
+  "display": "Vorselaar, Turnhout, Antwerpen, Flandern, 2290, Belgien"
+ },
+ "Zutphen|NL": {
+  "lat": 52.1396933,
+  "lon": 6.194772,
+  "display": "Zütphen, Geldern, Niederlande"
+ },
+ "The Hague|NL": {
+  "lat": 52.0799838,
+  "lon": 4.3113461,
+  "display": "Den Haag, Südholland, Niederlande"
+ },
+ "Hermoupolis|GR": {
+  "lat": 37.4460673,
+  "lon": 24.9408533,
+  "display": "1901 Hermoupolis, 37-39, Παλαιών Πατρών Γερμανού, Βροντάδο, Ξηρόκαμπος, Ermoupoli, Gemeinde Syros-Ermoupoli, Regionalbezirk Syros, Region Südliche Ägäis, Ägäis, 841 00, Griechenland"
+ },
+ "Miercurea Ciuc|RO": {
+  "lat": 46.3614042,
+  "lon": 25.8026675,
+  "display": "Szeklerburg, Miercurea Ciuc, Harghita, 530104, Rumänien"
+ },
+ "Lanuza|ES": {
+  "lat": 42.7562168,
+  "lon": -0.315473,
+  "display": "Lanuza, Sallent de Gállego, Alto Gállego, Huesca, Aragonien, 22660, Spanien"
+ },
+ "Galgamarken-Trossö|SE": {
+  "lat": 56.1659952,
+  "lon": 15.5695638,
+  "display": "Trossögatan, Ekholmen, Pottholmen, Karlskrona, Gemeinde Karlskrona, Provinz Blekinge, 371 37, Schweden"
+ },
+ "Antibes|FR": {
+  "lat": 43.5813878,
+  "lon": 7.1236966,
+  "display": "Antibes, Grasse, Alpes-Maritimes, Provence-Alpes-Côte d'Azur, Metropolitanes Frankreich, Frankreich"
+ },
+ "Lancy|CH": {
+  "lat": 46.1842526,
+  "lon": 6.1200831,
+  "display": "Lancy, Genf, Schweiz"
+ },
+ "A Estación|ES": {
+  "lat": 42.5372497,
+  "lon": -7.3982979,
+  "display": "A Estación, O Empalme, Castroncelos, A Pobra do Brollón, Terra de Lemos, Lugo, Galicien, 27334, Spanien"
+ },
+ "Svedala|SE": {
+  "lat": 55.5513434,
+  "lon": 13.216676,
+  "display": "Svedala kommun, Provinz Schonen, Schweden"
+ },
+ "Skåne län|SE": {
+  "lat": 55.8472301,
+  "lon": 13.6339292,
+  "display": "Provinz Schonen, Schweden"
+ },
+ "Vlore|AL": {
+  "lat": 40.4707602,
+  "lon": 19.4912716,
+  "display": "Vlora, Bashkia Vlorë, Qark Vlora, 9401-9403, Albanien"
+ },
+ "Hvar|HR": {
+  "lat": 43.1723237,
+  "lon": 16.4421753,
+  "display": "Hvar Stadt, Gespanschaft Split-Dalmatien, Kroatien"
+ },
+ "Dubrovnik|HR": {
+  "lat": 42.6491029,
+  "lon": 18.0939501,
+  "display": "Grad Dubrovnik, Gespanschaft Dubrovnik-Neretva, Kroatien"
+ },
+ "Detm Detmold|DE": {},
+ "Montmartin-sur-Mer|FR": {
+  "lat": 48.9885947,
+  "lon": -1.5259385,
+  "display": "Montmartin-sur-Mer, Coutances, Manche, Normandie, Metropolitanes Frankreich, 50590, Frankreich"
+ },
+ "La Ferté-Saint-Aubin|FR": {
+  "lat": 47.7169399,
+  "lon": 1.9442053,
+  "display": "La Ferté-Saint-Aubin, Orléans, Loiret, Zentrum-Loiretal, Metropolitanes Frankreich, 45240, Frankreich"
+ },
+ "Chiclana de la Frontera|ES": {
+  "lat": 36.4191096,
+  "lon": -6.1460683,
+  "display": "Chiclana de la Frontera, Bahía de Cádiz, Cádiz, Andalusien, Spanien"
+ },
+ "Neuve-Église|FR": {
+  "lat": 48.3283326,
+  "lon": 7.3145911,
+  "display": "Neukirch, Schlettstadt-Erstein, Unterelsass, Collectivité européenne d'Alsace, Grand Est, Metropolitanes Frankreich, 67220, Frankreich"
+ },
+ "Province of Udine|IT": {
+  "lat": 45.7494016,
+  "lon": 12.2676383,
+  "display": "Galleria FS Treviso - Udine, Case Borsato, Visnadello, Spresiano, Treviso, Venetien, 31027, Italien"
+ },
+ "Ajaccio|FR": {
+  "lat": 41.9263991,
+  "lon": 8.7376029,
+  "display": "Ajaccio, Südkorsika, Korsika, Metropolitanes Frankreich, Frankreich"
+ },
+ "Aulnoye-Aymeries|FR": {
+  "lat": 50.2002502,
+  "lon": 3.8336383,
+  "display": "Aulnoye-Aymeries, Avesnes-sur-Helpe, Nord, Nordfrankreich, Metropolitanes Frankreich, 59620, Frankreich"
+ },
+ "Königsee|DE": {
+  "lat": 50.6614922,
+  "lon": 11.0979579,
+  "display": "Königsee, Landkreis Saalfeld-Rudolstadt, Thüringen, 07426, Deutschland"
+ },
+ "Füssen|DE": {
+  "lat": 47.5675998,
+  "lon": 10.6993217,
+  "display": "Füssen, Landkreis Ostallgäu, Bayern, 87629, Deutschland"
+ },
+ "Ponferrada|ES": {
+  "lat": 42.4984436,
+  "lon": -6.5663176,
+  "display": "Ponferrada, El Bierzo, León, Kastilien und León, Spanien"
+ },
+ "Banja Luka|BA": {
+  "lat": 44.7720845,
+  "lon": 17.1917651,
+  "display": "Banja Luka, Grad Banja Luka, Republika Srpska, Bosnien und Herzegowina"
+ },
+ "Tournai|BE": {
+  "lat": 50.6056458,
+  "lon": 3.3878179,
+  "display": "Tournai, Tournai-Mouscron, Hennegau, Wallonien, Belgien"
+ },
+ "Burgos|ES": {
+  "lat": 42.3448498,
+  "lon": -3.6812477,
+  "display": "Burgos, Kastilien und León, Spanien"
+ },
+ "Turnhout|BE": {
+  "lat": 51.328932,
+  "lon": 4.9299924,
+  "display": "Turnhout, Antwerpen, Flandern, 2300, Belgien"
+ },
+ "Hamme|BE": {
+  "lat": 51.0977642,
+  "lon": 4.1377229,
+  "display": "Hamme, Dendermonde, Ostflandern, Flandern, 9220, Belgien"
+ },
+ "3270|AT": {
+  "lat": 47.9980178,
+  "lon": 15.1570328,
+  "display": "3270, Katastralgemeinde Brandstatt, Saffen, Scheibbs, Bezirk Scheibbs, Niederösterreich, Österreich"
+ },
+ "Vilnius|LT": {
+  "lat": 54.6870458,
+  "lon": 25.2829111,
+  "display": "Vilnius, Stadtgemeinde Vilnius, Bezirk Vilnius, Litauen"
+ },
+ "Lyss|CH": {
+  "lat": 47.0721368,
+  "lon": 7.305262,
+  "display": "Lyss, Verwaltungskreis Seeland, Verwaltungsregion Seeland, Bern, Schweiz"
+ },
+ "Borgloon|BE": {
+  "lat": 50.8024529,
+  "lon": 5.3435704,
+  "display": "Borgloon, Tongeren-Borgloon, Tongern, Limburg, Flandern, 3840, Belgien"
+ },
+ "De Koog|NL": {
+  "lat": 53.0998817,
+  "lon": 4.7626457,
+  "display": "De Koog, Texel, Nordholland, Niederlande"
+ },
+ "Rosmalen|NL": {
+  "lat": 51.71866,
+  "lon": 5.3629244,
+  "display": "Rosmalen, Herzogenbusch, Nordbrabant, Niederlande"
+ },
+ "Weißenhorn|DE": {
+  "lat": 48.3044877,
+  "lon": 10.1601492,
+  "display": "Weißenhorn, Landkreis Neu-Ulm, Bayern, 89264, Deutschland"
+ },
+ "Sindelfingen|DE": {
+  "lat": 48.7084162,
+  "lon": 9.0035455,
+  "display": "Sindelfingen, Landkreis Böblingen, Baden-Württemberg, Deutschland"
+ },
+ "Schoonhoven|NL": {
+  "lat": 51.9463984,
+  "lon": 4.8516431,
+  "display": "Schoonhoven, Krimpenerwaard, Südholland, Niederlande"
+ },
+ "Pejë|XK": {
+  "lat": 42.6593986,
+  "lon": 20.2885757,
+  "display": "Peja, Gemeinde Peja, Bezirk Peja, 39000, Kosovo"
+ },
+ "Dordrecht|NL": {
+  "lat": 51.814429,
+  "lon": 4.6692438,
+  "display": "Dordrecht, Südholland, Niederlande"
+ },
+ "Coimbra|PT": {
+  "lat": 40.2111874,
+  "lon": -8.4291478,
+  "display": "Coimbra, Portugal"
+ },
+ "Hank|NL": {
+  "lat": 51.7360352,
+  "lon": 4.8986026,
+  "display": "Hank, Altena, Nordbrabant, Niederlande"
+ },
+ "Vierpolders|NL": {
+  "lat": 51.8790314,
+  "lon": 4.1791729,
+  "display": "Vierpolders, Voorne aan Zee, Südholland, Niederlande"
+ },
+ "Galway|IE": {
+  "lat": 53.2744122,
+  "lon": -9.0490601,
+  "display": "Galway, County Galway, Connacht, Irland"
+ },
+ "Kaustinen|FI": {
+  "lat": 63.5490486,
+  "lon": 23.6964967,
+  "display": "Kaustinen, Kaustisen seutukunta, Mittelösterbotten, Festland-Finnland, 69600, Finnland"
+ },
+ "Arles|FR": {
+  "lat": 43.6776223,
+  "lon": 4.6309653,
+  "display": "Arles, Bouches-du-Rhône, Provence-Alpes-Côte d'Azur, Metropolitanes Frankreich, 13200, Frankreich"
+ },
+ "Kato Nevrokopi Dramas|GR": {
+  "lat": 41.3415784,
+  "lon": 23.8706088,
+  "display": "Πατριάρχου Γρηγορίου, Kato Nevrokopi, Δήμος Κάτω Νευροκοπίου, Regionalbezirk Drama, Region Ostmakedonien und Thrakien, Makedonien - Thrakien, 660 33, Griechenland"
+ },
+ "Martina Franca|IT": {
+  "lat": 40.7042378,
+  "lon": 17.3399908,
+  "display": "Martina Franca, Taranto, Apulien, Italien"
+ },
+ "Pordenone|IT": {
+  "lat": 45.9562503,
+  "lon": 12.6597197,
+  "display": "Pordenone, Pordenone / Pordenon, Friaul-Julisch Venetien, 33170, Italien"
+ },
+ "Sastamala|FI": {
+  "lat": 61.3402939,
+  "lon": 22.9097256,
+  "display": "Sastamala, Lounais-Pirkanmaan seutukunta, Pirkanmaa, Festland-Finnland, Finnland"
+ },
+ "Wales|GB": {
+  "lat": 53.3411904,
+  "lon": -1.2847542,
+  "display": "Wales, Rotherham, South Yorkshire, England, S26 5PP, Vereinigtes Königreich"
+ },
+ "Bitola|MK": {
+  "lat": 41.0316005,
+  "lon": 21.3302511,
+  "display": "Bitola, Општина Битола, 7000, Nordmazedonien"
+ },
+ "Llanera|ES": {
+  "lat": 43.4544808,
+  "lon": -5.8506737,
+  "display": "Llanera, Asturien, Spanien"
+ },
+ "Alcalá la Real|ES": {
+  "lat": 37.4619794,
+  "lon": -3.922384,
+  "display": "Alcalá la Real, Jaén, Andalusien, Spanien"
+ },
+ "Cividale del Friuli|IT": {
+  "lat": 46.0731464,
+  "lon": 13.4387878,
+  "display": "Cividale del Friuli, Udine, Friaul-Julisch Venetien, 33043, Italien"
+ },
+ "Crevoladossola|IT": {
+  "lat": 46.1643821,
+  "lon": 8.2710986,
+  "display": "Crevoladossola, Verbano-Cusio-Ossola, Piemont, 28865, Italien"
+ },
+ "Tjentište|BA": {
+  "lat": 43.3465795,
+  "lon": 18.6898211,
+  "display": "Tjentište, Opština Foča (RS), Republika Srpska, 73311, Bosnien und Herzegowina"
+ },
+ "Šibenik|HR": {
+  "lat": 43.7340647,
+  "lon": 15.8944767,
+  "display": "Grad Šibenik, Gespanschaft Šibenik-Knin, Kroatien"
+ },
+ "Sion|CH": {
+  "lat": 46.2311749,
+  "lon": 7.3588795,
+  "display": "Sitten, Mittelwallis, Wallis, 1950, Schweiz"
+ },
+ "Vantaa|FI": {
+  "lat": 60.2929883,
+  "lon": 25.0436744,
+  "display": "Vantaa, Verwaltungsgemeinschaft Helsinki, Uusimaa, Festland-Finnland, Finnland"
+ },
+ "Trespaderne|ES": {
+  "lat": 42.8152741,
+  "lon": -3.3751992,
+  "display": "Trespaderne, Burgos, Kastilien und León, Spanien"
+ },
+ "Val de Bagnes|CH": {
+  "lat": 46.0099005,
+  "lon": 7.3064757,
+  "display": "Val de Bagnes, Entremont, Unterwallis, Wallis, 1934, Schweiz"
+ },
+ "Ambert|FR": {
+  "lat": 45.5504338,
+  "lon": 3.742639,
+  "display": "Ambert, Puy-de-Dôme, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 63600, Frankreich"
+ },
+ "Aegina|GR": {
+  "lat": 37.746703,
+  "lon": 23.4306251,
+  "display": "Ägina, Δήμος Αίγινας, Regionalbezirk Inseln, Region Attika, Attika, 180 10, Griechenland"
+ },
+ "Tarragona|ES": {
+  "lat": 41.1172364,
+  "lon": 1.2546057,
+  "display": "Tarragona, Tarragonès, Tarragona, Katalonien, Spanien"
+ },
+ "Bourg|FR": {
+  "lat": 45.0394689,
+  "lon": -0.5596107,
+  "display": "Bourg, Blaye, Gironde, Neu-Aquitanien, Metropolitanes Frankreich, 33710, Frankreich"
+ },
+ "Sansepolcro|IT": {
+  "lat": 43.5700776,
+  "lon": 12.1403766,
+  "display": "Sansepolcro, Arezzo, Toskana, Italien"
+ },
+ "Champrepus|FR": {
+  "lat": 48.833965,
+  "lon": -1.3207607,
+  "display": "Champrepus, Saint-Lô, Manche, Normandie, Metropolitanes Frankreich, 50800, Frankreich"
+ },
+ "Provincia di Cremona|IT": {
+  "lat": 45.2208641,
+  "lon": 10.037038,
+  "display": "Cremona, Lombardei, Italien"
+ },
+ "Kent|GB": {
+  "lat": 51.2070749,
+  "lon": 0.7210362,
+  "display": "Kent, England, Vereinigtes Königreich"
+ },
+ "Angern|DE": {
+  "lat": 52.3574438,
+  "lon": 11.7355497,
+  "display": "Angern, Elbe-Heide, Börde, Sachsen-Anhalt, Deutschland"
+ },
+ "El Prat de Llobregat|ES": {
+  "lat": 41.3305918,
+  "lon": 2.0930815,
+  "display": "el Prat de Llobregat, Baix Llobregat, Barcelona, Katalonien, 08820, Spanien"
+ },
+ "Ventnor|GB": {
+  "lat": 50.594976,
+  "lon": -1.2029747,
+  "display": "Ventnor, Isle of Wight, England, Vereinigtes Königreich"
+ },
+ "Morella (Castellón)|ES": {
+  "lat": 40.3899807,
+  "lon": -0.2793547,
+  "display": "Corral de les Crebadelles, Camí de l'Estrella, Vilafranca / Villafranca del Cid, els Ports, Castelló / Castellón, Valencianische Gemeinschaft, 12150, Spanien"
+ },
+ "Maaseik|BE": {
+  "lat": 51.0947181,
+  "lon": 5.791733,
+  "display": "Maaseik, Limburg, Flandern, 3680, Belgien"
+ },
+ "Bunnik|NL": {
+  "lat": 52.0391518,
+  "lon": 5.2203198,
+  "display": "Bunnik, Utrecht, Niederlande"
+ },
+ "Tarragona|NL": {
+  "lat": 41.1375471,
+  "lon": 1.0642158,
+  "display": "NL-Parking.nl, Avinguda del Prat, Riudoms, Baix Camp, Tarragona, Katalonien, 43330, Spanien"
+ },
+ "Saint-Michel de Chaillol|FR": {
+  "lat": 44.68172,
+  "lon": 6.1669,
+  "display": "Saint-Michel-de-Chaillol, Gap, Hochalpen, Provence-Alpes-Côte d'Azur, Metropolitanes Frankreich, 05260, Frankreich"
+ },
+ "Reims|FR": {
+  "lat": 49.2577886,
+  "lon": 4.031926,
+  "display": "Reims, Marne, Grand Est, Metropolitanes Frankreich, 51100, Frankreich"
+ },
+ "Beverlo|BE": {
+  "lat": 51.0897785,
+  "lon": 5.244609,
+  "display": "Beverlo, Beringen, Heusden-Zolder, Hasselt, Limburg, Flandern, 3581, Belgien"
+ },
+ "València|ES": {
+  "lat": 39.4697065,
+  "lon": -0.3763353,
+  "display": "Valencia, Comarca de València, Valencia, Valencianische Gemeinschaft, Spanien"
+ },
+ "Fijnaart|NL": {
+  "lat": 51.6352829,
+  "lon": 4.4673134,
+  "display": "Fijnaart, Moerdijk, Nordbrabant, Niederlande"
+ },
+ "Ouddorp|NL": {
+  "lat": 51.8093104,
+  "lon": 3.9359204,
+  "display": "Ouddorp, Goeree-Overflakkee, Südholland, Niederlande"
+ },
+ "Almere|NL": {
+  "lat": 52.3705038,
+  "lon": 5.2185859,
+  "display": "Almere, Flevoland, Niederlande"
+ },
+ "'s-Gravenzande|NL": {
+  "lat": 52.0028294,
+  "lon": 4.1603759,
+  "display": "'s-Gravenzande, Westland, Südholland, Niederlande"
+ },
+ "Kerkrade|NL": {
+  "lat": 50.8749089,
+  "lon": 6.0593853,
+  "display": "Kerkrade, Limburg, Niederlande"
+ },
+ "Travemünde|DE": {
+  "lat": 53.939609,
+  "lon": 10.8587192,
+  "display": "Travemünde, Lübeck, Schleswig-Holstein, 23570, Deutschland"
+ },
+ "Lecce - Arnesano|IT": {
+  "lat": 40.3119721,
+  "lon": 18.0260569,
+  "display": "Strada Provinciale dalla Lecce-Arnesano per Leverano, Copertino, Lecce, Apulien, 73010, Italien"
+ },
+ "Hertfordshire|GB": {
+  "lat": 51.8400523,
+  "lon": -0.0978552,
+  "display": "Hertfordshire, England, Vereinigtes Königreich"
+ },
+ "Montserrat|ES": {
+  "lat": 39.3576494,
+  "lon": -0.6031,
+  "display": "Montserrat, la Ribera Alta, Valencia, Valencianische Gemeinschaft, 46192, Spanien"
+ },
+ "Spa|BE": {
+  "lat": 50.4920654,
+  "lon": 5.8627569,
+  "display": "Spa, Verviers, Lüttich, Wallonien, 4900, Belgien"
+ },
+ "Lugoj|RO": {
+  "lat": 45.6862542,
+  "lon": 21.9063162,
+  "display": "Lugoj, Temesch, 305500, Rumänien"
+ },
+ "De Veenhoop|NL": {
+  "lat": 53.0968238,
+  "lon": 5.9515408,
+  "display": "De Veenhoop, Smallingerland, Friesland, Niederlande"
+ },
+ "Bujumbura|DE": {},
+ "Nova Gorica|SI": {
+  "lat": 45.9581509,
+  "lon": 13.6474998,
+  "display": "Nova Gorica, Solkan, Neu-Görz, 5000, Slowenien"
+ },
+ "Santander|ES": {
+  "lat": 43.4618932,
+  "lon": -3.8100255,
+  "display": "Santander, Kantabrien, Spanien"
+ },
+ "Fiumicello Villa Vicentina|IT": {
+  "lat": 45.7836083,
+  "lon": 13.4130187,
+  "display": "Fiumicello Villa Vicentina / Flumisel Vile Visintine, Udine, Friaul-Julisch Venetien, 33050, Italien"
+ },
+ "Novegro-Tregarezzo|IT": {
+  "lat": 45.4684778,
+  "lon": 9.284377,
+  "display": "Via Novegro, Tregarezzo, Novegro, Segrate, Rodano, Mailand, Lombardei, 20054, Italien"
+ },
+ "Donostia / San Sebastián|ES": {
+  "lat": 43.3224219,
+  "lon": -1.9838889,
+  "display": "Donostia / San Sebastián, Gipuzkoa, Autonome Gemeinschaft Baskenland, Spanien"
+ },
+ "Walkern|GB": {
+  "lat": 51.9136937,
+  "lon": -0.1227182,
+  "display": "Walkern, East Hertfordshire, Hertfordshire, England, Vereinigtes Königreich"
+ },
+ "Châteauneuf-du-Faou|FR": {
+  "lat": 48.1862985,
+  "lon": -3.8128592,
+  "display": "Châteauneuf-du-Faou, Châteaulin, Finistère, Bretagne, Metropolitanes Frankreich, 29520, Frankreich"
+ },
+ "Kuopio|FI": {
+  "lat": 62.8924628,
+  "lon": 27.6783603,
+  "display": "Kuopio, Kuopion seutukunta, Nord-Savo, Festland-Finnland, Finnland"
+ },
+ "Porreres|ES": {
+  "lat": 39.5168891,
+  "lon": 3.0227517,
+  "display": "Porreres, Pla de Mallorca, Balearische Inseln, 07260, Spanien"
+ },
+ "El Puerto de Santa María|ES": {
+  "lat": 36.6004006,
+  "lon": -6.2252702,
+  "display": "El Puerto de Santa María, Bahía de Cádiz, Cádiz, Andalusien, Spanien"
+ },
+ "Koprivnica|HR": {
+  "lat": 46.1623335,
+  "lon": 16.8307909,
+  "display": "Grad Koprivnica, Gespanschaft Kopreinitz-Kreutz, Kroatien"
+ },
+ "Kapolcs|HU": {
+  "lat": 46.9559035,
+  "lon": 17.6089272,
+  "display": "Kapolcs, Tapolcai járás, Komitat Wesprim, Mitteltransdanubien, Transdanubien, Ungarn"
+ },
+ "Wenen|AT": {
+  "lat": 48.2083537,
+  "lon": 16.3725042,
+  "display": "Wien, Österreich"
+ },
+ "Mafra|PT": {
+  "lat": 38.9369782,
+  "lon": -9.3282374,
+  "display": "Mafra, Lissabon, Portugal"
+ },
+ "Briouze|FR": {
+  "lat": 48.6996275,
+  "lon": -0.3670932,
+  "display": "Briouze, Argentan, Orne, Normandie, Metropolitanes Frankreich, 61220, Frankreich"
+ },
+ "San Javier|ES": {
+  "lat": 37.8059567,
+  "lon": -0.8345537,
+  "display": "San Javier, Campo de Cartagena y Mar Menor, Region Murcia, Murcia, Spanien"
+ },
+ "Pionsat|FR": {
+  "lat": 46.1091604,
+  "lon": 2.6942777,
+  "display": "Pionsat, Riom, Puy-de-Dôme, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 63330, Frankreich"
+ },
+ "Southend-on-Sea|GB": {
+  "lat": 51.5388241,
+  "lon": 0.7128137,
+  "display": "Southend-on-Sea, Essex, England, Vereinigtes Königreich"
+ },
+ "La Coruña|ES": {
+  "lat": 43.3466447,
+  "lon": -8.4127029,
+  "display": "A Coruña, Galicien, Spanien"
+ },
+ "Provincia di Padova|IT": {
+  "lat": 45.391408,
+  "lon": 11.8058487,
+  "display": "Padova, Venetien, Italien"
+ },
+ "Bucharest|RO": {
+  "lat": 44.4361414,
+  "lon": 26.102684,
+  "display": "Bukarest, Rumänien"
+ },
+ "Balen|BE": {
+  "lat": 50.6312854,
+  "lon": 5.9713469,
+  "display": "Balen, Baelen, Verviers, Lüttich, Wallonien, 4837, Belgien"
+ },
+ "Rochefort|FR": {
+  "lat": 45.9366592,
+  "lon": -0.9616399,
+  "display": "Rochefort, Charente-Maritime, Neu-Aquitanien, Metropolitanes Frankreich, 17300, Frankreich"
+ },
+ "Laburgade|FR": {
+  "lat": 44.3861758,
+  "lon": 1.539913,
+  "display": "Laburgade, Cahors, Lot, Okzitanien, Metropolitanes Frankreich, 46230, Frankreich"
+ },
+ "Katydata|CY": {
+  "lat": 35.0819799,
+  "lon": 32.887752,
+  "display": "Κατύδατα, Katydata, Σύμπλεγμα Κοινοτήτων Σολέας, Nikosia, Zypern, 2831, Zypern"
+ },
+ "Zlatibor|RS": {
+  "lat": 43.7265428,
+  "lon": 19.6997891,
+  "display": "Златибор, Општина Чајетина, Златиборски управни округ, Zentralserbien, 31315, Serbien"
+ },
+ "Lisserbroek|NL": {
+  "lat": 52.2566546,
+  "lon": 4.5732,
+  "display": "Lisserbroek, Haarlemmermeer, Nordholland, Niederlande"
+ },
+ "Beveren|BE": {
+  "lat": 51.212611,
+  "lon": 4.2577808,
+  "display": "Beveren, Beveren-Kruibeke-Zwijndrecht, Sint-Niklaas, Ostflandern, Flandern, 9120, Belgien"
+ },
+ "Trappenkamp|DE": {
+  "lat": 54.0389776,
+  "lon": 10.217033,
+  "display": "Trappenkamp, Bornhöved, Kreis Segeberg, Schleswig-Holstein, Deutschland"
+ },
+ "Ghedi|IT": {
+  "lat": 45.4015124,
+  "lon": 10.2768169,
+  "display": "Ghedi, Brescia, Lombardei, 25016, Italien"
+ },
+ "Holtrup|DE": {
+  "lat": 52.2038927,
+  "lon": 8.8698589,
+  "display": "Holtrup, Porta Westfalica, Kreis Minden-Lübbecke, Nordrhein-Westfalen, 32457, Deutschland"
+ },
+ "Leveroy|NL": {
+  "lat": 51.2501563,
+  "lon": 5.8452028,
+  "display": "Leveroy, Nederweert, Limburg, Niederlande"
+ },
+ "Steenwijk|NL": {
+  "lat": 52.7895502,
+  "lon": 6.1210477,
+  "display": "Steenwijk, Steenwijkerland, Oberyssel, Niederlande"
+ },
+ "Den Hoorn|NL": {
+  "lat": 53.025316,
+  "lon": 4.7527063,
+  "display": "Den Hoorn, Texel, Nordholland, Niederlande"
+ },
+ "Chiprovtsi|BG": {
+  "lat": 43.3843795,
+  "lon": 22.8807639,
+  "display": "Чипровци, Oblast Montana, Bulgarien"
+ },
+ "Lichterfeld-Schacksdorf|DE": {
+  "lat": 51.5962678,
+  "lon": 13.7745344,
+  "display": "Lichterfeld-Schacksdorf, Kleine Elster (Niederlausitz), Elbe-Elster, Brandenburg, Deutschland"
+ },
+ "Nigrán|NL": {
+  "lat": 42.1425187,
+  "lon": -8.7880115,
+  "display": "Nigrán, Vigo, Pontevedra, Galicien, Spanien"
+ },
+ "Someren|NL": {
+  "lat": 51.3863224,
+  "lon": 5.6888845,
+  "display": "Someren, Nordbrabant, Niederlande"
+ },
+ "ÍLLORA|ES": {
+  "lat": 37.2885009,
+  "lon": -3.8795173,
+  "display": "Íllora, Comarca de Loja, Granada, Andalusien, Spanien"
+ },
+ "Torre Mondovì|IT": {
+  "lat": 44.3248775,
+  "lon": 7.9078773,
+  "display": "Torre Mondovì, Cuneo, Piemont, 12080, Italien"
+ },
+ "Râșnov|RO": {
+  "lat": 45.5910307,
+  "lon": 25.4656159,
+  "display": "Rosenau, Zona Metropolitană Brașov, Kronstadt, Rumänien"
+ },
+ "Ystad|SE": {
+  "lat": 55.4295203,
+  "lon": 13.8201171,
+  "display": "Ystad, Ystads kommun, Provinz Schonen, 271 43, Schweden"
+ },
+ "Yardebridge|GB": {},
+ "East Lulworth|GB": {
+  "lat": 50.6381161,
+  "lon": -2.2013105,
+  "display": "East Lulworth, Dorset, England, Vereinigtes Königreich"
+ },
+ "BH20 5QS Wareham, Lulworth Castle|GB": {
+  "lat": 50.6390726,
+  "lon": -2.208823,
+  "display": "Lulworth Castle, Wareham, East Lulworth, Dorset, England, BH20 5QS, Vereinigtes Königreich"
+ },
+ "Bacau|RO": {
+  "lat": 46.5560493,
+  "lon": 26.9153557,
+  "display": "Barchau, Rumänien"
+ },
+ "Steenwijkerwold|NL": {
+  "lat": 52.8046237,
+  "lon": 6.0646127,
+  "display": "Steenwijkerwold, Steenwijkerland, Oberyssel, Niederlande"
+ },
+ "Marki|CY": {
+  "lat": 35.023638,
+  "lon": 33.3259841,
+  "display": "Μαρκί, Margi, Σύμπλεγμα Κοινοτήτων Μαχαιρά, Nikosia, Zypern, 2560, Zypern"
+ },
+ "Oulu|FI": {
+  "lat": 65.0117914,
+  "lon": 25.4701973,
+  "display": "Oulu, Oulun seutukunta, Nordösterbotten, Festland-Finnland, Finnland"
+ },
+ "Nasavrky|CZ": {
+  "lat": 49.4519501,
+  "lon": 14.6405602,
+  "display": "Nasawerk, Bezirk Tabor, Südböhmische Region, Südwesten, Tschechien"
+ },
+ "Bansko|BG": {
+  "lat": 41.8344086,
+  "lon": 23.4841698,
+  "display": "Bansko, Банско, Oblast Blagoewgrad, 2770, Bulgarien"
+ },
+ "Vélez-Málaga|ES": {
+  "lat": 36.7818354,
+  "lon": -4.0988099,
+  "display": "Vélez-Málaga, La Axarquía, Málaga, Andalusien, Spanien"
+ },
+ "Gignac|FR": {
+  "lat": 43.6522859,
+  "lon": 3.5512018,
+  "display": "Gignac, Lodève, Hérault, Okzitanien, Metropolitanes Frankreich, 34150, Frankreich"
+ },
+ "Sitges|ES": {
+  "lat": 41.2353596,
+  "lon": 1.8114102,
+  "display": "Sitges, Garraf, Barcelona, Katalonien, Spanien"
+ },
+ "Luxey|FR": {
+  "lat": 44.2639628,
+  "lon": -0.5208838,
+  "display": "Luxey, Mont-de-Marsan, Landes, Neu-Aquitanien, Metropolitanes Frankreich, 40430, Frankreich"
+ },
+ "Trelins|FR": {
+  "lat": 45.731193,
+  "lon": 4.0073654,
+  "display": "Trelins, Montbrison, Loire, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 42130, Frankreich"
+ },
+ "La Seyne-sur-Mer|FR": {
+  "lat": 43.1007714,
+  "lon": 5.8788948,
+  "display": "La Seyne-sur-Mer, Toulon, Var, Provence-Alpes-Côte d'Azur, Metropolitanes Frankreich, 83500, Frankreich"
+ },
+ "Habère-Poche|FR": {
+  "lat": 46.2486108,
+  "lon": 6.4735471,
+  "display": "Habère-Poche, Thonon-les-Bains, Hochsavoyen, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 74420, Frankreich"
+ },
+ "Prishtina|XK": {
+  "lat": 42.6638771,
+  "lon": 21.1640849,
+  "display": "Pristina, Gemeinde Pristina, Bezirk Pristina, 10000, Kosovo"
+ },
+ "Uppsala län|SE": {
+  "lat": 60.1451819,
+  "lon": 17.6237665,
+  "display": "Provinz Uppsala, Schweden"
+ },
+ "Tõrva|EE": {
+  "lat": 58.0028204,
+  "lon": 25.9253612,
+  "display": "Tõrva, Tõrva vald, Kreis Valga, Estland"
+ },
+ "Ellingen|DE": {
+  "lat": 49.0608124,
+  "lon": 10.9677438,
+  "display": "Ellingen, Ellingen (VGem), Landkreis Weißenburg-Gunzenhausen, Bayern, 91792, Deutschland"
+ },
+ "IERAPETRA|GR": {
+  "lat": 35.0756788,
+  "lon": 25.8388298,
+  "display": "Provinz Ierapetra, Regionalbezirk Lasithi, Region Kreta, Griechenland"
+ },
+ "Bocholt|BE": {
+  "lat": 51.172979,
+  "lon": 5.577577,
+  "display": "Bocholt, Hamont-Achel, Maaseik, Limburg, Flandern, 3950, Belgien"
+ },
+ "Scharendijke|NL": {
+  "lat": 51.7379536,
+  "lon": 3.8404406,
+  "display": "Scharendijke, Schouwen-Duiveland, Seeland, Niederlande"
+ },
+ "Chania|GR": {
+  "lat": 35.5120831,
+  "lon": 24.0191544,
+  "display": "Chania, Provinz Chania, Regionalbezirk Chania, Region Kreta, 731 35, Griechenland"
+ },
+ "Kwintsheul|NL": {
+  "lat": 52.0152893,
+  "lon": 4.2555884,
+  "display": "Kwintsheul, Westland, Südholland, Niederlande"
+ },
+ "Rotenburg|DE": {
+  "lat": 53.1108906,
+  "lon": 9.4049292,
+  "display": "Rotenburg, Landkreis Rotenburg (Wümme), Niedersachsen, 27356, Deutschland"
+ },
+ "Roelofarendsveen|NL": {
+  "lat": 52.2027173,
+  "lon": 4.6312402,
+  "display": "Roelofarendsveen, Kaag en Braassem, Südholland, Niederlande"
+ },
+ "Ústí nad Labem|CZ": {
+  "lat": 50.6603327,
+  "lon": 14.0381357,
+  "display": "Aussig, Bezirk Aussig, Aussiger Region, Tschechien"
+ },
+ "Trebinje|BA": {
+  "lat": 42.7115264,
+  "lon": 18.34468,
+  "display": "Trebinje, Stadt Trebinje, Republika Srpska, 89000, Bosnien und Herzegowina"
+ },
+ "Pag|HR": {
+  "lat": 44.4437608,
+  "lon": 15.0545217,
+  "display": "Baag, Gespanschaft Zadar, Kroatien"
+ },
+ "Ohmstal|CH": {
+  "lat": 47.164099,
+  "lon": 7.952664,
+  "display": "Ohmstal, Schötz, Luzern, 6247, Schweiz"
+ },
+ "Ruinen|NL": {
+  "lat": 52.7641537,
+  "lon": 6.3600084,
+  "display": "Ruinen, De Wolden, Drente, Niederlande"
+ },
+ "Kapellen|BE": {
+  "lat": 51.3149455,
+  "lon": 4.4295354,
+  "display": "Kapellen, Antwerpen, Flandern, 2950, Belgien"
+ },
+ "Loenhout|BE": {
+  "lat": 51.3985762,
+  "lon": 4.6432154,
+  "display": "Loenhout, Wuustwezel, Malle, Antwerpen, Flandern, Belgien"
+ },
+ "Lottum|NL": {
+  "lat": 51.4610426,
+  "lon": 6.1617184,
+  "display": "Lottum, Horst aan de Maas, Limburg, Niederlande"
+ },
+ "Rossignol|BE": {
+  "lat": 49.718767,
+  "lon": 5.4851582,
+  "display": "Rossignol, Tintigny, Wirten, Luxemburg, Wallonien, Belgien"
+ },
+ "Le Cap d'Agde|FR": {
+  "lat": 43.2851399,
+  "lon": 3.5105508,
+  "display": "Le Petit Train du Cap d'Agde, Esplanade Pierre Racine, Cap d'Agde, Agde, Béziers, Hérault, Okzitanien, Metropolitanes Frankreich, 34300, Frankreich"
+ },
+ "Slantsjev Brjag|BG": {},
+ "Knokke|BE": {
+  "lat": 51.3464863,
+  "lon": 3.2876314,
+  "display": "Knokke, Knokke-Heist, Brügge, Westflandern, Flandern, 8300, Belgien"
+ },
+ "Santorini|GR": {
+  "lat": 36.4071112,
+  "lon": 25.4566637,
+  "display": "Santorin, Δημοτική Ενότητα Θήρας, Δήμος Θήρας, Regionalbezirk Thira, Region Südliche Ägäis, Ägäis, Griechenland"
+ },
+ "Calabria Region|IT": {
+  "lat": 37.5021422,
+  "lon": 15.0567728,
+  "display": "Largo Calabria, San Leone, Monte Po-Nesima-San Leone-Rapisardi, Catania, Sizilien, Italien"
+ },
+ "Province of Macerata|IT": {
+  "lat": 43.1388029,
+  "lon": 11.8550558,
+  "display": "Via Macerata, Montepulciano Stazione, Montepulciano, Unione dei Comuni Valdichiana Senese, Siena, Toskana, Italien"
+ },
+ "Aranda de Duero|ES": {
+  "lat": 41.6715067,
+  "lon": -3.6851172,
+  "display": "Aranda de Duero, Burgos, Kastilien und León, Spanien"
+ },
+ "Adra|ES": {
+  "lat": 36.748834,
+  "lon": -3.0203617,
+  "display": "Adra, Almería, Andalusien, Spanien"
+ },
+ "Bollène|FR": {
+  "lat": 44.2803882,
+  "lon": 4.7484092,
+  "display": "Bollène, Carpentras, Vaucluse, Provence-Alpes-Côte d'Azur, Metropolitanes Frankreich, 84500, Frankreich"
+ },
+ "Luosto|FI": {
+  "lat": 67.1582631,
+  "lon": 26.9183365,
+  "display": "Luosto, Sodankylä, Nordlappland, Lappland, Festland-Finnland, 99555, Finnland"
+ },
+ "Pütnitz|DE": {
+  "lat": 54.2527314,
+  "lon": 12.4640122,
+  "display": "Pütnitz, Damgarten, Ribnitz-Damgarten, Vorpommern-Rügen, Mecklenburg-Vorpommern, 18311, Deutschland"
+ },
+ "Salacgrīva|LV": {
+  "lat": 57.7567573,
+  "lon": 24.3570447,
+  "display": "Salacgrīva, Limbažu novads, LV-4033, Lettland"
+ },
+ "Corato (Bari)|IT": {
+  "lat": 41.1507606,
+  "lon": 16.4138738,
+  "display": "Via Ada Negri, Corato, Bari, Apulien, 70033, Italien"
+ },
+ "Kawęczyn|PL": {
+  "lat": 51.9408843,
+  "lon": 20.9064713,
+  "display": "Kawęczyn, gmina Tarczyn, powiat piaseczyński, Woiwodschaft Masowien, Polen"
+ },
+ "Coutarnoux|FR": {
+  "lat": 47.5863355,
+  "lon": 3.965606,
+  "display": "Coutarnoux, Avallon, Yonne, Bourgogne-Franche-Comté, Metropolitanes Frankreich, 89440, Frankreich"
+ },
+ "Cercoux|FR": {
+  "lat": 45.1297182,
+  "lon": -0.2048244,
+  "display": "Cercoux, Jonzac, Charente-Maritime, Neu-Aquitanien, Metropolitanes Frankreich, 17270, Frankreich"
+ },
+ "Pogoni Ioannina|GR": {
+  "lat": 39.9192841,
+  "lon": 20.4755885,
+  "display": "Δήμος Πωγωνίου, Regionalbezirk Ioannina, Region Epirus, Epirus - Westmakedonien, Griechenland"
+ },
+ "Cussac-Fort-Médoc|FR": {
+  "lat": 45.1190261,
+  "lon": -0.728851,
+  "display": "Cussac-Fort-Médoc, Lesparre-Médoc, Gironde, Neu-Aquitanien, Metropolitanes Frankreich, 33460, Frankreich"
+ },
+ "Landerneau|FR": {
+  "lat": 48.4514803,
+  "lon": -4.2557901,
+  "display": "Landerneau, Brest, Finistère, Bretagne, Metropolitanes Frankreich, 29800, Frankreich"
+ },
+ "Muldestausee|DE": {
+  "lat": 51.6398815,
+  "lon": 12.4528028,
+  "display": "Muldestausee, Anhalt-Bitterfeld, Sachsen-Anhalt, Deutschland"
+ },
+ "Forssa|FI": {
+  "lat": 60.8145114,
+  "lon": 23.6240911,
+  "display": "Forssa, Forssan seutukunta, Eigentliche Häme, Festland-Finnland, Finnland"
+ },
+ "Pirot|RS": {
+  "lat": 43.1547342,
+  "lon": 22.5865039,
+  "display": "Pirot, Град Пирот, Пиротски управни округ, Zentralserbien, 18300, Serbien"
+ },
+ "Saint-Malo-de-Phily|FR": {
+  "lat": 47.8767402,
+  "lon": -1.7882282,
+  "display": "Saint-Malo-de-Phily, Redon, Ille-et-Vilaine, Bretagne, Metropolitanes Frankreich, 35480, Frankreich"
+ },
+ "Wiesthal|DE": {
+  "lat": 50.0314357,
+  "lon": 9.4281943,
+  "display": "Wiesthal, Verwaltungsgemeinschaft Partenstein, Landkreis Main-Spessart, Bayern, 97859, Deutschland"
+ },
+ "Vagos|PT": {
+  "lat": 40.5538919,
+  "lon": -8.680915,
+  "display": "Vagos, Aveiro, Portugal"
+ },
+ "Eichbaumsee Hamburg-Allermöhe|DE": {
+  "lat": 53.4876031,
+  "lon": 10.1044178,
+  "display": "Eichbaumsee, Moorfleeter Deich, Allermöhe, Bergedorf, Hamburg, 21037, Deutschland"
+ },
+ "Westkapelle|NL": {
+  "lat": 51.5293313,
+  "lon": 3.4407863,
+  "display": "Westkapelle, Veere, Seeland, Niederlande"
+ },
+ "Zeebrugge|BE": {
+  "lat": 51.3312211,
+  "lon": 3.207561,
+  "display": "Seebrügge, Lissewege, Brügge, Westflandern, Flandern, Belgien"
+ },
+ "Finkenbach|DE": {
+  "lat": 49.5342321,
+  "lon": 8.9173824,
+  "display": "Finkenbach, Finkenbach/Hinterbach/Raubach, Oberzent, Odenwaldkreis, Hessen, Deutschland"
+ },
+ "Tourgéville|FR": {
+  "lat": 49.3237572,
+  "lon": 0.064252,
+  "display": "Tourgéville, Lisieux, Calvados, Normandie, Metropolitanes Frankreich, 14800, Frankreich"
+ },
+ "Sint Odiliënberg|NL": {
+  "lat": 51.1430524,
+  "lon": 6.0014301,
+  "display": "Sankt Odilienberg, Roerdalen, Limburg, Niederlande"
+ },
+ "West Lothian|GB": {
+  "lat": 55.916667,
+  "lon": -3.5,
+  "display": "West Lothian, Schottland, Vereinigtes Königreich"
+ },
+ "Seraing|BE": {
+  "lat": 50.6152381,
+  "lon": 5.5089437,
+  "display": "Seraing, Lüttich, Wallonien, 4100, Belgien"
+ },
+ "Erbach|DE": {
+  "lat": 48.3274603,
+  "lon": 9.8913803,
+  "display": "Erbach, Alb-Donau-Kreis, Baden-Württemberg, 89155, Deutschland"
+ },
+ "Sneek|NL": {
+  "lat": 53.033548,
+  "lon": 5.6611029,
+  "display": "Sneek, Súdwest-Fryslân, Friesland, Niederlande"
+ },
+ "Norra Asum|SE": {
+  "lat": 55.992771,
+  "lon": 14.1525784,
+  "display": "Norra Åsum, Gemeinde Kristianstad, Provinz Schonen, 291 63, Schweden"
+ },
+ "Lommel|BE": {
+  "lat": 51.2305657,
+  "lon": 5.3076895,
+  "display": "Lommel, Maaseik, Limburg, Flandern, 3920, Belgien"
+ },
+ "Seneffe|BE": {
+  "lat": 50.5292555,
+  "lon": 4.2566988,
+  "display": "Seneffe, Soignies, Hennegau, Wallonien, Belgien"
+ },
+ "Santes Creus|ES": {
+  "lat": 41.3491834,
+  "lon": 1.3628953,
+  "display": "Santes Creus, Aiguamúrcia, Alt Camp, Tarragona, Katalonien, 43815, Spanien"
+ },
+ "'t Zand|NL": {
+  "lat": 52.8357489,
+  "lon": 4.7565167,
+  "display": "'t Zand, Schagen, Nordholland, Niederlande"
+ },
+ "Pesaro|IT": {
+  "lat": 43.9098114,
+  "lon": 12.9131228,
+  "display": "Pesaro, Pesaro und Urbino, Marken, Italien"
+ },
+ "Molyvos (Mithymna)|GR": {
+  "lat": 39.3685079,
+  "lon": 26.1737266,
+  "display": "Mithymna, Δήμος Δυτικής Λέσβου, Regionalbezirk Lesbos, Region Nördliche Ägäis, Ägäis, 811 08, Griechenland"
+ },
+ "Kulturpark Deutzen|DE": {
+  "lat": 51.1100958,
+  "lon": 12.4335424,
+  "display": "Kulturpark Deutzen, 12, Deutzen, Neukieritzsch, Landkreis Leipzig, Sachsen, 04575, Deutschland"
+ },
+ "Bellaria-Igea Marina|IT": {
+  "lat": 44.1421077,
+  "lon": 12.4696937,
+  "display": "Bellaria-Igea Marina, Rimini, Emilia-Romagna, Italien"
+ },
+ "Basingstoke|GB": {
+  "lat": 51.262826,
+  "lon": -1.0861976,
+  "display": "Basingstoke, Basingstoke and Deane, Hampshire, England, Vereinigtes Königreich"
+ },
+ "Innervillgraten|AT": {
+  "lat": 46.8078411,
+  "lon": 12.3720904,
+  "display": "Innervillgraten, Bezirk Lienz, Tirol, 9932, Österreich"
+ },
+ "Adrianu Mare|RO": {
+  "lat": 46.4935733,
+  "lon": 24.8032443,
+  "display": "Adrianu Mare, Gălești, Mieresch, 547246, Rumänien"
+ },
+ "Rila|BG": {
+  "lat": 42.1278563,
+  "lon": 23.1323997,
+  "display": "Rila, Oblast Kjustendil, 2630, Bulgarien"
+ },
+ "Provincia di Chieti|IT": {
+  "lat": 42.1026928,
+  "lon": 14.4159053,
+  "display": "Chieti, Abruzzen, Italien"
+ },
+ "El Puig de Santa Maria|ES": {
+  "lat": 39.5887818,
+  "lon": -0.3062566,
+  "display": "el Puig de Santa Maria, l'Horta Nord, Valencia, Valencianische Gemeinschaft, Spanien"
+ },
+ "Arbatax|IT": {
+  "lat": 39.9360947,
+  "lon": 9.7070731,
+  "display": "Arbatassa/Arbatax, Tortolì, Ogliastra, Sardinien, 08048, Italien"
+ },
+ "Lievegem|BE": {
+  "lat": 51.1266908,
+  "lon": 3.5884951,
+  "display": "Lievegem, Gent, Ostflandern, Flandern, Belgien"
+ },
+ "Szombathely|HU": {
+  "lat": 47.2291184,
+  "lon": 16.6187625,
+  "display": "Szombathely, Szombathelyi járás, Komitat Vas, Westtransdanubien, Transdanubien, Ungarn"
+ },
+ "Vienna|AT": {
+  "lat": 48.2083537,
+  "lon": 16.3725042,
+  "display": "Wien, Österreich"
+ },
+ "Buzău|RO": {
+  "lat": 45.1490064,
+  "lon": 26.8306557,
+  "display": "Buzău, Rumänien"
+ },
+ "Mers-les-Bains|FR": {
+  "lat": 50.0656442,
+  "lon": 1.3892492,
+  "display": "Mers-les-Bains, Abbeville, Somme, Nordfrankreich, Metropolitanes Frankreich, 80350, Frankreich"
+ },
+ "Pedras Salgadas|PT": {
+  "lat": 41.5426745,
+  "lon": -7.6031268,
+  "display": "Pedras Salgadas, Vila Pouca de Aguiar, Vila Real, 5450-156, Portugal"
+ },
+ "Orange|FR": {
+  "lat": 44.1371311,
+  "lon": 4.8078783,
+  "display": "Orange, Carpentras, Vaucluse, Provence-Alpes-Côte d'Azur, Metropolitanes Frankreich, 84100, Frankreich"
+ },
+ "Six-Fours-les-Plages|FR": {
+  "lat": 43.0935105,
+  "lon": 5.8393953,
+  "display": "Six-Fours les Plages, Toulon, Var, Provence-Alpes-Côte d'Azur, Metropolitanes Frankreich, 83140, Frankreich"
+ },
+ "Maasmechelen|BE": {
+  "lat": 50.9634179,
+  "lon": 5.6960212,
+  "display": "Maasmechelen, Tongern, Limburg, Flandern, Belgien"
+ },
+ "Blankenberge|BE": {
+  "lat": 51.3112589,
+  "lon": 3.1323429,
+  "display": "Blankenberge, Brügge, Westflandern, Flandern, 8370, Belgien"
+ },
+ "Wessem|NL": {
+  "lat": 51.1620059,
+  "lon": 5.8813984,
+  "display": "Wessem, Maasgouw, Limburg, Niederlande"
+ },
+ "Airport Weeze|DE": {
+  "lat": 51.6031019,
+  "lon": 6.1433899,
+  "display": "Flughafen Weeze/Niederrhein, Limburger-Tor, Weeze, Kreis Kleve, Nordrhein-Westfalen, 47652, Deutschland"
+ },
+ "Conversano|IT": {
+  "lat": 40.9685142,
+  "lon": 17.1150442,
+  "display": "Conversano, Bari, Apulien, 70014, Italien"
+ },
+ "Maasbracht|NL": {
+  "lat": 51.1428567,
+  "lon": 5.8830683,
+  "display": "Maasbracht, Maasgouw, Limburg, Niederlande"
+ },
+ "Beek|NL": {
+  "lat": 50.9268769,
+  "lon": 5.8106851,
+  "display": "Beek, Limburg, Niederlande"
+ },
+ "Stanovice|CZ": {
+  "lat": 50.4007488,
+  "lon": 15.8714928,
+  "display": "Stangendorf, Bezirk Trautenau, Königgrätzer Region, 544 43, Tschechien"
+ },
+ "Liptovský Mikuláš|SK": {
+  "lat": 49.0835785,
+  "lon": 19.612785,
+  "display": "Liptau-Nikolaus, Bezirk Liptau-Nikolaus, Silleiner Landschaftsverband, Slowakei"
+ },
+ "Almería|ES": {
+  "lat": 36.8685739,
+  "lon": -2.3120282,
+  "display": "Almería, Andalusien, Spanien"
+ },
+ "Saintes|FR": {
+  "lat": 45.7460663,
+  "lon": -0.6300671,
+  "display": "Saintes, Charente-Maritime, Neu-Aquitanien, Metropolitanes Frankreich, 17100, Frankreich"
+ },
+ "Himara|AL": {
+  "lat": 40.1089032,
+  "lon": 19.762482,
+  "display": "1 Maji (Himarë), Himarë, Bashkia Himarë, Qark Vlora, 9425, Albanien"
+ },
+ "Staffordshire|GB": {
+  "lat": 52.8246942,
+  "lon": -2.0074547,
+  "display": "Staffordshire, England, Vereinigtes Königreich"
+ },
+ "Saint-Sorlin-en-Valloire|FR": {
+  "lat": 45.2889,
+  "lon": 4.95117,
+  "display": "Saint-Sorlin-en-Valloire, Valence, Drôme, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 26210, Frankreich"
+ },
+ "Bréal-sous-Montfort|FR": {
+  "lat": 48.0513567,
+  "lon": -1.867686,
+  "display": "Bréal-sous-Montfort, Rennes, Ille-et-Vilaine, Bretagne, Metropolitanes Frankreich, 35310, Frankreich"
+ },
+ "Lemmer|NL": {
+  "lat": 52.8444859,
+  "lon": 5.7099136,
+  "display": "Lemmer, De Fryske Marren, Friesland, Niederlande"
+ },
+ "Orchamps-Vennes|FR": {
+  "lat": 47.1304184,
+  "lon": 6.5254486,
+  "display": "Orchamps-Vennes, Pontarlier, Doubs, Bourgogne-Franche-Comté, Metropolitanes Frankreich, 25390, Frankreich"
+ },
+ "Didymoteicho|GR": {
+  "lat": 41.3492618,
+  "lon": 26.4963524,
+  "display": "Didymoteicho, Δημοτική Ενότητα Διδυμοτείχου, Δήμος Διδυμοτείχου, Regionalbezirk Evros, Region Ostmakedonien und Thrakien, Makedonien - Thrakien, 683 00, Griechenland"
+ },
+ "Oxfordshire|GB": {
+  "lat": 51.833333,
+  "lon": -1.25,
+  "display": "Oxfordshire, England, Vereinigtes Königreich"
+ },
+ "Achterveld|NL": {
+  "lat": 52.1357411,
+  "lon": 5.4965611,
+  "display": "Achterveld, Leusden, Utrecht, Niederlande"
+ },
+ "Ell|NL": {
+  "lat": 51.2197788,
+  "lon": 5.7949461,
+  "display": "Ell, Leudal, Limburg, Niederlande"
+ },
+ "Oirsbeek|NL": {
+  "lat": 50.9500389,
+  "lon": 5.9081569,
+  "display": "Oirsbeek, Beekdaelen, Limburg, Niederlande"
+ },
+ "Boerdonk|NL": {
+  "lat": 51.5595751,
+  "lon": 5.6263531,
+  "display": "Boerdonk, Erp, Meierijstad, Nordbrabant, Niederlande, 5469 NB, Niederlande"
+ },
+ "IJmuiden|NL": {
+  "lat": 52.4574139,
+  "lon": 4.6116211,
+  "display": "IJmuiden, Velsen, Nordholland, Niederlande"
+ },
+ "Katwijk|NL": {
+  "lat": 52.1898549,
+  "lon": 4.4145583,
+  "display": "Katwijk, Südholland, Niederlande"
+ },
+ "Made|NL": {
+  "lat": 51.6773008,
+  "lon": 4.7931811,
+  "display": "Made, Drimmelen, Nordbrabant, Niederlande"
+ },
+ "Grave|NL": {
+  "lat": 51.7596504,
+  "lon": 5.7411125,
+  "display": "Grave, Land van Cuijk, Nordbrabant, Niederlande"
+ },
+ "Reghin|RO": {
+  "lat": 46.7796886,
+  "lon": 24.7000238,
+  "display": "Sächsisch-Regen, Mieresch, Rumänien"
+ },
+ "Elefsina|GR": {
+  "lat": 38.047608,
+  "lon": 23.5348663,
+  "display": "Elefsina, Δημοτική Ενότητα Ελευσίνος, Δήμος Ελευσίνας, Regionalbezirk Westattika, Region Attika, Attika, 192 00, Griechenland"
+ },
+ "Trento|IT": {
+  "lat": 46.0664228,
+  "lon": 11.1257601,
+  "display": "Trient, Territorio Val d'Adige, Autonome Provinz Trient, Trentino-Südtirol, Italien"
+ },
+ "Zelbio|IT": {
+  "lat": 45.9022625,
+  "lon": 9.1954161,
+  "display": "Zelbio, Como, Lombardei, 22020, Italien"
+ },
+ "Ibiza|ES": {
+  "lat": 38.910072,
+  "lon": 1.430454,
+  "display": "Ibiza-Stadt, Ibiza, Balearische Inseln, 07800, Spanien"
+ },
+ "Murska Sobota|SI": {
+  "lat": 46.6624644,
+  "lon": 16.1655256,
+  "display": "Olsnitz, 9000, Slowenien"
+ },
+ "Ερμούπολη|GR": {
+  "lat": 37.444567,
+  "lon": 24.9423162,
+  "display": "Ermoupoli, Gemeinde Syros-Ermoupoli, Regionalbezirk Syros, Region Südliche Ägäis, Ägäis, 841 00, Griechenland"
+ },
+ "Heeswijk-Dinther|NL": {
+  "lat": 51.6493848,
+  "lon": 5.4739859,
+  "display": "Heeswijk-Dinther, Bernheze, Nordbrabant, Niederlande"
+ },
+ "Hirson|FR": {
+  "lat": 49.9203419,
+  "lon": 4.0837186,
+  "display": "Hirson, Vervins, Aisne, Nordfrankreich, Metropolitanes Frankreich, 02500, Frankreich"
+ },
+ "Essex|GB": {
+  "lat": 51.7704679,
+  "lon": 0.4646698,
+  "display": "Essex, England, Vereinigtes Königreich"
+ },
+ "Helenesee, Frankfurt (Oder)|DE": {
+  "lat": 52.270072,
+  "lon": 14.4979205,
+  "display": "Helenesee, Lossow, Frankfurt (Oder), Brandenburg, Deutschland"
+ },
+ "Guadalajara|ES": {
+  "lat": 40.6326979,
+  "lon": -3.1646067,
+  "display": "Guadalajara, Kastilien-La Mancha, Spanien"
+ },
+ "Cella Monte|IT": {
+  "lat": 45.0748677,
+  "lon": 8.3911849,
+  "display": "Cella Monte, Alessandria, Piemont, 15034, Italien"
+ },
+ "Mijnsheerenland|NL": {
+  "lat": 51.7987352,
+  "lon": 4.4874953,
+  "display": "Mijnsheerenland, Hoeksche Waard, Südholland, Niederlande"
+ },
+ "Jänschwalde|DE": {
+  "lat": 51.8616812,
+  "lon": 14.4984867,
+  "display": "Jänschwalde, Amt Peitz, Spree-Neiße, Brandenburg, 03197, Deutschland"
+ },
+ "Zlín|CZ": {
+  "lat": 49.226766,
+  "lon": 17.6667415,
+  "display": "Zlin, Bezirk Zlin, Region Zlin, Tschechien"
+ },
+ "IKEA Altona, Hamburg|DE": {
+  "lat": 53.551347,
+  "lon": 9.9416567,
+  "display": "IKEA, 164, Große Bergstraße, Altona, Altona-Altstadt, Altona, Hamburg, 22767, Deutschland"
+ },
+ "Timișoara|RO": {
+  "lat": 45.7538355,
+  "lon": 21.2257474,
+  "display": "Temeswar, Temesch, Rumänien"
+ },
+ "Boxmeer|NL": {
+  "lat": 51.6486483,
+  "lon": 5.9450972,
+  "display": "Boxmeer, Land van Cuijk, Nordbrabant, Niederlande"
+ },
+ "Orrhaga-Gamla Stan|SE": {},
+ "Dijon|FR": {
+  "lat": 47.3215806,
+  "lon": 5.0414701,
+  "display": "Dijon, Côte-d'Or, Bourgogne-Franche-Comté, Metropolitanes Frankreich, 21000, Frankreich"
+ },
+ "Maasland|NL": {
+  "lat": 51.9367248,
+  "lon": 4.2740314,
+  "display": "Maasland, Midden-Delfland, Südholland, Niederlande"
+ },
+ "Geleen|NL": {
+  "lat": 50.9699953,
+  "lon": 5.8267029,
+  "display": "Geleen, Sittard-Geleen, Limburg, Niederlande"
+ },
+ "Bordeieni|RO": {
+  "lat": 45.2598237,
+  "lon": 24.9789232,
+  "display": "Bordeieni, Bughea de Jos, Argisch, 117386, Rumänien"
+ },
+ "Tubbergen|NL": {
+  "lat": 52.4039627,
+  "lon": 6.7744417,
+  "display": "Tubbergen, Oberyssel, Niederlande"
+ },
+ "Roeselare|BE": {
+  "lat": 50.9449511,
+  "lon": 3.1243935,
+  "display": "Roeselare, Westflandern, Flandern, 8800, Belgien"
+ },
+ "Northern Ireland|GB": {
+  "lat": 54.5859836,
+  "lon": -6.9591554,
+  "display": "Nordirland, Vereinigtes Königreich"
+ },
+ "Bristol City|GB": {
+  "lat": 51.4538022,
+  "lon": -2.5972985,
+  "display": "Bristol, City of Bristol, West of England, England, Vereinigtes Königreich"
+ },
+ "Haren|NL": {
+  "lat": 53.1709841,
+  "lon": 6.6061413,
+  "display": "Haren, Groningen, Niederlande"
+ },
+ "Detern|DE": {
+  "lat": 53.2109195,
+  "lon": 7.6700309,
+  "display": "Detern, Samtgemeinde Jümme, Landkreis Leer, Niedersachsen, 26847, Deutschland"
+ },
+ "Imola|IT": {
+  "lat": 44.3535145,
+  "lon": 11.7141233,
+  "display": "Imola, Nuovo Circondario Imolese, Bologna, Emilia-Romagna, 40026, Italien"
+ },
+ "Torhout|BE": {
+  "lat": 51.0647837,
+  "lon": 3.1016415,
+  "display": "Torhout, Brügge, Westflandern, Flandern, 8820, Belgien"
+ },
+ "Harth-Pöllnitz|DE": {
+  "lat": 50.7607499,
+  "lon": 11.9708916,
+  "display": "Harth-Pöllnitz, Greiz, Thüringen, 07570, Deutschland"
+ },
+ "Brasschaat|BE": {
+  "lat": 51.2900693,
+  "lon": 4.4917295,
+  "display": "Brasschaat, Antwerpen, Flandern, 2930, Belgien"
+ },
+ "Elp|NL": {
+  "lat": 52.8820781,
+  "lon": 6.6432482,
+  "display": "Elp, Midden-Drenthe, Drente, Niederlande"
+ },
+ "Odzaci|RS": {
+  "lat": 45.5058662,
+  "lon": 19.2597368,
+  "display": "Оџаци, Општина Оџаци, Bezirk Westliche Batschka, Wojwodina, 25250, Serbien"
+ },
+ "Muravera|IT": {
+  "lat": 39.420945,
+  "lon": 9.573551,
+  "display": "Murera/Muravera, Casteddu/Cagliari, Sardinien, 09043, Italien"
+ },
+ "Rhodes|GR": {
+  "lat": 36.4437233,
+  "lon": 28.227369,
+  "display": "Rhodos, Δημοτική Ενότητα Ρόδου, Δήμος Ρόδου, Regionalbezirk Rhodos, Region Südliche Ägäis, Ägäis, 851 00, Griechenland"
+ },
+ "Muğla / Menteşe|TR": {
+  "lat": 37.2178776,
+  "lon": 28.3645937,
+  "display": "Menteşe, Muğla, Ägäisregion, Türkei"
+ },
+ "Torbay|GB": {
+  "lat": 57.4816263,
+  "lon": -3.1107581,
+  "display": "Torbay, Moray, Schottland, Vereinigtes Königreich"
+ },
+ "Baltar - Paredes|PT": {
+  "lat": 41.1927312,
+  "lon": -8.388552,
+  "display": "Baltar, Paredes, Porto, Portugal"
+ },
+ "København|DK": {
+  "lat": 55.6867243,
+  "lon": 12.5700724,
+  "display": "Kopenhagen, Hauptstadtregion, 1357, Dänemark"
+ },
+ "Lisboa|PT": {
+  "lat": 38.7077507,
+  "lon": -9.1365919,
+  "display": "Lissabon, Portugal"
+ },
+ "Aleksandrów Łódzki|PL": {
+  "lat": 51.8196533,
+  "lon": 19.3035375,
+  "display": "Aleksandrów Łódzki, gmina Aleksandrów Łódzki, powiat zgierski, Woiwodschaft Lodz, Polen"
+ },
+ "IJsselstein|NL": {
+  "lat": 52.0246381,
+  "lon": 5.0458792,
+  "display": "IJsselstein, Utrecht, Niederlande"
+ },
+ "Ottendorf|DE": {
+  "lat": 54.3417316,
+  "lon": 10.0534212,
+  "display": "Ottendorf, Amt Achterwehr, Kreis Rendsburg-Eckernförde, Schleswig-Holstein, Deutschland"
+ },
+ "Berghem|NL": {
+  "lat": 51.7709604,
+  "lon": 5.5721927,
+  "display": "Berghem, Oss, Nordbrabant, Niederlande"
+ },
+ "Les Mathes|FR": {
+  "lat": 45.718056,
+  "lon": -1.146944,
+  "display": "Les Mathes, Rochefort, Charente-Maritime, Neu-Aquitanien, Metropolitanes Frankreich, 17570, Frankreich"
+ },
+ "Sirolo|IT": {
+  "lat": 43.5190935,
+  "lon": 13.6066218,
+  "display": "Sirolo, Ancona, Marken, Italien"
+ },
+ "Offenbach am Main|NL": {
+  "lat": 50.0831579,
+  "lon": 8.7455148,
+  "display": "Deutsche Post NL Offenbach, 200, Sprendlinger Landstraße, Lauterborn, Offenbach am Main, Hessen, 63069, Deutschland"
+ },
+ "Sèvremont|FR": {
+  "lat": 46.8404782,
+  "lon": -0.856249,
+  "display": "Sèvremont, Fontenay-le-Comte, Vendée, Pays de la Loire, Metropolitanes Frankreich, 85700, Frankreich"
+ },
+ "Leusden|NL": {
+  "lat": 52.130355,
+  "lon": 5.4286989,
+  "display": "Leusden, Utrecht, Niederlande"
+ },
+ "Brielle|NL": {
+  "lat": 51.901662,
+  "lon": 4.1626292,
+  "display": "Brielle, Voorne aan Zee, Südholland, Niederlande"
+ },
+ "Ede|NL": {
+  "lat": 52.0716826,
+  "lon": 5.7455106,
+  "display": "Ede, Geldern, Niederlande"
+ },
+ "De Meern|NL": {
+  "lat": 52.0811781,
+  "lon": 5.0363571,
+  "display": "De Meern, Vleuten - De Meern, Utrecht, Niederlande"
+ },
+ "Greater Manchester|GB": {
+  "lat": 53.5065249,
+  "lon": -2.3374401,
+  "display": "Greater Manchester, England, Vereinigtes Königreich"
+ },
+ "Hockenheimring|DE": {
+  "lat": 49.3297989,
+  "lon": 8.5763,
+  "display": "Hockenheimring Baden-Württemberg, A 6, Hockenheim, VVG der Stadt Hockenheim, Rhein-Neckar-Kreis, Baden-Württemberg, 68766, Deutschland"
+ },
+ "Engenbachgelände, Kirchzarten|DE": {},
+ "Syros|GR": {
+  "lat": 37.4385101,
+  "lon": 24.9123772,
+  "display": "Syros, Κίνι, Gemeinde Syros-Ermoupoli, Regionalbezirk Syros, Region Südliche Ägäis, Ägäis, 841 00, Griechenland"
+ },
+ "Ambronay|FR": {
+  "lat": 46.0055071,
+  "lon": 5.3602947,
+  "display": "Ambronay, Belley, Ain, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 01500, Frankreich"
+ },
+ "Merksplas|BE": {
+  "lat": 51.3579924,
+  "lon": 4.8627355,
+  "display": "Merksplas, Turnhout, Antwerpen, Flandern, 2330, Belgien"
+ },
+ "Larissa|GR": {
+  "lat": 39.6383092,
+  "lon": 22.4160706,
+  "display": "Larisa, Δημοτική Ενότητα Λαρισαίων, Δήμος Λαρισαίων, Regionalbezirk Larisa, Region Thessalien, Thessalien - Mittelgriechenland, 422 22, Griechenland"
+ },
+ "Iasi|RO": {
+  "lat": 47.1615598,
+  "lon": 27.5837814,
+  "display": "Iași, Zona Metropolitană Iași, Jassy, Rumänien"
+ },
+ "Ambazac|FR": {
+  "lat": 45.958226,
+  "lon": 1.4019278,
+  "display": "Ambazac, Limoges, Haute-Vienne, Neu-Aquitanien, Metropolitanes Frankreich, 87240, Frankreich"
+ },
+ "Brétigny-sur-Orge|FR": {
+  "lat": 48.6099887,
+  "lon": 2.3075288,
+  "display": "Brétigny-sur-Orge, Palaiseau, Essonne, Île-de-France, Metropolitanes Frankreich, 91220, Frankreich"
+ },
+ "Gévezé|FR": {
+  "lat": 48.2204891,
+  "lon": -1.7896366,
+  "display": "Gévezé, Rennes, Ille-et-Vilaine, Bretagne, Metropolitanes Frankreich, 35850, Frankreich"
+ },
+ "Middelkerke|BE": {
+  "lat": 51.1864843,
+  "lon": 2.8229746,
+  "display": "Middelkerke, Ostende, Westflandern, Flandern, Belgien"
+ },
+ "Gozo Island|MT": {
+  "lat": 36.0467778,
+  "lon": 14.2582565,
+  "display": "Gozo, Malta"
+ },
+ "Stara Zagora|BG": {
+  "lat": 42.4248111,
+  "lon": 25.6257479,
+  "display": "Stara Sagora, Oblast Stara Sagora, 6000, Bulgarien"
+ },
+ "Kijkduin|NL": {
+  "lat": 52.0688264,
+  "lon": 4.2223137,
+  "display": "Kijkduin, Loosduinen, Den Haag, Südholland, Niederlande, 2554 EH, Niederlande"
+ },
+ "Florence|IT": {
+  "lat": 43.7697955,
+  "lon": 11.2556404,
+  "display": "Florenz, Firenze, Toskana, Italien"
+ },
+ "Cluses|FR": {
+  "lat": 46.0603171,
+  "lon": 6.5804218,
+  "display": "Cluses, Bonneville, Hochsavoyen, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 74300, Frankreich"
+ },
+ "Assen|NL": {
+  "lat": 52.9952273,
+  "lon": 6.560498,
+  "display": "Assen, Drente, Niederlande"
+ },
+ "Breskens|NL": {
+  "lat": 51.3957804,
+  "lon": 3.5551696,
+  "display": "Breskens, Sluis, Seeland, Niederlande"
+ },
+ "Vinkel|NL": {
+  "lat": 51.7055171,
+  "lon": 5.4614965,
+  "display": "Vinkel, Herzogenbusch, Nordbrabant, Niederlande"
+ },
+ "Clonakilty|IE": {
+  "lat": 51.6232159,
+  "lon": -8.8914072,
+  "display": "Clonakilty, County Cork, Munster, Irland"
+ },
+ "Tállya|HU": {
+  "lat": 48.2353737,
+  "lon": 21.229904,
+  "display": "Tállya, Szerencsi járás, Komitat Borsod-Abaúj-Zemplén, Nordungarn, Nördliche Große Tiefebene, 3907, Ungarn"
+ },
+ "Lisbon|PT": {
+  "lat": 38.7077507,
+  "lon": -9.1365919,
+  "display": "Lissabon, Portugal"
+ },
+ "Santa Maria di Lota|FR": {
+  "lat": 42.74687,
+  "lon": 9.43261,
+  "display": "Santa-Maria-di-Lota, Bastia, Oberkorsika, Korsika, Metropolitanes Frankreich, 20200, Frankreich"
+ },
+ "Corfu|GR": {
+  "lat": 39.6217347,
+  "lon": 19.9180908,
+  "display": "Korfu, Gemeinde Korfu-Mitte und Inseln, Regionalbezirk Korfu, Region der Ionischen Inseln, Peloponnes, Westgriechenland und Ionische Inseln, 491 00, Griechenland"
+ },
+ "Lingen (Ems)|DE": {
+  "lat": 52.5224659,
+  "lon": 7.316584,
+  "display": "Lingen (Ems), Landkreis Emsland, Niedersachsen, Deutschland"
+ },
+ "Mérignies|FR": {
+  "lat": 50.506087,
+  "lon": 3.1103335,
+  "display": "Mérignies, Lille, Nord, Nordfrankreich, Metropolitanes Frankreich, 59710, Frankreich"
+ },
+ "Königslutter am Elm|DE": {
+  "lat": 52.2499307,
+  "lon": 10.8171691,
+  "display": "Königslutter am Elm, Landkreis Helmstedt, Niedersachsen, 38154, Deutschland"
+ },
+ "Helmond|NL": {
+  "lat": 51.4736023,
+  "lon": 5.6670321,
+  "display": "Helmond, Nordbrabant, Niederlande"
+ },
+ "Corte Franca|IT": {
+  "lat": 45.6374172,
+  "lon": 10.0064681,
+  "display": "Corte Franca, Brescia, Lombardei, 25040, Italien"
+ },
+ "Warszawa|PL": {
+  "lat": 52.2319581,
+  "lon": 21.0067249,
+  "display": "Warschau, Woiwodschaft Masowien, Polen"
+ },
+ "Nicosia|CY": {
+  "lat": 35.1746503,
+  "lon": 33.3638783,
+  "display": "Nikosia, Δήμος Λευκωσίας, Nikosia, Zypern, 1107, Zypern"
+ },
+ "Lekkerkerk|NL": {
+  "lat": 51.8969648,
+  "lon": 4.6832671,
+  "display": "Lekkerkerk, Krimpenerwaard, Südholland, Niederlande"
+ },
+ "Saint-Malo|FR": {
+  "lat": 48.649518,
+  "lon": -2.0260409,
+  "display": "Saint-Malo, Ille-et-Vilaine, Bretagne, Metropolitanes Frankreich, 35400, Frankreich"
+ },
+ "Vigo|ES": {
+  "lat": 42.1986395,
+  "lon": -8.727956,
+  "display": "Vigo, Pontevedra, Galicien, Spanien"
+ },
+ "different cities in Italy|IT": {},
+ "Chassieu|FR": {
+  "lat": 45.7422756,
+  "lon": 4.9681796,
+  "display": "Chassieu, Lyon, Métropole de Lyon, Rhône, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 69680, Frankreich"
+ },
+ "Wiener Neustadt|AT": {
+  "lat": 47.8131847,
+  "lon": 16.2441166,
+  "display": "Wiener Neustadt, Niederösterreich, 2700, Österreich"
+ },
+ "Hengstdijk|NL": {
+  "lat": 51.3439801,
+  "lon": 3.9929221,
+  "display": "Hengstdijk, Hulst, Seeland, Niederlande"
+ },
+ "Rijeka|HR": {
+  "lat": 45.3267976,
+  "lon": 14.442208,
+  "display": "Rijeka, Gespanschaft Küstenland-Bergland, Kroatien"
+ },
+ "Muğla Bodrum|TR": {
+  "lat": 37.0027985,
+  "lon": 27.2583661,
+  "display": "D-Marin Turgutreis Heliport, Gazi Mustafa Kemal Bulvarı, Bahçelievler, Turgutreis, Bodrum, Muğla, Ägäisregion, 48960, Türkei"
+ },
+ "Aosta|IT": {
+  "lat": 45.7373075,
+  "lon": 7.3204025,
+  "display": "Aosta, Aostatal, 11100, Italien"
+ },
+ "Barreiro - various venues|PT": {},
+ "Krakow|PL": {
+  "lat": 50.0619474,
+  "lon": 19.9368564,
+  "display": "Krakau, Woiwodschaft Kleinpolen, Polen"
+ },
+ "Volkel|NL": {
+  "lat": 51.6440771,
+  "lon": 5.6557033,
+  "display": "Volkel, Maashorst, Nordbrabant, Niederlande"
+ },
+ "Bruges|BE": {
+  "lat": 51.2085526,
+  "lon": 3.226772,
+  "display": "Brügge, Westflandern, Flandern, Belgien"
+ },
+ "Brussels|BE": {
+  "lat": 50.8467372,
+  "lon": 4.352493,
+  "display": "Brüssel, Brüssel-Hauptstadt, Belgien"
+ },
+ "Ghent|BE": {
+  "lat": 51.0538286,
+  "lon": 3.7250121,
+  "display": "Gent, Ostflandern, Flandern, Belgien"
+ },
+ "Agrinio|GR": {
+  "lat": 38.6248275,
+  "lon": 21.4094206,
+  "display": "Agrinio, Δημοτική Ενότητα Αγρινίου, Δήμος Αγρινίου, Regionalbezirk Ätolien-Akarnanien, Region Westgriechenland, Peloponnes, Westgriechenland und Ionische Inseln, 301 00, Griechenland"
+ },
+ "Saint-Didier-Sur-Chalaronne|FR": {
+  "lat": 46.1773643,
+  "lon": 4.8181107,
+  "display": "Saint-Didier-sur-Chalaronne, Bourg-en-Bresse, Ain, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 01140, Frankreich"
+ },
+ "Vuren|NL": {
+  "lat": 51.8246914,
+  "lon": 5.0481559,
+  "display": "Vuren, West Betuwe, Geldern, Niederlande"
+ },
+ "Ermelo|NL": {
+  "lat": 52.2858961,
+  "lon": 5.654661,
+  "display": "Ermelo, Geldern, Niederlande"
+ },
+ "Grâce-Hollogne|BE": {
+  "lat": 50.6323039,
+  "lon": 5.4768436,
+  "display": "Grâce-Hollogne, Lüttich, Wallonien, 4460, Belgien"
+ },
+ "Dinan|FR": {
+  "lat": 48.4539775,
+  "lon": -2.047687,
+  "display": "Dinan, Côtes-d'Armor, Bretagne, Metropolitanes Frankreich, 22100, Frankreich"
+ },
+ "Alburquerque|ES": {
+  "lat": 39.2190169,
+  "lon": -6.9999295,
+  "display": "Alburquerque, Badajoz, Extremadura, 06510, Spanien"
+ },
+ "Sankt Johann im Saggautal|AT": {
+  "lat": 46.7021679,
+  "lon": 15.4001519,
+  "display": "Sankt Johann im Saggautal, Bezirk Leibnitz, Steiermark, 8453, Österreich"
+ },
+ "Drama|GR": {
+  "lat": 41.1499443,
+  "lon": 24.1468286,
+  "display": "Drama, Δημοτική Ενότητα Δράμας, Δήμος Δράμας, Regionalbezirk Drama, Region Ostmakedonien und Thrakien, Makedonien - Thrakien, 661 00, Griechenland"
+ },
+ "CORINTH|GR": {
+  "lat": 37.9385413,
+  "lon": 22.9273768,
+  "display": "Korinth, Δημοτική Ενότητα Κορινθίων, Δήμος Κορινθίων, Regionalbezirk Korinthia, Region Peloponnes, Peloponnes, Westgriechenland und Ionische Inseln, 201 00, Griechenland"
+ },
+ "Ancona|IT": {
+  "lat": 43.6170137,
+  "lon": 13.5170982,
+  "display": "Ancona, Marken, Italien"
+ },
+ "Rodos|GR": {
+  "lat": 36.4437233,
+  "lon": 28.227369,
+  "display": "Rhodos, Δημοτική Ενότητα Ρόδου, Δήμος Ρόδου, Regionalbezirk Rhodos, Region Südliche Ägäis, Ägäis, 851 00, Griechenland"
+ },
+ "Setúbal Municipality|PT": {},
+ "Montmorot|FR": {
+  "lat": 46.6769747,
+  "lon": 5.5302024,
+  "display": "Montmorot, Lons-le-Saunier, Jura, Bourgogne-Franche-Comté, Metropolitanes Frankreich, 39570, Frankreich"
+ },
+ "Vicenza VI|IT": {
+  "lat": 45.5644061,
+  "lon": 11.5381974,
+  "display": "Bikeservice.it, 118, Viale Jacopo Dal Verme, San Bortolo, Vicenza, Venetien, 36100, Italien"
+ },
+ "Rivoli|IT": {
+  "lat": 45.0697151,
+  "lon": 7.5176764,
+  "display": "Rivoli, Turin, Piemont, 10098, Italien"
+ },
+ "Mâcon|FR": {
+  "lat": 46.3036683,
+  "lon": 4.8322266,
+  "display": "Mâcon, Saône-et-Loire, Bourgogne-Franche-Comté, Metropolitanes Frankreich, 71000, Frankreich"
+ },
+ "Norfolk|GB": {
+  "lat": 52.666667,
+  "lon": 1.0,
+  "display": "Norfolk, England, Vereinigtes Königreich"
+ },
+ "Stretford|GB": {
+  "lat": 53.4477056,
+  "lon": -2.32344,
+  "display": "Stretford, Trafford, Greater Manchester, England, M32 9HP, Vereinigtes Königreich"
+ },
+ "Umeå|SE": {
+  "lat": 63.8256568,
+  "lon": 20.2630745,
+  "display": "Umeå, Umeå kommun, Provinz Westbottnien, Schweden"
+ },
+ "Torino|IT": {
+  "lat": 45.0677551,
+  "lon": 7.6824892,
+  "display": "Turin, Piemont, Italien"
+ },
+ "Arlon|BE": {
+  "lat": 49.6834601,
+  "lon": 5.8167711,
+  "display": "Arel, Luxemburg, Wallonien, Belgien"
+ },
+ "Saint-Étienne|FR": {
+  "lat": 45.4401467,
+  "lon": 4.3873058,
+  "display": "Saint-Étienne, Loire, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, Frankreich"
+ },
+ "Genappe|BE": {
+  "lat": 50.6108733,
+  "lon": 4.4510726,
+  "display": "Genappe, Nivelles, Wallonisch-Brabant, Wallonien, Belgien"
+ },
+ "Molfetta|IT": {
+  "lat": 41.1992456,
+  "lon": 16.5968279,
+  "display": "Molfetta, Bari, Apulien, 70056, Italien"
+ },
+ "Emspark Greven|DE": {},
+ "Festung Rosenberg|DE": {
+  "lat": 50.2448234,
+  "lon": 11.3283569,
+  "display": "Festung Rosenberg, Haingasse, Wilhelmshöhe, Kronach, Landkreis Kronach, Bayern, 96317, Deutschland"
+ },
+ "Mielkendorf, Hofstube Gut Blockshagen|DE": {
+  "lat": 54.2868372,
+  "lon": 10.038496,
+  "display": "Hofstube Gut Blockshagen, 18, Blockshagener Weg, Mielkendorf, Molfsee, Kreis Rendsburg-Eckernförde, Schleswig-Holstein, 24247, Deutschland"
+ },
+ "Eremitage Waghäusel|DE": {
+  "lat": 49.2524242,
+  "lon": 8.5085164,
+  "display": "Eremitage Waghäusel, 1, Friedrich-Hecker-Allee, Waghäusel, Landkreis Karlsruhe, Baden-Württemberg, 68753, Deutschland"
+ },
+ "Kamen, Freizeitzentrum Lüner Höhe|DE": {
+  "lat": 51.5946003,
+  "lon": 7.6436107,
+  "display": "Freizeitzentrum Lüner Höhe, 18, Ludwig-Schröder-Straße, Lüner Höhe, Kamen-Mitte, Kamen, Kreis Unna, Nordrhein-Westfalen, 59174, Deutschland"
+ },
+ "Zirndorf|DE": {
+  "lat": 49.4334921,
+  "lon": 10.9282447,
+  "display": "Zirndorf, Landkreis Fürth, Bayern, 90513, Deutschland"
+ },
+ "Neustadt/Orla|DE": {
+  "lat": 50.7093161,
+  "lon": 11.7747773,
+  "display": "Neustadt an der Orla, Saale-Orla-Kreis, Thüringen, Deutschland"
+ },
+ "Königstein (Taunus)|DE": {
+  "lat": 50.195133,
+  "lon": 8.4628165,
+  "display": "Königstein im Taunus, Hochtaunuskreis, Hessen, 61462, Deutschland"
+ },
+ "Warburg-Scherfede|DE": {
+  "lat": 51.5247649,
+  "lon": 9.0479539,
+  "display": "Warburg-Scherfede, Scherfeder Straße, Rimbeck, Warburg, Kreis Höxter, Nordrhein-Westfalen, 34414, Deutschland"
+ },
+ "Skatehalle Trier|DE": {
+  "lat": 49.7562252,
+  "lon": 6.625677,
+  "display": "Zuppermarket - Projekt X Skatehalle, 65, Aachener Straße, West, West-Pallien, Trier, Trierweiler, Rheinland-Pfalz, 54294, Deutschland"
+ },
+ "Rœschwoog|FR": {
+  "lat": 48.8278605,
+  "lon": 8.0363491,
+  "display": "Röschwoog, Hagenau-Weißenburg, Unterelsass, Collectivité européenne d'Alsace, Grand Est, Metropolitanes Frankreich, 67480, Frankreich"
+ },
+ "Stadtpark Rheinberg|DE": {
+  "lat": 51.5419232,
+  "lon": 6.6002108,
+  "display": "Stadtpark, Winterswick, Rheinberg, Kreis Wesel, Nordrhein-Westfalen, Deutschland"
+ },
+ "Mutterstadt|DE": {
+  "lat": 49.4422445,
+  "lon": 8.3542306,
+  "display": "Mutterstadt, Rhein-Pfalz-Kreis, Rheinland-Pfalz, 67112, Deutschland"
+ },
+ "Spaßbad Wedemark|DE": {
+  "lat": 52.5467847,
+  "lon": 9.7482486,
+  "display": "Spaßbad Mellendorf, 2, Am Freizeitpark, Mellendorf-Gailhof, Wedemark, Region Hannover, Niedersachsen, 30900, Deutschland"
+ },
+ "Nordhalben|DE": {
+  "lat": 50.3621611,
+  "lon": 11.5213578,
+  "display": "Nordhalben, Landkreis Kronach, Bayern, 96365, Deutschland"
+ },
+ "Athens (Peristeri)|GR": {
+  "lat": 38.0119978,
+  "lon": 23.7058507,
+  "display": "Πλατεία Πατριάρχου Γρηγορίου Ε', 3η Κοινότητα Περιστερίου, Δήμος Περιστερίου, Regionalbezirk Athen-West, Region Attika, Attika, Griechenland"
+ },
+ "Neerpelt|BE": {
+  "lat": 51.2292367,
+  "lon": 5.442759,
+  "display": "Neerpelt, Pelt, Maaseik, Limburg, Flandern, 3910, Belgien"
+ },
+ "Hildburghausen-Weitersroda|DE": {
+  "lat": 50.429716,
+  "lon": 10.750628,
+  "display": "SMAREG5 Hildburghausen, 80, Friedrichsanfang, Birkenfeld, Hildburghausen, Landkreis Hildburghausen, Thüringen, 98646, Deutschland"
+ },
+ "Leuven|BE": {
+  "lat": 50.879202,
+  "lon": 4.7011675,
+  "display": "Löwen, Flämisch-Brabant, Flandern, Belgien"
+ },
+ "Zeist|NL": {
+  "lat": 52.0892832,
+  "lon": 5.2276307,
+  "display": "Zeist, Utrecht, Niederlande"
+ },
+ "Halfweg|NL": {
+  "lat": 52.3826063,
+  "lon": 4.7546903,
+  "display": "Halfweg, Haarlemmermeer, Nordholland, Niederlande"
+ },
+ "Reuver|NL": {
+  "lat": 51.2839322,
+  "lon": 6.0779742,
+  "display": "Reuver, Beesel, Limburg, Niederlande"
+ },
+ "Wijchen|NL": {
+  "lat": 51.8202529,
+  "lon": 5.6960903,
+  "display": "Wijchen, Geldern, Niederlande"
+ },
+ "Altes Lager, Niedergörsdorf|DE": {
+  "lat": 52.0133319,
+  "lon": 12.9937524,
+  "display": "Altes Lager, Niedergörsdorf, Teltow-Fläming, Brandenburg, Deutschland"
+ },
+ "Nüburgring|DE": {},
+ "Dadow|DE": {
+  "lat": 53.2211561,
+  "lon": 11.4901031,
+  "display": "Dadow, Gorlosen, Grabow, Ludwigslust-Parchim, Mecklenburg-Vorpommern, 19294, Deutschland"
+ },
+ "Midelburg|NL": {
+  "lat": 51.4996784,
+  "lon": 3.6137371,
+  "display": "Middelburg, Seeland, Niederlande"
+ },
+ "Wolframs-Eschenbach|DE": {
+  "lat": 49.2264994,
+  "lon": 10.725877,
+  "display": "Wolframs-Eschenbach, Wolframs-Eschenbach (VGem), Landkreis Ansbach, Bayern, 91639, Deutschland"
+ },
+ "Plumlov|CZ": {
+  "lat": 49.4661434,
+  "lon": 17.0148581,
+  "display": "Plumlov, Bezirk Proßnitz, Olmützer Region, 798 03, Tschechien"
+ },
+ "Goma|ES": {
+  "lat": 41.9534501,
+  "lon": 1.7081866,
+  "display": "Pla de Goma, Montmajor, Berguedà, Barcelona, Katalonien, 08261, Spanien"
+ },
+ "Saronikos|GR": {
+  "lat": 37.7669562,
+  "lon": 23.9333952,
+  "display": "Δήμος Σαρωνικού, Regionalbezirk Ostattika, Region Attika, Attika, Griechenland"
+ },
+ "Lauchröden (Gerstungen)|DE": {
+  "lat": 50.9934452,
+  "lon": 10.1596802,
+  "display": "Lauchröden, Gerstungen, Wartburgkreis, Thüringen, 99819, Deutschland"
+ },
+ "Diepenbeek|BE": {
+  "lat": 50.9078485,
+  "lon": 5.4200307,
+  "display": "Diepenbeek, Hasselt, Limburg, Flandern, 3590, Belgien"
+ },
+ "Mazara del Vallo|IT": {
+  "lat": 37.6537292,
+  "lon": 12.5886912,
+  "display": "Mazara del Vallo, Trapani, Sizilien, 91026, Italien"
+ },
+ "M17 1AB Manchester|GB": {
+  "lat": 53.4643,
+  "lon": -2.28494,
+  "display": "M17 1AB, Trafford, Greater Manchester, England, Vereinigtes Königreich"
+ },
+ "Rochefort|BE": {
+  "lat": 50.15542,
+  "lon": 5.1752822,
+  "display": "Rochefort, Dinant, Namur, Wallonien, 5580, Belgien"
+ },
+ "Kragujevac|RS": {
+  "lat": 44.0131786,
+  "lon": 20.9196353,
+  "display": "Крагујевац, Град Крагујевац, Шумадијски управни округ, Zentralserbien, Serbien"
+ },
+ "Germersheim|DE": {
+  "lat": 49.2222749,
+  "lon": 8.36659,
+  "display": "Germersheim, Landkreis Germersheim, Rheinland-Pfalz, 76726, Deutschland"
+ },
+ "Drouwenermond|NL": {
+  "lat": 52.9767927,
+  "lon": 6.8997601,
+  "display": "Drouwenermond, Borger-Odoorn, Drente, Niederlande"
+ },
+ "Pristina|XK": {
+  "lat": 42.6638771,
+  "lon": 21.1640849,
+  "display": "Pristina, Gemeinde Pristina, Bezirk Pristina, 10000, Kosovo"
  }
 }
