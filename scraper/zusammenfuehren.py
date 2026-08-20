@@ -126,7 +126,15 @@ def schreibweise_gleich(a: str, b: str) -> bool:
     Namensschlüssel ohne Leerzeichen; ein Rumpf von sechs Zeichen schützt kurze
     Namen wie "Wutz" vor Zufallstreffern.
     """
-    x, y = eng(a), eng(b)
+    # Zweimal vergleichen: einmal den Schlüssel, einmal den vollen Namen. Beim
+    # "Soerdfest" gegen "Sørdfest" bleibt vom Schlüssel nur "soerd" und "sord"
+    # übrig - zu kurz für einen belastbaren Vergleich, während die vollen Namen
+    # zu 97 % übereinstimmen.
+    return _aehnlich(eng(a), eng(b)) or _aehnlich(fold(a).replace(" ", ""),
+                                                  fold(b).replace(" ", ""))
+
+
+def _aehnlich(x: str, y: str) -> bool:
     if len(x) < 6 or len(y) < 6:
         return False
     if x == y or x.startswith(y) or y.startswith(x):
@@ -413,6 +421,32 @@ def stufe6_ohne_termin(merged: dict) -> None:
                 merged.pop(drop_key, None)
 
 
+def stufe7_gleiche_quelle(merged: dict) -> None:
+    """Dieselbe Quelle führt dasselbe Festival zweimal.
+
+    Sonst gilt: Zwei Einträge derselben Quelle bleiben getrennt, weil eine
+    Quelle kein Festival doppelt führt — wohl aber zwei gleichnamige an
+    verschiedenen Orten. wannafest tut es doch, mit unterschiedlicher
+    Schreibweise ("Nacht Wacht XL" und "Nachtwacht XL", Arnheim, derselbe Tag).
+    Deshalb zum Schluss diese eine, eng gefasste Ausnahme: identischer
+    Namensschlüssel ohne Leerzeichen, gleicher Ort, überlappender Zeitraum.
+    """
+    gruppen: dict[tuple[str, str, str], list[tuple]] = {}
+    for key, rec in merged.items():
+        if rec["date_from"] and rec["city"]:
+            gruppen.setdefault((eng(key[0]), key[1], key[2]), []).append((key, rec))
+
+    for gruppe in gruppen.values():
+        if len(gruppe) < 2:
+            continue
+        gruppe = sorted(gruppe, key=lambda kr: kr[1]["_rang"])
+        _, keep = gruppe[0]
+        for drop_key, drop in gruppe[1:]:
+            if drop_key in merged and zeitraum_ueberlappt(keep, drop):
+                verschmelzen(keep, drop, spanne=True)
+                merged.pop(drop_key, None)
+
+
 def zusammenfuehren(records: list[dict], registry: dict[str, str]) -> list[dict]:
     """Alle Funde zu Festivals bündeln, chronologisch sortiert."""
     merged = stufe1_exakt(records, registry)
@@ -421,6 +455,7 @@ def zusammenfuehren(records: list[dict], registry: dict[str, str]) -> list[dict]
     stufe4_ueberlappung(merged)
     stufe5_schreibweise(merged)
     stufe6_ohne_termin(merged)
+    stufe7_gleiche_quelle(merged)
 
     festivals = []
     for rec in merged.values():

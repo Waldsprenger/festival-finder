@@ -4,7 +4,7 @@ Acht Festivalverzeichnisse, zu einem Bestand zusammengeführt, plus eine
 statische Webseite, die daraus nach Band oder Genre filtert. Ein Datenlauf
 hält beides aktuell, ohne dass ein Rechner dafür laufen muss.
 
-**Stand:** 5.744 Festivals in 42 Ländern, 40.547 Acts, 1.569 Festivals aus mehr
+**Stand:** 5.742 Festivals in 42 Ländern, 40.547 Acts, 1.570 Festivals aus mehr
 als einer Quelle · [Änderungshistorie](https://github.com/Waldsprenger/festival-finder/commits/main)
 
 ```
@@ -79,12 +79,12 @@ Doppelklick öffnen.
 
 | Quelle | Weg zu den Adressen | Seiten | Einträge | nur dort |
 |---|---|---:|---:|---:|
-| festivalsunited.com | Sitemap je Jahrgang **und** die europäischen Länderseiten | 3.226 | 2.775 | 1.527 |
-| festapp.io | Sitemaps der Festivals und der einzelnen Ausgaben | 2.977 | 740 | 376 |
-| wannafest.com | `sitemaps/festivals-1.xml` | 2.105 | 1.067 | 811 |
+| festivalsunited.com | Sitemap je Jahrgang **und** die europäischen Länderseiten | 3.226 | 2.776 | 1.527 |
+| festapp.io | Sitemaps der Festivals und der einzelnen Ausgaben | 2.977 | 740 | 375 |
+| wannafest.com | `sitemaps/festivals-1.xml` | 2.105 | 1.066 | 810 |
 | festivalfinder.eu | Trefferliste der European Festivals Association, geblättert | 2.069 | 396 | 367 |
-| festivalticker.de | alle Listenseiten: Jahres-, Monats-, Länder- und Statusarchive | 1.971 | 1.966 | 807 |
-| festival-alarm.com | Jahresseiten **und** die Regionsseiten je Land | 935 | 921 | 212 |
+| festivalticker.de | alle Listenseiten: Jahres-, Monats-, Länder- und Statusarchive | 1.971 | 1.966 | 806 |
+| festival-alarm.com | Jahresseiten **und** die Regionsseiten je Land | 935 | 921 | 211 |
 | festivalhopper.de | `sitemap-festivals.xml`, Jahrgang steht in der Adresse | 728 | 683 | 76 |
 | festivalflyer.com | die Startseite, mehr ist nicht erreichbar | 12 | 1 | 0 |
 
@@ -144,9 +144,10 @@ das ist die Sängerin LP, ihre acht Einträge bleiben unangetastet. Geprüft wir
 je Festival, nicht je Quellseite: Die Schreibweisen stehen oft auf den Seiten
 verschiedener Quellen und treffen sich erst beim Zusammenführen.
 
-**Sechs Stufen** führen die Einträge zusammen. Jede verlangt verschiedene
-Quellen — dieselbe Quelle führt kein Festival zweimal, wohl aber zwei
-gleichnamige an verschiedenen Orten:
+**Sieben Stufen** führen die Einträge zusammen. Die ersten sechs verlangen
+verschiedene Quellen — dieselbe Quelle führt kein Festival zweimal, wohl aber
+zwei gleichnamige an verschiedenen Orten. Die siebte ist die eng gefasste
+Ausnahme davon:
 
 | Stufe | Kriterium | Fängt ab |
 |---|---|---|
@@ -156,6 +157,7 @@ gleichnamige an verschiedenen Orten:
 | 4 | überlappender Zeitraum + Ort **oder Spielstätte**, Name steckt im anderen | um einen Tag versetzte Termine (Neuborn Open Air), Gemeinde gegen Spielstätte (Thallichtenberg / Burg Lichtenberg) |
 | 5 | ähnliche Schreibweise (82 %), gleicher Ort, überlappender Zeitraum | „SonneMondSterne", „Elbriot", „Szigit" |
 | 6 | gleicher Name, eine Quelle ohne Termin | Übersichtsseiten ohne bestätigtes Datum |
+| 7 | dieselbe Quelle, identischer Name, gleicher Ort, überlappender Termin | „Nacht Wacht XL" und „Nachtwacht XL", beide von wannafest |
 
 Die Stadt gehört ab Stufe 1 zum Schlüssel, sonst verschmölze das *Irish Spring
 Festival* seine 30 Auftrittsorte zu einem Eintrag. Der Starttermin schützt
@@ -165,7 +167,10 @@ Name vollständig im anderen stecken — ein gemeinsames Wort allein reicht nich
 sonst träfen sich „METAStadt Open Air Wien" und „Afrika Tage Wien" über die
 Stadt im Namen. Stufe 6 sucht über den Namen statt über den Jahrgang, den
 terminlose Einträge gar nicht haben; kommen mehrere Jahrgänge infrage, gewinnt
-der früheste Termin.
+der früheste Termin. Stufe 7 lässt zum Schluss auch zwei Einträge derselben
+Quelle zusammen, aber nur bei identischem Namensschlüssel, gleichem Ort und
+überlappendem Termin — zwei Ausgaben desselben Festivals im selben Jahr
+(Heartbeatz im Juni und im September) bleiben dadurch getrennt.
 
 Beim Verbinden füllt jede Quelle die Lücken der anderen, Genres werden
 gesammelt statt ersetzt, eine Absage aus einer Quelle genügt, und der Zeitraum
@@ -231,7 +236,7 @@ dagegen nicht auf.
 
 Reines HTML und JavaScript, kein Server, keine Cookies, keine fremden Dateien.
 Alle Daten stehen in `site/data.js` als Zahlenreihen: Bands und Genres nur als
-Index, das drückt 5.744 Festivals mit 40.547 Acts auf 6,1 MB (2,1 MB über die
+Index, das drückt 5.742 Festivals mit 40.547 Acts auf 6,1 MB (2,1 MB über die
 Leitung, weil GitHub Pages komprimiert).
 
 Der Code liegt in zwei Teilen: `karte.js` zeichnet die Landkarte und kennt vom
@@ -308,6 +313,14 @@ unerwarteter Wert kostet dieses Festival, nicht den Lauf — aber er soll
 auffallen. Ein Preis wie „8.900.00" im Datenblatt hat auf diese Weise 26
 Einträge gekostet, bis er auffiel.
 
+**Und der Lauf prüft sein eigenes Ergebnis.** Nicht „wie beim letzten Mal",
+sondern „in sich stimmig": Passt das Jahr zum Termin, liegt das Ende nicht vor
+dem Anfang, steckt jede Koordinate in Europa, zählt das Lineup richtig, ist die
+Besucherzahl eine Zahl, blieb eine Dublette übrig? Jeder dieser Punkte war
+schon einmal falsch — zehn Koordinaten in Mexiko und Buenos Aires, ein Jahrgang
+2027 mit Termin im August 2026, eine Besucherzahl „2.000", eine doppelte
+Nachtwacht. Was die Prüfung findet, steht am Ende des Laufs im Protokoll.
+
 ## Was fehlt und warum
 
 Feld für Feld gegen die zwischengespeicherten Quellseiten geprüft — bei jedem
@@ -315,14 +328,14 @@ fehlenden Wert wurde die Seite nach einem Beleg durchsucht:
 
 | Feld | fehlt | steht doch auf der Seite |
 |---|---:|---|
-| Besucherzahl | 2.927 | 0 |
-| Lineup | 2.751 | — die Quelle führt keins |
+| Besucherzahl | 2.925 | 0 |
+| Lineup | 2.750 | — die Quelle führt keins |
 | Postleitzahl | 1.922 | 0 |
-| Preis | 1.882 | 2 |
-| Genre | 1.828 | 0 |
-| Spielstätte | 939 | 129-mal nur der Festivalname selbst |
+| Preis | 1.880 | 2 |
+| Genre | 1.827 | 0 |
+| Spielstätte | 940 | 129-mal nur der Festivalname selbst |
 | Webseite | 360 | 0 — verlinkt sind nur Bildnachweise und Werbung |
-| Termin | 291 | nur Termine *vergangener* Ausgaben |
+| Termin | 292 | nur Termine *vergangener* Ausgaben |
 | Ort | 247 | 16 |
 | Land | 0 | — |
 
@@ -344,7 +357,7 @@ Abweichung gilt deshalb der Bestand, nicht die Veranstalterseite.**
 
 - festivalticker zeigt für vergangene Jahrgänge nur je 40 Einträge; mehr gibt
   die Seite nicht her.
-- 291 Einträge haben kein Datum: Die Quellen führen sie ohne bestätigte
+- 292 Einträge haben kein Datum: Die Quellen führen sie ohne bestätigte
   Neuauflage. Das Feld `Hinweis` nennt dann die letzte gefundene Ausgabe.
 - Zwei festivalticker-Seiten reihen Bandnamen ohne jeden Trenner aneinander
   (`Quincy Goldie 333 I Fire Schnuppe …`). Sie bleiben ohne Lineup: Eine

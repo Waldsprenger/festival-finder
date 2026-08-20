@@ -21,9 +21,11 @@ import time
 from datetime import date
 
 import netz
-from gemeinsam import DATA, lies_json, schreib_json
+from gemeinsam import DATA, EUROPA_CODES, liegt_in_europa, lies_json, schreib_json
 from quellen import FT_STAMM, QUELLEN, Quelle
-from zusammenfuehren import alias_kollisionen, band_registry, zusammenfuehren
+from text import city_key, festival_key, tag_zahl
+from zusammenfuehren import (alias_kollisionen, band_registry, zeitraum_ueberlappt,
+                             zusammenfuehren)
 
 
 #: Seiten, an denen ein Leser gescheitert ist - je Quelle gezaehlt
@@ -76,8 +78,59 @@ def pruefe_ausbeute(funde: dict[str, int], festivals: int) -> list[str]:
     frueher_gesamt = vorher.get("festivals")
     if frueher_gesamt and festivals < frueher_gesamt * 0.8:
         warnungen.append(f"Festivals gesamt: {festivals} statt {frueher_gesamt}")
-    schreib_json(stand, {"quellen": funde, "festivals": festivals})
+    # Bei einem Einbruch bleibt der alte Maßstab stehen: Sonst gilt der
+    # schlechte Wert ab morgen als normal und die Warnung verstummt, obwohl
+    # nichts repariert ist.
+    gemerkt = {name: (vorher.get("quellen", {}).get(name, jetzt)
+                      if any(name in w for w in warnungen) else jetzt)
+               for name, jetzt in funde.items()}
+    schreib_json(stand, {"quellen": gemerkt,
+                         "festivals": max(festivals, frueher_gesamt or 0)
+                         if warnungen else festivals})
     return warnungen
+
+
+def pruefe_stimmigkeit(festivals: list[dict]) -> list[str]:
+    """Widersprüche im Ergebnis finden, bevor sie auf die Seite kommen.
+
+    Nicht "wie beim letzten Mal", sondern "in sich stimmig": Passt das Jahr zum
+    Termin, liegt das Ende nicht vor dem Anfang, steckt jede Koordinate in
+    Europa, zählt das Lineup richtig? Jeder dieser Punkte war schon einmal
+    falsch.
+    """
+    zaehler: dict[str, int] = {}
+
+    def merke(bedingung: bool, was: str) -> None:
+        if not bedingung:
+            zaehler[was] = zaehler.get(was, 0) + 1
+
+    for f in festivals:
+        merke(bool(f["name"].strip()), "ohne Namen")
+        merke(bool(f["sources"]), "ohne Quelle")
+        merke(not f["date_from"] or f["year"] == f["date_from"][-4:],
+              "Jahr passt nicht zum Termin")
+        merke(not (f["date_from"] and f["date_to"])
+              or tag_zahl(f["date_to"]) >= tag_zahl(f["date_from"]), "Ende vor Anfang")
+        merke(f["lat"] is None or liegt_in_europa(f["lat"], f["lon"]),
+              "Koordinate außerhalb Europas")
+        merke(f["lineup_count"] == len(f["lineup"]), "Lineup falsch gezählt")
+        merke(not f["visitors"] or f["visitors"].isdigit(), "Besucherzahl keine Zahl")
+        merke(not f["country"] or f["country"] in EUROPA_CODES, "Land außerhalb Europas")
+
+    # Dubletten: gleicher Name, gleicher Ort, sich überschneidender Termin.
+    # Zwei Ausgaben desselben Festivals im selben Jahr gibt es wirklich
+    # (Heartbeatz im Juni und im September) - die dürfen bleiben.
+    gruppen: dict[tuple[str, str, str], list[dict]] = {}
+    for f in festivals:
+        schluessel = (festival_key(f["name"]).replace(" ", ""), f["year"],
+                      city_key(f["city"]))
+        gruppen.setdefault(schluessel, []).append(f)
+    for gleiche in gruppen.values():
+        for i, a in enumerate(gleiche):
+            for b in gleiche[i + 1:]:
+                merke(not zeitraum_ueberlappt(a, b), "Dublette übrig geblieben")
+
+    return [f"{n}x {was}" for was, n in sorted(zaehler.items())]
 
 
 def schreibe_ausgaben(festivals: list[dict]) -> None:
@@ -163,6 +216,9 @@ def main() -> None:
                  if not f["date_from"] or int(f["date_from"][-4:]) >= args.since]
     if vorher != len(festivals):
         print(f"  {vorher - len(festivals)} Einträge älter als {args.since} verworfen")
+
+    for widerspruch in pruefe_stimmigkeit(festivals):
+        print(f"  ! Widerspruch in den Daten: {widerspruch}", file=sys.stderr)
 
     schreibe_ausgaben(festivals)
     schreib_json(DATA / "band_normalisierung.json", bandstatistik)

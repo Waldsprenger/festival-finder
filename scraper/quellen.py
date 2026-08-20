@@ -13,7 +13,8 @@ from dataclasses import dataclass
 from typing import Callable
 from urllib.parse import parse_qs, urljoin, urlparse
 
-from gemeinsam import EUROPA_CODES, JAHR_HEUTE, JAHRE, ausser_europa, land_code
+from gemeinsam import (EUROPA_CODES, JAHR_HEUTE, JAHRE, ausser_europa,
+                       land_code, liegt_in_europa)
 from netz import fetch, endziel, json_ld_events, melde, sitemap_adressen, soup
 from text import (MONATE, betrag, clean, datum_de, datum_englisch,
                   genres_vereinen, valid_band)
@@ -40,17 +41,26 @@ def datensatz(quelle: str, url: str, name: str, *, date_from: str = "",
               lat: float | None = None, lon: float | None = None) -> dict:
     """Ein Fund, wie ihn alle Quellen abliefern.
 
-    Das Jahr ergibt sich aus dem Termin, sofern die Quelle es nicht selbst
-    nennt; die Ortsangabe setzt erst das Zusammenführen zusammen, weil dort
-    Ort und Land aus mehreren Quellen zusammenkommen.
+    Hier werden drei Dinge geradegezogen, die sonst jede Quelle einzeln
+    beachten müsste:
+
+    * Das Jahr richtet sich nach dem Termin. Steht im Titel ein anderes als im
+      Datum ("Sommer im Park Gera 2027" mit Termin im August 2026), gilt der
+      Termin — er ist die genauere Angabe.
+    * Die Besucherzahl ist eine Zahl, keine Schreibweise: "2.000" wird 2000.
+    * Eine Koordinate außerhalb Europas ist keine. Die Datenblätter der Quellen
+      setzen dort schon mal Buenos Aires für Lugano; solche Punkte fliegen
+      raus, statt später mühsam geprüft zu werden.
     """
+    if not liegt_in_europa(lat, lon):
+        lat = lon = None
     return {
         "source": quelle,
         "source_url": url,
         "name": name,
         "date_from": date_from,
         "date_to": date_to or date_from,
-        "year": year or (date_from[-4:] if date_from else ""),
+        "year": date_from[-4:] if date_from else year,
         "city": city,
         "country": country,
         "venue": venue,
@@ -60,7 +70,7 @@ def datensatz(quelle: str, url: str, name: str, *, date_from: str = "",
         "price": price,
         "website": website,
         "genre": genre,
-        "visitors": visitors,
+        "visitors": re.sub(r"\D", "", visitors),
         "note": note,
         "cancelled": cancelled,
         "lineup": lineup or [],
@@ -519,14 +529,14 @@ def fu_lesen(url: str, html: str) -> dict | None:
             genre = genres_vereinen(stile, genre)
 
     # "Kapazität: ca. 18.000" steht im selben Block
-    bm = re.search(r"Kapazität:\s*(?:ca\.?\s*)?([\d.\s]{3,12})", html)
+    bm = re.search(r"Kapazität:\s*(?:ca\.?\s*)?([\d.\s]{3,12})", html)  # "ca. 18.000"
 
     return datensatz(
         "festivalsunited", url, name,
         date_from=date_from, date_to=date_to, year=year,
         city=city, country=country, venue=venue, plz=plz, lat=lat, lon=lon,
         price=price, website=website, genre=genre,
-        visitors=re.sub(r"\D", "", bm.group(1)) if bm else "",
+        visitors=bm.group(1) if bm else "",
         note=note, cancelled=cancelled, lineup=fu_lineup(s),
     )
 
@@ -627,7 +637,7 @@ def fa_lesen(url: str, html: str) -> dict | None:
         venue=feld.get("ort_name", ""),
         plz=plz_m.group(1) if plz_m else "",
         price=preis, website=website, genre=feld.get("genre", ""),
-        visitors=re.sub(r"\D", "", feld.get("besucher", "")),
+        visitors=feld.get("besucher", ""),
         lineup=[clean(b) for b in feld.get("acts", "").split(",") if valid_band(b)],
     )
 
@@ -719,7 +729,7 @@ def fh_lesen(url: str, html: str) -> dict | None:
         country=land,
         plz=plz_m.group(1) if plz_m else "",
         price=preis, website=website, genre=feld.get("genre", ""),
-        visitors=re.sub(r"\D", "", feld.get("besucher", "")),
+        visitors=feld.get("besucher", ""),
         note="" if date_from else "Termin noch nicht veröffentlicht",
         lineup=bands,
     )

@@ -13,7 +13,7 @@ import math
 import re
 from datetime import datetime
 
-from gemeinsam import DATA, SITE, land_code, lies_json
+from gemeinsam import DATA, EUROPA_RAHMEN, SITE, land_code, lies_json
 from genres import OBERBEGRIFFE, oberbegriffe
 from text import fold
 
@@ -390,7 +390,8 @@ def main() -> None:
         "world": lies_json(DATA / "welt_grob.json", []),
         "worldFine": lies_json(DATA / "welt_fein.json", []),
         # Ausschnitt, für den feine Umrisse vorliegen: lon0, lon1, lat0, lat1
-        "fineBox": [-32.0, 46.0, 27.0, 72.0],
+        "fineBox": [EUROPA_RAHMEN[2], EUROPA_RAHMEN[3],
+                    EUROPA_RAHMEN[0], EUROPA_RAHMEN[1]],
         "maxDistanceKm": max_entfernung_km(zeilen, plz),
         "maxPriceEur": max_preis_eur(zeilen),
         "minDate": frueheste_monatsgrenze(zeilen),

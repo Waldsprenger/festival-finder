@@ -96,6 +96,20 @@ LAENDER = {
     "north macedonia": "MK", "bosnia and herzegovina": "BA",
 }
 
+# Rahmen um Europa: lat0, lat1, lon0, lon1. Reicht von den Azoren bis zur
+# Osttuerkei und von Zypern bis Nordnorwegen; die Karte zeichnet denselben
+# Ausschnitt fein.
+EUROPA_RAHMEN = (27.0, 72.0, -32.0, 46.0)
+
+
+def liegt_in_europa(lat: float | None, lon: float | None) -> bool:
+    """Steckt der Punkt im europaeischen Rahmen?"""
+    if lat is None or lon is None:
+        return False
+    lat0, lat1, lon0, lon1 = EUROPA_RAHMEN
+    return lat0 <= lat <= lat1 and lon0 <= lon <= lon1
+
+
 # Alle in LAENDER vorkommenden Codes plus Inselgebiete ohne eigene Schreibweise
 EUROPA_CODES = sorted(set(LAENDER.values()) | {"GG", "JE", "IM"})
 
@@ -147,7 +161,3 @@ def ausser_europa(country: str) -> bool:
     code = land_code(country)
     return len(code) == 2 and code.isalpha() and code.upper() not in EUROPA_CODES
 
-
-def in_europa(country: str) -> bool:
-    """Gehört die Angabe zu einem europäischen Land? Leer zählt nicht."""
-    return land_code(country) in EUROPA_CODES
