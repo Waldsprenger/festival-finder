@@ -30,3 +30,4 @@ site/icons/
 __pycache__/
 *.pyc
 .venv/
+data/quellen_stand.json

@@ -97,21 +97,39 @@ self.addEventListener('activate', (e) => {
     .then(() => self.clients.claim()));
 });
 
-// Erst das Netz, damit neue Festivaldaten ankommen; ohne Netz der Speicher.
+// Erst das Netz, damit neue Festivaldaten ankommen - aber mit Frist. Ohne sie
+// haengt die Seite im schlechten Mobilfunknetz am leeren Bildschirm, bis der
+// Versuch scheitert; mit ihr erscheint nach 2,5 Sekunden der gespeicherte
+// Stand, waehrend der Abruf im Hintergrund weiterlaeuft. Wie frisch die Daten
+// sind, steht im Seitenfuss.
 // Nur eigene Dateien: Ein Zaehlimpuls traegt bei jedem Aufruf eine neue Adresse
 // und wuerde den Speicher sonst Aufruf fuer Aufruf fuellen.
+const FRIST = 2500;
+
+async function ausliefern(anfrage) {
+  const speicher = await caches.open(CACHE);
+  const abgelegt = await speicher.match(anfrage);
+  const ausDemNetz = fetch(anfrage).then((res) => {
+    if (res && res.ok) speicher.put(anfrage, res.clone()).catch(() => {});
+    return res;
+  });
+
+  if (!abgelegt) {
+    return ausDemNetz.catch(() => speicher.match('./index.html'));
+  }
+  return Promise.race([
+    ausDemNetz.catch(() => abgelegt),
+    new Promise((fertig) => setTimeout(() => fertig(abgelegt), FRIST)),
+  ]);
+}
+
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
   if (new URL(e.request.url).origin !== self.location.origin) return;
-  e.respondWith(
-    fetch(e.request)
-      .then((res) => {
-        const kopie = res.clone();
-        caches.open(CACHE).then((c) => c.put(e.request, kopie)).catch(() => {});
-        return res;
-      })
-      .catch(() => caches.match(e.request).then((t) => t || caches.match('./index.html')))
-  );
+  const antwort = ausliefern(e.request);
+  // Der Hintergrundabruf soll auch dann zu Ende laufen, wenn die Frist gewann.
+  e.waitUntil(antwort.catch(() => {}));
+  e.respondWith(antwort);
 });
 """
     stand = (SITE / "data.js").stat().st_mtime if (SITE / "data.js").exists() else 0

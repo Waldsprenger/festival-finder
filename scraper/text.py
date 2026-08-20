@@ -158,6 +158,26 @@ def canonical_band(variants: list[str]) -> str:
     return max(counts.items(), key=score)[0]
 
 
+def betrag(roh: str) -> float | None:
+    """Zahl aus einem Datenblatt-Preis; None, wenn sie keine ist.
+
+    Die Quellen schreiben Tausender mal mit Punkt, mal gar nicht: "1690.00",
+    aber auch "8.900.00". Der letzte Punkt trennt die Nachkommastellen, alle
+    übrigen sind Tausenderpunkte. Ohne diese Unterscheidung warf float() eine
+    Ausnahme - und der Aufrufer verwarf das ganze Festival.
+    """
+    text = re.sub(r"[^\d.,]", "", roh or "").replace(",", ".")
+    if not text:
+        return None
+    if text.count(".") > 1:
+        kopf, _, schwanz = text.rpartition(".")
+        text = kopf.replace(".", "") + "." + schwanz
+    try:
+        return float(text)
+    except ValueError:
+        return None
+
+
 # --------------------------------------------------------------------------
 # Genretexte
 # --------------------------------------------------------------------------

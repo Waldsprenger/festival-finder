@@ -16,7 +16,7 @@ import time
 
 import requests
 
-from gemeinsam import DATA, EU_CODES, LAENDER, land_code, lies_json, schreib_json
+from gemeinsam import DATA, EU_CODES, land_code, lies_json, schreib_json
 from text import fold
 
 GEO = DATA / "geo.json"
@@ -31,7 +31,9 @@ ENDPOINT = "https://nominatim.openstreetmap.org/search"
 # Hilla im Irak. Jede Suche bleibt deshalb auf Europa beschraenkt; die
 # Laenderzuordnung und EU_CODES stehen in gemeinsam.py.
 def cc(country: str) -> str:
-    return LAENDER.get((country or "").strip().lower(), "").lower()
+    """Laendercode klein geschrieben, wie Nominatim ihn erwartet."""
+    code = land_code(country)
+    return code.lower() if len(code) == 2 else ""
 
 
 def key(city: str, country: str) -> str:

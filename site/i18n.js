@@ -98,6 +98,12 @@ window.I18N = {
       ru: 'Где, как далеко, за сколько, с какого числа',
       tr: 'Nerede, ne kadar uzağa, ne kadara, ne zamandan itibaren',
     },
+    'help.aria': {
+      de: 'Hilfe', en: 'Help', fr: 'Aide', es: 'Ayuda',
+      it: 'Aiuto', nl: 'Help', pl: 'Pomoc', pt: 'Ajuda',
+      ru: 'Справка',
+      tr: 'Yardım',
+    },
     'home.label': {
       de: 'Postleitzahl oder Ort', en: 'Postcode or town', fr: 'Code postal ou ville',
       es: 'Código postal o ciudad', it: 'CAP o città', nl: 'Postcode of plaats',

@@ -311,6 +311,24 @@ class Verorter:
 
 # --------------------------------------------------------------------------
 
+def als_javascript(payload: dict) -> str:
+    """Die Daten als JS-Datei — der Inhalt bleibt dabei JSON.
+
+    `window.DATA = {…}` müsste der Browser als Quelltext lesen; über
+    JSON.parse geht dasselbe rund doppelt so schnell (gemessen 64 statt 137 ms
+    für 6 MB). Die JSON-Zeichenkette steht dafür in einfachen Anführungszeichen,
+    sodass die vielen doppelten aus dem JSON unangetastet bleiben.
+    """
+    text = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+    text = (text.replace("\\", "\\\\").replace("'", "\\'")
+                # In der gebündelten Einzelseite steht das Ganze in einem
+                # <script>; ein "</" im Text würde es sonst beenden.
+                .replace("</", "<\\/")
+                # Zeilentrenner sind in JSON erlaubt, in JS-Zeichenketten nicht
+                .replace("\u2028", "\\u2028").replace("\u2029", "\\u2029"))
+    return f"window.DATA = JSON.parse('{text}');\n"
+
+
 def main() -> None:
     festivals = lies_json(DATA / "festivals.json", [])
     geo = lies_json(DATA / "geo.json", {})
@@ -367,8 +385,8 @@ def main() -> None:
         "bandAlias": alias_paare,
         "genres": genre_keys,
         "festivals": zeilen,
-        "places": orte,
-        "plz": plz,
+        "places": [[n, round(la, 3), round(lo, 3), cc] for n, la, lo, cc in orte],
+        "plz": [[c, o, round(la, 3), round(lo, 3), cc] for c, o, la, lo, cc in plz],
         "world": lies_json(DATA / "welt_grob.json", []),
         "worldFine": lies_json(DATA / "welt_fein.json", []),
         # Ausschnitt, für den feine Umrisse vorliegen: lon0, lon1, lat0, lat1
@@ -378,9 +396,7 @@ def main() -> None:
         "minDate": frueheste_monatsgrenze(zeilen),
     }
     ziel = SITE / "data.js"
-    ziel.write_text("window.DATA = " + json.dumps(payload, ensure_ascii=False,
-                                                  separators=(",", ":")) + ";\n",
-                    encoding="utf-8")
+    ziel.write_text(als_javascript(payload), encoding="utf-8")
 
     mit_preis = sum(1 for z in zeilen if z[EURO] is not None)
     mit_genre = sum(1 for z in zeilen if z[GENRES])

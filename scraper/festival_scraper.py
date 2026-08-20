@@ -16,13 +16,18 @@ from __future__ import annotations
 import argparse
 import concurrent.futures as cf
 import csv
+import sys
 import time
 from datetime import date
 
 import netz
-from gemeinsam import DATA, schreib_json
+from gemeinsam import DATA, lies_json, schreib_json
 from quellen import FT_STAMM, QUELLEN, Quelle
 from zusammenfuehren import alias_kollisionen, band_registry, zusammenfuehren
+
+
+#: Seiten, an denen ein Leser gescheitert ist - je Quelle gezaehlt
+PARSEFEHLER: dict[str, int] = {}
 
 
 def einlesen(quelle: Quelle, urls: list[str]) -> list[dict]:
@@ -43,11 +48,36 @@ def einlesen(quelle: Quelle, urls: list[str]) -> list[dict]:
                 rec = (quelle.lesen(url, html, FT_STAMM.get(url))
                        if quelle.mit_stammdaten else quelle.lesen(url, html))
             except Exception as exc:
+                # Ein Fehler kostet dieses Festival, nicht den Lauf. Gezaehlt
+                # wird trotzdem: Stille Ausfaelle sind die gefaehrlichsten.
+                PARSEFEHLER[quelle.name] = PARSEFEHLER.get(quelle.name, 0) + 1
                 netz.melde(f"Parsefehler {url}: {exc}")
                 continue
             if rec and rec["name"]:
                 funde.append(rec)
     return funde
+
+
+def pruefe_ausbeute(funde: dict[str, int], festivals: int) -> list[str]:
+    """Vergleicht die Ausbeute mit dem letzten Lauf und meldet Einbrüche.
+
+    Ändert eine Quelle ihren Seitenaufbau, liefert ihr Leser plötzlich weniger
+    oder nichts mehr — in der Gesamtliste fällt das kaum auf, weil die anderen
+    sieben weiter füllen. Ein Fünftel weniger gilt als Einbruch; kleinere
+    Schwankungen sind normal, Festivals kommen und gehen.
+    """
+    stand = DATA / "quellen_stand.json"
+    vorher = lies_json(stand, {})
+    warnungen = []
+    for name, jetzt in funde.items():
+        frueher = vorher.get("quellen", {}).get(name)
+        if frueher and jetzt < frueher * 0.8:
+            warnungen.append(f"{name}: {jetzt} statt {frueher} Funde")
+    frueher_gesamt = vorher.get("festivals")
+    if frueher_gesamt and festivals < frueher_gesamt * 0.8:
+        warnungen.append(f"Festivals gesamt: {festivals} statt {frueher_gesamt}")
+    schreib_json(stand, {"quellen": funde, "festivals": festivals})
+    return warnungen
 
 
 def schreibe_ausgaben(festivals: list[dict]) -> None:
@@ -109,9 +139,12 @@ def main() -> None:
           flush=True)
 
     records: list[dict] = []
+    funde: dict[str, int] = {}
     for quelle in QUELLEN:
         urls = adressen[quelle.name]
-        records += einlesen(quelle, urls[:args.limit] if args.limit else urls)
+        gefunden = einlesen(quelle, urls[:args.limit] if args.limit else urls)
+        funde[quelle.name] = len(gefunden)
+        records += gefunden
     print(f"Datensätze: {len(records)}", flush=True)
 
     doppelt = alias_kollisionen(records)
@@ -134,6 +167,12 @@ def main() -> None:
     schreibe_ausgaben(festivals)
     schreib_json(DATA / "band_normalisierung.json", bandstatistik)
 
+    # Nur bei einem vollständigen Lauf vergleichen - ein Testlauf mit --limit
+    # liefert naturgemäß weniger.
+    if not args.limit:
+        for warnung in pruefe_ausbeute(funde, len(festivals)):
+            print(f"  ! Einbruch gegenüber dem letzten Lauf: {warnung}", file=sys.stderr)
+
     acts = len({b for f in festivals for b in f["lineup"]})
     print(f"\nFestivals gesamt        : {len(festivals)}")
     print(f"  aus mehreren Quellen  : {sum(1 for f in festivals if len(f['sources']) > 1)}")
@@ -142,6 +181,9 @@ def main() -> None:
     print(f"Acts (normalisiert)     : {acts}")
     print(f"  Rohschreibweisen      : {bandstatistik['roh_schreibweisen']}, davon "
           f"{bandstatistik['vereinheitlicht']} auf eine Schreibweise vereinheitlicht")
+    if PARSEFEHLER:
+        print("Nicht lesbare Seiten: "
+              + ", ".join(f"{q} {n}" for q, n in sorted(PARSEFEHLER.items())))
     if netz.FEHLGESCHLAGEN:
         print(f"Nicht ladbar: {len(netz.FEHLGESCHLAGEN)} Seiten (siehe data/failed.txt)")
         (DATA / "failed.txt").write_text("\n".join(netz.FEHLGESCHLAGEN), encoding="utf-8")

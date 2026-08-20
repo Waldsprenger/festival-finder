@@ -4,14 +4,14 @@ Acht Festivalverzeichnisse, zu einem Bestand zusammengeführt, plus eine
 statische Webseite, die daraus nach Band oder Genre filtert. Ein Datenlauf
 hält beides aktuell, ohne dass ein Rechner dafür laufen muss.
 
-**Stand:** 5.741 Festivals in 42 Ländern, 40.543 Acts, 1.568 Festivals aus mehr
+**Stand:** 5.744 Festivals in 42 Ländern, 40.547 Acts, 1.569 Festivals aus mehr
 als einer Quelle · [Änderungshistorie](https://github.com/Waldsprenger/festival-finder/commits/main)
 
 ```
    acht Quellen
         │  quellen.py         Adressen sammeln, Detailseiten auslesen
         ▼
-   11.336 Funde
+   11.362 Funde
         │  zusammenfuehren.py sechs Stufen gegen Dubletten
         ▼
    data/festivals.json
@@ -79,7 +79,7 @@ Doppelklick öffnen.
 
 | Quelle | Weg zu den Adressen | Seiten | Einträge | nur dort |
 |---|---|---:|---:|---:|
-| festivalsunited.com | Sitemap je Jahrgang **und** die europäischen Länderseiten | 3.226 | 2.771 | 1.524 |
+| festivalsunited.com | Sitemap je Jahrgang **und** die europäischen Länderseiten | 3.226 | 2.775 | 1.527 |
 | festapp.io | Sitemaps der Festivals und der einzelnen Ausgaben | 2.977 | 740 | 376 |
 | wannafest.com | `sitemaps/festivals-1.xml` | 2.105 | 1.067 | 811 |
 | festivalfinder.eu | Trefferliste der European Festivals Association, geblättert | 2.069 | 396 | 367 |
@@ -231,7 +231,8 @@ dagegen nicht auf.
 
 Reines HTML und JavaScript, kein Server, keine Cookies, keine fremden Dateien.
 Alle Daten stehen in `site/data.js` als Zahlenreihen: Bands und Genres nur als
-Index, das drückt 5.741 Festivals mit 40.543 Acts auf 6,3 MB.
+Index, das drückt 5.744 Festivals mit 40.547 Acts auf 6,1 MB (2,1 MB über die
+Leitung, weil GitHub Pages komprimiert).
 
 Der Code liegt in zwei Teilen: `karte.js` zeichnet die Landkarte und kennt vom
 Rest nur vier Handgriffe (`start`, `zeichnen`, `setzePins`, `zentrieren`);
@@ -257,7 +258,16 @@ fehlende Angaben immer am Ende. Gezeichnet wird in Stapeln — 25 Karten am
 Telefon, 50 am Rechner; alle 300 auf einmal ergaben eine Seite von 109.000
 Pixeln Höhe.
 
-Dazu: zehn Sprachen ([i18n.js](site/i18n.js), 189 Schlüssel), Hilfetexte an
+**Schnell laden, auch bei schlechtem Netz.** Die Daten stehen als
+`window.DATA = JSON.parse('…')` in der Datei statt als JS-Objekt: Der Browser
+liest JSON etwa doppelt so schnell wie gleichwertigen Quelltext (gemessen 64
+statt 137 ms für 6 MB — auf dem Telefon entsprechend mehr). Der Service Worker
+gibt dem Netz 2,5 Sekunden; danach zeigt er den gespeicherten Stand und lädt im
+Hintergrund weiter, statt am leeren Bildschirm zu warten. Ortsverzeichnis und
+Postleitzahlen werden auf drei Nachkommastellen gekürzt — 110 Meter genügen für
+einen Wohnort, den ein Umkreisfilter in Kilometern auswertet.
+
+Dazu: zehn Sprachen ([i18n.js](site/i18n.js), 190 Schlüssel), Hilfetexte an
 jedem Regler, Installation als App mit Offline-Betrieb, Rückmeldung per
 `mailto` und eine Zugriffszählung, die nur startet, wenn in
 [config.js](site/config.js) eine GoatCounter-Kennung steht **und** die Seite
@@ -287,6 +297,17 @@ schaltet den frischen Lauf ein. Mitveröffentlicht werden die Ausgaben unter
 `/daten/`: `festivals.json`, `festivals.csv`, `lineups.csv`, `bands.csv` und
 die Kontrolltabelle `uebersicht.html`.
 
+## Wenn eine Quelle sich ändert
+
+Ändert eine Seite ihren Aufbau, liefert ihr Leser stillschweigend weniger — in
+der Gesamtliste fällt das kaum auf, weil sieben andere weiter füllen. Der Lauf
+vergleicht deshalb jede Quelle mit dem letzten Mal (`data/quellen_stand.json`)
+und meldet, wenn eine um mehr als ein Fünftel einbricht. Ebenso gemeldet wird,
+wie viele Detailseiten ein Leser gar nicht verarbeiten konnte: Ein einzelner
+unerwarteter Wert kostet dieses Festival, nicht den Lauf — aber er soll
+auffallen. Ein Preis wie „8.900.00" im Datenblatt hat auf diese Weise 26
+Einträge gekostet, bis er auffiel.
+
 ## Was fehlt und warum
 
 Feld für Feld gegen die zwischengespeicherten Quellseiten geprüft — bei jedem
@@ -294,13 +315,13 @@ fehlenden Wert wurde die Seite nach einem Beleg durchsucht:
 
 | Feld | fehlt | steht doch auf der Seite |
 |---|---:|---|
-| Besucherzahl | 2.925 | 0 |
-| Lineup | 2.749 | — die Quelle führt keins |
-| Postleitzahl | 1.923 | 0 |
-| Preis | 1.883 | 2 |
-| Genre | 1.827 | 0 |
+| Besucherzahl | 2.927 | 0 |
+| Lineup | 2.751 | — die Quelle führt keins |
+| Postleitzahl | 1.922 | 0 |
+| Preis | 1.882 | 2 |
+| Genre | 1.828 | 0 |
 | Spielstätte | 939 | 129-mal nur der Festivalname selbst |
-| Webseite | 361 | 0 — verlinkt sind nur Bildnachweise und Werbung |
+| Webseite | 360 | 0 — verlinkt sind nur Bildnachweise und Werbung |
 | Termin | 291 | nur Termine *vergangener* Ausgaben |
 | Ort | 247 | 16 |
 | Land | 0 | — |

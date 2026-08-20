@@ -46,7 +46,7 @@
     <div class="grid">
       <div class="field">
         <label for="home"><span data-i18n="home.label">Postleitzahl oder Ort</span>
-          <button type="button" class="help" aria-label="?" data-i18n-title="home.help">?</button>
+          <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="home.help">?</button>
         </label>
         <div class="row">
           <input type="text" id="home" placeholder="z. B. 97209" inputmode="numeric"
@@ -58,13 +58,13 @@
         <label class="check">
           <input type="checkbox" id="geo-unknown">
           <span data-i18n="geoUnknown.label">Festivals ohne Ortskoordinaten mitzeigen</span>
-          <button type="button" class="help" aria-label="?" data-i18n-title="geoUnknown.help">?</button>
+          <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="geoUnknown.help">?</button>
         </label>
       </div>
 
       <div class="field">
         <label for="radius"><span data-i18n="radius.label">Umkreis</span> <output id="radius-out">200 km</output>
-          <button type="button" class="help" aria-label="?" data-i18n-title="radius.help">?</button>
+          <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="radius.help">?</button>
         </label>
         <input type="range" id="radius" min="10" max="3300" step="10" value="200">
         <p class="hint" data-i18n="radius.hint">Luftlinie ab Wohnort.</p>
@@ -72,19 +72,19 @@
 
       <div class="field">
         <label for="price"><span data-i18n="price.label">Ticket maximal</span> <output id="price-out">150 €</output>
-          <button type="button" class="help" aria-label="?" data-i18n-title="price.help">?</button>
+          <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="price.help">?</button>
         </label>
         <input type="range" id="price" min="0" max="1600" step="10" value="150">
         <label class="check">
           <input type="checkbox" id="price-unknown" checked>
           <span data-i18n="priceUnknown.label">Festivals ohne Preisangabe mitzeigen</span>
-          <button type="button" class="help" aria-label="?" data-i18n-title="priceUnknown.help">?</button>
+          <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="priceUnknown.help">?</button>
         </label>
       </div>
 
       <div class="field">
         <label for="from"><span data-i18n="date.label">Zeitraum</span>
-          <button type="button" class="help" aria-label="?" data-i18n-title="date.help">?</button>
+          <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="date.help">?</button>
         </label>
         <div class="row dates">
           <input type="date" id="from" data-i18n-aria="date.from" aria-label="Frühester Start">
@@ -94,12 +94,12 @@
         <label class="check">
           <input type="checkbox" id="date-unknown">
           <span data-i18n="dateUnknown.label">Festivals ohne Termin mitzeigen</span>
-          <button type="button" class="help" aria-label="?" data-i18n-title="dateUnknown.help">?</button>
+          <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="dateUnknown.help">?</button>
         </label>
         <label class="check">
           <input type="checkbox" id="show-cancelled">
           <span data-i18n="cancelled.label">Abgesagte Festivals mitzeigen</span>
-          <button type="button" class="help" aria-label="?" data-i18n-title="cancelled.help">?</button>
+          <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="cancelled.help">?</button>
         </label>
       </div>
     </div>
@@ -107,7 +107,7 @@
     <figure class="map-wrap">
       <canvas id="map" width="1000" height="440"></canvas>
       <div class="map-tools">
-        <button type="button" class="help" aria-label="?" data-i18n-title="map.help">?</button>
+        <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="map.help">?</button>
         <button type="button" id="zoom-in" class="ghost small" data-i18n-title="map.zoomIn">+</button>
         <button type="button" id="zoom-out" class="ghost small" data-i18n-title="map.zoomOut">−</button>
         <button type="button" id="zoom-reset" class="ghost small" data-i18n="map.reset"
@@ -138,7 +138,7 @@
           <span data-i18n="mode.off">Ohne beides</span>
         </label>
       </div>
-      <button type="button" class="help" aria-label="?" data-i18n-title="mode.help">?</button>
+      <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="mode.help">?</button>
     </div>
 
     <div id="band-block">
@@ -147,9 +147,9 @@
 
       <div class="field">
         <label for="band-search"><span data-i18n="bands.searchLabel">Band suchen</span>
-          <button type="button" class="help" aria-label="?" data-i18n-title="bands.searchHelp">?</button>
+          <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="bands.searchHelp">?</button>
         </label>
-        <input type="text" id="band-search" placeholder="z. B. Powerwolf, Wolf Alice, Deichkind …">
+        <input type="text" id="band-search" placeholder="z. B. Powerwolf, Wolf Alice, Sportfreunde Stiller …">
         <p class="hint" id="band-hint"></p>
       </div>
 
@@ -180,7 +180,7 @@
       <label class="check">
         <input type="checkbox" id="genre-unknown">
         <span data-i18n="genreUnknown.label">Festivals ohne Genreangabe mitzeigen</span>
-        <button type="button" class="help" aria-label="?" data-i18n-title="genreUnknown.help">?</button>
+        <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="genreUnknown.help">?</button>
       </label>
     </div>
   </section>
@@ -192,7 +192,7 @@
     <div class="sort-row">
       <label for="sort" data-i18n="sort.label">Sortieren nach</label>
       <select id="sort"></select>
-      <button type="button" class="help" aria-label="?" data-i18n-title="sort.help">?</button>
+      <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="sort.help">?</button>
     </div>
 
     <p class="stat" id="result-stat" data-i18n="res.needBand">Wähle mindestens eine Band.</p>
@@ -202,7 +202,7 @@
   <!-- ============ Rückmeldung ============ -->
   <section class="panel" id="step-feedback">
     <h2><span class="num">✉</span> <span data-i18n="fb.title">Rückmeldung</span>
-      <button type="button" class="help" aria-label="?" data-i18n-title="fb.help">?</button>
+      <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="fb.help">?</button>
     </h2>
     <p class="lead" data-i18n="fb.lead">Fehlendes Festival, falscher Termin, Wunsch oder Kritik — alles willkommen.</p>
 

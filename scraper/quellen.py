@@ -15,7 +15,8 @@ from urllib.parse import parse_qs, urljoin, urlparse
 
 from gemeinsam import EUROPA_CODES, JAHR_HEUTE, JAHRE, ausser_europa, land_code
 from netz import fetch, endziel, json_ld_events, melde, sitemap_adressen, soup
-from text import MONATE, clean, datum_de, datum_englisch, genres_vereinen, valid_band
+from text import (MONATE, betrag, clean, datum_de, datum_englisch,
+                  genres_vereinen, valid_band)
 
 FT = "https://www.festivalticker.de"      # dichteste Abdeckung für Deutschland
 FU = "https://www.festivalsunited.com"    # Lineups, Preise, Datenblatt je Seite
@@ -483,9 +484,9 @@ def fu_lesen(url: str, html: str) -> dict | None:
     if not price:
         pm2 = re.search(r'"price"\s*:\s*"([\d.]+)"\s*,\s*"priceCurrency"\s*:\s*"([A-Z]{3})"',
                         html)
-        if pm2:
-            betrag = f"{float(pm2.group(1)):.2f}".replace(".", ",")
-            price = f"ab {pm2.group(2)} {betrag}"
+        wert = betrag(pm2.group(1)) if pm2 else None
+        if wert is not None:
+            price = f"ab {pm2.group(2)} " + f"{wert:.2f}".replace(".", ",")
 
     if not date_from:
         sm = re.search(r'"startDate"\s*:\s*"(\d{4})-(\d{2})-(\d{2})"', html)
@@ -786,13 +787,10 @@ def fp_lesen(url: str, html: str) -> dict | None:
     if isinstance(angebot, list):
         angebot = angebot[0] if angebot else {}
     angebot = angebot if isinstance(angebot, dict) else {}
-    preis = ""
-    if angebot.get("price"):
-        try:
-            preis = (f"ab {angebot.get('priceCurrency', 'EUR')} "
-                     f"{float(angebot['price']):.2f}").replace(".", ",")
-        except (TypeError, ValueError):
-            preis = ""
+    wert = betrag(str(angebot.get("price", "")))
+    preis = ("" if wert is None else
+             f"ab {angebot.get('priceCurrency', 'EUR')} "
+             + f"{wert:.2f}".replace(".", ","))
 
     return datensatz(
         "festapp", url, re.sub(r"\s*\b20\d{2}\b\s*$", "", roh).strip() or roh,
