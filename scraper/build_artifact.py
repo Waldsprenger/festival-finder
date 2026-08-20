@@ -10,10 +10,9 @@ Ergebnis: site/artifact.html
 from __future__ import annotations
 
 import re
-from pathlib import Path
 
-BASE = Path(__file__).resolve().parent.parent
-SITE = BASE / "site"
+from gemeinsam import SITE
+
 OUT = SITE / "artifact.html"
 
 

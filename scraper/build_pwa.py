@@ -12,12 +12,11 @@ Registrierung eines Service Workers durch die Sicherheitsrichtlinie gesperrt.
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-BASE = Path(__file__).resolve().parent.parent
-SITE = BASE / "site"
+from gemeinsam import SITE
+
 ICONS = SITE / "icons"
 ICONS.mkdir(parents=True, exist_ok=True)
 

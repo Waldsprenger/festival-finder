@@ -1,12 +1,15 @@
-"""Gemeinsame Grundlagen aller Bauskripte.
+"""Pfade, Länderwissen und Dateihilfen — die Grundlage aller Skripte.
 
-Pfade, Browserkennung und das Länderwissen lagen vorher in drei Modulen
-nebeneinander und drohten auseinanderzulaufen. Hier stehen sie einmal.
+Bewusst ohne Fremdpakete: Auch die reinen Bauskripte (build_pwa, build_map)
+binden dieses Modul ein, und sie sollen dafür weder requests noch bs4 brauchen.
+Was das Netz betrifft, steht in `netz.py`, was Namen betrifft, in `text.py`.
 """
 
 from __future__ import annotations
 
+import json
 import re
+from datetime import date
 from pathlib import Path
 
 BASE = Path(__file__).resolve().parent.parent
@@ -16,10 +19,27 @@ SITE = BASE / "site"
 for _ordner in (CACHE, DATA, SITE):
     _ordner.mkdir(exist_ok=True)
 
-# Ohne Browserkennung antworten mehrere Quellen mit 403.
-UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-      "(KHTML, like Gecko) Chrome/126.0 Safari/537.36")
-HEADERS = {"User-Agent": UA, "Accept-Language": "de-DE,de;q=0.9,en;q=0.8"}
+# Jahrgänge, die abgeklopft werden. Die Obergrenze wächst mit der Zeit mit,
+# damit künftige Jahre (2029, 2030 …) ohne Codeänderung erfasst werden.
+JAHR_HEUTE = date.today().year
+JAHRE = range(2006, JAHR_HEUTE + 6)
+
+
+# --------------------------------------------------------------------------
+# Dateien
+# --------------------------------------------------------------------------
+
+def lies_json(pfad: Path, standard=None):
+    """JSON lesen; fehlt die Datei, kommt der Standardwert zurück."""
+    if not pfad.exists():
+        return standard
+    return json.loads(pfad.read_text(encoding="utf-8"))
+
+
+def schreib_json(pfad: Path, inhalt, *, kompakt: bool = False) -> None:
+    text = json.dumps(inhalt, ensure_ascii=False,
+                      **({"separators": (",", ":")} if kompakt else {"indent": 2}))
+    pfad.write_text(text + ("" if kompakt else "\n"), encoding="utf-8")
 
 
 # --------------------------------------------------------------------------
@@ -69,7 +89,7 @@ LAENDER = {
     "tuerkei": "TR", "türkei": "TR", "turkey": "TR", "tr": "TR",
     "vatikan": "VA", "va": "VA", "gibraltar": "GI", "gi": "GI",
     "faeroeer": "FO", "färöer": "FO", "fo": "FO",
-    # Schreibweisen aus den Laenderlinks von festivalsunited
+    # Schreibweisen aus den Länderlinks von festivalsunited
     "czech republic": "CZ", "romania": "RO", "slovakia": "SK", "serbia": "RS",
     "bulgaria": "BG", "slovenia": "SI", "albania": "AL", "estonia": "EE",
     "latvia": "LV", "lithuania": "LT", "faroe islands": "FO",
@@ -79,28 +99,25 @@ LAENDER = {
 # Alle in LAENDER vorkommenden Codes plus Inselgebiete ohne eigene Schreibweise
 EUROPA_CODES = sorted(set(LAENDER.values()) | {"GG", "JE", "IM"})
 
-# Kleingeschrieben fuer Nominatim
+# Kleingeschrieben für Nominatim
 EU_CODES = ",".join(c.lower() for c in EUROPA_CODES)
 
-# festival-alarm fuehrt auch Ueberseefestivals. Gesammelt wird Europa, und die
-# Geokodierung ist ohnehin auf europaeische Laender begrenzt.
+# Ausgeschriebene Namen außereuropäischer Länder. Kürzel stehen hier nicht:
+# Die kennt `ausser_europa` schon daran, dass sie nicht zu Europa gehören.
 NICHT_EUROPA = {
     "usa", "vereinigte staaten", "united states", "kanada", "canada", "mexiko",
-    "brasilien", "argentinien", "chile", "kolumbien", "peru", "uruguay",
-    "australien", "neuseeland", "japan", "china", "indien", "indonesien",
-    "thailand", "vietnam", "philippinen", "singapur", "suedafrika", "südafrika",
-    "aegypten", "ägypten", "marokko", "tunesien", "israel", "katar",
-    "vereinigte arabische emirate", "us", "ca", "au", "nz", "jp", "br", "mx",
-    # ebenfalls aus den Laenderlinks von festivalsunited
-    "brazil", "argentina", "chile", "colombia", "paraguay", "ecuador",
-    "costa rica", "mexico", "india", "indonesia", "china", "south korea",
-    "south africa", "kazakhstan", "new zealand", "australia", "japan",
-    "canada", "thailand",
+    "mexico", "brasilien", "brazil", "argentinien", "argentina", "chile",
+    "kolumbien", "colombia", "peru", "uruguay", "paraguay", "ecuador",
+    "costa rica", "australien", "australia", "neuseeland", "new zealand",
+    "japan", "china", "indien", "india", "indonesien", "indonesia", "thailand",
+    "vietnam", "philippinen", "singapur", "suedafrika", "südafrika",
+    "south africa", "south korea", "kazakhstan", "aegypten", "ägypten",
+    "marokko", "tunesien", "israel", "katar", "vereinigte arabische emirate",
 }
 
 
 def land_code(country: str) -> str:
-    """Laenderkuerzel; unbekannte Angaben bleiben unveraendert."""
+    """Länderkürzel; unbekannte Angaben bleiben unverändert."""
     roh = re.sub(r"\s+", " ", (country or "")).strip()
     if not roh:
         return ""
@@ -113,14 +130,14 @@ def land_code(country: str) -> str:
 
 
 def ausser_europa(country: str) -> bool:
-    """Liegt das Land ausserhalb Europas?
+    """Liegt das Land außerhalb Europas?
 
-    Die Namensliste allein genuegte nicht: Sie kannte "usa", aber nicht die
-    Kuerzel IN, CL, PY, CO, ZA, ID, KR, KZ, CR, CN oder TH, die in den Quellen
-    ebenso vorkommen. Deshalb zaehlt zusaetzlich jedes gueltige Zweibuchstaben-
-    kuerzel, das nicht zu Europa gehoert. Laengere unbekannte Angaben
-    ("Bayern", "Region Hannover") bleiben ausdruecklich drin - sie sind keine
-    Laender, und ein Rauswurf auf Verdacht kostet echte Festivals.
+    Die Namensliste allein genügte nicht: Sie kannte "usa", aber nicht die
+    Kürzel IN, CL, PY, CO, ZA, ID, KR, KZ, CR, CN oder TH, die in den Quellen
+    ebenso vorkommen. Deshalb zählt zusätzlich jedes gültige Zweibuchstaben-
+    kürzel, das nicht zu Europa gehört. Längere unbekannte Angaben ("Bayern",
+    "Region Hannover") bleiben ausdrücklich drin — sie sind keine Länder, und
+    ein Rauswurf auf Verdacht kostet echte Festivals.
     """
     roh = (country or "").strip().lower()
     if not roh:
@@ -129,3 +146,8 @@ def ausser_europa(country: str) -> bool:
         return True
     code = land_code(country)
     return len(code) == 2 and code.isalpha() and code.upper() not in EUROPA_CODES
+
+
+def in_europa(country: str) -> bool:
+    """Gehört die Angabe zu einem europäischen Land? Leer zählt nicht."""
+    return land_code(country) in EUROPA_CODES

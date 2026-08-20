@@ -9,16 +9,16 @@ from __future__ import annotations
 
 import base64
 import re
-from pathlib import Path
 
 import requests
 
-SITE = Path(__file__).resolve().parent.parent / "site"
+from gemeinsam import SITE
+from netz import HEADERS
+
 OUT = SITE / "fonts.css"
 
-# Ein moderner Browser-UA liefert woff2 statt des viel groesseren ttf
-UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                    "(KHTML, like Gecko) Chrome/126.0 Safari/537.36"}
+# Ein moderner Browser-UA liefert woff2 statt des viel größeren ttf
+UA = HEADERS
 
 FAMILIES = [("Anton", "https://fonts.googleapis.com/css2?family=Anton&display=swap")]
 

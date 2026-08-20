@@ -18,23 +18,15 @@ from __future__ import annotations
 
 import csv
 import io
-import json
-import sys
 import zipfile
-from pathlib import Path
 
+from gemeinsam import CACHE as SEITEN_CACHE, DATA, EUROPA_CODES, schreib_json
+from netz import datei_holen
 
-import requests
-
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from gemeinsam import DATA, EUROPA_CODES, HEADERS  # noqa: E402
-
-CACHE = DATA.parent / "cache" / "geonames"
-CACHE.mkdir(parents=True, exist_ok=True)
+CACHE = SEITEN_CACHE / "geonames"
 OUT = DATA / "gazetteer.json"
 OUT_PLZ = DATA / "plz.json"
 
-UA = HEADERS
 DUMP = "https://download.geonames.org/export/dump/"
 
 FULL = ["DE", "AT", "CH"]          # feine Aufloesung
@@ -49,15 +41,9 @@ PLACE_CODES = {"PPL", "PPLA", "PPLA2", "PPLA3", "PPLA4", "PPLA5", "PPLC", "PPLG"
 
 def grab(filename: str, kind: str = "dump") -> bytes:
     """kind='dump' liefert Ortsdaten, kind='zip' die Postleitzahlen."""
-    local = CACHE / f"{kind}_{filename}"
-    if local.exists() and local.stat().st_size > 0:
-        return local.read_bytes()
-    print(f"  lade {kind}/{filename} …", flush=True)
-    base = DUMP if kind == "dump" else "https://download.geonames.org/export/zip/"
-    r = requests.get(base + filename, headers=UA, timeout=300)
-    r.raise_for_status()
-    local.write_bytes(r.content)
-    return r.content
+    basis = DUMP if kind == "dump" else "https://download.geonames.org/export/zip/"
+    return datei_holen(basis + filename, CACHE / f"{kind}_{filename}",
+                       f"{kind}/{filename}")
 
 
 # Spalten des Postleitzahl-Datensatzes
@@ -80,8 +66,7 @@ def build_plz() -> int:
                 seen[key] = [code, place, round(float(r[Z_LAT]), 4),
                              round(float(r[Z_LON]), 4), r[Z_CC]]
     out = sorted(seen.values(), key=lambda e: (e[4], e[0]))
-    OUT_PLZ.write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")),
-                       encoding="utf-8")
+    schreib_json(OUT_PLZ, out, kompakt=True)
     print(f"{OUT_PLZ}  ({OUT_PLZ.stat().st_size / 1e6:.2f} MB, {len(out)} Postleitzahlen)")
     return len(out)
 
@@ -131,8 +116,7 @@ def main() -> None:
     # Groesste Orte zuerst: bei mehrdeutigen Namen gewinnt der bekanntere.
     # Die Einwohnerzahl dient nur der Sortierung und wird nicht mit ausgeliefert.
     out = [e[:4] for e in sorted(entries.values(), key=lambda e: -e[4])]
-    OUT.write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")),
-                   encoding="utf-8")
+    schreib_json(OUT, out, kompakt=True)
     print(f"{OUT}  ({OUT.stat().st_size / 1e6:.1f} MB, {len(out)} Orte)")
     build_plz()
 

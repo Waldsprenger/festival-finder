@@ -177,21 +177,17 @@ def oberbegriffe(genre_text: str) -> list[str]:
 
 if __name__ == "__main__":     # Abdeckung gegen den echten Datenbestand pruefen
     import collections
-    import json
-    import sys
-    from pathlib import Path
 
-    sys.path.insert(0, str(Path(__file__).resolve().parent))
-    from gemeinsam import DATA
+    from gemeinsam import DATA, lies_json
 
-    festivals = json.loads((DATA / "festivals.json").read_text(encoding="utf-8"))
+    festivals = lies_json(DATA / "festivals.json", [])
     haeufig: collections.Counter[str] = collections.Counter()
     offen: collections.Counter[str] = collections.Counter()
     je_festival: collections.Counter[str] = collections.Counter()
     mit = ohne = 0
 
     for f in festivals:
-        text = f.get("genre", "")
+        text = f["genre"]
         for angabe in text.split(","):
             angabe = angabe.strip()
             if angabe:

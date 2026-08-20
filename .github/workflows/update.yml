@@ -70,24 +70,10 @@ jobs:
             echo "Nur Veraltetes nachladen"
           fi
 
-      - name: Festivaldaten einsammeln
-        run: python scraper/festival_scraper.py --max-age 24 ${{ steps.art.outputs.frisch }}
-
-      - name: Neue Orte geokodieren
-        run: python scraper/geocode.py
-
-      - name: Ortsverzeichnis, Kartengrenzen, Schrift
-        run: |
-          python scraper/build_gazetteer.py
-          python scraper/build_map.py
-          python scraper/fetch_fonts.py
-
-      - name: Seite bauen
-        run: |
-          python scraper/build_overview.py
-          python scraper/build_site.py
-          python scraper/build_pwa.py
-          python scraper/build_artifact.py
+      # Die Reihenfolge der Schritte steht in scraper/daily_update.py - damit
+      # ein Lauf hier und ein Lauf am eigenen Rechner dasselbe tun.
+      - name: Datenlauf
+        run: python scraper/daily_update.py ${{ steps.art.outputs.frisch }}
 
       - name: CSV- und JSON-Ausgaben mitveröffentlichen
         run: |

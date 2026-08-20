@@ -1,73 +1,82 @@
-"""Taeglicher Datenlauf: scrapen, neue Orte geokodieren, Seite neu bauen.
+"""Der komplette Datenlauf: sammeln, verorten, Seite bauen.
 
-    python scraper/daily_update.py            # taeglich: nur Aelteres nachladen
-    python scraper/daily_update.py --frisch   # woechentlich: alles neu holen
+    python scraper/daily_update.py            # täglich: nur Älteres nachladen
+    python scraper/daily_update.py --frisch   # wöchentlich: alles neu holen
 
-Schreibt ein Protokoll nach data/update.log. Im Regelfall laedt der Scraper nur
-Seiten neu, deren Cache aelter als 24 Stunden ist; die Geokodierung fragt
-ausschliesslich Orte an, die noch nicht im Cache stehen.
+Im Regelfall lädt der Scraper nur Seiten neu, deren Zwischenspeicher älter als
+24 Stunden ist; die Geokodierung fragt ausschließlich Orte an, die noch nicht
+im Cache stehen.
 
-Mit --frisch wird jede Seite neu abgerufen und anschliessend geloescht, was der
-Lauf nicht angefasst hat. Das haelt den Zwischenspeicher aktuell: Stille
-Korrekturen der Quellen - ein verschobener Termin, ein nachgetragener Act -
-kaemen sonst erst an, wenn die Seite von sich aus wieder abgerufen wird.
+Mit --frisch wird jede Seite neu abgerufen und anschließend gelöscht, was der
+Lauf nicht angefasst hat. Das hält den Zwischenspeicher aktuell: Stille
+Korrekturen der Quellen — ein verschobener Termin, ein nachgetragener Act —
+kämen sonst erst an, wenn die Seite von sich aus wieder abgerufen wird.
+
+Jeder Schritt läuft als eigener Prozess: Bricht einer ab, laufen die übrigen
+weiter, und das Protokoll in data/update.log sagt, welcher es war.
 """
 
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 import time
 from datetime import datetime
-from pathlib import Path
 
-BASE = Path(__file__).resolve().parent.parent
-LOG = BASE / "data" / "update.log"
+from gemeinsam import BASE, DATA
+
+LOG = DATA / "update.log"
+
+# Die Schritte laufen als eigene Prozesse; ohne diese Vorgabe schreibt ein
+# Kindprozess unter Windows in der Codepage der Konsole, während hier UTF-8
+# gelesen wird - Umlaute im Protokoll wären dann Buchstabensalat.
+UMGEBUNG = {**os.environ, "PYTHONIOENCODING": "utf-8"}
 
 FRISCH = "--frisch" in sys.argv[1:]
 
-STEPS = [
-    ("Festivaldaten", [sys.executable, "scraper/festival_scraper.py", "--max-age", "24"]
+SCHRITTE = [
+    ("Festivaldaten", ["festival_scraper.py", "--max-age", "24"]
                       + (["--frisch"] if FRISCH else [])),
-    ("Ortskoordinaten", [sys.executable, "scraper/geocode.py"]),
-    # Die folgenden drei Datensaetze aendern sich kaum und laufen aus dem Cache.
-    # Sie stehen trotzdem hier, damit ein frischer Klon vollstaendig baut.
-    ("Ortsverzeichnis", [sys.executable, "scraper/build_gazetteer.py"]),
-    ("Kartengrenzen", [sys.executable, "scraper/build_map.py"]),
-    ("Schrift", [sys.executable, "scraper/fetch_fonts.py"]),
-    ("Uebersicht", [sys.executable, "scraper/build_overview.py"]),
-    ("Webseite", [sys.executable, "scraper/build_site.py"]),
+    ("Ortskoordinaten", ["geocode.py"]),
+    # Die folgenden drei Datensätze ändern sich kaum und laufen aus dem Cache.
+    # Sie stehen trotzdem hier, damit ein frischer Klon vollständig baut.
+    ("Ortsverzeichnis", ["build_gazetteer.py"]),
+    ("Kartengrenzen", ["build_map.py"]),
+    ("Schrift", ["fetch_fonts.py"]),
+    ("Übersicht", ["build_overview.py"]),
+    ("Webseite", ["build_site.py"]),
     # nach build_site, weil der Service Worker den Datenstand als Version nutzt
-    ("App-Dateien", [sys.executable, "scraper/build_pwa.py"]),
-    ("Artifact-Bundle", [sys.executable, "scraper/build_artifact.py"]),
+    ("App-Dateien", ["build_pwa.py"]),
+    ("Einzelseite", ["build_artifact.py"]),
 ]
 
 
 def main() -> int:
-    started = datetime.now()
-    art = "frischer Lauf" if FRISCH else "Lauf"
-    lines = [f"=== {art} {started:%Y-%m-%d %H:%M} ==="]
-    failed = 0
+    start = datetime.now()
+    zeilen = [f"=== {'frischer Lauf' if FRISCH else 'Lauf'} {start:%Y-%m-%d %H:%M} ==="]
+    fehler = 0
 
-    for label, cmd in STEPS:
+    for name, args in SCHRITTE:
         t0 = time.time()
-        proc = subprocess.run(cmd, cwd=BASE, capture_output=True, text=True,
-                              encoding="utf-8", errors="replace")
-        tail = [l for l in (proc.stdout or "").strip().splitlines() if l.strip()][-3:]
-        status = "ok" if proc.returncode == 0 else f"FEHLER (exit {proc.returncode})"
-        if proc.returncode != 0:
-            failed += 1
-            tail += [l for l in (proc.stderr or "").strip().splitlines()[-5:]]
-        lines.append(f"[{label}] {status} nach {time.time() - t0:.0f}s")
-        lines += [f"    {l}" for l in tail]
-        print(f"[{label}] {status}", flush=True)
+        lauf = subprocess.run([sys.executable, "scraper/" + args[0], *args[1:]],
+                              cwd=BASE, capture_output=True, text=True,
+                              encoding="utf-8", errors="replace", env=UMGEBUNG)
+        letzte = [z for z in (lauf.stdout or "").strip().splitlines() if z.strip()][-3:]
+        stand = "ok" if lauf.returncode == 0 else f"FEHLER (exit {lauf.returncode})"
+        if lauf.returncode != 0:
+            fehler += 1
+            letzte += (lauf.stderr or "").strip().splitlines()[-5:]
+        zeilen.append(f"[{name}] {stand} nach {time.time() - t0:.0f}s")
+        zeilen += [f"    {z}" for z in letzte]
+        print(f"[{name}] {stand}", flush=True)
 
-    lines.append(f"=== Ende, Dauer {(datetime.now() - started).seconds}s, "
-                 f"{failed} Fehler ===\n")
+    zeilen.append(f"=== Ende, Dauer {(datetime.now() - start).seconds}s, "
+                  f"{fehler} Fehler ===\n")
     with LOG.open("a", encoding="utf-8") as fh:
-        fh.write("\n".join(lines) + "\n")
+        fh.write("\n".join(zeilen) + "\n")
     print(f"Protokoll: {LOG}")
-    return 1 if failed else 0
+    return 1 if fehler else 0
 
 
 if __name__ == "__main__":

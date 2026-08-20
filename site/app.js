@@ -467,6 +467,16 @@
     }
   }
 
+  /** Nächster Pin zu einem Punkt im Bild, oder -1. */
+  function pinBei(mx, my, radius) {
+    let treffer = -1, best = radius * radius;
+    map.pins.forEach((p, i) => {
+      const d = (p.px - mx) ** 2 + (p.py - my) ** 2;
+      if (d < best) { best = d; treffer = i; }
+    });
+    return treffer;
+  }
+
   function initMap() {
     map.canvas = $('map');
     if (!map.canvas) return;
@@ -521,11 +531,7 @@
         return;
       }
 
-      let found = -1, bestD = 12 * 12;
-      map.pins.forEach((p, i) => {
-        const d = (p.px - mx) ** 2 + (p.py - my) ** 2;
-        if (d < bestD) { bestD = d; found = i; }
-      });
+      const found = pinBei(mx, my, 12);
       if (found !== map.hover) {
         map.hover = found;
         map.canvas.style.cursor = found >= 0 ? 'pointer' : 'default';
@@ -556,7 +562,6 @@
     $('zoom-out').addEventListener('click', () => step(1 / 1.5));
     $('zoom-reset').addEventListener('click', resetMapView);
 
-    // Zwei Finger auf Touchgeräten
     // Zwei Finger zoomen und verschieben. Bewusst nicht ein Finger: Die Karte
     // steht mitten im Seitenfluss, und wer mit dem Daumen weiterscrollen will,
     // bliebe sonst darauf hängen. Ein Fingertipp wählt weiterhin einen Pin.
@@ -595,11 +600,7 @@
       if (e.touches.length !== 1 || !map.pins.length) return;
       const r = map.canvas.getBoundingClientRect();
       const mx = e.touches[0].clientX - r.left, my = e.touches[0].clientY - r.top;
-      let found = -1, bestD = 26 * 26;          // großzügiger als mit der Maus
-      map.pins.forEach((p, i) => {
-        const d = (p.px - mx) ** 2 + (p.py - my) ** 2;
-        if (d < bestD) { bestD = d; found = i; }
-      });
+      const found = pinBei(mx, my, 26);        // großzügiger als mit der Maus
       if (found !== map.hover) { map.hover = found; drawMap(); }
     }, { passive: true });
 
@@ -1406,9 +1407,6 @@
     for (const a of document.querySelectorAll('.site-footer nav a')) {
       const id = (a.getAttribute('href') || '').replace('#', '');
       if (!ids.includes(id)) continue;
-      a.title = id === 'impressum'
-        ? 'Impressum mit Anbieterangaben öffnen.'
-        : 'Datenschutzerklärung öffnen — was mit deinen Eingaben passiert.';
       a.addEventListener('click', (e) => { e.preventDefault(); show(id); });
     }
   }
@@ -1529,15 +1527,13 @@
     });
 
     // Die beiden Felder begrenzen sich gegenseitig, damit kein leerer
-    // Zeitraum entstehen kann
-    const heute = today;
-
+    // Zeitraum entstehen kann.
     /** Erklärt, warum ein Datum zurückgezogen wurde, und warnt vor
      *  Zeiträumen in der Vergangenheit. */
     function datumsHinweis(zuFrueh) {
       const el = $('date-hint');
-      const vergangen = (state.from && state.from < heute) ||
-                        (state.to && state.to < heute);
+      const vergangen = (state.from && state.from < today) ||
+                        (state.to && state.to < today);
       if (zuFrueh) {
         el.className = 'hint err';
         el.textContent = t('date.tooEarly', { datum: fmtDate(state.minDate) });

@@ -8,15 +8,11 @@ User-Agent (Nutzungsrichtlinie), daher der bewusst langsame Lauf.
 
 from __future__ import annotations
 
-import json
-import sys
 import time
-from pathlib import Path
 
 import requests
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from gemeinsam import DATA, EU_CODES, LAENDER  # noqa: E402
+from gemeinsam import DATA, EU_CODES, LAENDER, lies_json, schreib_json
 
 GEO = DATA / "geo.json"
 
@@ -66,8 +62,8 @@ def lookup(session: requests.Session, city: str, country: str) -> dict | None:
 
 
 def main() -> None:
-    festivals = json.loads((DATA / "festivals.json").read_text(encoding="utf-8"))
-    geo = json.loads(GEO.read_text(encoding="utf-8")) if GEO.exists() else {}
+    festivals = lies_json(DATA / "festivals.json", [])
+    geo = lies_json(GEO, {})
 
     offen: dict[str, tuple[str, str, str]] = {}
     for f in festivals:
@@ -91,10 +87,10 @@ def main() -> None:
         geo[k] = res or {}
         hit, miss = (hit + 1, miss) if res else (hit, miss + 1)
         if i % 50 == 0 or i == len(todo):
-            GEO.write_text(json.dumps(geo, ensure_ascii=False, indent=1), encoding="utf-8")
+            schreib_json(GEO, geo)
             print(f"  {i}/{len(todo)}  gefunden {hit}, ohne Treffer {miss}", flush=True)
 
-    GEO.write_text(json.dumps(geo, ensure_ascii=False, indent=1), encoding="utf-8")
+    schreib_json(GEO, geo)
     found = sum(1 for v in geo.values() if v)
     print(f"fertig: {found}/{len(geo)} Orte mit Koordinaten -> {GEO}")
 

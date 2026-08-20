@@ -12,15 +12,13 @@ Ergebnis: data/welt_grob.json (ganze Welt) und data/welt_fein.json
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
-import requests
+from gemeinsam import CACHE as SEITEN_CACHE, DATA, schreib_json
+from netz import datei_holen
 
-BASE = Path(__file__).resolve().parent.parent
-CACHE = BASE / "cache" / "naturalearth"
-CACHE.mkdir(parents=True, exist_ok=True)
-OUT_GROB = BASE / "data" / "welt_grob.json"
-OUT_FEIN = BASE / "data" / "welt_fein.json"
+CACHE = SEITEN_CACHE / "naturalearth"
+OUT_GROB = DATA / "welt_grob.json"
+OUT_FEIN = DATA / "welt_fein.json"
 
 BASIS = ("https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/"
          "geojson/")
@@ -43,11 +41,7 @@ MIN_UMFANG = 0.35      # Grad; verwirft Kleinstinseln, die als Punkt verschwinde
 
 def load(datei: str) -> dict:
     local = CACHE / datei
-    if not local.exists():
-        print(f"  lade {datei} …", flush=True)
-        r = requests.get(BASIS + datei, timeout=300)
-        r.raise_for_status()
-        local.write_bytes(r.content)
+    datei_holen(BASIS + datei, local, datei)
     return json.loads(local.read_text(encoding="utf-8"))
 
 
@@ -103,7 +97,7 @@ def main() -> None:
     for datei, box, ziel, was in ((DATEI_GROB, None, OUT_GROB, "Welt, grob"),
                                   (DATEI_FEIN, (FEIN_LON, FEIN_LAT), OUT_FEIN, "Europa, fein")):
         rings = sammeln(datei, box)
-        ziel.write_text(json.dumps(rings, separators=(",", ":")), encoding="utf-8")
+        schreib_json(ziel, rings, kompakt=True)
         pts = sum(len(r) for r in rings)
         print(f"{ziel.name:<16} {was:<14} {ziel.stat().st_size / 1e6:>5.2f} MB, "
               f"{len(rings):>5} Ringe, {pts:>7} Punkte")

@@ -3,13 +3,11 @@
 from __future__ import annotations
 
 import html
-import json
 from collections import Counter
-from pathlib import Path
 
-BASE = Path(__file__).resolve().parent.parent
-DATA = BASE / "data" / "festivals.json"
-OUTF = BASE / "data" / "uebersicht.html"
+from gemeinsam import DATA, lies_json
+
+OUTF = DATA / "uebersicht.html"
 
 
 def esc(v: str) -> str:
@@ -17,17 +15,18 @@ def esc(v: str) -> str:
 
 
 def main() -> None:
-    festivals = json.loads(DATA.read_text(encoding="utf-8"))
+    festivals = lies_json(DATA / "festivals.json", [])
 
     band_count: Counter[str] = Counter()
     for f in festivals:
         band_count.update(f["lineup"])
     shared = [(b, c) for b, c in band_count.most_common(40) if c > 1]
 
-    # Kuerzel je Quelle - "s[:2]" ergab dreimal "FE", weil alle drei Namen mit
-    # "festival" beginnen.
+    # Kürzel je Quelle: Sechs der acht Namen beginnen mit "festival", ein
+    # Kürzel aus den ersten beiden Buchstaben ergäbe also sechsmal "FE".
     KUERZEL = {"festivalticker": "FT", "festivalsunited": "FU",
-               "festivalalarm": "FA"}
+               "festivalalarm": "FA", "festivalhopper": "FH", "festapp": "FP",
+               "wannafest": "WF", "festivalflyer": "FL", "festivalfinder": "FF"}
 
     rows = []
     for i, f in enumerate(festivals):
@@ -61,7 +60,7 @@ def main() -> None:
 <td class="sr">{srcs}</td></tr>""")
 
     with_lineup = sum(1 for f in festivals if f["lineup"])
-    both = sum(1 for f in festivals if len(f["sources"]) > 1)
+    mehrfach = sum(1 for f in festivals if len(f["sources"]) > 1)
 
     doc = f"""<!doctype html>
 <html lang="de"><head><meta charset="utf-8">
@@ -108,8 +107,8 @@ tr.cancelled .nm {{ text-decoration:line-through; }}
   text-decoration:none; vertical-align:middle; }}
 </style></head><body>
 <h1>Festival-Übersicht Europa</h1>
-<div class="meta">{len(festivals)} Festivals · {with_lineup} mit Lineup · {both} in beiden Quellen ·
-{len(band_count)} normalisierte Acts · Quellen: festivalticker.de, festivalsunited.com</div>
+<div class="meta">{len(festivals)} Festivals · {with_lineup} mit Lineup · {mehrfach} aus mehreren Quellen ·
+{len(band_count)} normalisierte Acts · acht Quellen</div>
 
 <div class="tags">{''.join(f'<span class="tag">{esc(b)} <b>{c}×</b></span>' for b, c in shared)}</div>
 
