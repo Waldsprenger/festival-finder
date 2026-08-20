@@ -38,10 +38,12 @@ FRISCH = "--frisch" in sys.argv[1:]
 SCHRITTE = [
     ("Festivaldaten", ["festival_scraper.py", "--max-age", "24"]
                       + (["--frisch"] if FRISCH else [])),
-    ("Ortskoordinaten", ["geocode.py"]),
-    # Die folgenden drei Datensätze ändern sich kaum und laufen aus dem Cache.
-    # Sie stehen trotzdem hier, damit ein frischer Klon vollständig baut.
+    # Das Ortsverzeichnis steht vor der Geokodierung: Was dort schon
+    # drinsteht, muss nicht bei Nominatim erfragt werden.
     ("Ortsverzeichnis", ["build_gazetteer.py"]),
+    ("Ortskoordinaten", ["geocode.py"]),
+    # Kartengrenzen und Schrift ändern sich kaum und laufen aus dem Cache.
+    # Sie stehen trotzdem hier, damit ein frischer Klon vollständig baut.
     ("Kartengrenzen", ["build_map.py"]),
     ("Schrift", ["fetch_fonts.py"]),
     ("Übersicht", ["build_overview.py"]),

@@ -1,17 +1,19 @@
-"""Baut ein Ortsverzeichnis fuer die Umkreissuche ohne Netzzugriff.
+"""Ortsverzeichnisse aus GeoNames (CC BY 4.0).
 
-Die veroeffentlichte Seite darf keine externen Requests absetzen, deshalb muss
-die Wohnort-Suche vollstaendig lokal funktionieren. Quelle: GeoNames (CC BY 4.0).
+Zwei Zwecke, zwei Größen:
 
-  * DE/AT/CH        - alle Orte (auch kleine Gemeinden)
-  * uebriges Europa - Orte ab 15.000 Einwohnern
+  `data/gazetteer.json`   Wohnortsuche im Browser: DE/AT/CH vollständig, übriges
+  `data/plz.json`         Europa ab 15.000 Einwohnern, Postleitzahlen DE/AT/CH.
+                          Beides liegt in site/data.js und muss klein bleiben.
 
-Ergebnis:
-  data/gazetteer.json -> [[Name, lat, lon, Laendercode], ...]
-  data/plz.json       -> [[Postleitzahl, Ort, lat, lon, Laendercode], ...]
+  `data/verortung.json`   Verortung der Festivals beim Bauen: Postleitzahlen
+                          ganz Europas und alle Orte ab 1.000 Einwohnern.
+                          Bleibt auf dem Rechner, wird nicht ausgeliefert.
 
-Die Postleitzahl ist die verlaesslichere Eingabe: Ortsnamen sind mehrdeutig
-(Seeheim gibt es mehrfach), eine Postleitzahl trifft genau einen Zustellbereich.
+Die Postleitzahl ist die verlässlichere Angabe: Ortsnamen sind mehrdeutig
+(Bernau gibt es dreimal), eine Postleitzahl trifft genau einen Zustellbereich.
+Deshalb lohnt die große Tabelle — sie bringt 634 Festivals von einem geratenen
+Ortsmittelpunkt auf ihren Zustellbereich.
 """
 
 from __future__ import annotations
@@ -24,101 +26,123 @@ from gemeinsam import CACHE as SEITEN_CACHE, DATA, EUROPA_CODES, schreib_json
 from netz import datei_holen
 
 CACHE = SEITEN_CACHE / "geonames"
-OUT = DATA / "gazetteer.json"
-OUT_PLZ = DATA / "plz.json"
+GAZETTEER = DATA / "gazetteer.json"
+PLZ = DATA / "plz.json"
+VERORTUNG = DATA / "verortung.json"
 
 DUMP = "https://download.geonames.org/export/dump/"
+ZIP = "https://download.geonames.org/export/zip/"
 
-FULL = ["DE", "AT", "CH"]          # feine Aufloesung
-EUROPE = set(EUROPA_CODES)
+FEIN = ["DE", "AT", "CH"]          # alle Orte, auch kleine Gemeinden
+EUROPA = set(EUROPA_CODES)
 
-# GeoNames-Spalten
-NAME, ASCII, ALT, LAT, LON, FCLASS, FCODE, CC, POP = 1, 2, 3, 4, 5, 6, 7, 8, 14
+# Spalten des Ortsdatensatzes
+NAME, ASCII, LAT, LON, FCLASS, FCODE, CC, POP = 1, 2, 4, 5, 6, 7, 8, 14
+# Spalten des Postleitzahl-Datensatzes
+Z_CC, Z_CODE, Z_ORT, Z_LAT, Z_LON = 0, 1, 2, 9, 10
 
 # Nur bewohnte Orte, keine Ortsteile/Farmen
-PLACE_CODES = {"PPL", "PPLA", "PPLA2", "PPLA3", "PPLA4", "PPLA5", "PPLC", "PPLG", "PPLS"}
+ORTSARTEN = {"PPL", "PPLA", "PPLA2", "PPLA3", "PPLA4", "PPLA5", "PPLC", "PPLG", "PPLS"}
 
 
-def grab(filename: str, kind: str = "dump") -> bytes:
-    """kind='dump' liefert Ortsdaten, kind='zip' die Postleitzahlen."""
-    basis = DUMP if kind == "dump" else "https://download.geonames.org/export/zip/"
-    return datei_holen(basis + filename, CACHE / f"{kind}_{filename}",
-                       f"{kind}/{filename}")
-
-
-# Spalten des Postleitzahl-Datensatzes
-Z_CC, Z_CODE, Z_PLACE, Z_LAT, Z_LON = 0, 1, 2, 9, 10
-
-
-def build_plz() -> int:
-    """Postleitzahlen fuer DE/AT/CH. Je Code der erste Zustellbereich."""
-    seen: dict[tuple[str, str], list] = {}
-    for cc in FULL:
-        print(f"{cc}: Postleitzahlen", flush=True)
-        for r in rows(f"{cc}.zip", kind="zip"):
-            if len(r) <= Z_LON:
-                continue
-            code, place = r[Z_CODE].strip(), r[Z_PLACE].strip()
-            if not code or not r[Z_LAT] or not r[Z_LON]:
-                continue
-            key = (code, r[Z_CC])
-            if key not in seen:
-                seen[key] = [code, place, round(float(r[Z_LAT]), 4),
-                             round(float(r[Z_LON]), 4), r[Z_CC]]
-    out = sorted(seen.values(), key=lambda e: (e[4], e[0]))
-    schreib_json(OUT_PLZ, out, kompakt=True)
-    print(f"{OUT_PLZ}  ({OUT_PLZ.stat().st_size / 1e6:.2f} MB, {len(out)} Postleitzahlen)")
-    return len(out)
-
-
-def rows(filename: str, kind: str = "dump"):
-    """Zeilen der Datendatei im ZIP - nicht der beiliegenden readme.txt."""
-    with zipfile.ZipFile(io.BytesIO(grab(filename, kind))) as z:
-        want = filename[:-4] + ".txt"
-        names = z.namelist()
-        inner = want if want in names else next(
-            n for n in names if n.endswith(".txt") and "readme" not in n.lower())
-        # Ortsdatensatz hat 19 Spalten, der Postleitzahlsatz nur 12
-        need = POP if kind == "dump" else Z_LON
-        with z.open(inner) as fh:
+def zeilen(datei: str, art: str = "dump"):
+    """Zeilen der Datendatei im ZIP — nicht der beiliegenden readme.txt."""
+    roh = datei_holen((DUMP if art == "dump" else ZIP) + datei,
+                      CACHE / f"{art}_{datei}", f"{art}/{datei}")
+    with zipfile.ZipFile(io.BytesIO(roh)) as z:
+        gesucht = datei[:-4] + ".txt"
+        namen = z.namelist()
+        innen = gesucht if gesucht in namen else next(
+            n for n in namen if n.endswith(".txt") and "readme" not in n.lower())
+        mindestens = POP if art == "dump" else Z_LON
+        with z.open(innen) as fh:
             text = io.TextIOWrapper(fh, encoding="utf-8", newline="")
-            for row in csv.reader(text, delimiter="\t", quoting=csv.QUOTE_NONE):
-                if len(row) > need:
-                    yield row
+            for zeile in csv.reader(text, delimiter="\t", quoting=csv.QUOTE_NONE):
+                if len(zeile) > mindestens:
+                    yield zeile
 
 
-def main() -> None:
-    entries: dict[tuple[str, str], list] = {}
+def orte_sammeln(ab_einwohnern: int) -> dict[tuple[str, str], list]:
+    """Orte je (Name, Land): DE/AT/CH vollständig, Europa ab N Einwohnern.
 
-    def add(name: str, lat: str, lon: str, cc: str, pop: str) -> None:
+    Bei gleichem Namen im selben Land gewinnt der größere Ort — dieselbe Regel,
+    nach der auch ein Ortsverzeichnis den bekannteren zuerst nennt.
+    """
+    orte: dict[tuple[str, str], list] = {}
+
+    def merken(name: str, lat: str, lon: str, cc: str, pop: str) -> None:
         name = name.strip()
         if not name or len(name) > 60:
             return
-        key = (name.casefold(), cc)
-        pop_i = int(pop or 0)
-        cur = entries.get(key)
-        if cur is None or pop_i > cur[4]:
-            entries[key] = [name, round(float(lat), 4), round(float(lon), 4), cc, pop_i]
+        schluessel, einwohner = (name.casefold(), cc), int(pop or 0)
+        vorhanden = orte.get(schluessel)
+        if vorhanden is None or einwohner > vorhanden[4]:
+            orte[schluessel] = [name, round(float(lat), 4), round(float(lon), 4),
+                                cc, einwohner]
 
-    for cc in FULL:
+    for cc in FEIN:
         print(f"{cc}: alle Orte", flush=True)
-        for r in rows(f"{cc}.zip"):
-            if r[FCLASS] == "P" and r[FCODE] in PLACE_CODES:
-                add(r[NAME], r[LAT], r[LON], r[CC], r[POP])
+        for r in zeilen(f"{cc}.zip"):
+            if r[FCLASS] == "P" and r[FCODE] in ORTSARTEN:
+                merken(r[NAME], r[LAT], r[LON], r[CC], r[POP])
 
-    print("Europa: Orte ab 15.000 Einwohnern", flush=True)
-    for r in rows("cities15000.zip"):
-        if r[CC] in EUROPE and r[CC] not in FULL:
-            add(r[NAME], r[LAT], r[LON], r[CC], r[POP])
+    datei = f"cities{ab_einwohnern}.zip"
+    print(f"Europa: Orte ab {ab_einwohnern:,} Einwohnern".replace(",", "."), flush=True)
+    for r in zeilen(datei):
+        if r[CC] in EUROPA and r[CC] not in FEIN:
+            merken(r[NAME], r[LAT], r[LON], r[CC], r[POP])
+            # Die Umschrift ohne Sonderzeichen ist oft die Schreibweise der
+            # Quellen ("Zurich" statt "Zürich").
             if r[ASCII] and r[ASCII] != r[NAME]:
-                add(r[ASCII], r[LAT], r[LON], r[CC], r[POP])
+                merken(r[ASCII], r[LAT], r[LON], r[CC], r[POP])
+    return orte
 
-    # Groesste Orte zuerst: bei mehrdeutigen Namen gewinnt der bekanntere.
-    # Die Einwohnerzahl dient nur der Sortierung und wird nicht mit ausgeliefert.
-    out = [e[:4] for e in sorted(entries.values(), key=lambda e: -e[4])]
-    schreib_json(OUT, out, kompakt=True)
-    print(f"{OUT}  ({OUT.stat().st_size / 1e6:.1f} MB, {len(out)} Orte)")
-    build_plz()
+
+def postleitzahlen(laender: list[str] | None) -> list[list]:
+    """Je Postleitzahl der erste Zustellbereich.
+
+    Ohne Länderliste kommt die Weltdatei und wird auf Europa gefiltert; das
+    spart vierzig einzelne Abrufe.
+    """
+    gesehen: dict[tuple[str, str], list] = {}
+    quellen = [f"{cc}.zip" for cc in laender] if laender else ["allCountries.zip"]
+    for datei in quellen:
+        print(f"Postleitzahlen: {datei}", flush=True)
+        for r in zeilen(datei, art="zip"):
+            code, cc = r[Z_CODE].strip().replace(" ", ""), r[Z_CC]
+            if not code or cc not in EUROPA or not r[Z_LAT] or not r[Z_LON]:
+                continue
+            gesehen.setdefault((code, cc), [code, r[Z_ORT].strip(),
+                                            round(float(r[Z_LAT]), 4),
+                                            round(float(r[Z_LON]), 4), cc])
+    return sorted(gesehen.values(), key=lambda e: (e[4], e[0]))
+
+
+def main() -> None:
+    # --- mitgeliefert: klein genug für site/data.js -----------------------
+    orte = orte_sammeln(15000)
+    # Größte Orte zuerst: Bei mehrdeutigen Namen gewinnt in der Suche der
+    # bekanntere. Die Einwohnerzahl dient nur der Sortierung.
+    schlank = [e[:4] for e in sorted(orte.values(), key=lambda e: -e[4])]
+    schreib_json(GAZETTEER, schlank, kompakt=True)
+    print(f"{GAZETTEER}  ({GAZETTEER.stat().st_size / 1e6:.1f} MB, "
+          f"{len(schlank)} Orte)")
+
+    plz_dach = postleitzahlen(FEIN)
+    schreib_json(PLZ, plz_dach, kompakt=True)
+    print(f"{PLZ}  ({PLZ.stat().st_size / 1e6:.2f} MB, {len(plz_dach)} Postleitzahlen)")
+
+    # --- nur zum Bauen: so genau wie möglich ------------------------------
+    fein = orte_sammeln(1000)
+    plz_europa = postleitzahlen(None)
+    # Beide Tabellen in derselben Form wie die mitgelieferten:
+    # Postleitzahl bzw. Name, dann Breite, Länge, Land.
+    schreib_json(VERORTUNG, {
+        "plz": [[e[0], e[2], e[3], e[4]] for e in plz_europa],
+        "orte": [e[:4] for e in fein.values()],
+    }, kompakt=True)
+    print(f"{VERORTUNG}  ({VERORTUNG.stat().st_size / 1e6:.1f} MB, "
+          f"{len(plz_europa)} Postleitzahlen, {len(fein)} Orte)")
 
 
 if __name__ == "__main__":

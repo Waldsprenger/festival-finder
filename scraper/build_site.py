@@ -15,6 +15,7 @@ from datetime import datetime
 
 from gemeinsam import DATA, SITE, land_code, lies_json
 from genres import OBERBEGRIFFE, oberbegriffe
+from text import fold
 
 # Spalten einer Festivalzeile - dieselbe Reihenfolge steht in site/app.js
 NAME, VON, BIS, ORT, LAND, VENUE, EURO, PREIS_TEXT, WEB, LAT, LON, \
@@ -192,62 +193,80 @@ def platzhalter(festivals: list) -> set[tuple[float, float]]:
 
 
 class Verorter:
-    """Findet zu jedem Festival eine Koordinate — in drei Rängen.
+    """Findet zu jedem Festival eine Koordinate — in vier Rängen.
 
     1. Postleitzahl: trifft den Zustellbereich und ist damit am genauesten.
-    2. Ortsname aus dem Geo-Cache (Nominatim).
-    3. Der Punkt aus dem Datenblatt der Quellseite — aber nur, wenn er im
-       Rahmen seines Landes liegt: Bei 37 Einträgen liegt er im falschen Land,
-       Lugano landete in Buenos Aires, Basel in Berlin.
+       Die große Tabelle deckt ganz Europa ab; ohne sie bleibt es bei DE/AT/CH.
+    2. Ortsname im Geo-Cache (Nominatim), sofern schon einmal gefragt.
+    3. Ortsname im mitgebauten Ortsverzeichnis — für alles, was der Cache noch
+       nicht kennt. Das erspart die Nachfrage bei einem fremden Dienst.
+    4. Der Punkt aus dem Datenblatt der Quellseite, aber nur, wenn er im Rahmen
+       seines Landes liegt: Bei 37 Einträgen liegt er im falschen Land, Lugano
+       landete in Buenos Aires, Basel in Berlin.
+
+    Warum der Cache vor dem Ortsverzeichnis steht: Bei mehrdeutigen Namen
+    wählen beide verschieden — "Bernau" gibt es dreimal in Deutschland. Keiner
+    hat nachweislich recht, deshalb bleibt es bei der Antwort, die schon in den
+    Daten steht, statt bestehende Koordinaten ohne Grund zu verschieben.
     """
 
-    def __init__(self, festivals: list, geo: dict, plz: list, gazetteer: list):
-        self.aus_plz = self.aus_quelle = self.gefunden = 0
+    def __init__(self, festivals: list, geo: dict, verortung: dict,
+                 gazetteer: list, plz: list):
+        self.aus_plz = self.aus_ort = self.aus_quelle = self.gefunden = 0
 
         # Postleitzahl -> Koordinate, einmal mit Land und einmal ohne. Der
-        # zweite Index fängt Einträge ohne Landesangabe ab, ohne dass dafür
-        # jedes Mal die ganze Tabelle durchlaufen werden muss.
-        self.nach_plz: dict[tuple[str, str], list] = {}
-        self.nur_plz: dict[str, list] = {}
+        # zweite Index fängt Einträge ohne Landesangabe ab, ohne dafür die
+        # ganze Tabelle zu durchlaufen; mehrdeutige Codes fallen dabei weg.
+        plz_tabelle = verortung.get("plz") or [[c, la, lo, cc]
+                                               for c, _ort, la, lo, cc in plz]
+        self.nach_plz: dict[tuple[str, str], tuple] = {}
+        self.nur_plz: dict[str, tuple] = {}
         mehrdeutig: set[str] = set()
-        for code, _ort, lat, lon, cc in plz:
-            self.nach_plz.setdefault((code, cc), [lat, lon])
+        for code, lat, lon, cc in plz_tabelle:
+            self.nach_plz.setdefault((code, cc), (lat, lon))
             if code in self.nur_plz and self.nur_plz[code][2] != cc:
                 mehrdeutig.add(code)
-            self.nur_plz.setdefault(code, [lat, lon, cc])
+            self.nur_plz.setdefault(code, (lat, lon, cc))
         for code in mehrdeutig:
             self.nur_plz.pop(code, None)
 
         # Der Geo-Cache ist unter der ursprünglichen Landesschreibweise
         # abgelegt ("Wacken|Deutschland"), die Festivals tragen inzwischen das
         # Kürzel. Ein normalisierter Index erspart das erneute Geokodieren.
-        self.nach_ort_land: dict[tuple[str, str], dict] = {}
-        self.nach_ort: dict[str, tuple[dict, str]] = {}
+        self.cache_mit_land: dict[tuple[str, str], dict] = {}
+        self.cache_ohne_land: dict[str, tuple[dict, str]] = {}
         for schluessel, wert in geo.items():
-            if not wert:
+            if not wert or wert.get("lat") is None:
                 continue
             ort, _, land = schluessel.partition("|")
             code = land_code(land)
-            self.nach_ort_land.setdefault((ort.strip().casefold(), code), wert)
+            self.cache_mit_land.setdefault((ort.strip().casefold(), code), wert)
             # Fehlt in der Quelle die Landesangabe, liefert sie der Geokodierer
             # als letztes Glied seiner Adresse mit ("..., Deutschland").
             if not code:
                 code = land_code((wert.get("display") or "").rsplit(",", 1)[-1])
-            self.nach_ort.setdefault(ort.strip().casefold(), (wert, code))
+            self.cache_ohne_land.setdefault(ort.strip().casefold(), (wert, code))
 
-        self.rahmen = laender_rahmen(gazetteer)
+        # Ortsverzeichnis: gefaltete Namen, weil GeoNames "Zürich" schreibt und
+        # die Quellen mal "Zurich", mal "Zuerich".
+        orte = verortung.get("orte") or gazetteer
+        self.nach_ort: dict[tuple[str, str], tuple] = {}
+        for name, lat, lon, cc in orte:
+            self.nach_ort.setdefault((fold(name), cc), (lat, lon))
+
+        self.rahmen = laender_rahmen(orte)
         self.verdaechtig = platzhalter(festivals)
 
     def __call__(self, f: dict) -> tuple[float | None, float | None, str]:
         """Koordinate und (gegebenenfalls ergänztes) Land eines Festivals."""
         city, country = f["city"].strip(), f["country"].strip()
-        code = (f["plz"] or "").strip()
+        code = (f["plz"] or "").strip().replace(" ", "")
 
         treffer = self.nach_plz.get((code, country)) if code else None
         if treffer is None and code and code in self.nur_plz:
             # Land unbekannt oder abweichend notiert: eindeutige PLZ genügt
             lat, lon, cc = self.nur_plz[code]
-            treffer, country = [lat, lon], country or cc
+            treffer, country = (lat, lon), country or cc
         if treffer:
             self.aus_plz += 1
             self.gefunden += 1
@@ -255,15 +274,21 @@ class Verorter:
 
         # Zuerst der genaue Treffer aus Ort und Land; fehlt die Landesangabe,
         # zählt der Ortstreffer samt nachgetragenem Kürzel.
-        g = self.nach_ort_land.get((city.casefold(), country)) if country else None
+        g = self.cache_mit_land.get((city.casefold(), country)) if country else None
         if g is None and city:
-            treffer_ort = self.nach_ort.get(city.casefold())
-            if treffer_ort:
-                g, ergaenzt = treffer_ort
+            gefunden = self.cache_ohne_land.get(city.casefold())
+            if gefunden:
+                g, ergaenzt = gefunden
                 country = country or ergaenzt
         if g and g.get("lat") is not None:
             self.gefunden += 1
             return g["lat"], g["lon"], country
+
+        treffer = self.nach_ort.get((fold(city), country)) if city and country else None
+        if treffer:
+            self.aus_ort += 1
+            self.gefunden += 1
+            return treffer[0], treffer[1], country
 
         lat, lon = self.quellkoordinate(f, country)
         if lat is not None:
@@ -291,6 +316,9 @@ def main() -> None:
     geo = lies_json(DATA / "geo.json", {})
     plz = lies_json(DATA / "plz.json", [])
     gazetteer = lies_json(DATA / "gazetteer.json", [])
+    # Die große Verortungstabelle wird nicht mitversioniert; fehlt sie, reichen
+    # die mitgelieferten Verzeichnisse (dann eben nur DE/AT/CH bei den PLZ).
+    verortung = lies_json(DATA / "verortung.json", {})
 
     # Oberbegriffe als Spaltennummern - die Namen stehen auf der Seite in der
     # jeweiligen Sprache, in den Daten steht nur der Index.
@@ -306,7 +334,7 @@ def main() -> None:
             bands.append(name)
         return band_ix[name]
 
-    verorten = Verorter(festivals, geo, plz, gazetteer)
+    verorten = Verorter(festivals, geo, verortung, gazetteer, plz)
     zeilen = []
     for f in festivals:
         lat, lon, land = verorten(f)
@@ -357,8 +385,9 @@ def main() -> None:
     mit_preis = sum(1 for z in zeilen if z[EURO] is not None)
     mit_genre = sum(1 for z in zeilen if z[GENRES])
     print(f"{ziel}  ({ziel.stat().st_size / 1e6:.1f} MB)")
-    print(f"  Koordinaten aus Postleitzahl: {verorten.aus_plz}, aus Ortsname: "
-          f"{verorten.gefunden - verorten.aus_plz - verorten.aus_quelle}, "
+    print(f"  Koordinaten aus Postleitzahl: {verorten.aus_plz}, aus dem Geo-Cache: "
+          f"{verorten.gefunden - verorten.aus_plz - verorten.aus_ort - verorten.aus_quelle}"
+          f", aus dem Ortsverzeichnis: {verorten.aus_ort}, "
           f"aus der Quellseite: {verorten.aus_quelle}")
     print(f"  Festivals {len(zeilen)} | mit Koordinaten {verorten.gefunden} | "
           f"mit Preis in EUR {mit_preis} | Acts {len(bands)} | Orte {len(orte)} | "

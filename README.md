@@ -32,7 +32,7 @@ als einer Quelle · [Änderungshistorie](https://github.com/Waldsprenger/festiva
 | `scraper/festival_scraper.py` | Ablauf und Ausgaben → `data/festivals.json` + CSV |
 | `scraper/genres.py` | Genre-Freitext → 17 Oberbegriffe |
 | `scraper/geocode.py` | Ortskoordinaten von Nominatim → `data/geo.json` |
-| `scraper/build_gazetteer.py` | Ortsverzeichnis und Postleitzahlen aus GeoNames |
+| `scraper/build_gazetteer.py` | Ortsverzeichnisse aus GeoNames: klein für den Browser, groß fürs Verorten |
 | `scraper/build_map.py` | Kartenumrisse aus Natural Earth |
 | `scraper/fetch_fonts.py` | Display-Schrift als data-URI |
 | `scraper/build_site.py` | → `site/data.js` |
@@ -176,13 +176,37 @@ Sammelkategorie weg.
 
 ## Koordinaten und Preise
 
-Verortet wird in drei Rängen: **Postleitzahl** (trifft den Zustellbereich),
-sonst **Ortsname** aus dem Geo-Cache, sonst der **Punkt aus dem Datenblatt** der
-Quelle. Der zählt nur, wenn er im Rahmen seines Landes liegt (Landesgrenzen aus
-dem Ortsverzeichnis, ein Grad Toleranz) und nicht als Platzhalter auffällt —
-erkennbar daran, dass dieselbe Koordinate für drei oder mehr verschiedene Orte
-herhalten muss. Bei 37 Einträgen sitzt er im falschen Land: Lugano in Buenos
-Aires, Basel in Berlin, Andorra in Mexiko.
+Verortet wird in vier Rängen:
+
+1. **Postleitzahl** — trifft den Zustellbereich und ist damit am genauesten.
+2. **Ortsname im Geo-Cache**, sofern Nominatim ihn schon einmal beantwortet hat.
+3. **Ortsname im Ortsverzeichnis** (`data/verortung.json`, ganz Europa ab 1.000
+   Einwohnern) — für alles, was der Cache noch nicht kennt.
+4. **Punkt aus dem Datenblatt** der Quellseite, aber nur, wenn er im Rahmen
+   seines Landes liegt (Landesgrenzen aus dem Ortsverzeichnis, ein Grad
+   Toleranz) und nicht als Platzhalter auffällt — erkennbar daran, dass
+   dieselbe Koordinate für drei oder mehr verschiedene Orte herhalten muss. Bei
+   37 Einträgen sitzt er im falschen Land: Lugano in Buenos Aires, Basel in
+   Berlin, Andorra in Mexiko.
+
+**Warum Postleitzahlen für ganz Europa.** Ortsnamen sind mehrdeutig — „Bernau"
+gibt es dreimal in Deutschland, und welches gemeint ist, weiß weder ein
+Verzeichnis noch ein Suchdienst sicher. Eine Postleitzahl dagegen trifft genau
+einen Zustellbereich. Bis vor Kurzem lagen nur die Postleitzahlen von DE/AT/CH
+vor; seit die Tabelle ganz Europa abdeckt (410.185 Codes), bekommen **510
+Festivals** statt eines geratenen Ortsmittelpunkts ihren Zustellbereich —
+Median 1,9 km genauer, in 31 Fällen lag der Ortsname um mehr als 25 km daneben.
+
+**Warum der Cache vor dem Verzeichnis steht.** Wo beide etwas wissen, sind sie
+sich einig: Median 0,3 km Abstand, 90 % unter 2,3 km. In 4 % der Fälle wählen
+sie verschiedene gleichnamige Orte, und keiner hat nachweislich recht. Deshalb
+bleibt es bei der Antwort, die schon in den Daten steht, statt bestehende
+Koordinaten ohne Grund zu verschieben.
+
+**Was das spart.** Ein frischer Klon musste 4.816 Orte bei Nominatim erfragen —
+bei einer erlaubten Anfrage je Sekunde rund 96 Minuten. Jetzt beantwortet das
+Verzeichnis 5.058 Festivals selbst, es bleiben 323 Anfragen und sechs Minuten.
+Im Alltag kommen ohnehin nur eine Handvoll neuer Orte dazu.
 
 **Preise** sind Freitext in zehn Währungen. Als Preis zählt nur eine Zahl
 unmittelbar an einer Währung, sonst würde „VVK 199 € (Stufe 2)" als 2 €

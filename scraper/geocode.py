@@ -1,9 +1,13 @@
-"""Geokodiert die Festivalorte ueber Nominatim (OpenStreetMap).
+"""Geokodiert Festivalorte über Nominatim (OpenStreetMap) — nur die Reste.
+
+Gefragt wird ausschließlich, was das mitgebaute Ortsverzeichnis nicht hergibt:
+Orte, für die weder eine Postleitzahl noch ein Eintrag ab 1.000 Einwohnern
+vorliegt. Nominatim erlaubt eine Anfrage je Sekunde und verlangt eine
+Kontaktangabe im User-Agent; jede vermiedene Anfrage ist deshalb eine Sekunde
+Laufzeit und ein Stück Last weniger auf einem Gratisdienst.
 
 Ergebnis: data/geo.json  {"stadt|land": {"lat":.., "lon":.., "display":..}}
-Die Datei dient als Cache - bereits aufgeloeste Orte werden nicht erneut angefragt.
-Nominatim erlaubt max. 1 Anfrage/Sekunde und verlangt eine Kontaktangabe im
-User-Agent (Nutzungsrichtlinie), daher der bewusst langsame Lauf.
+Die Datei ist zugleich Cache — einmal aufgelöste Orte werden nie erneut gefragt.
 """
 
 from __future__ import annotations
@@ -12,7 +16,8 @@ import time
 
 import requests
 
-from gemeinsam import DATA, EU_CODES, LAENDER, lies_json, schreib_json
+from gemeinsam import DATA, EU_CODES, LAENDER, land_code, lies_json, schreib_json
+from text import fold
 
 GEO = DATA / "geo.json"
 
@@ -65,17 +70,29 @@ def main() -> None:
     festivals = lies_json(DATA / "festivals.json", [])
     geo = lies_json(GEO, {})
 
+    # Was das Ortsverzeichnis selbst beantwortet, muss niemand erfragen.
+    verortung = lies_json(DATA / "verortung.json", {})
+    bekannte_plz = {(c, cc) for c, _lat, _lon, cc in verortung.get("plz", [])}
+    bekannte_orte = {(fold(n), cc) for n, _lat, _lon, cc in verortung.get("orte", [])}
+
     offen: dict[str, tuple[str, str, str]] = {}
+    lokal = 0
     for f in festivals:
         city = (f.get("city") or "").strip()
         if not city:
             continue
         k = key(city, f.get("country", ""))
-        if k not in geo:
-            offen.setdefault(k, (k, city, f.get("country", "")))
+        if k in geo:
+            continue
+        land = land_code(f.get("country", ""))
+        code = (f.get("plz") or "").strip().replace(" ", "")
+        if (code and (code, land) in bekannte_plz) or (fold(city), land) in bekannte_orte:
+            lokal += 1
+            continue
+        offen.setdefault(k, (k, city, f.get("country", "")))
     todo = list(offen.values())
 
-    print(f"{len(geo)} im Cache, {len(todo)} offen "
+    print(f"{len(geo)} im Cache, {lokal} aus dem Ortsverzeichnis, {len(todo)} offen "
           f"(~{len(todo) * 1.2 / 60:.0f} min)", flush=True)
 
     session = requests.Session()
