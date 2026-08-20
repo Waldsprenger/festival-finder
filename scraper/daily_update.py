@@ -66,6 +66,11 @@ def main() -> int:
                               encoding="utf-8", errors="replace", env=UMGEBUNG)
         letzte = [z for z in (lauf.stdout or "").strip().splitlines() if z.strip()][-3:]
         stand = "ok" if lauf.returncode == 0 else f"FEHLER (exit {lauf.returncode})"
+        # Warnungen stehen auf der Fehlerausgabe, auch wenn der Schritt gelingt -
+        # ein Einbruch bei einer Quelle oder ein Widerspruch in den Daten soll
+        # nicht nur in der Konsole aufblitzen, sondern im Protokoll stehen.
+        meldungen = [z for z in (lauf.stderr or "").splitlines() if z.strip().startswith("!")]
+        letzte += meldungen[-8:]
         if lauf.returncode != 0:
             fehler += 1
             letzte += (lauf.stderr or "").strip().splitlines()[-5:]

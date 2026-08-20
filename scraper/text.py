@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import re
 import unicodedata
+from datetime import date
 
 from gemeinsam import DATA
 
@@ -120,9 +121,12 @@ _BAND_FUELLWORT = re.compile(
 # "26. 7.2026" oder "04.07.2026 Auch der zweite Festivaltag"
 _BAND_DATUM = re.compile(r"^\d{1,2}\.\s?\d{1,2}\.\d{2,4}\b")
 
-# Reste aus Beschreibungs- und Preisfeldern
-_BAND_FELD = re.compile(r"\b(?:VVK|AK|Kategorie:|Preis:|Besucher:|Camping|"
-                        r"Rahmenprogramm|zum kompletten Programm)\b", re.I)
+# Reste aus Beschreibungs- und Preisfeldern. Die Beschriftungen brauchen ihren
+# Doppelpunkt: "\bKategorie:\b" traf nie, weil dahinter ein Leerzeichen steht
+# und zwischen zwei Satzzeichen keine Wortgrenze liegt.
+_BAND_FELD = re.compile(r"\b(?:VVK|AK|Camping|Rahmenprogramm|"
+                        r"zum kompletten Programm)\b"
+                        r"|\b(?:Kategorie|Preis|Besucher|Stil|Location)\s*:", re.I)
 _BAND_SATZ = re.compile(r"\b(?:ist|sind|wird|werden|findet|treffen|startet|sorgen|"
                         r"bestätigt|außerdem)\b", re.I)
 
@@ -245,3 +249,13 @@ def tag_zahl(datum: str) -> int:
     """TT.MM.JJJJ als vergleichbare Zahl; 0, wenn nichts dasteht."""
     m = re.match(r"(\d{2})\.(\d{2})\.(\d{4})", datum or "")
     return int(m.group(3) + m.group(2) + m.group(1)) if m else 0
+
+
+def tage_abstand(a: str, b: str) -> int | None:
+    """Abstand zweier Termine in Tagen; None, wenn einer fehlt oder unlesbar ist."""
+    try:
+        erst = date(int(a[6:10]), int(a[3:5]), int(a[0:2]))
+        zweit = date(int(b[6:10]), int(b[3:5]), int(b[0:2]))
+    except (ValueError, IndexError, TypeError):
+        return None
+    return abs((erst - zweit).days)

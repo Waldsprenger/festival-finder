@@ -2,9 +2,10 @@
 
 Acht Quellen beschreiben dieselbe Veranstaltung verschieden: anderer Ort
 ("Kronach" gegen "Burg Lichtenberg"), anderer Anreisetag, andere Schreibweise
-("Reloadfestival"). Sechs Stufen führen sie zusammen, jede mit einer eigenen
+("Reloadfestival"). Sieben Stufen führen sie zusammen, jede mit einer eigenen
 Sicherung gegen falsche Treffer — Tour-Formate wie das Irish Spring Festival
-laufen unter einem Namen an 30 Orten und müssen getrennt bleiben.
+laufen unter einem Namen an 30 Orten und müssen getrennt bleiben, und zwei
+Festivals gleichen Namens in verschiedenen Städten erst recht.
 """
 
 from __future__ import annotations
@@ -14,7 +15,8 @@ import difflib
 from gemeinsam import ausser_europa, land_code
 from quellen import RANG
 from text import (ALIAS_KEY, ALIAS_NAME, band_key, canonical_band, city_key,
-                  clean, festival_key, fold, genres_vereinen, tag_zahl)
+                  clean, festival_key, fold, genres_vereinen, tag_zahl,
+                  tage_abstand)
 
 
 # --------------------------------------------------------------------------
@@ -98,8 +100,19 @@ def zeitraum_ueberlappt(a: dict, b: dict) -> bool:
 
 
 def ort_deckt_sich(a: str, b: str) -> bool:
-    """Gemeinde und Ortsteil zählen als derselbe Ort ("Oberndorf am Neckar")."""
-    return bool(a and b and (a == b or a.startswith(b + " ") or b.startswith(a + " ")))
+    """Steckt der eine Ortsname im anderen?
+
+    Die Quellen füllen das Ortsfeld unterschiedlich genau. Mal steht die
+    Gemeinde vorn ("Oberndorf am Neckar" gegen "Oberndorf"), mal hinten
+    ("Stemwede-Wehdem" gegen "Wehdem"), mal steht die Spielstätte davor
+    ("Kulturpark Deutzen" gegen "Deutzen"). Alle drei meinen denselben Ort.
+    Ein bloßer Wortanfang genügt dagegen nicht — "Kiel" und "Kieler Bucht"
+    sind nicht dasselbe.
+    """
+    if not (a and b):
+        return False
+    return (a == b or a.startswith(b + " ") or b.startswith(a + " ")
+            or a.endswith(" " + b) or b.endswith(" " + a))
 
 
 def name_deckt_sich(ka: str, kb: str) -> bool:
@@ -273,11 +286,33 @@ def stufe1_exakt(records: list[dict], registry: dict[str, str]) -> dict:
     return merged
 
 
+#: So weit dürfen zwei Termine auseinanderliegen und noch dasselbe Fest sein.
+#: Die Quellen zählen Anreise- und Aufbautage verschieden und datieren mehrtägige
+#: Feste mal auf den ersten, mal auf den Haupttag - zwei Wochen decken das ab.
+NAHER_TERMIN = 14
+
+
+def termine_passen(gruppe: list[tuple]) -> bool:
+    """Liegen alle Termine der Gruppe nah beieinander?
+
+    Ohne diese Frage verband Stufe 2 das "Campus Festival" in Dresden mit dem
+    in Debrecen und das "Sommer im Park" in Vellmar mit dem in Gera — gleicher
+    Name, gleiches Jahr, verschiedene Quellen, aber Monate auseinander. Eines
+    der beiden verschwand dabei aus der Liste.
+    """
+    termine = [rec["date_from"] for _, rec in gruppe if rec["date_from"]]
+    return all(tage_abstand(a, b) <= NAHER_TERMIN
+               for a in termine for b in termine)
+
+
 def stufe2_quellenpaare(merged: dict) -> None:
     """Eindeutige Quellenpaare über abweichende Ortsschreibweisen hinweg.
 
-    Gibt es zu Name + Jahr in jeder Quelle genau einen Kandidaten, gehören sie
-    zusammen — sonst wären es echte Parallelveranstaltungen.
+    Gibt es zu Name + Jahr in jeder Quelle genau einen Kandidaten und liegen
+    die Termine nah beieinander, gehören sie zusammen — auch wenn die eine
+    Quelle die Gemeinde nennt und die andere den Ortsteil ("Stemwede" und
+    "Wehdem") oder den deutschen statt des polnischen Namens ("Kattowitz" und
+    "Katowice").
     """
     nach_name: dict[tuple[str, str], list[tuple]] = {}
     for key, rec in merged.items():
@@ -288,6 +323,8 @@ def stufe2_quellenpaare(merged: dict) -> None:
             continue
         quellen = [next(iter(rec["sources"])) for _, rec in gruppe]
         if len(set(quellen)) != len(quellen):
+            continue
+        if not termine_passen(gruppe):
             continue
         gruppe = sorted(gruppe, key=lambda kr: kr[1]["_rang"])
         _, keep = gruppe[0]

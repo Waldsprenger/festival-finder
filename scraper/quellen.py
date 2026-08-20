@@ -126,9 +126,11 @@ def ft_adressen(since: int) -> list[str]:
     for url in FT_LISTEN:
         html = fetch(url)
         if not html:
-            # Künftige Jahrgänge existieren noch nicht - das ist kein Fehler
+            # Künftige Jahrgänge existieren noch nicht - das ist kein Fehler.
+            # Auch das kommende Jahr zählt dazu: festivalticker führt es unter
+            # /festivals-2027/, aber nicht unter /2027/.
             jahr = re.search(r"/(?:festivals-)?(\d{4})/?$", url)
-            if not (jahr and int(jahr.group(1)) > JAHR_HEUTE + 1):
+            if not (jahr and int(jahr.group(1)) > JAHR_HEUTE):
                 melde(f"Liste nicht ladbar: {url}")
             continue
         for ev in soup(html).find_all("tbody", class_="vevent"):

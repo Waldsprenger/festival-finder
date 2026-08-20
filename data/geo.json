@@ -23690,5 +23690,15 @@
     "lat": 51.6511806,
     "lon": 5.2368001,
     "display": "Vught, Nordbrabant, Niederlande"
+  },
+  "Beograd|RS": {
+    "lat": 44.8178131,
+    "lon": 20.4568974,
+    "display": "Belgrad, Stadtbezirk Stari Grad, Stadt Belgrad, Zentralserbien, 11000, Serbien"
+  },
+  "Rijkevoort|NL": {
+    "lat": 51.6576195,
+    "lon": 5.885017,
+    "display": "Rijkevoort, Land van Cuijk, Nordbrabant, Niederlande"
   }
 }

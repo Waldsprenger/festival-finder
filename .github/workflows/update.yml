@@ -40,7 +40,12 @@ jobs:
           python-version: "3.12"
 
       - name: Abhängigkeiten
-        run: pip install requests beautifulsoup4 pillow
+        run: pip install requests beautifulsoup4 pillow pytest
+
+      # Erst prüfen, dann sammeln: Ein Fehler in der Logik soll auffallen,
+      # bevor er sich in die veröffentlichten Daten schreibt.
+      - name: Tests
+        run: python -m pytest tests -q
 
       # Der Seiten-Cache spart Abrufe bei den Quellen, der Geo-Cache spart
       # Nominatim-Anfragen. Ohne ihn liefe jeder Tag von vorn.
@@ -76,6 +81,17 @@ jobs:
       # ein Lauf hier und ein Lauf am eigenen Rechner dasselbe tun.
       - name: Datenlauf
         run: python scraper/daily_update.py ${{ steps.art.outputs.frisch }}
+
+      # Warnungen sollen sichtbar sein, ohne dass jemand ins Protokoll steigt.
+      - name: Protokoll in die Zusammenfassung
+        if: always()
+        run: |
+          {
+            echo "### Datenlauf"
+            echo '```'
+            grep -E '^\[|^ +!|^=== Ende' data/update.log | tail -40 || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: CSV- und JSON-Ausgaben mitveröffentlichen
         run: |

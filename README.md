@@ -4,7 +4,7 @@ Acht Festivalverzeichnisse, zu einem Bestand zusammengeführt, plus eine
 statische Webseite, die daraus nach Band oder Genre filtert. Ein Datenlauf
 hält beides aktuell, ohne dass ein Rechner dafür laufen muss.
 
-**Stand:** 5.742 Festivals in 42 Ländern, 40.547 Acts, 1.570 Festivals aus mehr
+**Stand:** 5.743 Festivals in 42 Ländern, 40.547 Acts, 1.567 Festivals aus mehr
 als einer Quelle · [Änderungshistorie](https://github.com/Waldsprenger/festival-finder/commits/main)
 
 ```
@@ -40,6 +40,7 @@ als einer Quelle · [Änderungshistorie](https://github.com/Waldsprenger/festiva
 | `scraper/build_pwa.py` | Manifest, App-Symbole, Service Worker |
 | `scraper/build_artifact.py` | → `site/artifact.html`, alles in einer Datei |
 | `scraper/daily_update.py` | führt die Kette aus, protokolliert nach `data/update.log` |
+| `tests/` | 178 Tests für Schlüssel, Stufen, Leser, Preise und Wächter |
 
 Und in `site/` die Seite selbst — reines HTML, CSS und JavaScript, kein
 Bauschritt, keine Bibliothek:
@@ -79,13 +80,13 @@ Doppelklick öffnen.
 
 | Quelle | Weg zu den Adressen | Seiten | Einträge | nur dort |
 |---|---|---:|---:|---:|
-| festivalsunited.com | Sitemap je Jahrgang **und** die europäischen Länderseiten | 3.226 | 2.776 | 1.527 |
-| festapp.io | Sitemaps der Festivals und der einzelnen Ausgaben | 2.977 | 740 | 375 |
-| wannafest.com | `sitemaps/festivals-1.xml` | 2.105 | 1.066 | 810 |
-| festivalfinder.eu | Trefferliste der European Festivals Association, geblättert | 2.069 | 396 | 367 |
-| festivalticker.de | alle Listenseiten: Jahres-, Monats-, Länder- und Statusarchive | 1.971 | 1.966 | 806 |
-| festival-alarm.com | Jahresseiten **und** die Regionsseiten je Land | 935 | 921 | 211 |
-| festivalhopper.de | `sitemap-festivals.xml`, Jahrgang steht in der Adresse | 728 | 683 | 76 |
+| festivalsunited.com | Sitemap je Jahrgang **und** die europäischen Länderseiten | 3.226 | 2.776 | 1.529 |
+| festapp.io | Sitemaps der Festivals und der einzelnen Ausgaben | 2.977 | 740 | 377 |
+| wannafest.com | `sitemaps/festivals-1.xml` | 2.105 | 1.066 | 813 |
+| festivalfinder.eu | Trefferliste der European Festivals Association, geblättert | 2.069 | 396 | 371 |
+| festivalticker.de | alle Listenseiten: Jahres-, Monats-, Länder- und Statusarchive | 1.971 | 1.966 | 804 |
+| festival-alarm.com | Jahresseiten **und** die Regionsseiten je Land | 935 | 921 | 210 |
+| festivalhopper.de | `sitemap-festivals.xml`, Jahrgang steht in der Adresse | 728 | 683 | 72 |
 | festivalflyer.com | die Startseite, mehr ist nicht erreichbar | 12 | 1 | 0 |
 
 Der Wert einer Quelle steckt nicht in der Zahl ihrer Seiten, sondern in der
@@ -152,7 +153,7 @@ Ausnahme davon:
 | Stufe | Kriterium | Fängt ab |
 |---|---|---|
 | 1 | Name + Jahr + Stadt exakt | den Normalfall |
-| 2 | eindeutige Quellenpaare zu Name + Jahr | abweichende Ortsschreibweisen |
+| 2 | eindeutige Quellenpaare zu Name + Jahr, Termine höchstens 14 Tage auseinander | abweichende Ortsschreibweisen („Stemwede" / „Wehdem", „Kattowitz" / „Katowice") |
 | 3 | gleicher Starttermin + Ort + gemeinsamer Namensteil | „Kosmos Festival" gegen „Kosmos Festival Chemnitz" |
 | 4 | überlappender Zeitraum + Ort **oder Spielstätte**, Name steckt im anderen | um einen Tag versetzte Termine (Neuborn Open Air), Gemeinde gegen Spielstätte (Thallichtenberg / Burg Lichtenberg) |
 | 5 | ähnliche Schreibweise (82 %), gleicher Ort, überlappender Zeitraum | „SonneMondSterne", „Elbriot", „Szigit" |
@@ -160,7 +161,11 @@ Ausnahme davon:
 | 7 | dieselbe Quelle, identischer Name, gleicher Ort, überlappender Termin | „Nacht Wacht XL" und „Nachtwacht XL", beide von wannafest |
 
 Die Stadt gehört ab Stufe 1 zum Schlüssel, sonst verschmölze das *Irish Spring
-Festival* seine 30 Auftrittsorte zu einem Eintrag. Der Starttermin schützt
+Festival* seine 30 Auftrittsorte zu einem Eintrag. Stufe 2 verzichtet auf den
+Ortsvergleich — sie lebt davon, dass die Quellen den Ort verschieden genau
+angeben — und prüft dafür den Termin: Ohne diese Frist verband sie das *Campus
+Festival* in Dresden mit dem in Debrecen und das *Sommer im Park* in Vellmar
+mit dem in Gera; eines der beiden verschwand jeweils aus der Liste. Der Starttermin schützt
 Stufe 3: „Winter Wutzrock" im Februar und „Wutzrock" im August teilen Stadt und
 Namen, sind aber zwei Feste. In Stufe 4 genügt ein Überlapp, dafür muss ein
 Name vollständig im anderen stecken — ein gemeinsames Wort allein reicht nicht,
@@ -236,7 +241,7 @@ dagegen nicht auf.
 
 Reines HTML und JavaScript, kein Server, keine Cookies, keine fremden Dateien.
 Alle Daten stehen in `site/data.js` als Zahlenreihen: Bands und Genres nur als
-Index, das drückt 5.742 Festivals mit 40.547 Acts auf 6,1 MB (2,1 MB über die
+Index, das drückt 5.743 Festivals mit 40.547 Acts auf 6,1 MB (2,1 MB über die
 Leitung, weil GitHub Pages komprimiert).
 
 Der Code liegt in zwei Teilen: `karte.js` zeichnet die Landkarte und kennt vom
@@ -302,6 +307,28 @@ schaltet den frischen Lauf ein. Mitveröffentlicht werden die Ausgaben unter
 `/daten/`: `festivals.json`, `festivals.csv`, `lineups.csv`, `bands.csv` und
 die Kontrolltabelle `uebersicht.html`.
 
+## Tests
+
+```bash
+pip install pytest && python -m pytest tests -q
+```
+
+178 Tests in unter einer Sekunde, ohne Netz und ohne Datenbestand. Sie halten
+fest, warum die Regeln so aussehen, wie sie aussehen — fast jeder Fall stand
+einmal falsch in den Daten:
+
+| Datei | prüft |
+|---|---|
+| `tests/test_text.py` | Namen, Schlüssel, Bandnamen, Preise, Datumsformate |
+| `tests/test_zusammenfuehren.py` | die sieben Stufen, jede mit ihrer Sicherung |
+| `tests/test_quellen.py` | die Leser an gespeicherten Seitenausschnitten |
+| `tests/test_build_site.py` | Preisdeutung, Verortung, Auslieferung als JS |
+| `tests/test_genres.py` | Freitext zu Oberbegriffen, samt Irreführern |
+| `tests/test_lauf.py` | Selbstprüfung und Einbruchsmeldung |
+
+Der Workflow führt sie vor jedem Datenlauf aus: Ein Fehler in der Logik soll
+auffallen, bevor er sich in die veröffentlichten Daten schreibt.
+
 ## Wenn eine Quelle sich ändert
 
 Ändert eine Seite ihren Aufbau, liefert ihr Leser stillschweigend weniger — in
@@ -328,13 +355,13 @@ fehlenden Wert wurde die Seite nach einem Beleg durchsucht:
 
 | Feld | fehlt | steht doch auf der Seite |
 |---|---:|---|
-| Besucherzahl | 2.925 | 0 |
-| Lineup | 2.750 | — die Quelle führt keins |
-| Postleitzahl | 1.922 | 0 |
-| Preis | 1.880 | 2 |
-| Genre | 1.827 | 0 |
+| Besucherzahl | 2.927 | 0 |
+| Lineup | 2.752 | — die Quelle führt keins |
+| Postleitzahl | 1.926 | 0 |
+| Preis | 1.884 | 2 |
+| Genre | 1.833 | 0 |
 | Spielstätte | 940 | 129-mal nur der Festivalname selbst |
-| Webseite | 360 | 0 — verlinkt sind nur Bildnachweise und Werbung |
+| Webseite | 363 | 0 — verlinkt sind nur Bildnachweise und Werbung |
 | Termin | 292 | nur Termine *vergangener* Ausgaben |
 | Ort | 247 | 16 |
 | Land | 0 | — |
