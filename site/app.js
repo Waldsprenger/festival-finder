@@ -1,5 +1,7 @@
-/* Festival Finder — Filter, Bandauswahl, Trefferberechnung.
-   Läuft ohne Server; die Daten liegen in data.js als window.DATA. */
+/* Festival Finder — Sprache, Filter, Auswahl, Trefferliste.
+
+   Läuft ohne Server; die Daten liegen in data.js als window.DATA, die
+   Übersetzungen in i18n.js, die Landkarte in karte.js. */
 
 (() => {
   'use strict';
@@ -50,9 +52,22 @@
     return text;
   }
 
+  /** Zahlen, die in Hilfetexten vorkommen — aus den Daten statt aus dem Text.
+
+      Eine Zahl im Hilfetext veraltet still: "rund 450 Festivals ohne Preis"
+      stand in zehn Sprachen da, während es längst dreimal so viele waren. */
+  function hilfszahlen() {
+    const zahl = (n) => n.toLocaleString(sprache);
+    return {
+      ohnePreis: zahl(F.reduce((n, r) => n + (r[EUR] === null ? 1 : 0), 0)),
+      ohneGenre: zahl(F.reduce((n, r) => n + ((r[GENRE_IDS] || []).length ? 0 : 1), 0)),
+    };
+  }
+
   /** Trägt alle ausgezeichneten Texte im Dokument neu ein. */
   function spracheAnwenden() {
     document.documentElement.lang = sprache;
+    const zahlen = hilfszahlen();
     for (const el of document.querySelectorAll('[data-i18n]')) {
       el.textContent = t(el.dataset.i18n);
     }
@@ -60,7 +75,7 @@
       el.innerHTML = t(el.dataset.i18nHtml);
     }
     for (const el of document.querySelectorAll('[data-i18n-title]')) {
-      el.title = t(el.dataset.i18nTitle);
+      el.title = t(el.dataset.i18nTitle, zahlen);
     }
     for (const el of document.querySelectorAll('[data-i18n-ph]')) {
       el.placeholder = t(el.dataset.i18nPh);
@@ -254,357 +269,9 @@
           : '') +
         (hit.ambiguousName ? t('home.ambiguousName', { n: hit.ambiguousName }) : '');
     }
-    map.center = null;
+    KARTE.zentrieren();
     render();
-    drawMap();
-  }
-
-  /* ---------------- Karte ----------------
-     Gezeichnet wird auf Canvas aus mitgelieferten Vektorgrenzen. Kartenkacheln
-     fremder Server sind in der veröffentlichten Fassung blockiert — und eine
-     eigene Zeichnung verrät niemandem, wo jemand sucht. */
-
-  const map = {
-    canvas: null, ctx: null, view: null, pins: [], hover: -1,
-    zoom: 1, center: null, drag: null, moved: false,
-  };
-
-  const ZOOM_MIN = 0.02, ZOOM_MAX = 60;
-
-  // Am Finger gibt es kein Mausrad; der Hinweis unter der Karte richtet sich
-  // danach, womit die Seite gerade bedient wird.
-  const tippgeraet = window.matchMedia('(pointer: coarse)').matches;
-
-  // Umschließendes Rechteck je Polygonring, einmal berechnet und gemerkt
-  const bounds = new WeakMap();
-  function ringBounds(ring) {
-    let b = bounds.get(ring);
-    if (b) return b;
-    let lon0 = Infinity, lon1 = -Infinity, lat0 = Infinity, lat1 = -Infinity;
-    for (const [lon, lat] of ring) {
-      if (lon < lon0) lon0 = lon;
-      if (lon > lon1) lon1 = lon;
-      if (lat < lat0) lat0 = lat;
-      if (lat > lat1) lat1 = lat;
-    }
-    b = { lon0, lon1, lat0, lat1 };
-    bounds.set(ring, b);
-    return b;
-  }
-
-  // Mittabstandstreue Zylinderprojektion, an der Bildmitte ausgerichtet.
-  // Für Ausschnitte bis ~2000 km ist die Verzerrung vernachlässigbar.
-  function makeView(centerLat, centerLon, spanKm, w, h) {
-    const kmPerDegLat = 111.32;
-    const kmPerDegLon = kmPerDegLat * Math.cos(centerLat * Math.PI / 180);
-    const aspect = w / h;
-    const halfKmY = spanKm, halfKmX = spanKm * aspect;
-    const sx = (w / 2) / halfKmX, sy = (h / 2) / halfKmY;
-    return {
-      w, h, centerLat, centerLon,
-      x: (lon) => w / 2 + (lon - centerLon) * kmPerDegLon * sx,
-      y: (lat) => h / 2 - (lat - centerLat) * kmPerDegLat * sy,
-      lon: (px) => centerLon + (px - w / 2) / (kmPerDegLon * sx),
-      lat: (py) => centerLat - (py - h / 2) / (kmPerDegLat * sy),
-      kmToPxY: (km) => km * sy,
-    };
-  }
-
-  function baseSpan() {
-    return state.home ? state.radius * 1.35 : 2100;
-  }
-
-  function mapCenter() {
-    if (map.center) return map.center;
-    return state.home ? { lat: state.home.lat, lon: state.home.lon }
-                      : { lat: 52.5, lon: 12.0 };
-  }
-
-  function resetMapView() {
-    map.zoom = 1;
-    map.center = null;
-    drawMap();
-  }
-
-  function drawMap() {
-    const cv = map.canvas;
-    if (!cv) return;
-    const ctx = map.ctx;
-    const dpr = window.devicePixelRatio || 1;
-    const w = cv.clientWidth || 1000;
-    // Am Telefon ist das Bild schmal und hoch: Ein 16:7-Streifen wäre dort
-    // 120 Pixel hoch und zeigte vom Umkreis nichts Brauchbares.
-    const h = Math.round(w * (w < 520 ? 0.95 : w < 760 ? 0.65 : 0.44));
-    if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) {
-      cv.width = Math.round(w * dpr);
-      cv.height = Math.round(h * dpr);
-      cv.style.height = h + 'px';
-    }
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, w, h);
-
-    // Ausschnitt: um den Wohnort herum etwas mehr als der Radius, ohne Wohnort
-    // ganz Europa - beides veränderbar durch Zoomen und Ziehen
-    const c = mapCenter();
-    const v = makeView(c.lat, c.lon, baseSpan() / map.zoom, w, h);
-    map.view = v;
-
-    ctx.fillStyle = '#080b10';                 // Wasser
-    ctx.fillRect(0, 0, w, h);
-
-    // Landmassen. Ringe ausserhalb des Ausschnitts werden uebersprungen -
-    // die Weltkarte hat rund 90.000 Punkte, beim Hineinzoomen liegt das
-    // meiste davon weit weg.
-    const sicht = {
-      lon0: v.lon(-40), lon1: v.lon(w + 40),
-      lat0: v.lat(h + 40), lat1: v.lat(-40),
-    };
-
-    // Nah dran die feinen Umrisse, sonst die grobe Weltkarte: In der
-    // Weltansicht kostet jeder Punkt Zeichenzeit, in der Nahansicht fiele
-    // jede Vereinfachung als Kante auf.
-    const box = D.fineBox;
-    const nah = (baseSpan() / map.zoom) <= 1200;
-    const inEuropa = box && sicht.lon0 >= box[0] && sicht.lon1 <= box[1]
-                         && sicht.lat0 >= box[2] && sicht.lat1 <= box[3];
-    const umrisse = (nah && inEuropa && D.worldFine && D.worldFine.length)
-      ? D.worldFine : (D.world || []);
-
-    ctx.beginPath();
-    for (const ring of umrisse) {
-      const b = ringBounds(ring);
-      if (b.lon1 < sicht.lon0 || b.lon0 > sicht.lon1 ||
-          b.lat1 < sicht.lat0 || b.lat0 > sicht.lat1) continue;
-      let started = false;
-      for (const [lon, lat] of ring) {
-        const px = v.x(lon), py = v.y(lat);
-        if (!started) { ctx.moveTo(px, py); started = true; } else ctx.lineTo(px, py);
-      }
-      ctx.closePath();
-    }
-    ctx.fillStyle = '#39424f';                 // Land, deutlich heller als Wasser
-    ctx.fill('evenodd');
-    ctx.strokeStyle = '#7d8899';               // Küstenlinie
-    ctx.lineWidth = 0.9;
-    ctx.stroke();
-
-    // Radiuskreis. Die Projektion ist in beiden Achsen maßstabsgleich,
-    // ein Bildschirmkreis entspricht also einer echten Luftlinie.
-    if (state.home) {
-      const hx = v.x(state.home.lon), hy = v.y(state.home.lat);
-      const rPx = v.kmToPxY(state.radius);
-      ctx.beginPath();
-      ctx.ellipse(hx, hy, rPx, rPx, 0, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(226,35,26,.16)';
-      ctx.fill();
-      ctx.strokeStyle = '#ff3b30';
-      ctx.lineWidth = 2.2;
-      ctx.setLineDash([6, 5]);
-      ctx.stroke();
-      ctx.setLineDash([]);
-    }
-
-    // Pins der aktuellen Treffer
-    for (const p of map.pins) {
-      p.px = v.x(p.lon);
-      p.py = v.y(p.lat);
-    }
-    map.pins.forEach((p, i) => {
-      const active = i === map.hover;
-      ctx.beginPath();
-      ctx.arc(p.px, p.py, active ? 7 : 4.5, 0, Math.PI * 2);
-      ctx.fillStyle = p.pct >= 50 ? '#ffb703' : '#f2f0ec';
-      ctx.fill();
-      ctx.lineWidth = 1.6;
-      ctx.strokeStyle = '#0b0b0d';
-      ctx.stroke();
-    });
-
-    // Wohnort als Kreuz
-    if (state.home) {
-      const hx = v.x(state.home.lon), hy = v.y(state.home.lat);
-      ctx.strokeStyle = '#6ec36e';
-      ctx.lineWidth = 2.4;
-      ctx.beginPath();
-      ctx.moveTo(hx - 7, hy); ctx.lineTo(hx + 7, hy);
-      ctx.moveTo(hx, hy - 7); ctx.lineTo(hx, hy + 7);
-      ctx.stroke();
-    }
-
-    // Maßstab: passt sich dem sichtbaren Ausschnitt an
-    const visibleKm = baseSpan() / map.zoom;
-    const stepKm = visibleKm >= 800 ? 500 : visibleKm >= 300 ? 100
-                 : visibleKm >= 80 ? 25 : visibleKm >= 25 ? 10 : 2;
-    const barPx = v.kmToPxY(stepKm);
-    ctx.strokeStyle = '#9a978f';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(14, h - 16); ctx.lineTo(14 + barPx, h - 16);
-    ctx.stroke();
-    ctx.fillStyle = '#9a978f';
-    ctx.font = '11px system-ui, sans-serif';
-    ctx.fillText(`${stepKm} km`, 14, h - 22);
-
-    // Hinweistext unter der Karte
-    const cap = $('map-caption');
-    const zoomInfo = map.zoom !== 1 || map.center
-      ? t('map.view', { zoom: map.zoom.toFixed(1) })
-      : t(tippgeraet ? 'map.zoomHintTouch' : 'map.zoomHint');
-    const hovered = map.hover >= 0 ? map.pins[map.hover] : null;
-    const km = state.radius.toLocaleString(sprache);
-
-    if (hovered) {
-      cap.textContent = `${hovered.name} — ${hovered.pct === null ? '' : hovered.pct.toFixed(0) + ' % '}` +
-        (hovered.pct === null ? '' : t('card.match')) +
-        (hovered.dist === null ? '' : `, ${hovered.dist.toLocaleString(sprache)} km`);
-    } else if (!state.home) {
-      cap.textContent = t('map.captionNoHome') + zoomInfo;
-    } else if (!map.pins.length) {
-      cap.textContent = t('map.captionRadius', { km, ort: state.home.label }) + zoomInfo;
-    } else {
-      cap.textContent = t(map.pins.length === 1 ? 'map.captionPin1' : 'map.captionPins',
-        { n: map.pins.length, km, ort: state.home.label }) + zoomInfo;
-    }
-  }
-
-  /** Nächster Pin zu einem Punkt im Bild, oder -1. */
-  function pinBei(mx, my, radius) {
-    let treffer = -1, best = radius * radius;
-    map.pins.forEach((p, i) => {
-      const d = (p.px - mx) ** 2 + (p.py - my) ** 2;
-      if (d < best) { best = d; treffer = i; }
-    });
-    return treffer;
-  }
-
-  function initMap() {
-    map.canvas = $('map');
-    if (!map.canvas) return;
-    map.ctx = map.canvas.getContext('2d');
-
-    // Zoom am Mauszeiger: der Punkt unter dem Cursor bleibt liegen
-    map.canvas.addEventListener('wheel', (e) => {
-      e.preventDefault();
-      const v = map.view;
-      if (!v) return;
-      const r = map.canvas.getBoundingClientRect();
-      const mx = e.clientX - r.left, my = e.clientY - r.top;
-      const lon0 = v.lon(mx), lat0 = v.lat(my);
-
-      const factor = Math.exp(-e.deltaY * 0.0015);
-      const next = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, map.zoom * factor));
-      if (next === map.zoom) return;
-      map.zoom = next;
-
-      const c = mapCenter();
-      const v2 = makeView(c.lat, c.lon, baseSpan() / map.zoom,
-                          map.canvas.clientWidth, map.canvas.clientHeight);
-      map.center = { lat: c.lat + (lat0 - v2.lat(my)), lon: c.lon + (lon0 - v2.lon(mx)) };
-      drawMap();
-    }, { passive: false });
-
-    map.canvas.addEventListener('mousedown', (e) => {
-      map.drag = { x: e.clientX, y: e.clientY, center: mapCenter() };
-      map.moved = false;
-      map.canvas.style.cursor = 'grabbing';
-    });
-
-    window.addEventListener('mouseup', () => {
-      if (!map.drag) return;
-      map.drag = null;
-      map.canvas.style.cursor = map.hover >= 0 ? 'pointer' : 'default';
-    });
-
-    map.canvas.addEventListener('dblclick', resetMapView);
-
-    map.canvas.addEventListener('mousemove', (e) => {
-      const r = map.canvas.getBoundingClientRect();
-      const mx = e.clientX - r.left, my = e.clientY - r.top;
-
-      if (map.drag && map.view) {
-        const v = map.view;
-        const dLon = v.lon(mx) - v.lon(mx - (e.clientX - map.drag.x));
-        const dLat = v.lat(my) - v.lat(my - (e.clientY - map.drag.y));
-        map.center = { lat: map.drag.center.lat - dLat, lon: map.drag.center.lon - dLon };
-        if (Math.abs(e.clientX - map.drag.x) + Math.abs(e.clientY - map.drag.y) > 3) map.moved = true;
-        drawMap();
-        return;
-      }
-
-      const found = pinBei(mx, my, 12);
-      if (found !== map.hover) {
-        map.hover = found;
-        map.canvas.style.cursor = found >= 0 ? 'pointer' : 'default';
-        drawMap();
-      }
-    });
-
-    map.canvas.addEventListener('mouseleave', () => {
-      if (map.hover !== -1) { map.hover = -1; drawMap(); }
-    });
-
-    map.canvas.addEventListener('click', () => {
-      if (map.moved) { map.moved = false; return; }   // war ein Verschieben
-      if (map.hover < 0) return;
-      const card = karteZeigen(map.pins[map.hover].cardId);
-      if (card) {
-        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        card.classList.add('flash');
-        setTimeout(() => card.classList.remove('flash'), 1600);
-      }
-    });
-
-    const step = (factor) => {
-      map.zoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, map.zoom * factor));
-      drawMap();
-    };
-    $('zoom-in').addEventListener('click', () => step(1.5));
-    $('zoom-out').addEventListener('click', () => step(1 / 1.5));
-    $('zoom-reset').addEventListener('click', resetMapView);
-
-    // Zwei Finger zoomen und verschieben. Bewusst nicht ein Finger: Die Karte
-    // steht mitten im Seitenfluss, und wer mit dem Daumen weiterscrollen will,
-    // bliebe sonst darauf hängen. Ein Fingertipp wählt weiterhin einen Pin.
-    let pinch = 0, mitte = null;
-    const spread = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
-    const zentrum = (t) => ({ x: (t[0].clientX + t[1].clientX) / 2,
-                              y: (t[0].clientY + t[1].clientY) / 2 });
-    map.canvas.addEventListener('touchstart', (e) => {
-      if (e.touches.length === 2) {
-        pinch = spread(e.touches);
-        mitte = zentrum(e.touches);
-      }
-    }, { passive: true });
-    map.canvas.addEventListener('touchmove', (e) => {
-      if (e.touches.length !== 2 || !pinch || !map.view) return;
-      e.preventDefault();
-      const now = spread(e.touches);
-      map.zoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, map.zoom * (now / pinch)));
-      pinch = now;
-
-      const jetzt = zentrum(e.touches);
-      const v = map.view;
-      const c = mapCenter();
-      map.center = {
-        lat: c.lat + (v.lat(mitte.y) - v.lat(jetzt.y)),
-        lon: c.lon + (v.lon(mitte.x) - v.lon(jetzt.x)),
-      };
-      mitte = jetzt;
-      drawMap();
-    }, { passive: false });
-    map.canvas.addEventListener('touchend', () => { pinch = 0; mitte = null; });
-
-    // Ein Tipp auf einen Pin springt zum Eintrag - am Telefon gibt es kein
-    // Zeigen, deshalb wählt die Berührung den nächsten Pin selbst aus.
-    map.canvas.addEventListener('touchstart', (e) => {
-      if (e.touches.length !== 1 || !map.pins.length) return;
-      const r = map.canvas.getBoundingClientRect();
-      const mx = e.touches[0].clientX - r.left, my = e.touches[0].clientY - r.top;
-      const found = pinBei(mx, my, 26);        // großzügiger als mit der Maus
-      if (found !== map.hover) { map.hover = found; drawMap(); }
-    }, { passive: true });
-
-    window.addEventListener('resize', () => drawMap());
+    KARTE.zeichnen();
   }
 
   /* ---------------- Filter ---------------- */
@@ -913,16 +580,14 @@
 
     if (state.mode === 'bands' && !total) {
       $('result-stat').textContent = t('res.needBand');
-      map.pins = [];
-      map.hover = -1;
-      drawMap();
+      KARTE.setzePins([]);
+      KARTE.zeichnen();
       return;
     }
     if (state.mode === 'genre' && !state.genres.size) {
       $('result-stat').textContent = t('res.needGenre');
-      map.pins = [];
-      map.hover = -1;
-      drawMap();
+      KARTE.setzePins([]);
+      KARTE.zeichnen();
       return;
     }
 
@@ -974,18 +639,17 @@
     }
 
     treffer = scored.slice(0, 300);
-    treffer.forEach((s, n) => { s.cardId = `fest-${n}`; });
+    treffer.forEach((s, n) => { s.eintragId = `fest-${n}`; });
     gezeigt = stapel();
     listeZeichnen();
 
-    map.pins = treffer
+    KARTE.setzePins(treffer
       .filter((s) => s.row[LAT] != null)
       .map((s) => ({
         lat: s.row[LAT], lon: s.row[LON], name: s.row[NAME],
-        pct: s.pct, dist: s.dist, cardId: s.cardId, px: 0, py: 0,
-      }));
-    map.hover = -1;
-    drawMap();
+        pct: s.pct, dist: s.dist, eintragId: s.eintragId, px: 0, py: 0,
+      })));
+    KARTE.zeichnen();
 
     if (scored.length > 300) {
       const li = document.createElement('li');
@@ -1013,7 +677,7 @@
 
     const frag = document.createDocumentFragment();
     for (let n = bisher; n < Math.min(gezeigt, treffer.length); n++) {
-      frag.append(card(treffer[n]));
+      frag.append(eintragKarte(treffer[n]));
     }
     list.append(frag);
 
@@ -1033,23 +697,23 @@
     }
   }
 
-  /** Sorgt dafuer, dass eine Karte gezeichnet ist - etwa nach einem Klick auf
+  /** Sorgt dafür, dass ein Eintrag gezeichnet ist — etwa nach einem Klick auf
       einen Kartenpin, dessen Eintrag noch im Nachschub steckt. */
-  function karteZeigen(cardId) {
-    const stelle = treffer.findIndex((s) => s.cardId === cardId);
+  function eintragZeigen(eintragId) {
+    const stelle = treffer.findIndex((s) => s.eintragId === eintragId);
     if (stelle >= gezeigt) {
       gezeigt = Math.ceil((stelle + 1) / stapel()) * stapel();
       listeZeichnen();
     }
-    return $(cardId);
+    return $(eintragId);
   }
 
-  function card(s) {
+  function eintragKarte(s) {
     const row = s.row;
     const li = document.createElement('li');
     li.className = 'fest' + (s.pct !== null && s.pct >= 50 ? ' top' : '') +
                    (row[CANCELLED] ? ' cancelled' : '');
-    li.id = s.cardId;
+    li.id = s.eintragId;
 
     const head = document.createElement('div');
     head.className = 'fest-head';
@@ -1479,7 +1143,7 @@
     $('radius').addEventListener('input', (e) => {
       state.radius = +e.target.value;
       $('radius-out').textContent = `${state.radius.toLocaleString('de-DE')} km`;
-      drawMap();
+      KARTE.zeichnen();
       render();
     });
 
@@ -1595,7 +1259,24 @@
     datumsHinweisNeu = () => datumsHinweis(false);
     datumsHinweis(false);
     initSprache();
-    initMap();
+    KARTE.start({
+      t,
+      sprache: () => sprache,
+      wohnort: () => state.home,
+      umkreis: () => state.radius,
+      welt: D.world,
+      weltFein: D.worldFine,
+      fineBox: D.fineBox,
+      // Ein Klick auf einen Pin springt zum Eintrag - notfalls muss die Karte
+      // dafuer erst nachgezeichnet werden.
+      aufPinKlick: (eintragId) => {
+        const eintrag = eintragZeigen(eintragId);
+        if (!eintrag) return;
+        eintrag.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        eintrag.classList.add('flash');
+        setTimeout(() => eintrag.classList.remove('flash'), 1600);
+      },
+    });
     initHelp();
     initPwa();
     initZaehler();

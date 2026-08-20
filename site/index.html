@@ -24,15 +24,13 @@
       <h1><span class="bolt">⚡</span>Festival<span class="hl">Finder</span></h1>
       <div class="lang">
         <label for="lang" data-i18n="app.language">Sprache</label>
-        <select id="lang" data-i18n-title="app.languageTitle"
-                title="Stellt die Sprache der Oberfläche um. Festival- und Bandnamen bleiben, wie die Quellen sie schreiben."></select>
+        <select id="lang" data-i18n-title="app.languageTitle"></select>
       </div>
     </div>
     <p class="tag" data-i18n="app.tagline">Dein Lineup. Dein Radius. Dein Wochenende.</p>
 
     <button type="button" id="install" hidden data-i18n="app.install"
-            data-i18n-title="app.installTitle"
-            title="Legt die Seite als App auf deinen Startbildschirm. Sie startet dann ohne Browserleiste und funktioniert auch ohne Netz.">
+            data-i18n-title="app.installTitle">
       App installieren</button>
     <p class="hint install-hint" id="install-hint" hidden data-i18n-html="app.installHintIos">
       Als App speichern: unten auf <b>Teilen</b> tippen, dann <b>Zum Home-Bildschirm</b>.</p>
@@ -48,29 +46,25 @@
     <div class="grid">
       <div class="field">
         <label for="home"><span data-i18n="home.label">Postleitzahl oder Ort</span>
-          <button type="button" class="help" aria-label="?" data-i18n-title="home.help"
-                  title="Mittelpunkt der Umkreissuche und Basis aller Entfernungsangaben. Am sichersten ist die Postleitzahl, weil Ortsnamen mehrdeutig sind. Möglich sind 97209, 97209 Veitshöchheim oder nur der Ortsname.">?</button>
+          <button type="button" class="help" aria-label="?" data-i18n-title="home.help">?</button>
         </label>
         <div class="row">
           <input type="text" id="home" placeholder="z. B. 97209" inputmode="numeric"
                  autocomplete="postal-code">
           <button type="button" id="locate" class="ghost" data-i18n="home.search"
-                  data-i18n-title="home.searchTitle"
-                  title="Schlägt Postleitzahl oder Ort im mitgelieferten Verzeichnis nach und aktiviert die Umkreissuche.">Suchen</button>
+                  data-i18n-title="home.searchTitle">Suchen</button>
         </div>
         <p class="hint" id="home-status" data-i18n="home.statusStart">Postleitzahl eingeben und „Suchen“ drücken.</p>
         <label class="check">
           <input type="checkbox" id="geo-unknown">
           <span data-i18n="geoUnknown.label">Festivals ohne Ortskoordinaten mitzeigen</span>
-          <button type="button" class="help" aria-label="?" data-i18n-title="geoUnknown.help"
-                  title="Für einige Festivals liefert die Quelle keinen brauchbaren Ort. Ohne Haken bleiben sie bei gesetztem Wohnort außen vor, mit Haken erscheinen sie ohne Entfernungsangabe.">?</button>
+          <button type="button" class="help" aria-label="?" data-i18n-title="geoUnknown.help">?</button>
         </label>
       </div>
 
       <div class="field">
         <label for="radius"><span data-i18n="radius.label">Umkreis</span> <output id="radius-out">200 km</output>
-          <button type="button" class="help" aria-label="?" data-i18n-title="radius.help"
-                  title="Wie weit du maximal fahren willst, in Luftlinie ab Wohnort. Der rote Kreis auf der Karte zeigt den Bereich sofort an. Das Maximum entspricht dem entferntesten Festival im Datenbestand.">?</button>
+          <button type="button" class="help" aria-label="?" data-i18n-title="radius.help">?</button>
         </label>
         <input type="range" id="radius" min="10" max="3300" step="10" value="200">
         <p class="hint" data-i18n="radius.hint">Luftlinie ab Wohnort.</p>
@@ -78,22 +72,19 @@
 
       <div class="field">
         <label for="price"><span data-i18n="price.label">Ticket maximal</span> <output id="price-out">150 €</output>
-          <button type="button" class="help" aria-label="?" data-i18n-title="price.help"
-                  title="Obergrenze für das günstigste Ticket eines Festivals. Preise in anderen Währungen sind zum Vergleich in Euro umgerechnet. Das Maximum entspricht dem teuersten gefundenen Ticket.">?</button>
+          <button type="button" class="help" aria-label="?" data-i18n-title="price.help">?</button>
         </label>
         <input type="range" id="price" min="0" max="1600" step="10" value="150">
         <label class="check">
           <input type="checkbox" id="price-unknown" checked>
           <span data-i18n="priceUnknown.label">Festivals ohne Preisangabe mitzeigen</span>
-          <button type="button" class="help" aria-label="?" data-i18n-title="priceUnknown.help"
-                  title="Für rund 450 Festivals nennt die Quelle keinen Preis. Mit Haken bleiben sie in der Liste, ohne Haken verschwinden sie.">?</button>
+          <button type="button" class="help" aria-label="?" data-i18n-title="priceUnknown.help">?</button>
         </label>
       </div>
 
       <div class="field">
         <label for="from"><span data-i18n="date.label">Zeitraum</span>
-          <button type="button" class="help" aria-label="?" data-i18n-title="date.help"
-                  title="Angezeigt werden Festivals, die in diesem Zeitraum beginnen. Das Startdatum ist mit heute vorbelegt, das Enddatum bleibt offen, bis du eines setzt.">?</button>
+          <button type="button" class="help" aria-label="?" data-i18n-title="date.help">?</button>
         </label>
         <div class="row dates">
           <input type="date" id="from" data-i18n-aria="date.from" aria-label="Frühester Start">
@@ -103,14 +94,12 @@
         <label class="check">
           <input type="checkbox" id="date-unknown">
           <span data-i18n="dateUnknown.label">Festivals ohne Termin mitzeigen</span>
-          <button type="button" class="help" aria-label="?" data-i18n-title="dateUnknown.help"
-                  title="Manche Festivals haben noch keinen bestätigten Termin für die nächste Ausgabe. Mit Haken erscheinen sie trotzdem, mit dem Hinweis auf die letzte bekannte Ausgabe.">?</button>
+          <button type="button" class="help" aria-label="?" data-i18n-title="dateUnknown.help">?</button>
         </label>
         <label class="check">
           <input type="checkbox" id="show-cancelled">
           <span data-i18n="cancelled.label">Abgesagte Festivals mitzeigen</span>
-          <button type="button" class="help" aria-label="?" data-i18n-title="cancelled.help"
-                  title="Einige Ausgaben sind in den Quellen als abgesagt gemeldet. Sie bleiben standardmäßig ausgeblendet; mit Haken erscheinen sie deutlich gekennzeichnet.">?</button>
+          <button type="button" class="help" aria-label="?" data-i18n-title="cancelled.help">?</button>
         </label>
       </div>
     </div>
@@ -118,15 +107,11 @@
     <figure class="map-wrap">
       <canvas id="map" width="1000" height="440"></canvas>
       <div class="map-tools">
-        <button type="button" class="help" aria-label="?" data-i18n-title="map.help"
-                title="Der rote Kreis zeigt deinen Umkreis, das grüne Kreuz deinen Wohnort. Nach der Bandauswahl erscheinen die passenden Festivals als Pins — gelb ab 50 Prozent Übereinstimmung. Mausrad zoomt, Ziehen verschiebt, ein Klick auf einen Pin springt zum Eintrag.">?</button>
-        <button type="button" id="zoom-in" class="ghost small" data-i18n-title="map.zoomIn"
-                title="Näher heranzoomen. Am Mausrad geht es auch — der Punkt unter dem Zeiger bleibt dabei liegen.">+</button>
-        <button type="button" id="zoom-out" class="ghost small" data-i18n-title="map.zoomOut"
-                title="Weiter herauszoomen.">−</button>
+        <button type="button" class="help" aria-label="?" data-i18n-title="map.help">?</button>
+        <button type="button" id="zoom-in" class="ghost small" data-i18n-title="map.zoomIn">+</button>
+        <button type="button" id="zoom-out" class="ghost small" data-i18n-title="map.zoomOut">−</button>
         <button type="button" id="zoom-reset" class="ghost small" data-i18n="map.reset"
-                data-i18n-title="map.resetTitle"
-                title="Zurück zur Ausgangsansicht, in der der Suchradius genau ins Bild passt. Doppelklick auf die Karte tut dasselbe.">Ansicht zurücksetzen</button>
+                data-i18n-title="map.resetTitle">Ansicht zurücksetzen</button>
       </div>
       <figcaption id="map-caption" data-i18n="map.captionNoHome">Wohnort eingeben, um den Suchradius zu sehen.</figcaption>
     </figure>
@@ -153,8 +138,7 @@
           <span data-i18n="mode.off">Ohne beides</span>
         </label>
       </div>
-      <button type="button" class="help" aria-label="?" data-i18n-title="mode.help"
-              title="Gefiltert wird entweder nach Bands oder nach Genre, nicht nach beidem. „Nach Bands“ zeigt Festivals mit deinen Acts, „Nach Genre“ solche mit passender Musikrichtung, jeweils sortiert nach Übereinstimmung. „Ohne beides“ zeigt alle Festivals, die zu Wohnort, Umkreis, Preis und Termin passen.">?</button>
+      <button type="button" class="help" aria-label="?" data-i18n-title="mode.help">?</button>
     </div>
 
     <div id="band-block">
@@ -163,8 +147,7 @@
 
       <div class="field">
         <label for="band-search"><span data-i18n="bands.searchLabel">Band suchen</span>
-          <button type="button" class="help" aria-label="?" data-i18n-title="bands.searchHelp"
-                  title="Ab zwei Zeichen wird gesucht. Die Trefferliste zeigt, auf wie vielen Festivals eine Band insgesamt spielt — die häufigsten zuerst.">?</button>
+          <button type="button" class="help" aria-label="?" data-i18n-title="bands.searchHelp">?</button>
         </label>
         <input type="text" id="band-search" placeholder="z. B. Powerwolf, Wolf Alice, Deichkind …">
         <p class="hint" id="band-hint"></p>
@@ -176,8 +159,7 @@
         <div class="chosen-head">
           <h3><span data-i18n="bands.chosen">Ausgewählt</span> <span class="badge" id="chosen-count">0</span></h3>
           <button type="button" id="clear-bands" class="ghost small" data-i18n="bands.clear"
-                  data-i18n-title="bands.clearTitle"
-                  title="Leert die komplette Bandauswahl und setzt die Trefferliste zurück.">Alle entfernen</button>
+                  data-i18n-title="bands.clearTitle">Alle entfernen</button>
         </div>
         <ul class="chips" id="chosen-list"></ul>
       </div>
@@ -192,15 +174,13 @@
       <div class="chosen-head genre-actions">
         <p class="hint" id="genre-hint"></p>
         <button type="button" id="clear-genres" class="ghost small" data-i18n="genre.clear"
-                data-i18n-title="genre.clearTitle"
-                title="Hebt die komplette Genreauswahl auf und setzt die Trefferliste zurück.">Alle entfernen</button>
+                data-i18n-title="genre.clearTitle">Alle entfernen</button>
       </div>
 
       <label class="check">
         <input type="checkbox" id="genre-unknown">
         <span data-i18n="genreUnknown.label">Festivals ohne Genreangabe mitzeigen</span>
-        <button type="button" class="help" aria-label="?" data-i18n-title="genreUnknown.help"
-                title="Für rund 800 Festivals nennt keine Quelle eine Musikrichtung. Ohne Haken bleiben sie beim Genrefilter außen vor, mit Haken erscheinen sie am Ende der Liste ohne Prozentwert.">?</button>
+        <button type="button" class="help" aria-label="?" data-i18n-title="genreUnknown.help">?</button>
       </label>
     </div>
   </section>
@@ -212,8 +192,7 @@
     <div class="sort-row">
       <label for="sort" data-i18n="sort.label">Sortieren nach</label>
       <select id="sort"></select>
-      <button type="button" class="help" aria-label="?" data-i18n-title="sort.help"
-              title="Bestimmt die Reihenfolge der Trefferliste. Mit Bandauswahl steht die Übereinstimmung voran, mit Genreauswahl der Termin; Entfernung, Preis und Datum lassen sich jederzeit stattdessen wählen. Festivals ohne Angabe — kein Preis, kein Termin, kein Ort — stehen dabei immer am Ende.">?</button>
+      <button type="button" class="help" aria-label="?" data-i18n-title="sort.help">?</button>
     </div>
 
     <p class="stat" id="result-stat" data-i18n="res.needBand">Wähle mindestens eine Band.</p>
@@ -223,8 +202,7 @@
   <!-- ============ Rückmeldung ============ -->
   <section class="panel" id="step-feedback">
     <h2><span class="num">✉</span> <span data-i18n="fb.title">Rückmeldung</span>
-      <button type="button" class="help" aria-label="?" data-i18n-title="fb.help"
-              title="Fehlt ein Festival, stimmt ein Termin nicht, oder fehlt dir eine Funktion? Der Knopf öffnet dein E-Mail-Programm mit fertig vorbereitetem Text — abgeschickt wird erst dort von dir. Die Seite selbst verschickt nichts.">?</button>
+      <button type="button" class="help" aria-label="?" data-i18n-title="fb.help">?</button>
     </h2>
     <p class="lead" data-i18n="fb.lead">Fehlendes Festival, falscher Termin, Wunsch oder Kritik — alles willkommen.</p>
 
@@ -256,12 +234,10 @@
 
     <div class="feedback-actions">
       <a id="fb-send" class="btn-link" href="mailto:waldsprenger@gmail.com" data-i18n="fb.send"
-         data-i18n-title="fb.sendTitle"
-         title="Öffnet dein E-Mail-Programm mit Betreff und Text. Abgeschickt wird erst dort von dir.">
+         data-i18n-title="fb.sendTitle">
         E-Mail-Programm öffnen</a>
       <button type="button" id="fb-copy" class="ghost" data-i18n="fb.copy"
-              data-i18n-title="fb.copyTitle"
-              title="Kopiert Adresse und Nachricht in die Zwischenablage — praktisch, wenn kein E-Mail-Programm eingerichtet ist.">
+              data-i18n-title="fb.copyTitle">
         Text kopieren</button>
       <span class="fb-mail">waldsprenger@gmail.com</span>
     </div>
@@ -276,8 +252,7 @@
       <p class="support-text" data-i18n="support.text">Diese Seite entsteht in Handarbeit und läuft ohne Werbung.
         Wenn sie dir das Suchen erspart, freue ich mich über einen Beitrag zu Pflege und Betrieb.</p>
       <a class="paypal" href="https://paypal.me/Waldsperger" target="_blank" rel="noopener"
-         data-i18n="support.button" data-i18n-title="support.buttonTitle"
-         title="Öffnet paypal.me in einem neuen Tab. Der Betrag ist frei wählbar, die Seite bleibt in jedem Fall kostenlos und vollständig nutzbar.">
+         data-i18n="support.button" data-i18n-title="support.buttonTitle">
         Mit PayPal unterstützen</a>
     </div>
 
@@ -286,8 +261,7 @@
       <a href="datenschutz.html" data-i18n="footer.privacy">Datenschutz</a>
       <a href="https://github.com/Waldsprenger/festival-finder/commits/main"
          target="_blank" rel="noopener"
-         data-i18n="footer.changelog" data-i18n-title="footer.changelogTitle"
-         title="Öffnet die Änderungshistorie auf GitHub in einem neuen Tab — jeder Eintrag beschreibt, was sich geändert hat.">Änderungen</a>
+         data-i18n="footer.changelog" data-i18n-title="footer.changelogTitle">Änderungen</a>
     </nav>
     <p class="src" id="legal-note" hidden data-i18n="legal.germanOnly"></p>
     <p class="src">Festival- und Lineup-Daten zusammengetragen von
@@ -313,6 +287,7 @@
 <script src="config.js"></script>
 <script src="i18n.js"></script>
 <script src="data.js"></script>
+<script src="karte.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

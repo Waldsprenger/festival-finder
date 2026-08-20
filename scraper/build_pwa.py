@@ -83,7 +83,7 @@ def main() -> None:
     sw = """/* erzeugt von build_pwa.py */
 const CACHE = 'festival-finder-v__VERSION__';
 const DATEIEN = ['./', './index.html', './style.css', './fonts.css',
-                 './app.js', './i18n.js', './config.js', './data.js',
+                 './karte.js', './app.js', './i18n.js', './config.js', './data.js',
                  './impressum.html', './datenschutz.html',
                  './manifest.webmanifest'];
 

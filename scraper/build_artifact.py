@@ -68,6 +68,7 @@ def main() -> None:
     # Ohne config.js laeuft die Seite ebenfalls - app.js prueft window.CONFIG
     config = read("config.js", pflicht=False)
     data = read("data.js")
+    karte = read("karte.js")
     app = read("app.js")
 
     main_body = body_of(read("index.html"))
@@ -89,6 +90,7 @@ def main() -> None:
     legal = html_ascii(legal)
     css = html_ascii(css)
     data = js_ascii(data)
+    karte = js_ascii(karte)
     app = js_ascii(app)
     i18n = js_ascii(i18n)
     config = js_ascii(config)
@@ -112,6 +114,9 @@ html, body {{ background: #0b0b0d; }}
 </script>
 <script>
 {data}
+</script>
+<script>
+{karte}
 </script>
 <script>
 {app}

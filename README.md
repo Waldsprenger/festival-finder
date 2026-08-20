@@ -41,6 +41,19 @@ als einer Quelle · [Änderungshistorie](https://github.com/Waldsprenger/festiva
 | `scraper/build_artifact.py` | → `site/artifact.html`, alles in einer Datei |
 | `scraper/daily_update.py` | führt die Kette aus, protokolliert nach `data/update.log` |
 
+Und in `site/` die Seite selbst — reines HTML, CSS und JavaScript, kein
+Bauschritt, keine Bibliothek:
+
+| Datei | Aufgabe |
+|---|---|
+| `site/index.html` | das Gerüst: drei Schritte, Rückmeldung, Fuß |
+| `site/style.css` | Aussehen, inklusive der Regeln fürs Telefon |
+| `site/karte.js` | die Landkarte auf Canvas: Umrisse, Umkreis, Pins, Zoom |
+| `site/app.js` | Sprache, Filter, Auswahl, Trefferliste, Rahmen |
+| `site/i18n.js` | 189 Texte in zehn Sprachen |
+| `site/config.js` | einzige Einstellung: Kennung für die Zugriffszählung |
+| `site/data.js` | die Daten, von `build_site.py` erzeugt |
+
 ## Selbst bauen
 
 ```bash
@@ -219,6 +232,14 @@ dagegen nicht auf.
 Reines HTML und JavaScript, kein Server, keine Cookies, keine fremden Dateien.
 Alle Daten stehen in `site/data.js` als Zahlenreihen: Bands und Genres nur als
 Index, das drückt 5.741 Festivals mit 40.543 Acts auf 6,3 MB.
+
+Der Code liegt in zwei Teilen: `karte.js` zeichnet die Landkarte und kennt vom
+Rest nur vier Handgriffe (`start`, `zeichnen`, `setzePins`, `zentrieren`);
+`app.js` kümmert sich um alles andere. Deutsche Texte stehen ausschließlich in
+`i18n.js` — auch die Hilfetexte hinter den Fragezeichen, die früher zusätzlich
+im HTML standen und dort auseinanderliefen. Zahlen in diesen Texten kommen aus
+den Daten (`Für {ohnePreis} Festivals nennt die Quelle keinen Preis`), damit
+sie nicht in zehn Sprachen veralten.
 
 **Schritt 1 — Rahmen setzen.** Wohnort per Postleitzahl (auch „1010 AT" zur
 Trennung von Österreich und Schweiz) oder Ortsname, gesucht im mitgelieferten
