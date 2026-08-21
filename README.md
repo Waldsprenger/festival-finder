@@ -4,7 +4,7 @@ Acht Festivalverzeichnisse, zu einem Bestand zusammengeführt, plus eine
 statische Webseite, die daraus nach Band oder Genre filtert. Ein Datenlauf
 hält beides aktuell, ohne dass ein Rechner dafür laufen muss.
 
-**Stand:** 5.740 Festivals in 42 Ländern, 40.547 Acts, 1.569 Festivals aus mehr
+**Stand:** 5.518 Festivals in 42 Ländern, 40.547 Acts, 1.571 Festivals aus mehr
 als einer Quelle · [Änderungshistorie](https://github.com/Waldsprenger/festival-finder/commits/main)
 
 ```
@@ -41,7 +41,7 @@ als einer Quelle · [Änderungshistorie](https://github.com/Waldsprenger/festiva
 | `scraper/build_pwa.py` | Manifest, App-Symbole, Service Worker |
 | `scraper/build_artifact.py` | → `site/artifact.html`, alles in einer Datei |
 | `scraper/daily_update.py` | führt die Kette aus, protokolliert nach `data/update.log` |
-| `tests/` | 195 Tests für Schlüssel, Stufen, Leser, Preise und Wächter |
+| `tests/` | 208 Tests für Schlüssel, Stufen, Leser, Preise, Sprachdatei und Wächter |
 
 Und in `site/` die Seite selbst — reines HTML, CSS und JavaScript, kein
 Bauschritt, keine Bibliothek:
@@ -55,6 +55,7 @@ Bauschritt, keine Bibliothek:
 | `site/i18n.js` | 189 Texte in zehn Sprachen |
 | `site/config.js` | einzige Einstellung: Kennung für die Zugriffszählung |
 | `site/data.js` | die Daten, von `build_site.py` erzeugt |
+| `site/orte.js` | das große Ortsverzeichnis, nur bei Bedarf nachgeladen |
 
 ## Selbst bauen
 
@@ -165,7 +166,7 @@ Ausnahme davon:
 | 3 | gleicher Starttermin + Ort + gemeinsamer Namensteil | „Kosmos Festival" gegen „Kosmos Festival Chemnitz" |
 | 4 | überlappender Zeitraum + Ort **oder Spielstätte**, Name steckt im anderen | um einen Tag versetzte Termine (Neuborn Open Air), Gemeinde gegen Spielstätte (Thallichtenberg / Burg Lichtenberg) |
 | 5 | ähnliche Schreibweise (82 %), gleicher Ort, überlappender Zeitraum | „SonneMondSterne", „Elbriot", „Szigit" |
-| 6 | gleicher Name, eine Quelle ohne Termin | Übersichtsseiten ohne bestätigtes Datum |
+| 6 | gleicher Name, eine Quelle ohne Termin, gleicher Ort **oder dieselbe offizielle Adresse** | Übersichtsseiten ohne bestätigtes Datum |
 | 7 | dieselbe Quelle, identischer Name, gleicher Ort, überlappender Termin | „Nacht Wacht XL" und „Nachtwacht XL", beide von wannafest |
 
 Die Stadt gehört ab Stufe 1 zum Schlüssel, sonst verschmölze das *Irish Spring
@@ -180,7 +181,11 @@ Name vollständig im anderen stecken — ein gemeinsames Wort allein reicht nich
 sonst träfen sich „METAStadt Open Air Wien" und „Afrika Tage Wien" über die
 Stadt im Namen. Stufe 6 sucht über den Namen statt über den Jahrgang, den
 terminlose Einträge gar nicht haben; kommen mehrere Jahrgänge infrage, gewinnt
-der früheste Termin. Stufe 7 lässt zum Schluss auch zwei Einträge derselben
+der früheste Termin. Vier von fünf terminlosen Einträgen nennen allerdings auch
+keinen Ort — mit dem Ortsvergleich allein blieben 222 Doppeleinträge stehen,
+Karten ohne Termin, ohne Stadt, ohne Preis. Sie nennen aber die offizielle
+Adresse, und `kosmosfestival.fi` gehört genau einem Fest; führt dieselbe
+Adresse zu mehreren Städten, bleibt der Eintrag lieber stehen. Stufe 7 lässt zum Schluss auch zwei Einträge derselben
 Quelle zusammen, aber nur bei identischem Namensschlüssel, gleichem Ort und
 überlappendem Termin — zwei Ausgaben desselben Festivals im selben Jahr
 (Heartbeatz im Juni und im September) bleiben dadurch getrennt.
@@ -252,10 +257,11 @@ gelesen. Spannen liefern den unteren Wert, „Spende" und „Zahl was du willst"
 ergeben 0 € — ein solcher Nachsatz hinter einer Preisangabe hebt den Preis
 dagegen nicht auf.
 
-Angezeigt wird der Text der Quelle, nicht die umgerechnete Zahl: „VVK 18,60 €"
-statt „ab 18,60 € (VVK 18,60 €)". Umgerechnet wird nur, was in fremder Währung
-dasteht („ab 168,38 € (VVK 158,85 CHF)"); der umgerechnete Wert dient ohnehin
-vor allem dem Preisregler und der Sortierung.
+Angezeigt wird der Quelltext nur dann, wenn er mehr sagt als die Zahl selbst:
+„VVK 22,50 € | AK 24 €" nennt zwei Preise, „ab 12,90 Eur" nur den einen —
+daraus wurde früher „ab 12,90 € (ab 12,90 Eur)", zweimal dasselbe. Umgerechnet
+wird, was in fremder Währung dasteht („ab 168,38 € (VVK 158,85 CHF)"); der
+umgerechnete Wert dient ohnehin vor allem dem Preisregler und der Sortierung.
 
 **Tagesaktuelle Preise gibt es nicht — aber die Veränderung.** Die Quellen
 nennen fast immer den Preis zum Verkaufsstart und schreiben ihn selten fort.
@@ -276,7 +282,7 @@ verschwinden, fallen aus der Datei — sonst wüchse sie mit jedem Jahrgang.
 
 Reines HTML und JavaScript, kein Server, keine Cookies, keine fremden Dateien.
 Alle Daten stehen in `site/data.js` als Zahlenreihen: Bands und Genres nur als
-Index, das drückt 5.740 Festivals mit 40.547 Acts auf 6,1 MB (2,1 MB über die
+Index, das drückt 5.518 Festivals mit 40.547 Acts auf 6,1 MB (2,1 MB über die
 Leitung, weil GitHub Pages komprimiert).
 
 Der Code liegt in zwei Teilen: `karte.js` zeichnet die Landkarte und kennt vom
@@ -287,9 +293,28 @@ im HTML standen und dort auseinanderliefen. Zahlen in diesen Texten kommen aus
 den Daten (`Für {ohnePreis} Festivals nennt die Quelle keinen Preis`), damit
 sie nicht in zehn Sprachen veralten.
 
-**Schritt 1 — Rahmen setzen.** Wohnort per Postleitzahl (auch „1010 AT" zur
-Trennung von Österreich und Schweiz) oder Ortsname, gesucht im mitgelieferten
-Verzeichnis; Nominatim nur, wenn lokal nichts passt. Dazu Umkreis, Höchstpreis
+**Schritt 1 — Rahmen setzen.** Der Wohnort lässt sich in ganz Europa angeben,
+per Postleitzahl oder Ortsname; daraus rechnet die Seite jede Entfernung. Vier
+Stufen, von der billigsten zur teuersten:
+
+1. **Mitgeliefert** (in `data.js`): die Postleitzahlen von DE/AT/CH und alle
+   Orte ab 15.000 Einwohnern in Europa, DE/AT/CH vollständig. Damit ist der
+   Normalfall ohne einen einzigen Netzabruf beantwortet.
+2. **Nachgeladen** (`site/orte.js`, 1,9 MB übertragen): 155.344 Orte bis
+   hinunter zu kleinen Gemeinden und 24.893 Postleitzahlen der Länder, deren
+   Codes höchstens vierstellig sind. Die Datei kommt erst, wenn die kleine
+   Tabelle nichts hergibt — wer „97209" eingibt, lädt sie nie.
+3. **Nominatim**, strukturiert gefragt (`postalcode` plus `countrycodes`), für
+   fünfstellige Codes wie „75001 FR".
+4. Bleibt auch das ohne Treffer, sagt die Seite das — statt still den falschen
+   Ort zu nehmen.
+
+Warum die Aufteilung: „1012" gibt es in Lausanne **und** in Amsterdam. Wer
+„1012 NL" eingibt, bekam früher die Schweiz, weil nur DACH-Codes vorlagen und
+das genannte Land ignoriert wurde. Und Nominatim hilft dort nicht: „75001 FR"
+findet der Dienst, „1012 NL" nicht — niederländische Codes sind dort nur mit
+ihrem Buchstabenteil erfasst („1012 AB"). Genau diese Länder liegen jetzt in
+der nachladbaren Tabelle. Dazu Umkreis, Höchstpreis
 und Zeitraum, jeweils mit Schalter „auch ohne Angabe zeigen", und einer für
 abgesagte Festivals. Die Karte ist ein Canvas aus mitgelieferten Vektorgrenzen
 — keine Kartenkacheln, also erfährt kein fremder Server, wo jemand sucht.
@@ -354,7 +379,7 @@ die Kontrolltabelle `uebersicht.html`.
 pip install pytest && python -m pytest tests -q
 ```
 
-195 Tests in unter einer Sekunde, ohne Netz und ohne Datenbestand. Sie halten
+208 Tests in unter einer Sekunde, ohne Netz und ohne Datenbestand. Sie halten
 fest, warum die Regeln so aussehen, wie sie aussehen — fast jeder Fall stand
 einmal falsch in den Daten:
 
@@ -368,6 +393,8 @@ einmal falsch in den Daten:
 | `tests/test_lauf.py` | Selbstprüfung und Einbruchsmeldung |
 | `tests/test_ausgabe.py` | die Prüfung der Zahlenreihen vor dem Ausliefern |
 | `tests/test_preisverlauf.py` | erster und heutiger Preis über mehrere Läufe |
+| `tests/test_gazetteer.py` | welche Postleitzahlen mitgeliefert und welche nachgeladen werden |
+| `tests/test_oberflaeche.py` | die Sprachdatei: Anführungszeichen, zehn Sprachen, Platzhalter, Schlüssel |
 
 Der Workflow führt sie vor jedem Datenlauf aus: Ein Fehler in der Logik soll
 auffallen, bevor er sich in die veröffentlichten Daten schreibt.

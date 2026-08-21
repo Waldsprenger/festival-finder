@@ -831,6 +831,9 @@ WF_DRAUSSEN = {"outdoor", "buiten", "draussen", "draußen", "strand", "beach",
                "boot", "park"}
 WF_FESTIVALWORT = re.compile(r"(?i)festival|open ?air|openair|\bfest\b|"
                              r"weekender|\bdagen\b|\bdays\b|\bfestivals\b")
+#: Nennt die Seite keine Spielstätte, steht an ihrer Stelle der nächste Knopf.
+#: Ohne diesen Riegel stand auf acht Karten "Tickets Ticket" als Ort.
+WF_KEINE_STAETTE = re.compile(r"(?i)^(?:tickets?\b|get |buy |more |website\b|infos?\b)")
 
 
 def wf_adressen(since: int) -> list[str]:
@@ -892,7 +895,7 @@ def wf_lesen(url: str, html: str) -> dict | None:
         "wannafest", url, name,
         date_from=date_from, date_to=date_to,
         city=clean(lm.group(1)) if lm else "", country=country,
-        venue=venue if len(venue) <= 60 else "",
+        venue=venue if len(venue) <= 60 and not WF_KEINE_STAETTE.match(venue) else "",
         website=website,
     )
 

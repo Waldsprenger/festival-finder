@@ -15,11 +15,16 @@ from datetime import date
 from gemeinsam import DATA
 
 
+#: Zeichen, die man nicht sieht und trotzdem stören: schmales Leerzeichen,
+#: geschütztes Leerzeichen, Nullbreiten-Zeichen, Schreibrichtungsmarken.
+UNSICHTBAR = re.compile(r"[\u00a0\u200b-\u200f\u2028\u2029\u202a-\u202e\ufeff]")
+
+
 def clean(text: str | None) -> str:
-    """Mehrfache Leerzeichen und Zeilenumbrüche zu einem Leerzeichen."""
+    """Ein Name in einer Zeile: unsichtbare Zeichen weg, Leerraum vereinheitlicht."""
     if not text:
         return ""
-    return re.sub(r"\s+", " ", text).strip()
+    return re.sub(r"\s+", " ", UNSICHTBAR.sub(" ", text)).strip()
 
 
 # --------------------------------------------------------------------------

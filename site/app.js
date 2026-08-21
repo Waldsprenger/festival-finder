@@ -165,6 +165,63 @@
 
   /* ---------------- Wohnort bestimmen ---------------- */
 
+  /* Das mitgelieferte Verzeichnis deckt DE/AT/CH vollständig ab und das
+     übrige Europa ab 15.000 Einwohnern. Alles darunter steht in site/orte.js
+     und wird erst geholt, wenn jemand danach sucht - als <script>, damit es
+     auch beim Öffnen per Doppelklick (file://) funktioniert, wo fetch()
+     scheitert. In der gebündelten Einzelseite gibt es die Datei nicht; dort
+     bleibt es beim kleinen Verzeichnis. */
+  let europaVerzeichnis = null;
+
+  function ortsverzeichnisEuropa() {
+    if (europaVerzeichnis) return europaVerzeichnis;
+    europaVerzeichnis = new Promise((fertig) => {
+      if (window.ORTE_EUROPA) return fertig(window.ORTE_EUROPA);
+      // Die Datei setzt window.ORTE_EUROPA = {orte, plz}
+      const skript = document.createElement('script');
+      skript.src = 'orte.js';
+      skript.onload = () => fertig(window.ORTE_EUROPA || null);
+      skript.onerror = () => fertig(null);
+      document.head.append(skript);
+    });
+    return europaVerzeichnis;
+  }
+
+  /** Postleitzahl im nachgeladenen Verzeichnis, sonst null. */
+  async function plzNachladen(code, land) {
+    const europa = await ortsverzeichnisEuropa();
+    const treffer = (europa && europa.plz || []).filter(
+      (p) => p[0] === code && (!land || fold(p[4]) === land));
+    if (!treffer.length) return null;
+    const pick = treffer[0];
+    const andere = treffer.filter((p) => p[4] !== pick[4]).map((p) => p[4]);
+    return {
+      lat: pick[2], lon: pick[3],
+      label: `${pick[0]} ${pick[1]} (${pick[4]})`,
+      ambiguous: andere.length ? andere : null,
+    };
+  }
+
+  /** Einen Ortsnamen in einem Verzeichnis suchen: genau, sonst am Wortanfang. */
+  function ortSuchen(verzeichnis, needle) {
+    let exact = null, prefix = null, weitere = 0;
+    for (const [name, lat, lon, cc] of verzeichnis) {
+      const f = fold(name);
+      if (f === needle) {
+        if (exact) { weitere++; continue; }
+        exact = { lat, lon, label: `${name} (${cc})` };
+      } else if (f.startsWith(needle)) {
+        if (prefix) { weitere++; continue; }
+        prefix = { lat, lon, label: `${name} (${cc})` };
+      }
+    }
+    const treffer = exact || prefix;
+    if (!treffer) return null;
+    if (exact && prefix) weitere++;
+    if (weitere) treffer.ambiguousName = weitere;
+    return treffer;
+  }
+
   async function geocode(query) {
     const q = query.trim();
     if (!q) return null;
@@ -175,22 +232,33 @@
     if (pm) {
         const code = pm[1];
         const rest = fold(pm[2] || '');
-        const hits = (D.plz || []).filter((p) => p[0] === code);
+        // "1012 NL" nennt ein Land, "1012 AB" ist eine niederländische
+        // Postleitzahl, "97209 Veitshöchheim" nennt den Ort.
+        const laender = new Set((D.laender || []).map((c) => c.toLowerCase()));
+        const genanntesLand = laender.has(rest) ? rest : '';
+        // "1012 AB" ist eine niederländische Postleitzahl, keine Ortsangabe -
+        // dafür ist Nominatim zuständig, unsere Tabelle führt nur die Zahl.
+        const buchstabenteil = !genanntesLand && /^[a-z]{1,3}$/.test(rest);
+        let hits = buchstabenteil ? [] : (D.plz || []).filter((p) => p[0] === code);
+        if (genanntesLand) hits = hits.filter((p) => fold(p[4]) === genanntesLand);
         if (hits.length) {
             let pick = hits[0];
-            if (rest) {
-                pick = hits.find((p) => fold(p[4]) === rest)
-                    || hits.find((p) => fold(p[1]).startsWith(rest))
-                    || pick;
+            if (rest && !genanntesLand) {
+                pick = hits.find((p) => fold(p[1]).startsWith(rest)) || pick;
             }
-            const alt = hits.filter((p) => p[4] !== pick[4]).map((p) => p[4]);
+            const andere = hits.filter((p) => p[4] !== pick[4]).map((p) => p[4]);
             return {
                 lat: pick[2], lon: pick[3],
                 label: `${pick[0]} ${pick[1]} (${pick[4]})`,
-                ambiguous: alt.length ? alt : null,
+                ambiguous: andere.length ? andere : null,
             };
         }
-        return { notFound: code };
+        // Mitgeliefert sind die Postleitzahlen von DE/AT/CH. Für die übrigen
+        // Länder liegt die Tabelle in orte.js und wird jetzt nachgeladen.
+        if (!buchstabenteil) {
+          const fern = await plzNachladen(code, genanntesLand);
+          if (fern) return fern;
+        }
     }
 
     // 2. Ortsverzeichnis (GeoNames), nach Einwohnerzahl sortiert - der erste
@@ -215,13 +283,40 @@
       return treffer;
     }
 
-    // 3. Nur wenn lokal nichts passt: Nominatim (OpenStreetMap).
-    //    In der veroeffentlichten Fassung blockiert die Sicherheitsrichtlinie
-    //    externe Aufrufe - dann bleibt es beim Ergebnis aus Schritt 1.
+    // 3. Kleinerer Ort in Europa: das große Verzeichnis nachladen und dort
+    //    dieselbe Suche noch einmal führen.
+    const europa = await ortsverzeichnisEuropa();
+    if (europa && europa.orte) {
+      const weiterer = ortSuchen(europa.orte, needle);
+      if (weiterer) return weiterer;
+    }
+
+    // 4. Nur wenn auch dort nichts passt: Nominatim (OpenStreetMap).
+    //    In der eingebetteten Fassung blockiert die Sicherheitsrichtlinie
+    //    externe Aufrufe - dann bleibt es bei den Schritten davor.
+    //    Eine Postleitzahl wird strukturiert gefragt: Als Freitext lieferte
+    //    "1012 NL" die Hausnummer "42-1012" irgendwo.
+    const felder = new URLSearchParams({ format: 'jsonv2', limit: '1',
+                                         'accept-language': sprache });
+    if (pm) {
+      const rest = (pm[2] || '').trim();
+      const laender = new Set((D.laender || []).map((c) => c.toLowerCase()));
+      if (laender.has(fold(rest))) {
+        felder.set('postalcode', pm[1]);
+        felder.set('countrycodes', fold(rest));
+      } else if (/^[A-Za-z]{1,3}$/.test(rest)) {
+        // Der Buchstabenteil gehört zur Postleitzahl ("1012 AB", "SW1A 1AA")
+        felder.set('postalcode', `${pm[1]} ${rest.toUpperCase()}`);
+      } else {
+        felder.set('postalcode', pm[1]);
+        if (rest) felder.set('city', rest);
+      }
+    } else {
+      felder.set('q', q);
+    }
     try {
-      const url = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1' +
-        '&accept-language=de&q=' + encodeURIComponent(q);
-      const res = await fetch(url, { headers: { Accept: 'application/json' } });
+      const res = await fetch('https://nominatim.openstreetmap.org/search?' + felder,
+                              { headers: { Accept: 'application/json' } });
       if (res.ok) {
         const hits = await res.json();
         if (hits.length) {
@@ -235,7 +330,9 @@
       }
     } catch (_) { /* offline oder blockiert */ }
 
-    return null;
+    // Wer eine Postleitzahl eingegeben hat, soll das auch hören - "Ort nicht
+    // gefunden" führt sonst auf die falsche Fährte.
+    return pm ? { notFound: pm[1] } : null;
   }
 
   async function resolveHome() {
@@ -511,14 +608,28 @@
     const raw = (row[PRICE_RAW] || '').trim();
     if (row[EUR] == null) return (raw || t('card.priceUnknown')) + seit;
 
-    // Steht der Betrag in Euro schon im Quelltext, ist er die Anzeige - sonst
-    // stünde dort "ab 18,60 € (VVK 18,60 €)", zweimal dasselbe. Nur bei
-    // fremder Währung lohnt die Umrechnung, und dann bleibt der Originalpreis
-    // dahinter stehen.
     const eur = `${row[EUR].toLocaleString(sprache, { minimumFractionDigits: 2 })} €`;
-    const inEuro = /(€|EUR)/i.test(raw);
-    const heute = inEuro ? raw : `${t('card.from')} ${eur}${raw ? ` (${raw})` : ''}`;
-    return heute + seit;
+    // Fremde Währung: umgerechnet zeigen, den Originalpreis dahinter.
+    if (FREMDWAEHRUNG.test(raw)) return `${t('card.from')} ${eur} (${raw})` + seit;
+    // Sonst den Quelltext nur zeigen, wenn er mehr sagt als die Zahl selbst.
+    return (preisZusatz(raw) ? raw : `${t('card.from')} ${eur}`) + seit;
+  }
+
+  //: Währungen, die erst umgerechnet vergleichbar sind
+  const FREMDWAEHRUNG = /\b(CHF|GBP|USD|DKK|SEK|NOK|PLN|CZK|HUF)\b|£|\$/i;
+
+  /** Was bleibt vom Preistext, wenn Betrag, Währung und "ab" weg sind?
+
+      "ab 12,90 Eur" sagt nichts, was die Zahl nicht schon sagt — angezeigt
+      wurde daraus "ab 12,90 € (ab 12,90 Eur)", zweimal dasselbe. "VVK 22,50 €
+      | AK 24 €" dagegen trägt zwei Preise und gehört im Wortlaut auf die
+      Karte. */
+  function preisZusatz(raw) {
+    return raw
+      .replace(/\d+(?:[.,]\d+)?/g, ' ')
+      .replace(/€|\bEUR\b|\bab\b|\bfrom\b/gi, ' ')
+      .replace(/[^\p{L}]+/gu, ' ')
+      .trim();
   }
 
   /* ---------------- Sortierung ----------------

@@ -12,6 +12,7 @@ data/update.log
 data/failed.txt
 data/verortung.json
 site/data.js
+site/orte.js
 site/artifact.html
 site/fonts.css
 site/manifest.webmanifest

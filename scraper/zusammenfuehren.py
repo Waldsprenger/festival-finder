@@ -11,6 +11,7 @@ Festivals gleichen Namens in verschiedenen Städten erst recht.
 from __future__ import annotations
 
 import difflib
+from urllib.parse import urlparse
 
 from gemeinsam import ausser_europa, land_code
 from quellen import RANG
@@ -158,6 +159,16 @@ def _aehnlich(x: str, y: str) -> bool:
 def eng(name: str) -> str:
     """Namensschlüssel ohne Leerzeichen."""
     return festival_key(name).replace(" ", "")
+
+
+def adresse(url: str) -> str:
+    """Der Rechnername einer Adresse, ohne www und Schrägstrich.
+
+    "https://www.Kosmosfestival.fi/" und "http://kosmosfestival.fi" sind
+    dieselbe Seite - und damit dasselbe Fest.
+    """
+    wirt = urlparse((url or "").strip().lower()).netloc
+    return wirt[4:] if wirt.startswith("www.") else wirt
 
 
 # --------------------------------------------------------------------------
@@ -420,6 +431,11 @@ def stufe6_ohne_termin(merged: dict) -> None:
         v = city_key(mit["venue"])
         return bool(v and (v == sb or v in sb or sb in v))
 
+    def webseite_passt(mit: dict, ohne: dict) -> bool:
+        """Dieselbe offizielle Adresse - dann ist es dasselbe Fest."""
+        a, b = adresse(mit["website"]), adresse(ohne["website"])
+        return bool(a and a == b)
+
     datiert: dict[str, list[tuple]] = {}
     for key, rec in merged.items():
         if rec["date_from"]:
@@ -430,10 +446,19 @@ def stufe6_ohne_termin(merged: dict) -> None:
         if ohne is None:
             continue
         schluessel = eng(ohne_key[0])
-        treffer = [(k, r) for k, r in datiert.get(schluessel[:5], [])
-                   if k in merged
-                   and (eng(k[0]) == schluessel or schreibweise_gleich(r["name"], ohne["name"]))
-                   and ort_passt(r, ohne)]
+        gleichnamig = [(k, r) for k, r in datiert.get(schluessel[:5], [])
+                       if k in merged
+                       and (eng(k[0]) == schluessel
+                            or schreibweise_gleich(r["name"], ohne["name"]))]
+        treffer = [(k, r) for k, r in gleichnamig if ort_passt(r, ohne)]
+        if not treffer:
+            # Vier von fünf terminlosen Einträgen nennen gar keinen Ort - wohl
+            # aber die offizielle Adresse. Sie gehört genau einem Fest und ist
+            # damit der bessere Anker. Nur wenn alle Kandidaten in derselben
+            # Stadt liegen: sonst wäre offen, welches Fest gemeint ist.
+            treffer = [(k, r) for k, r in gleichnamig if webseite_passt(r, ohne)]
+            if len({city_key(r["city"]) for _, r in treffer}) > 1:
+                treffer = []
         if not treffer:
             continue
         _, mit = min(treffer, key=lambda kr: tag_zahl(kr[1]["date_from"]))

@@ -6,7 +6,8 @@ an denen die Leser sich einmal verschluckt haben.
 
 import pytest
 
-from quellen import QUELLEN, RANG, datensatz, fa_lesen, fh_lesen, fp_lesen, ft_bands
+from quellen import (QUELLEN, RANG, datensatz, fa_lesen, fh_lesen, fp_lesen,
+                     ft_bands, wf_lesen)
 
 
 class TestDatensatz:
@@ -149,6 +150,26 @@ class TestFestapp:
 
     def test_ohne_datenblatt_kein_datensatz(self):
         assert fp_lesen("u", "<html><body>nichts</body></html>") is None
+
+
+class TestWannafest:
+    def seite(self, hinter_dem_land):
+        return ("<html><head><title>Beispielfest - WannaFest</title></head><body>"
+                "Date July 3, 2026 to July 5, 2026 "
+                f"Location Haarlem, Netherlands {hinter_dem_land} Place Type Outdoor"
+                "</body></html>")
+
+    def test_spielstaette_wird_uebernommen(self):
+        rec = wf_lesen("https://wannafest.com/x", self.seite("Festivalterrein Zuiderpark"))
+        assert rec["city"] == "Haarlem"
+        assert rec["country"] == "NL"
+        assert rec["venue"] == "Festivalterrein Zuiderpark"
+
+    def test_knopfbeschriftung_ist_keine_spielstaette(self):
+        # Ohne Spielstätte steht dort der nächste Knopf - acht Karten trugen
+        # deshalb "Tickets Ticket" als Ort.
+        rec = wf_lesen("https://wannafest.com/x", self.seite("Tickets Ticket"))
+        assert rec["venue"] == ""
 
 
 def test_quellenreihenfolge_bestimmt_den_rang():

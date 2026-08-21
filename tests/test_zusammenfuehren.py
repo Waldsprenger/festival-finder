@@ -172,6 +172,32 @@ class TestStufe6OhneTermin:
         assert len(ergebnis["01.06.2026"]["sources"]) == 2      # die terminlose kam hierher
         assert len(ergebnis["01.06.2027"]["sources"]) == 1
 
+    def test_ohne_ortsangabe_hilft_die_offizielle_adresse(self):
+        # Vier von fünf terminlosen Einträgen nennen keinen Ort. Die Adresse
+        # kosmosfestival.fi gehört aber genau einem Fest.
+        a = fund("festivalticker", "Kosmos Festival", von="09.07.2026",
+                 stadt="Närhilä", land="FI", website="https://kosmosfestival.fi/")
+        b = fund("festivalsunited", "Kosmos Festival", land="FI",
+                 website="http://www.kosmosfestival.fi")
+        [ergebnis] = fuehre_zusammen(a, b)
+        assert ergebnis["city"] == "Närhilä"
+
+    def test_fremde_adresse_verbindet_nichts(self):
+        a = fund("festivalticker", "Beispielfest", von="09.07.2026", stadt="Bonn",
+                 website="https://beispielfest-bonn.de")
+        b = fund("festivalsunited", "Beispielfest", website="https://beispielfest.at")
+        assert len(fuehre_zusammen(a, b)) == 2
+
+    def test_zwei_orte_bleiben_unentschieden(self):
+        # Dieselbe Adresse führt zwei Feste - welches gemeint ist, steht nicht
+        # fest, also bleibt der terminlose Eintrag stehen.
+        a = fund("festivalticker", "Sommerfest", von="01.06.2026", stadt="Bonn",
+                 website="https://veranstalter.de")
+        b = fund("festivalticker", "Sommerfest", von="01.08.2026", stadt="Kiel",
+                 website="https://veranstalter.de")
+        c = fund("festivalsunited", "Sommerfest", website="https://veranstalter.de")
+        assert len(fuehre_zusammen(a, b, c)) == 3
+
 
 class TestStufe7GleicheQuelle:
     def test_dieselbe_quelle_fuehrt_dasselbe_fest_zweimal(self):

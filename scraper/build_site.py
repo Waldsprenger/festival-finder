@@ -11,9 +11,10 @@ from __future__ import annotations
 import json
 import math
 import re
+import sys
 from datetime import datetime
 
-from gemeinsam import DATA, EUROPA_RAHMEN, SITE, land_code, lies_json
+from gemeinsam import DATA, EUROPA_CODES, EUROPA_RAHMEN, SITE, land_code, lies_json
 from genres import OBERBEGRIFFE, oberbegriffe
 from text import fold
 
@@ -412,6 +413,9 @@ def main() -> None:
         "genres": genre_keys,
         "festivals": zeilen,
         "places": [[n, round(la, 3), round(lo, 3), cc] for n, la, lo, cc in orte],
+        # Damit die Seite "1012 NL" (Land) von "1012 AB" (niederländischer
+        # Postleitzahlteil) unterscheiden kann
+        "laender": EUROPA_CODES,
         "plz": [[c, o, round(la, 3), round(lo, 3), cc] for c, o, la, lo, cc in plz],
         "world": lies_json(DATA / "welt_grob.json", []),
         "worldFine": lies_json(DATA / "welt_fein.json", []),
@@ -423,6 +427,27 @@ def main() -> None:
         "minDate": frueheste_monatsgrenze(zeilen),
     }
     pruefe_zeilen(zeilen, bands, genre_keys)
+    # Das große Ortsverzeichnis kommt in eine eigene Datei: Wer eine
+    # Postleitzahl aus DE/AT/CH oder eine größere Stadt eingibt, braucht es
+    # nie - die Seite lädt es erst nach, wenn die kleine Liste nichts hergibt.
+    europa = verortung.get("orte") or gazetteer
+    plz_europa = verortung.get("plz_nachladen") or []
+    orte_ziel = SITE / "orte.js"
+    orte_ziel.write_text(
+        "window.ORTE_EUROPA = " + json.dumps({
+            "orte": [[n, round(la, 3), round(lo, 3), cc] for n, la, lo, cc in europa],
+            "plz": [[c, o, round(la, 3), round(lo, 3), cc]
+                    for c, o, la, lo, cc in plz_europa],
+        }, ensure_ascii=False, separators=(",", ":")) + ";\n",
+        encoding="utf-8")
+    print(f"{orte_ziel}  ({orte_ziel.stat().st_size / 1e6:.1f} MB zum Nachladen: "
+          f"{len(europa)} Orte, {len(plz_europa)} Postleitzahlen)")
+    if not plz_europa:
+        # Ohne verortung.json bleibt nur das mitgelieferte Verzeichnis: Wohnorte
+        # in DE/AT/CH gehen weiter, ausländische Postleitzahlen nicht mehr.
+        print("  ! verortung.json fehlt - keine ausländischen Postleitzahlen",
+              file=sys.stderr)
+
     ziel = SITE / "data.js"
     ziel.write_text(als_javascript(payload), encoding="utf-8")
 

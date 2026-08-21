@@ -49,7 +49,8 @@
           <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="home.help">?</button>
         </label>
         <div class="row">
-          <input type="text" id="home" placeholder="z. B. 97209" inputmode="numeric"
+          <input type="text" id="home" data-i18n-ph="home.placeholder"
+                 placeholder="z. B. 97209 oder Amsterdam"
                  autocomplete="postal-code">
           <button type="button" id="locate" class="ghost" data-i18n="home.search"
                   data-i18n-title="home.searchTitle">Suchen</button>
@@ -149,7 +150,8 @@
         <label for="band-search"><span data-i18n="bands.searchLabel">Band suchen</span>
           <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="bands.searchHelp">?</button>
         </label>
-        <input type="text" id="band-search" placeholder="z. B. Powerwolf, Wolf Alice, Sportfreunde Stiller …">
+        <input type="text" id="band-search" data-i18n-ph="bands.placeholder"
+               placeholder="z. B. Powerwolf, Wolf Alice, Sportfreunde Stiller …">
         <p class="hint" id="band-hint"></p>
       </div>
 

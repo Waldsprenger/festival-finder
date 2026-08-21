@@ -109,24 +109,35 @@ def orte_sammeln(ab_einwohnern: int, vollstaendig: list[str]) -> dict[tuple[str,
     return orte
 
 
-def postleitzahlen(laender: list[str] | None) -> list[list]:
-    """Je Postleitzahl der erste Zustellbereich.
+def postleitzahlen() -> list[list]:
+    """Je Postleitzahl der erste Zustellbereich, für ganz Europa.
 
-    Ohne Länderliste kommt die Weltdatei und wird auf Europa gefiltert; das
-    spart vierzig einzelne Abrufe.
+    Eine einzige Weltdatei statt vierzig Länderabrufe; gefiltert wird hier.
     """
     gesehen: dict[tuple[str, str], list] = {}
-    quellen = [f"{cc}.zip" for cc in laender] if laender else ["allCountries.zip"]
-    for datei in quellen:
-        print(f"Postleitzahlen: {datei}", flush=True)
-        for r in zeilen(datei, art="zip"):
-            code, cc = r[Z_CODE].strip().replace(" ", ""), r[Z_CC]
-            if not code or cc not in EUROPA or not r[Z_LAT] or not r[Z_LON]:
-                continue
-            gesehen.setdefault((code, cc), [code, r[Z_ORT].strip(),
-                                            round(float(r[Z_LAT]), 4),
-                                            round(float(r[Z_LON]), 4), cc])
+    print("Postleitzahlen: allCountries.zip", flush=True)
+    for r in zeilen("allCountries.zip", art="zip"):
+        code, cc = r[Z_CODE].strip().replace(" ", ""), r[Z_CC]
+        if not code or cc not in EUROPA or not r[Z_LAT] or not r[Z_LON]:
+            continue
+        gesehen.setdefault((code, cc), [code, r[Z_ORT].strip(),
+                                        round(float(r[Z_LAT]), 4),
+                                        round(float(r[Z_LON]), 4), cc])
     return sorted(gesehen.values(), key=lambda e: (e[4], e[0]))
+
+
+def kurze_codes(alle: list[list]) -> set[str]:
+    """Länder mit höchstens vierstelligen Postleitzahlen.
+
+    Genau an denen scheitert Nominatim: "75001 FR" findet der Dienst, "1012 NL"
+    nicht, weil niederländische Codes dort nur mit ihrem Buchstabenteil erfasst
+    sind. Für diese Länder lohnt die eigene Tabelle — sie wird nachgeladen,
+    nicht mitgeliefert.
+    """
+    laenge: dict[str, int] = {}
+    for code, _ort, _la, _lo, cc in alle:
+        laenge[cc] = max(laenge.get(cc, 0), len(code))
+    return {cc for cc, n in laenge.items() if n <= 4}
 
 
 def main() -> None:
@@ -139,18 +150,24 @@ def main() -> None:
     print(f"{GAZETTEER}  ({GAZETTEER.stat().st_size / 1e6:.1f} MB, "
           f"{len(schlank)} Orte)")
 
-    plz_dach = postleitzahlen(FEIN)
+    plz_europa = postleitzahlen()
+    plz_dach = [e for e in plz_europa if e[4] in FEIN]
     schreib_json(PLZ, plz_dach, kompakt=True)
-    print(f"{PLZ}  ({PLZ.stat().st_size / 1e6:.2f} MB, {len(plz_dach)} Postleitzahlen)")
+    print(f"{PLZ}  ({PLZ.stat().st_size / 1e6:.2f} MB, {len(plz_dach)} Postleitzahlen "
+          f"für {', '.join(FEIN)})")
 
     # --- nur zum Bauen: so genau wie möglich ------------------------------
     fein = orte_sammeln(1000, FEIN_BAU)
-    plz_europa = postleitzahlen(None)
     # Beide Tabellen in derselben Form wie die mitgelieferten:
     # Postleitzahl bzw. Name, dann Breite, Länge, Land.
+    # Einmal bestimmen, nicht je Eintrag - sonst läuft es nie durch.
+    kurz = kurze_codes(plz_europa) - set(FEIN)
     schreib_json(VERORTUNG, {
         "plz": [[e[0], e[2], e[3], e[4]] for e in plz_europa],
         "orte": [e[:4] for e in fein.values()],
+        # Für die nachladbare Fassung der Webseite: Postleitzahlen der Länder,
+        # die Nominatim nicht beantwortet, mit Ortsnamen für die Anzeige.
+        "plz_nachladen": [e for e in plz_europa if e[4] in kurz],
     }, kompakt=True)
     print(f"{VERORTUNG}  ({VERORTUNG.stat().st_size / 1e6:.1f} MB, "
           f"{len(plz_europa)} Postleitzahlen, {len(fein)} Orte)")
