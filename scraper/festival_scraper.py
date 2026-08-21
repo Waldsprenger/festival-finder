@@ -19,6 +19,7 @@ import csv
 import sys
 import time
 from datetime import date, datetime
+from urllib.parse import urlparse
 
 import netz
 from gemeinsam import DATA, EUROPA_CODES, liegt_in_europa, lies_json, schreib_json
@@ -61,6 +62,15 @@ def einlesen(quelle: Quelle, urls: list[str]) -> list[dict]:
     return funde
 
 
+def haeuser(adressen: list[str]) -> dict[str, int]:
+    """Nicht ladbare Adressen je Rechnername — welche Quelle hakt, nicht welche Seite."""
+    zaehler: dict[str, int] = {}
+    for eintrag in adressen:
+        haus = urlparse(eintrag.split(" ")[0]).netloc
+        zaehler[haus] = zaehler.get(haus, 0) + 1
+    return dict(sorted(zaehler.items(), key=lambda p: -p[1]))
+
+
 def pruefe_ausbeute(funde: dict[str, int], festivals: int) -> list[str]:
     """Vergleicht die Ausbeute mit dem letzten Lauf und meldet Einbrüche.
 
@@ -74,7 +84,13 @@ def pruefe_ausbeute(funde: dict[str, int], festivals: int) -> list[str]:
     warnungen = []
     for name, jetzt in funde.items():
         frueher = vorher.get("quellen", {}).get(name)
-        if frueher and jetzt < frueher * 0.8:
+        if not jetzt:
+            # Ohne diesen Fall bleibt die schlimmste Störung stumm: Eine Null
+            # ist als Maßstab unbrauchbar (`0 < 0 * 0.8` ist falsch), also
+            # meldete der Vergleich nichts - und beim Lauf auf fremden Servern
+            # lieferte festivalticker über Monate nichts, ohne dass es auffiel.
+            warnungen.append(f"{name}: kein einziger Fund")
+        elif frueher and jetzt < frueher * 0.8:
             warnungen.append(f"{name}: {jetzt} statt {frueher} Funde")
     frueher_gesamt = vorher.get("festivals")
     if frueher_gesamt and festivals < frueher_gesamt * 0.8:
@@ -245,6 +261,8 @@ def main() -> None:
         "festivals": len(festivals),
         "warnungen": warnungen,
         "nicht_ladbar": len(netz.FEHLGESCHLAGEN),
+        "nicht_ladbar_je_haus": haeuser(netz.FEHLGESCHLAGEN),
+        "meldungen": netz.MELDUNGEN[:40],
     })
 
     acts = len({b for f in festivals for b in f["lineup"]})

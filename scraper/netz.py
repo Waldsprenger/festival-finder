@@ -33,6 +33,8 @@ _lokal = threading.local()
 
 #: Adressen, die auch nach drei Versuchen nicht antworteten
 FEHLGESCHLAGEN: list[str] = []
+#: Hinweise der Leser, etwa auf eine Listenseite ohne Inhalt
+MELDUNGEN: list[str] = []
 
 
 def einstellen(max_age_h: float, frisch: bool) -> None:
@@ -167,5 +169,10 @@ def json_ld_events(html: str) -> list[dict]:
 
 
 def melde(text: str) -> None:
-    """Hinweis auf die Fehlerausgabe — Listenseiten, die nicht antworten."""
+    """Hinweis auf die Fehlerausgabe — Listenseiten, die nicht antworten.
+
+    Gesammelt wird er außerdem: Beim Lauf auf fremden Servern liest niemand
+    die Fehlerausgabe, wohl aber den Bericht, der mitveröffentlicht wird.
+    """
+    MELDUNGEN.append(text)
     print(f"  ! {text}", file=sys.stderr)

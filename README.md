@@ -374,10 +374,17 @@ schaltet den frischen Lauf ein. Mitveröffentlicht werden die Ausgaben unter
 Kontrolltabelle `uebersicht.html` und `lauf.json`.
 
 `lauf.json` ist der Zustandsbericht des letzten Laufs: Funde je Quelle,
-Festivals gesamt, Einbruchsmeldungen, Zahl der nicht ladbaren Seiten. Er steht
-dort, weil das Protokoll eines fremden Servers niemandem zugänglich ist — eine
-Quelle, die dort nichts liefert (etwa weil sie Rechenzentrums-Adressen
-abweist), fiele sonst nur als etwas kleinere Gesamtzahl auf.
+Festivals gesamt, Einbruchsmeldungen, nicht ladbare Seiten je Rechnername und
+die Hinweise der Leser. Er steht dort, weil das Protokoll eines fremden Servers
+niemandem zugänglich ist — und genau dort blieb eine Störung monatelang
+verborgen: **festivalticker liefert beim Lauf auf GitHub-Servern nichts**, vom
+eigenen Rechner aus dagegen 1.966 Festivals. Der Verdacht fällt auf die
+Rechenzentrums-Adressen; die veröffentlichte Fassung hat deshalb rund 800
+Festivals weniger als ein Lauf zu Hause.
+
+Der Wächter schwieg dabei, weil eine Null als Maßstab unbrauchbar ist:
+`0 < 0 * 0.8` ist falsch, also verglich er nichts mehr. Jetzt meldet er jede
+Quelle, die gar nichts liefert — unabhängig davon, was sie früher lieferte.
 
 ## Tests
 

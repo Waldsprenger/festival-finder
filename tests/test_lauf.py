@@ -41,6 +41,18 @@ class TestSelbstpruefung:
         assert lauf.pruefe_stimmigkeit([juni, september]) == []
 
 
+class TestFehlerherkunft:
+    def test_nicht_ladbare_adressen_je_haus(self):
+        assert lauf.haeuser([
+            "https://www.festivalticker.de/2026/ (HTTPError)",
+            "https://www.festivalticker.de/alle-festivals/ (HTTPError)",
+            "https://festapp.io/x (Timeout)",
+        ]) == {"www.festivalticker.de": 2, "festapp.io": 1}
+
+    def test_ohne_fehler_leeres_verzeichnis(self):
+        assert lauf.haeuser([]) == {}
+
+
 class TestEinbruchswaechter:
     def stand(self, tmp_path, monkeypatch, inhalt=None):
         monkeypatch.setattr(lauf, "DATA", tmp_path)
@@ -61,6 +73,19 @@ class TestEinbruchswaechter:
         self.stand(tmp_path, monkeypatch,
                    '{"quellen": {"festivalticker": 1000}, "festivals": 900}')
         assert lauf.pruefe_ausbeute({"festivalticker": 950}, 890) == []
+
+    def test_gar_kein_fund_wird_gemeldet(self, tmp_path, monkeypatch):
+        # Die schlimmste Störung war die stumme: Eine Null taugt nicht als
+        # Maßstab, also verglich niemand mehr - festivalticker lieferte beim
+        # Lauf auf fremden Servern monatelang nichts, ohne eine Zeile Protokoll.
+        self.stand(tmp_path, monkeypatch,
+                   '{"quellen": {"festivalticker": 0}, "festivals": 900}')
+        warnungen = lauf.pruefe_ausbeute({"festivalticker": 0}, 890)
+        assert warnungen == ["festivalticker: kein einziger Fund"]
+
+    def test_null_meldet_auch_ohne_massstab(self, tmp_path, monkeypatch):
+        self.stand(tmp_path, monkeypatch)
+        assert lauf.pruefe_ausbeute({"festivalticker": 0}, 890)
 
     def test_massstab_bleibt_bis_es_wieder_stimmt(self, tmp_path, monkeypatch):
         import json
