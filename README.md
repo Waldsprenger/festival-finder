@@ -4,7 +4,7 @@ Acht Festivalverzeichnisse, zu einem Bestand zusammengeführt, plus eine
 statische Webseite, die daraus nach Band oder Genre filtert. Ein Datenlauf
 hält beides aktuell, ohne dass ein Rechner dafür laufen muss.
 
-**Stand:** 5.518 Festivals in 42 Ländern, 40.547 Acts, 1.571 Festivals aus mehr
+**Stand:** 5.524 Festivals in 42 Ländern, 40.547 Acts, 1.571 Festivals aus mehr
 als einer Quelle · [Änderungshistorie](https://github.com/Waldsprenger/festival-finder/commits/main)
 
 ```
@@ -322,7 +322,7 @@ verschwinden, fallen aus der Datei — sonst wüchse sie mit jedem Jahrgang.
 
 Reines HTML und JavaScript, kein Server, keine Cookies, keine fremden Dateien.
 Alle Daten stehen in `site/data.js` als Zahlenreihen: Bands und Genres nur als
-Index, das drückt 5.518 Festivals mit 40.547 Acts auf 6,1 MB (2,1 MB über die
+Index, das drückt 5.524 Festivals mit 40.547 Acts auf 6,1 MB (2,1 MB über die
 Leitung, weil GitHub Pages komprimiert).
 
 Der Code liegt in zwei Teilen: `karte.js` zeichnet die Landkarte und kennt vom
