@@ -25,6 +25,7 @@ import netz
 from gemeinsam import DATA, EUROPA_CODES, liegt_in_europa, lies_json, schreib_json
 from quellen import FT_STAMM, QUELLEN, Quelle
 from preisverlauf import verfolgen
+import schnappschuss
 from text import city_key, festival_key, tag_zahl
 from zusammenfuehren import (alias_kollisionen, band_registry, zeitraum_ueberlappt,
                              zusammenfuehren)
@@ -86,7 +87,8 @@ def gruende(adressen: list[str]) -> dict[str, int]:
     return dict(sorted(zaehler.items(), key=lambda p: -p[1]))
 
 
-def pruefe_ausbeute(funde: dict[str, int], festivals: int) -> list[str]:
+def pruefe_ausbeute(funde: dict[str, int], festivals: int,
+                    mitgebracht: dict[str, str] | None = None) -> list[str]:
     """Vergleicht die Ausbeute mit dem letzten Lauf und meldet Einbrüche.
 
     Ändert eine Quelle ihren Seitenaufbau, liefert ihr Leser plötzlich weniger
@@ -97,7 +99,19 @@ def pruefe_ausbeute(funde: dict[str, int], festivals: int) -> list[str]:
     stand = DATA / "quellen_stand.json"
     vorher = lies_json(stand, {})
     warnungen = []
+    mitgebracht = mitgebracht or {}
+    for name, datum in mitgebracht.items():
+        # Die Quelle bedient diesen Lauf nicht, ihr Stand liegt aber bei.
+        # Zu melden ist deshalb nicht ihr Schweigen, sondern sein Alter.
+        tage = schnappschuss.alter_in_tagen(datum)
+        if tage is None:
+            warnungen.append(f"{name}: mitgebrachter Stand ohne lesbares Datum")
+        elif tage > schnappschuss.ALTERSGRENZE_TAGE:
+            warnungen.append(f"{name}: mitgebrachter Stand vom {datum} "
+                             f"ist {tage} Tage alt")
     for name, jetzt in funde.items():
+        if name in mitgebracht:
+            continue
         frueher = vorher.get("quellen", {}).get(name)
         if not jetzt:
             # Ohne diesen Fall bleibt die schlimmste Störung stumm: Eine Null
@@ -225,10 +239,23 @@ def main() -> None:
 
     records: list[dict] = []
     funde: dict[str, int] = {}
+    mitgebracht: dict[str, str] = {}
     for quelle in QUELLEN:
         urls = adressen[quelle.name]
         gefunden = einlesen(quelle, urls[:args.limit] if args.limit else urls)
         funde[quelle.name] = len(gefunden)
+        if gefunden:
+            # Was dieser Lauf erreicht hat, bekommt der nächste mit, der es
+            # nicht erreicht. Ein Teillauf (--limit) taugt dafür nicht.
+            if not args.limit and schnappschuss.schreiben(quelle.name, gefunden):
+                print(f"  Stand von {quelle.name} abgelegt "
+                      f"({schnappschuss.datei(quelle.name).stat().st_size / 1e6:.2f} MB)")
+        else:
+            gefunden, stand = schnappschuss.lesen(quelle.name)
+            if gefunden:
+                mitgebracht[quelle.name] = stand
+                print(f"  {quelle.name} antwortet nicht - Stand vom {stand} "
+                      f"mit {len(gefunden)} Datensätzen")
         records += gefunden
     print(f"Datensätze: {len(records)}", flush=True)
 
@@ -262,7 +289,7 @@ def main() -> None:
     # liefert naturgemäß weniger.
     warnungen: list[str] = []
     if not args.limit:
-        warnungen = pruefe_ausbeute(funde, len(festivals))
+        warnungen = pruefe_ausbeute(funde, len(festivals), mitgebracht)
         for warnung in warnungen:
             print(f"  ! Einbruch gegenüber dem letzten Lauf: {warnung}", file=sys.stderr)
 
@@ -273,6 +300,7 @@ def main() -> None:
     schreib_json(DATA / "lauf.json", {
         "stand": datetime.now().astimezone().strftime("%Y-%m-%dT%H:%M%z"),
         "quellen": funde,
+        "mitgebrachter_stand": mitgebracht,
         "festivals": len(festivals),
         "warnungen": warnungen,
         "nicht_ladbar": len(netz.FEHLGESCHLAGEN),

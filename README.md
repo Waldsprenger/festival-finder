@@ -32,6 +32,8 @@ als einer Quelle · [Änderungshistorie](https://github.com/Waldsprenger/festiva
 | `scraper/festival_scraper.py` | Ablauf und Ausgaben → `data/festivals.json` + CSV |
 | `scraper/genres.py` | Genre-Freitext → 17 Oberbegriffe |
 | `scraper/preisverlauf.py` | merkt sich, was ein Ticket zuerst und was es heute kostet |
+| `scraper/schnappschuss.py` | legt den Stand einer Quelle ab, die nicht jeder Lauf erreicht |
+| `scraper/stand_auffrischen.py` | frischt genau diesen Stand auf, sonst nichts (`.ps1`: samt Veröffentlichen) |
 | `scraper/geocode.py` | Ortskoordinaten von Nominatim → `data/geo.json` |
 | `scraper/build_gazetteer.py` | Ortsverzeichnisse aus GeoNames: klein für den Browser, groß fürs Verorten |
 | `scraper/build_map.py` | Kartenumrisse aus Natural Earth |
@@ -41,7 +43,7 @@ als einer Quelle · [Änderungshistorie](https://github.com/Waldsprenger/festiva
 | `scraper/build_pwa.py` | Manifest, App-Symbole, Service Worker |
 | `scraper/build_artifact.py` | → `site/artifact.html`, alles in einer Datei |
 | `scraper/daily_update.py` | führt die Kette aus, protokolliert nach `data/update.log` |
-| `tests/` | 208 Tests für Schlüssel, Stufen, Leser, Preise, Sprachdatei und Wächter |
+| `tests/` | 231 Tests für Schlüssel, Stufen, Leser, Preise, Sprachdatei und Wächter |
 
 Und in `site/` die Seite selbst — reines HTML, CSS und JavaScript, kein
 Bauschritt, keine Bibliothek:
@@ -120,10 +122,42 @@ Die Sperren werden nicht umgangen: Ein Cloudflare-Schutz ist eine Entscheidung
 des Betreibers. Dasselbe gilt für **festivalticker** — mit einer Besonderheit,
 die lange niemand sah: Vom eigenen Rechner antwortet die Seite normal (200),
 dem täglichen Lauf auf GitHub-Servern dagegen mit **403 auf jede einzelne
-Listenseite**. Der veröffentlichten Fassung fehlen dadurch rund 800 Festivals,
-die ein Lauf zu Hause findet. Nach fünf Absagen fragt der Lauf dort für den
-Rest des Durchgangs nicht weiter — 213 abgewiesene Anfragen je Lauf sind
-niemandem gedient. Gespeicherte Seiten kommen weiter aus dem Cache.
+Listenseite**. Nach fünf Absagen fragt der Lauf dort für den Rest des
+Durchgangs nicht weiter — 213 abgewiesene Anfragen je Lauf sind niemandem
+gedient. Gespeicherte Seiten kommen weiter aus dem Cache.
+
+### Ein Stand, den der Lauf mitbringt
+
+Damit der veröffentlichten Fassung deswegen nicht rund 800 Festivals fehlen,
+legt der Lauf zu Hause ab, was er von festivalticker geholt hat:
+`data/schnappschuss/festivalticker.json.gz`, rund 0,6 MB, mitversioniert. Der
+Serverlauf liest die Datei, wenn seine eigene Anfrage nichts einbringt. Keine
+Sperre wird dabei umgangen — die Daten stammen aus einem Abruf, den die Seite
+selbst beantwortet hat.
+
+Zwei Regeln halten das ehrlich, beide durch Tests festgehalten:
+
+* **Geschrieben** wird nur, was auch gefunden wurde. Ein Lauf mit null Funden
+  lässt die Datei unangetastet — sonst löschte ausgerechnet der Server, was
+  der eigene Rechner mitgebracht hat. Teilläufe (`--limit`) schreiben nie.
+* **Gelesen** wird nur, wenn die Quelle im Lauf selbst nichts hergibt. Solange
+  sie antwortet, gilt ihre Antwort.
+
+Der Wächter meldet für eine mitgebrachte Quelle nicht mehr ihr Schweigen,
+sondern das Alter ihres Standes: ab drei Wochen steht es als Warnung im
+Bericht und in der Zusammenfassung des Laufs.
+
+Aufgefrischt wird er von diesem Rechner, ohne Handgriff: Eine Aufgabe der
+Windows-Aufgabenplanung startet abends `scraper/stand_auffrischen.ps1`, das
+holt nur diese eine Quelle (`scraper/stand_auffrischen.py`, wenige Minuten),
+und veröffentlicht das Ergebnis nur, wenn es sich geändert hat. War der
+Rechner aus, holt die Aufgabe den Lauf beim nächsten Einschalten nach. Der
+Push stößt zugleich den Serverlauf an, der den neuen Stand dann mitliest.
+
+Der Stand ist so frisch wie der letzte Lauf zu Hause. Vom Aufräumen des
+Caches ist er nicht betroffen: Das löscht nur Dateien unter `cache/`, nur beim
+sonntäglichen `--frisch`-Lauf und nur, was seit einer Woche niemand angefasst
+hat. `data/schnappschuss/` liegt in der Versionsverwaltung, nicht im Cache.
 
 ## Vom Fund zum Festival
 
@@ -401,7 +435,7 @@ das andere wäre unsere eigene Ungeduld.
 pip install pytest && python -m pytest tests -q
 ```
 
-208 Tests in unter einer Sekunde, ohne Netz und ohne Datenbestand. Sie halten
+231 Tests in unter einer Sekunde, ohne Netz und ohne Datenbestand. Sie halten
 fest, warum die Regeln so aussehen, wie sie aussehen — fast jeder Fall stand
 einmal falsch in den Daten:
 
@@ -417,6 +451,7 @@ einmal falsch in den Daten:
 | `tests/test_preisverlauf.py` | erster und heutiger Preis über mehrere Läufe |
 | `tests/test_gazetteer.py` | welche Postleitzahlen mitgeliefert und welche nachgeladen werden |
 | `tests/test_oberflaeche.py` | die Sprachdatei: Anführungszeichen, zehn Sprachen, Platzhalter, Schlüssel |
+| `tests/test_schnappschuss.py` | der mitgebrachte Stand: füllen, lesen, nicht leeren lassen |
 
 Der Workflow führt sie vor jedem Datenlauf aus: Ein Fehler in der Logik soll
 auffallen, bevor er sich in die veröffentlichten Daten schreibt.
