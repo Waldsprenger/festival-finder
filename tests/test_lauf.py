@@ -66,6 +66,21 @@ class TestAbweisung:
             netz.abweisung_vermerken(f"https://beispiel.de/{i}", 403)
         assert netz.weist_ab("https://andere.de/x") is False
 
+    def test_hinweise_zum_gesperrten_rechner_verstummen(self):
+        # Sonst stehen vierzig Zeilen "Liste nicht ladbar" im Bericht und
+        # verdecken alles andere
+        self.vergessen()
+        netz.melde("Liste nicht ladbar: https://beispiel.de/erste/")
+        for i in range(netz.SPERRE_AB):
+            netz.abweisung_vermerken(f"https://beispiel.de/{i}", 403)
+        netz.melde("Liste nicht ladbar: https://beispiel.de/zweite/")
+        netz.melde("Liste nicht ladbar: https://andere.de/dritte/")
+        assert netz.MELDUNGEN == [
+            "Liste nicht ladbar: https://beispiel.de/erste/",
+            "beispiel.de weist den Lauf ab (403) - keine weiteren Anfragen dorthin",
+            "Liste nicht ladbar: https://andere.de/dritte/",
+        ]
+
     def test_nur_403_zaehlt(self):
         # 429 heisst "zu schnell", 500 ist eine Panne - beides keine Absage
         self.vergessen()

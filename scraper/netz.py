@@ -214,6 +214,13 @@ def melde(text: str) -> None:
 
     Gesammelt wird er außerdem: Beim Lauf auf fremden Servern liest niemand
     die Fehlerausgabe, wohl aber den Bericht, der mitveröffentlicht wird.
+
+    Von einem Rechner, der den Lauf ohnehin abweist, kommt keine Seite mehr -
+    das einmal zu sagen genügt, es vierzigmal zu wiederholen verdeckt nur die
+    übrigen Hinweise.
     """
+    adresse = re.search(r"https?://\S+", text)
+    if adresse and weist_ab(adresse.group()):
+        return
     MELDUNGEN.append(text)
     print(f"  ! {text}", file=sys.stderr)
