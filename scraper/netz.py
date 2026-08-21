@@ -77,7 +77,12 @@ def fetch(url: str, retries: int = 3) -> str | None:
             return r.text
         except Exception as exc:
             if versuch == retries - 1:
-                FEHLGESCHLAGEN.append(f"{url} ({exc.__class__.__name__})")
+                # Mit dem Statuscode: 403 ist eine Entscheidung des Betreibers,
+                # 429 oder 503 heißt "zu schnell" - das eine ist zu achten, das
+                # andere abzustellen.
+                code = getattr(getattr(exc, "response", None), "status_code", None)
+                art = exc.__class__.__name__ + (f" {code}" if code else "")
+                FEHLGESCHLAGEN.append(f"{url} ({art})")
                 return None
             time.sleep(2.0 * (versuch + 1))
     return None

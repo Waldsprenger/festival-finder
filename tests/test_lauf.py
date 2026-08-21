@@ -60,6 +60,11 @@ class TestFehlerherkunft:
             "https://festapp.io/x (HTTPError)",
         ]) == {"www.festivalticker.de ConnectionError": 2, "festapp.io HTTPError": 1}
 
+    def test_statuscode_bleibt_erhalten(self):
+        # 403 waere eine Entscheidung des Betreibers, 429 nur zu schnelles Fragen
+        assert lauf.gruende(["https://www.festivalticker.de/2026/ (HTTPError 403)"]) == {
+            "www.festivalticker.de HTTPError 403": 1}
+
 
 class TestEinbruchswaechter:
     def stand(self, tmp_path, monkeypatch, inhalt=None):
