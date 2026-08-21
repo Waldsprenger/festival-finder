@@ -987,6 +987,11 @@
      native Tooltip erhalten. */
 
   function initHelp() {
+    // Der Zustand gehört an den Knopf, sonst kündigt ein Screenreader das
+    // Aufklappen nicht an.
+    for (const btn of document.querySelectorAll('button.help')) {
+      btn.setAttribute('aria-expanded', 'false');
+    }
     const box = document.createElement('div');
     box.className = 'help-box';
     box.hidden = true;
@@ -997,7 +1002,10 @@
 
     function schliessen() {
       box.hidden = true;
-      if (offen) offen.classList.remove('on');
+      if (offen) {
+        offen.classList.remove('on');
+        offen.setAttribute('aria-expanded', 'false');
+      }
       offen = null;
     }
 
@@ -1005,6 +1013,7 @@
       box.textContent = btn.getAttribute('title') || '';
       box.hidden = false;
       btn.classList.add('on');
+      btn.setAttribute('aria-expanded', 'true');
       offen = btn;
 
       // unter dem Fragezeichen platzieren, aber im Fenster halten

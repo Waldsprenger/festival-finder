@@ -311,6 +311,29 @@ class Verorter:
 
 # --------------------------------------------------------------------------
 
+def pruefe_zeilen(zeilen: list, bands: list, genres: list) -> None:
+    """Die Zahlenreihen prüfen, bevor sie ausgeliefert werden.
+
+    Die Webseite liest jede Zeile über feste Spaltennummern und jede Band über
+    ihren Index. Stimmt daran etwas nicht, bleibt die Seite leer - und zwar
+    still. Deshalb lieber hier abbrechen: Dann behält die Veröffentlichung den
+    letzten guten Stand.
+    """
+    for nr, z in enumerate(zeilen):
+        if len(z) != 15:
+            raise ValueError(f"Zeile {nr} hat {len(z)} statt 15 Spalten")
+        if not isinstance(z[NAME], str) or not z[NAME]:
+            raise ValueError(f"Zeile {nr} ohne Namen")
+        if any(not 0 <= b < len(bands) for b in z[LINEUP]):
+            raise ValueError(f"{z[NAME]}: Bandnummer außerhalb der Liste")
+        if any(not 0 <= g < len(genres) for g in z[GENRES]):
+            raise ValueError(f"{z[NAME]}: Genrenummer außerhalb der Liste")
+        if (z[LAT] is None) != (z[LON] is None):
+            raise ValueError(f"{z[NAME]}: nur eine Koordinatenhälfte")
+        if z[EURO] is not None and not 0 <= z[EURO] <= 5000:
+            raise ValueError(f"{z[NAME]}: Preis {z[EURO]} ist unplausibel")
+
+
 def als_javascript(payload: dict) -> str:
     """Die Daten als JS-Datei — der Inhalt bleibt dabei JSON.
 
@@ -396,6 +419,7 @@ def main() -> None:
         "maxPriceEur": max_preis_eur(zeilen),
         "minDate": frueheste_monatsgrenze(zeilen),
     }
+    pruefe_zeilen(zeilen, bands, genre_keys)
     ziel = SITE / "data.js"
     ziel.write_text(als_javascript(payload), encoding="utf-8")
 

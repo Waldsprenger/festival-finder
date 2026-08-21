@@ -40,7 +40,7 @@ als einer Quelle · [Änderungshistorie](https://github.com/Waldsprenger/festiva
 | `scraper/build_pwa.py` | Manifest, App-Symbole, Service Worker |
 | `scraper/build_artifact.py` | → `site/artifact.html`, alles in einer Datei |
 | `scraper/daily_update.py` | führt die Kette aus, protokolliert nach `data/update.log` |
-| `tests/` | 178 Tests für Schlüssel, Stufen, Leser, Preise und Wächter |
+| `tests/` | 187 Tests für Schlüssel, Stufen, Leser, Preise und Wächter |
 
 Und in `site/` die Seite selbst — reines HTML, CSS und JavaScript, kein
 Bauschritt, keine Bibliothek:
@@ -282,6 +282,12 @@ fehlende Angaben immer am Ende. Gezeichnet wird in Stapeln — 25 Karten am
 Telefon, 50 am Rechner; alle 300 auf einmal ergaben eine Seite von 109.000
 Pixeln Höhe.
 
+`build_site.py` prüft seine eigene Ausgabe, bevor sie in die Datei geht: 15
+Spalten je Zeile, jede Bandnummer und jeder Genreindex innerhalb der Liste,
+Koordinaten immer paarweise, Preise im plausiblen Bereich. Stimmt etwas nicht,
+bricht der Lauf ab — dann bleibt die veröffentlichte Seite beim letzten guten
+Stand, statt still leer zu bleiben.
+
 **Schnell laden, auch bei schlechtem Netz.** Die Daten stehen als
 `window.DATA = JSON.parse('…')` in der Datei statt als JS-Objekt: Der Browser
 liest JSON etwa doppelt so schnell wie gleichwertigen Quelltext (gemessen 64
@@ -327,7 +333,7 @@ die Kontrolltabelle `uebersicht.html`.
 pip install pytest && python -m pytest tests -q
 ```
 
-178 Tests in unter einer Sekunde, ohne Netz und ohne Datenbestand. Sie halten
+187 Tests in unter einer Sekunde, ohne Netz und ohne Datenbestand. Sie halten
 fest, warum die Regeln so aussehen, wie sie aussehen — fast jeder Fall stand
 einmal falsch in den Daten:
 
@@ -339,6 +345,7 @@ einmal falsch in den Daten:
 | `tests/test_build_site.py` | Preisdeutung, Verortung, Auslieferung als JS |
 | `tests/test_genres.py` | Freitext zu Oberbegriffen, samt Irreführern |
 | `tests/test_lauf.py` | Selbstprüfung und Einbruchsmeldung |
+| `tests/test_ausgabe.py` | die Prüfung der Zahlenreihen vor dem Ausliefern |
 
 Der Workflow führt sie vor jedem Datenlauf aus: Ein Fehler in der Logik soll
 auffallen, bevor er sich in die veröffentlichten Daten schreibt.
