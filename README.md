@@ -117,7 +117,13 @@ ausdrücklich in seiner `robots.txt`), bachtrack.com (Liste wird im Browser
 zusammengesetzt, die Sitemap führt Kritiken) sowie festivalnetworks.com,
 musicfestadvisor.com und festivalcalendars.com (Listenartikel statt Datenbank).
 Die Sperren werden nicht umgangen: Ein Cloudflare-Schutz ist eine Entscheidung
-des Betreibers.
+des Betreibers. Dasselbe gilt für **festivalticker** — mit einer Besonderheit,
+die lange niemand sah: Vom eigenen Rechner antwortet die Seite normal (200),
+dem täglichen Lauf auf GitHub-Servern dagegen mit **403 auf jede einzelne
+Listenseite**. Der veröffentlichten Fassung fehlen dadurch rund 800 Festivals,
+die ein Lauf zu Hause findet. Nach fünf Absagen fragt der Lauf dort für den
+Rest des Durchgangs nicht weiter — 213 abgewiesene Anfragen je Lauf sind
+niemandem gedient. Gespeicherte Seiten kommen weiter aus dem Cache.
 
 ## Vom Fund zum Festival
 
@@ -384,7 +390,10 @@ Festivals weniger als ein Lauf zu Hause.
 
 Der Wächter schwieg dabei, weil eine Null als Maßstab unbrauchbar ist:
 `0 < 0 * 0.8` ist falsch, also verglich er nichts mehr. Jetzt meldet er jede
-Quelle, die gar nichts liefert — unabhängig davon, was sie früher lieferte.
+Quelle, die gar nichts liefert — unabhängig davon, was sie früher lieferte. Der
+Bericht nennt dazu die Fehlerart samt Statuscode (`www.festivalticker.de
+HTTPError 403`), denn 403 ist etwas anderes als 429: das eine ist zu achten,
+das andere wäre unsere eigene Ungeduld.
 
 ## Tests
 

@@ -13,6 +13,7 @@ import re
 import sys
 import threading
 import time
+from urllib.parse import urlparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -35,6 +36,10 @@ _lokal = threading.local()
 FEHLGESCHLAGEN: list[str] = []
 #: Hinweise der Leser, etwa auf eine Listenseite ohne Inhalt
 MELDUNGEN: list[str] = []
+#: Rechner, die den Lauf mit 403 abweisen, und wie oft
+ABGEWIESEN: dict[str, int] = {}
+#: So oft wird eine Ablehnung hingenommen, dann bleibt der Rechner in Ruhe
+SPERRE_AB = 5
 
 
 def einstellen(max_age_h: float, frisch: bool) -> None:
@@ -57,6 +62,32 @@ def _cachedatei(url: str):
     return CACHE / (hashlib.sha1(url.encode()).hexdigest() + ".html")
 
 
+def code_von(exc: Exception) -> int | None:
+    """Der Statuscode hinter einem Fehler, falls es einen gibt."""
+    return getattr(getattr(exc, "response", None), "status_code", None)
+
+
+def weist_ab(url: str) -> bool:
+    """Hat dieser Rechner den Lauf schon oft genug abgewiesen?"""
+    return ABGEWIESEN.get(urlparse(url).netloc, 0) >= SPERRE_AB
+
+
+def abweisung_vermerken(url: str, code: int | None) -> bool:
+    """Eine Ablehnung zählen; True, sobald der Rechner als abweisend gilt.
+
+    Ein 403 ist eine Entscheidung des Betreibers. Sie wird nicht umgangen -
+    aber auch nicht 213-mal je Lauf erneut ausprobiert: festivalticker weist
+    den Lauf auf fremden Servern bei jeder einzelnen Seite ab.
+    """
+    if code != 403:
+        return False
+    haus = urlparse(url).netloc
+    ABGEWIESEN[haus] = ABGEWIESEN.get(haus, 0) + 1
+    if ABGEWIESEN[haus] == SPERRE_AB:
+        melde(f"{haus} weist den Lauf ab (403) - keine weiteren Anfragen dorthin")
+    return ABGEWIESEN[haus] >= SPERRE_AB
+
+
 def fetch(url: str, retries: int = 3) -> str | None:
     """GET mit Plattencache; None, wenn die Seite nicht ladbar ist."""
     path = _cachedatei(url)
@@ -64,6 +95,10 @@ def fetch(url: str, retries: int = 3) -> str | None:
         alter_h = (time.time() - path.stat().st_mtime) / 3600
         if MAX_AGE_H <= 0 or alter_h < MAX_AGE_H:
             return path.read_text(encoding="utf-8", errors="replace")
+    # Gespeicherte Seiten kommen weiter aus dem Cache; nur neu gefragt wird
+    # dort nicht mehr, wo der Lauf ohnehin abgewiesen wird.
+    if weist_ab(url):
+        return None
     for versuch in range(retries):
         try:
             with BREMSE:
@@ -76,13 +111,14 @@ def fetch(url: str, retries: int = 3) -> str | None:
             path.write_text(r.text, encoding="utf-8", errors="replace")
             return r.text
         except Exception as exc:
-            if versuch == retries - 1:
-                # Mit dem Statuscode: 403 ist eine Entscheidung des Betreibers,
-                # 429 oder 503 heißt "zu schnell" - das eine ist zu achten, das
-                # andere abzustellen.
-                code = getattr(getattr(exc, "response", None), "status_code", None)
+            # Mit dem Statuscode: 403 ist eine Entscheidung des Betreibers,
+            # 429 oder 503 heißt "zu schnell" - das eine ist zu achten, das
+            # andere abzustellen. Gegen ein 403 hilft auch kein zweiter Anlauf.
+            code = code_von(exc)
+            if versuch == retries - 1 or code == 403:
                 art = exc.__class__.__name__ + (f" {code}" if code else "")
                 FEHLGESCHLAGEN.append(f"{url} ({art})")
+                abweisung_vermerken(url, code)
                 return None
             time.sleep(2.0 * (versuch + 1))
     return None

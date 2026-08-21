@@ -1,6 +1,7 @@
 """Die Wächter des Laufs: Selbstprüfung und Einbruchsmeldung."""
 
 import festival_scraper as lauf
+import netz
 import pytest
 
 
@@ -39,6 +40,39 @@ class TestSelbstpruefung:
         juni = festival(date_from="14.06.2026", date_to="14.06.2026")
         september = festival(date_from="05.09.2026", date_to="05.09.2026")
         assert lauf.pruefe_stimmigkeit([juni, september]) == []
+
+
+class TestAbweisung:
+    def vergessen(self):
+        netz.ABGEWIESEN.clear()
+        netz.MELDUNGEN.clear()
+
+    def test_eine_absage_sperrt_noch_nichts(self):
+        self.vergessen()
+        assert netz.abweisung_vermerken("https://beispiel.de/a", 403) is False
+        assert netz.weist_ab("https://beispiel.de/b") is False
+
+    def test_nach_fuenf_absagen_bleibt_der_rechner_in_ruhe(self):
+        self.vergessen()
+        for i in range(netz.SPERRE_AB):
+            netz.abweisung_vermerken(f"https://beispiel.de/{i}", 403)
+        assert netz.weist_ab("https://beispiel.de/noch-eine") is True
+        assert netz.MELDUNGEN == ["beispiel.de weist den Lauf ab (403) - "
+                                  "keine weiteren Anfragen dorthin"]
+
+    def test_andere_rechner_bleiben_unberuehrt(self):
+        self.vergessen()
+        for i in range(netz.SPERRE_AB + 3):
+            netz.abweisung_vermerken(f"https://beispiel.de/{i}", 403)
+        assert netz.weist_ab("https://andere.de/x") is False
+
+    def test_nur_403_zaehlt(self):
+        # 429 heisst "zu schnell", 500 ist eine Panne - beides keine Absage
+        self.vergessen()
+        for code in (429, 500, 503, None):
+            for i in range(netz.SPERRE_AB + 1):
+                netz.abweisung_vermerken(f"https://beispiel.de/{i}", code)
+        assert netz.weist_ab("https://beispiel.de/x") is False
 
 
 class TestFehlerherkunft:
