@@ -370,8 +370,14 @@ antwortet, behält ihren Stand und fällt nicht gleich heraus.
 
 Von Hand startbar ist beides unter *Actions*; das Feld *Alles neu abrufen*
 schaltet den frischen Lauf ein. Mitveröffentlicht werden die Ausgaben unter
-`/daten/`: `festivals.json`, `festivals.csv`, `lineups.csv`, `bands.csv` und
-die Kontrolltabelle `uebersicht.html`.
+`/daten/`: `festivals.json`, `festivals.csv`, `lineups.csv`, `bands.csv`, die
+Kontrolltabelle `uebersicht.html` und `lauf.json`.
+
+`lauf.json` ist der Zustandsbericht des letzten Laufs: Funde je Quelle,
+Festivals gesamt, Einbruchsmeldungen, Zahl der nicht ladbaren Seiten. Er steht
+dort, weil das Protokoll eines fremden Servers niemandem zugänglich ist — eine
+Quelle, die dort nichts liefert (etwa weil sie Rechenzentrums-Adressen
+abweist), fiele sonst nur als etwas kleinere Gesamtzahl auf.
 
 ## Tests
 

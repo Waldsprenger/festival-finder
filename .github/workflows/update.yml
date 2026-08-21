@@ -98,7 +98,7 @@ jobs:
         run: |
           mkdir -p site/daten
           cp data/festivals.csv data/lineups.csv data/bands.csv \
-             data/festivals.json data/uebersicht.html site/daten/
+             data/festivals.json data/uebersicht.html data/lauf.json site/daten/
 
       - uses: actions/upload-pages-artifact@v3
         with:

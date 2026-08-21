@@ -18,7 +18,7 @@ import concurrent.futures as cf
 import csv
 import sys
 import time
-from datetime import date
+from datetime import date, datetime
 
 import netz
 from gemeinsam import DATA, EUROPA_CODES, liegt_in_europa, lies_json, schreib_json
@@ -229,9 +229,23 @@ def main() -> None:
 
     # Nur bei einem vollständigen Lauf vergleichen - ein Testlauf mit --limit
     # liefert naturgemäß weniger.
+    warnungen: list[str] = []
     if not args.limit:
-        for warnung in pruefe_ausbeute(funde, len(festivals)):
+        warnungen = pruefe_ausbeute(funde, len(festivals))
+        for warnung in warnungen:
             print(f"  ! Einbruch gegenüber dem letzten Lauf: {warnung}", file=sys.stderr)
+
+    # Der Zustand des Laufs geht mit auf die Webseite. Auf dem eigenen Rechner
+    # steht er im Protokoll - beim Lauf auf fremden Servern kommt niemand an
+    # dessen Protokoll heran, und eine Quelle, die dort nichts liefert, fiele
+    # sonst nur als kleinere Zahl auf.
+    schreib_json(DATA / "lauf.json", {
+        "stand": datetime.now().astimezone().strftime("%Y-%m-%dT%H:%M%z"),
+        "quellen": funde,
+        "festivals": len(festivals),
+        "warnungen": warnungen,
+        "nicht_ladbar": len(netz.FEHLGESCHLAGEN),
+    })
 
     acts = len({b for f in festivals for b in f["lineup"]})
     print(f"Preise beobachtet        : {preise['beobachtet']}, "

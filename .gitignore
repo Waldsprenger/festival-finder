@@ -10,6 +10,7 @@ data/band_normalisierung.json
 data/uebersicht.html
 data/update.log
 data/failed.txt
+data/lauf.json
 data/verortung.json
 site/data.js
 site/orte.js
