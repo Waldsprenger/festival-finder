@@ -1343,6 +1343,12 @@ window.I18N = {
       ru: 'Вход свободный',
       tr: 'Giriş ücretsiz',
     },
+    'card.priceStart': {
+      de: 'zum Start:', en: 'at launch:', fr: 'au lancement :', es: 'al inicio:',
+      it: 'all’avvio:', nl: 'bij de start:', pl: 'na starcie:', pt: 'no início:',
+      ru: 'на старте:',
+      tr: 'satış başında:',
+    },
     'card.priceUnknown': {
       de: 'Preis unbekannt', en: 'Price unknown', fr: 'Prix inconnu', es: 'Precio desconocido',
       it: 'Prezzo sconosciuto', nl: 'Prijs onbekend', pl: 'Cena nieznana', pt: 'Preço desconhecido',

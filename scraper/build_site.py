@@ -320,8 +320,8 @@ def pruefe_zeilen(zeilen: list, bands: list, genres: list) -> None:
     letzten guten Stand.
     """
     for nr, z in enumerate(zeilen):
-        if len(z) != 15:
-            raise ValueError(f"Zeile {nr} hat {len(z)} statt 15 Spalten")
+        if len(z) != 16:
+            raise ValueError(f"Zeile {nr} hat {len(z)} statt 16 Spalten")
         if not isinstance(z[NAME], str) or not z[NAME]:
             raise ValueError(f"Zeile {nr} ohne Namen")
         if any(not 0 <= b < len(bands) for b in z[LINEUP]):
@@ -387,6 +387,9 @@ def main() -> None:
             sorted(band_nr(b) for b in f["lineup"]),
             f["note"], 1 if f["cancelled"] else 0,
             [genre_ix[k] for k in oberbegriffe(f["genre"])],
+            # Preis zum Verkaufsstart, sofern die Quelle ihn inzwischen
+            # geändert hat - sonst leer
+            f["price_start"],
         ])
 
     # Ortsverzeichnis für die Wohnortsuche. Die veröffentlichte Fassung darf

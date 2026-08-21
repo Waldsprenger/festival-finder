@@ -15,7 +15,7 @@
   // Spaltenindizes von data.js
   const NAME = 0, FROM = 1, TO = 2, CITY = 3, LAND = 4, VENUE = 5,
         EUR = 6, PRICE_RAW = 7, WEB = 8, LAT = 9, LON = 10, LINEUP = 11,
-        NOTE = 12, CANCELLED = 13, GENRE_IDS = 14;
+        NOTE = 12, CANCELLED = 13, GENRE_IDS = 14, PRICE_START = 15;
 
   const $ = (id) => document.getElementById(id);
 
@@ -498,13 +498,27 @@
       : fmtDate(row[FROM]);
   }
 
+  /** Preisangabe einer Karte — heutiger Stand, davor der Startpreis.
+
+      Die Quellen nennen fast immer den Preis zum Verkaufsstart. Ändert eine
+      Quelle ihn, merkt sich der Datenlauf beides: Angezeigt wird dann der
+      heutige Preis, der erste beobachtete steht in Klammern dahinter. */
   function priceLabel(row) {
-    if (row[EUR] === 0) return t('card.free');
-    if (row[EUR] == null) return row[PRICE_RAW] || t('card.priceUnknown');
-    const eur = `${row[EUR].toLocaleString(sprache, { minimumFractionDigits: 2 })} €`;
+    const start = (row[PRICE_START] || '').trim();
+    const seit = start ? ` (${t('card.priceStart')} ${start})` : '';
+    if (row[EUR] === 0) return t('card.free') + seit;
+
     const raw = (row[PRICE_RAW] || '').trim();
-    const ab = t('card.from');
-    return /^(ab )?(EUR|€)/i.test(raw) ? `${ab} ${eur}` : `${ab} ${eur} (${raw})`;
+    if (row[EUR] == null) return (raw || t('card.priceUnknown')) + seit;
+
+    // Steht der Betrag in Euro schon im Quelltext, ist er die Anzeige - sonst
+    // stünde dort "ab 18,60 € (VVK 18,60 €)", zweimal dasselbe. Nur bei
+    // fremder Währung lohnt die Umrechnung, und dann bleibt der Originalpreis
+    // dahinter stehen.
+    const eur = `${row[EUR].toLocaleString(sprache, { minimumFractionDigits: 2 })} €`;
+    const inEuro = /(€|EUR)/i.test(raw);
+    const heute = inEuro ? raw : `${t('card.from')} ${eur}${raw ? ` (${raw})` : ''}`;
+    return heute + seit;
   }
 
   /* ---------------- Sortierung ----------------

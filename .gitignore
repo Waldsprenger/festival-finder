@@ -31,3 +31,4 @@ __pycache__/
 *.pyc
 .venv/
 data/quellen_stand.json
+data/preis_verlauf.json

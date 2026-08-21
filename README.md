@@ -31,6 +31,7 @@ als einer Quelle · [Änderungshistorie](https://github.com/Waldsprenger/festiva
 | `scraper/zusammenfuehren.py` | aus vielen Funden ein Festival: sechs Stufen |
 | `scraper/festival_scraper.py` | Ablauf und Ausgaben → `data/festivals.json` + CSV |
 | `scraper/genres.py` | Genre-Freitext → 17 Oberbegriffe |
+| `scraper/preisverlauf.py` | merkt sich, was ein Ticket zuerst und was es heute kostet |
 | `scraper/geocode.py` | Ortskoordinaten von Nominatim → `data/geo.json` |
 | `scraper/build_gazetteer.py` | Ortsverzeichnisse aus GeoNames: klein für den Browser, groß fürs Verorten |
 | `scraper/build_map.py` | Kartenumrisse aus Natural Earth |
@@ -40,7 +41,7 @@ als einer Quelle · [Änderungshistorie](https://github.com/Waldsprenger/festiva
 | `scraper/build_pwa.py` | Manifest, App-Symbole, Service Worker |
 | `scraper/build_artifact.py` | → `site/artifact.html`, alles in einer Datei |
 | `scraper/daily_update.py` | führt die Kette aus, protokolliert nach `data/update.log` |
-| `tests/` | 187 Tests für Schlüssel, Stufen, Leser, Preise und Wächter |
+| `tests/` | 195 Tests für Schlüssel, Stufen, Leser, Preise und Wächter |
 
 Und in `site/` die Seite selbst — reines HTML, CSS und JavaScript, kein
 Bauschritt, keine Bibliothek:
@@ -251,6 +252,26 @@ gelesen. Spannen liefern den unteren Wert, „Spende" und „Zahl was du willst"
 ergeben 0 € — ein solcher Nachsatz hinter einer Preisangabe hebt den Preis
 dagegen nicht auf.
 
+Angezeigt wird der Text der Quelle, nicht die umgerechnete Zahl: „VVK 18,60 €"
+statt „ab 18,60 € (VVK 18,60 €)". Umgerechnet wird nur, was in fremder Währung
+dasteht („ab 168,38 € (VVK 158,85 CHF)"); der umgerechnete Wert dient ohnehin
+vor allem dem Preisregler und der Sortierung.
+
+**Tagesaktuelle Preise gibt es nicht — aber die Veränderung.** Die Quellen
+nennen fast immer den Preis zum Verkaufsstart und schreiben ihn selten fort.
+Von den Veranstalterseiten ist er nicht zu holen: Eine Stichprobe über 60
+Festivals ergab, dass 23 % der Seiten das Auslesen in ihrer `robots.txt`
+untersagen, und von 22 erreichbaren Ticket-Unterseiten enthielt **keine
+einzige** einen lesbaren Preis — die Shops laden per JavaScript nach oder
+liegen bei Ticketanbietern.
+
+Was bleibt, ist die eigene Beobachtung: Der Lauf holt die Quellseiten täglich.
+[preisverlauf.py](scraper/preisverlauf.py) hält je Festival fest, was zuerst
+dastand und was heute dasteht (`data/preis_verlauf.json`). Ändert eine Quelle
+ihren Preis, zeigt die Karte den heutigen und dahinter in Klammern den ersten:
+„VVK 129 € (zum Start: VVK 89 €)". Festivals, die aus den Quellen
+verschwinden, fallen aus der Datei — sonst wüchse sie mit jedem Jahrgang.
+
 ## Die Webseite (`site/`)
 
 Reines HTML und JavaScript, kein Server, keine Cookies, keine fremden Dateien.
@@ -333,7 +354,7 @@ die Kontrolltabelle `uebersicht.html`.
 pip install pytest && python -m pytest tests -q
 ```
 
-187 Tests in unter einer Sekunde, ohne Netz und ohne Datenbestand. Sie halten
+195 Tests in unter einer Sekunde, ohne Netz und ohne Datenbestand. Sie halten
 fest, warum die Regeln so aussehen, wie sie aussehen — fast jeder Fall stand
 einmal falsch in den Daten:
 
@@ -346,6 +367,7 @@ einmal falsch in den Daten:
 | `tests/test_genres.py` | Freitext zu Oberbegriffen, samt Irreführern |
 | `tests/test_lauf.py` | Selbstprüfung und Einbruchsmeldung |
 | `tests/test_ausgabe.py` | die Prüfung der Zahlenreihen vor dem Ausliefern |
+| `tests/test_preisverlauf.py` | erster und heutiger Preis über mehrere Läufe |
 
 Der Workflow führt sie vor jedem Datenlauf aus: Ein Fehler in der Logik soll
 auffallen, bevor er sich in die veröffentlichten Daten schreibt.

@@ -499,6 +499,9 @@ def zusammenfuehren(records: list[dict], registry: dict[str, str]) -> list[dict]
         rec.pop("_rang", None)
         rec["country"] = land_code(rec["country"])
         rec["location"] = ", ".join(x for x in (rec["city"], rec["country"]) if x)
+        # Wird von preisverlauf.verfolgen() gefüllt, sobald sich ein Preis ändert
+        rec["price_start"] = ""
+        rec["price_start_seit"] = ""
         lineup = sorted(set(rec.pop("_bands").values()), key=str.casefold)
         rec["lineup"] = lineup
         rec["lineup_count"] = len(lineup)

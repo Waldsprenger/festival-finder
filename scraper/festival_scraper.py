@@ -23,6 +23,7 @@ from datetime import date
 import netz
 from gemeinsam import DATA, EUROPA_CODES, liegt_in_europa, lies_json, schreib_json
 from quellen import FT_STAMM, QUELLEN, Quelle
+from preisverlauf import verfolgen
 from text import city_key, festival_key, tag_zahl
 from zusammenfuehren import (alias_kollisionen, band_registry, zeitraum_ueberlappt,
                              zusammenfuehren)
@@ -146,11 +147,11 @@ def schreibe_ausgaben(festivals: list[dict]) -> None:
     tabelle("festivals.csv",
             ["Name", "Jahr", "Von", "Bis", "Ort", "Land", "Venue", "Preis",
              "Webseite", "Genre", "Besucher", "Abgesagt", "Hinweis",
-             "Anzahl Acts", "Lineup", "Quellen"],
+             "Preis zum Start", "Anzahl Acts", "Lineup", "Quellen"],
             ([f["name"], f["year"], f["date_from"], f["date_to"], f["city"],
               f["country"], f["venue"], f["price"], f["website"], f["genre"],
               f["visitors"], "ja" if f["cancelled"] else "", f["note"],
-              f["lineup_count"], ", ".join(f["lineup"]),
+              f["price_start"], f["lineup_count"], ", ".join(f["lineup"]),
               " | ".join(f["sources"].values())] for f in festivals))
 
     tabelle("lineups.csv",
@@ -217,6 +218,9 @@ def main() -> None:
     if vorher != len(festivals):
         print(f"  {vorher - len(festivals)} Einträge älter als {args.since} verworfen")
 
+    # Preise mit dem letzten Lauf vergleichen, bevor geprüft und geschrieben wird
+    preise = verfolgen(festivals)
+
     for widerspruch in pruefe_stimmigkeit(festivals):
         print(f"  ! Widerspruch in den Daten: {widerspruch}", file=sys.stderr)
 
@@ -230,6 +234,8 @@ def main() -> None:
             print(f"  ! Einbruch gegenüber dem letzten Lauf: {warnung}", file=sys.stderr)
 
     acts = len({b for f in festivals for b in f["lineup"]})
+    print(f"Preise beobachtet        : {preise['beobachtet']}, "
+          f"seit dem ersten Mal geändert: {preise['geändert']}")
     print(f"\nFestivals gesamt        : {len(festivals)}")
     print(f"  aus mehreren Quellen  : {sum(1 for f in festivals if len(f['sources']) > 1)}")
     print(f"  mit Lineup            : {sum(1 for f in festivals if f['lineup'])}")
