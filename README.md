@@ -4,7 +4,7 @@ Acht Festivalverzeichnisse, zu einem Bestand zusammengeführt, plus eine
 statische Webseite, die daraus nach Band oder Genre filtert. Ein Datenlauf
 hält beides aktuell, ohne dass ein Rechner dafür laufen muss.
 
-**Stand:** 5.743 Festivals in 42 Ländern, 40.547 Acts, 1.567 Festivals aus mehr
+**Stand:** 5.740 Festivals in 42 Ländern, 40.547 Acts, 1.569 Festivals aus mehr
 als einer Quelle · [Änderungshistorie](https://github.com/Waldsprenger/festival-finder/commits/main)
 
 ```
@@ -80,13 +80,13 @@ Doppelklick öffnen.
 
 | Quelle | Weg zu den Adressen | Seiten | Einträge | nur dort |
 |---|---|---:|---:|---:|
-| festivalsunited.com | Sitemap je Jahrgang **und** die europäischen Länderseiten | 3.226 | 2.776 | 1.529 |
+| festivalsunited.com | Sitemap je Jahrgang **und** die europäischen Länderseiten | 3.226 | 2.776 | 1.528 |
 | festapp.io | Sitemaps der Festivals und der einzelnen Ausgaben | 2.977 | 740 | 377 |
-| wannafest.com | `sitemaps/festivals-1.xml` | 2.105 | 1.066 | 813 |
-| festivalfinder.eu | Trefferliste der European Festivals Association, geblättert | 2.069 | 396 | 371 |
-| festivalticker.de | alle Listenseiten: Jahres-, Monats-, Länder- und Statusarchive | 1.971 | 1.966 | 804 |
+| wannafest.com | `sitemaps/festivals-1.xml` | 2.105 | 1.065 | 812 |
+| festivalfinder.eu | Trefferliste der European Festivals Association, geblättert | 2.069 | 396 | 370 |
+| festivalticker.de | alle Listenseiten: Jahres-, Monats-, Länder- und Statusarchive | 1.971 | 1.966 | 803 |
 | festival-alarm.com | Jahresseiten **und** die Regionsseiten je Land | 935 | 921 | 210 |
-| festivalhopper.de | `sitemap-festivals.xml`, Jahrgang steht in der Adresse | 728 | 683 | 72 |
+| festivalhopper.de | `sitemap-festivals.xml`, Jahrgang steht in der Adresse | 728 | 683 | 71 |
 | festivalflyer.com | die Startseite, mehr ist nicht erreichbar | 12 | 1 | 0 |
 
 Der Wert einer Quelle steckt nicht in der Zahl ihrer Seiten, sondern in der
@@ -145,6 +145,13 @@ das ist die Sängerin LP, ihre acht Einträge bleiben unangetastet. Geprüft wir
 je Festival, nicht je Quellseite: Die Schreibweisen stehen oft auf den Seiten
 verschiedener Quellen und treffen sich erst beim Zusammenführen.
 
+**Zweitnamen.** Was kein Buchstabenvergleich findet, steht in
+[data/festival_aliase.json](data/festival_aliase.json): „Carnival of Cultures"
+ist der Berliner „Karneval der Kulturen", und „Die Schagernacht München" ist
+ein Tippfehler in genau dem Wort, das den Namen ausmacht. Die Liste lässt sich
+ohne Codeänderung erweitern; der Name wird schon beim Einlesen ersetzt, sodass
+alle Stufen und die Anzeige dieselbe Schreibweise sehen.
+
 **Sieben Stufen** führen die Einträge zusammen. Die ersten sechs verlangen
 verschiedene Quellen — dieselbe Quelle führt kein Festival zweimal, wohl aber
 zwei gleichnamige an verschiedenen Orten. Die siebte ist die eng gefasste
@@ -199,6 +206,13 @@ Sammelkategorie weg.
 
 ## Koordinaten und Preise
 
+Das Ortsverzeichnis ist zweimal fein aufgelöst, weil die beiden Zwecke
+verschiedene Rücksichten kennen: Im Browser stehen DE/AT/CH vollständig, denn
+dort zählt jedes Kilobyte. Beim Bauen kommen die Niederlande hinzu — wannafest
+liefert über tausend niederländische Festivals, viele in Dörfern unter tausend
+Einwohnern. Für Großbritannien lohnt es nicht: 3,6 MB Ortsdaten lösen 22
+offene Fälle.
+
 Verortet wird in vier Rängen:
 
 1. **Postleitzahl** — trifft den Zustellbereich und ist damit am genauesten.
@@ -241,7 +255,7 @@ dagegen nicht auf.
 
 Reines HTML und JavaScript, kein Server, keine Cookies, keine fremden Dateien.
 Alle Daten stehen in `site/data.js` als Zahlenreihen: Bands und Genres nur als
-Index, das drückt 5.743 Festivals mit 40.547 Acts auf 6,1 MB (2,1 MB über die
+Index, das drückt 5.740 Festivals mit 40.547 Acts auf 6,1 MB (2,1 MB über die
 Leitung, weil GitHub Pages komprimiert).
 
 Der Code liegt in zwei Teilen: `karte.js` zeichnet die Landkarte und kennt vom
@@ -355,11 +369,11 @@ fehlenden Wert wurde die Seite nach einem Beleg durchsucht:
 
 | Feld | fehlt | steht doch auf der Seite |
 |---|---:|---|
-| Besucherzahl | 2.927 | 0 |
-| Lineup | 2.752 | — die Quelle führt keins |
-| Postleitzahl | 1.926 | 0 |
-| Preis | 1.884 | 2 |
-| Genre | 1.833 | 0 |
+| Besucherzahl | 2.924 | 0 |
+| Lineup | 2.750 | — die Quelle führt keins |
+| Postleitzahl | 1.924 | 0 |
+| Preis | 1.882 | 2 |
+| Genre | 1.830 | 0 |
 | Spielstätte | 940 | 129-mal nur der Festivalname selbst |
 | Webseite | 363 | 0 — verlinkt sind nur Bildnachweise und Werbung |
 | Termin | 292 | nur Termine *vergangener* Ausgaben |

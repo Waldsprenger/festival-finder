@@ -188,6 +188,22 @@ class TestStufe7GleicheQuelle:
         assert len(fuehre_zusammen(a, b)) == 2
 
 
+class TestZweitnamen:
+    def test_uebersetzter_name_findet_zusammen(self):
+        # festivalfinder nennt den Berliner Karneval der Kulturen englisch
+        a = fund("festivalhopper", "Karneval der Kulturen", von="22.05.2026", stadt="Berlin")
+        b = fund("festivalfinder", "Carnival of Cultures", von="22.05.2026", stadt="Berlin")
+        [ergebnis] = fuehre_zusammen(a, b)
+        assert ergebnis["name"] == "Karneval der Kulturen"
+
+    def test_tippfehler_im_kennwort(self):
+        a = fund("festivalticker", "Die Schlagernacht des Jahres", von="28.03.2026",
+                 stadt="München")
+        b = fund("festivalsunited", "Die Schagernacht München", von="28.03.2026",
+                 stadt="München")
+        assert len(fuehre_zusammen(a, b)) == 1
+
+
 class TestAufraeumenAmEnde:
     def test_jahr_folgt_dem_termin(self):
         a = fund("festivalhopper", "Sommer im Park", von="27.08.2026", stadt="Gera", year="2027")

@@ -91,6 +91,31 @@ def band_key(name: str) -> str:
     return _zusammen(fold(ziel) if ziel else k)
 
 
+def _lade_festival_aliase() -> dict[str, str]:
+    """Zweitnamen aus data/festival_aliase.json, nach gefaltetem Namen."""
+    pfad = DATA / "festival_aliase.json"
+    if not pfad.exists():
+        return {}
+    roh = json.loads(pfad.read_text(encoding="utf-8"))
+    return {fold(variante): richtig for variante, richtig in roh.items()}
+
+
+#: Namen, die keine Regel zusammenbringt - siehe festival_name()
+FESTIVAL_ALIAS = _lade_festival_aliase()
+
+
+def festival_name(name: str) -> str:
+    """Die verbindliche Schreibweise eines Festivals.
+
+    Manche Quellen übersetzen den Namen ("Carnival of Cultures" für den
+    Berliner "Karneval der Kulturen") oder verschreiben sich in genau dem Wort,
+    das den Namen ausmacht ("Die Schagernacht München"). Kein Vergleich von
+    Buchstaben findet das — deshalb eine kurze Liste in
+    `data/festival_aliase.json`, die sich ohne Codeänderung erweitern lässt.
+    """
+    return FESTIVAL_ALIAS.get(fold(name), name)
+
+
 def festival_key(name: str) -> str:
     """Schlüssel eines Festivals: ohne Artikel, Jahr und die Wörter Festival/Open Air."""
     v = fold(name)

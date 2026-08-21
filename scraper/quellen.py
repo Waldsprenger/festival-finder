@@ -17,7 +17,7 @@ from gemeinsam import (EUROPA_CODES, JAHR_HEUTE, JAHRE, ausser_europa,
                        land_code, liegt_in_europa)
 from netz import fetch, endziel, json_ld_events, melde, sitemap_adressen, soup
 from text import (MONATE, betrag, clean, datum_de, datum_englisch,
-                  genres_vereinen, valid_band)
+                  festival_name, genres_vereinen, valid_band)
 
 FT = "https://www.festivalticker.de"      # dichteste Abdeckung für Deutschland
 FU = "https://www.festivalsunited.com"    # Lineups, Preise, Datenblatt je Seite
@@ -41,8 +41,11 @@ def datensatz(quelle: str, url: str, name: str, *, date_from: str = "",
               lat: float | None = None, lon: float | None = None) -> dict:
     """Ein Fund, wie ihn alle Quellen abliefern.
 
-    Hier werden drei Dinge geradegezogen, die sonst jede Quelle einzeln
+    Hier werden vier Dinge geradegezogen, die sonst jede Quelle einzeln
     beachten müsste:
+
+    * Der Name folgt der Liste in `data/festival_aliase.json`, falls er dort
+      steht — für Fälle, die kein Buchstabenvergleich findet.
 
     * Das Jahr richtet sich nach dem Termin. Steht im Titel ein anderes als im
       Datum ("Sommer im Park Gera 2027" mit Termin im August 2026), gilt der
@@ -57,7 +60,7 @@ def datensatz(quelle: str, url: str, name: str, *, date_from: str = "",
     return {
         "source": quelle,
         "source_url": url,
-        "name": name,
+        "name": festival_name(name),
         "date_from": date_from,
         "date_to": date_to or date_from,
         "year": date_from[-4:] if date_from else year,

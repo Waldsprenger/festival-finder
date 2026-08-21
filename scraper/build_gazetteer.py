@@ -33,7 +33,18 @@ VERORTUNG = DATA / "verortung.json"
 DUMP = "https://download.geonames.org/export/dump/"
 ZIP = "https://download.geonames.org/export/zip/"
 
-FEIN = ["DE", "AT", "CH"]          # alle Orte, auch kleine Gemeinden
+# Fein aufgelöst wird zweimal verschieden, weil die beiden Verzeichnisse
+# verschiedene Rücksichten kennen:
+#
+#   Im Browser zählt jedes Kilobyte - dort stehen DE/AT/CH vollständig, weil
+#   die Seite dort genutzt wird und der Wohnort von dort kommt.
+#
+#   Beim Bauen zählt nur Genauigkeit. Dort kommt NL hinzu: wannafest liefert
+#   über tausend niederländische Festivals, viele in Dörfern unter tausend
+#   Einwohnern. Für Großbritannien lohnt es nicht - 3,6 MB Ortsdaten lösen
+#   22 offene Fälle.
+FEIN = ["DE", "AT", "CH"]
+FEIN_BAU = FEIN + ["NL"]
 EUROPA = set(EUROPA_CODES)
 
 # Spalten des Ortsdatensatzes
@@ -62,8 +73,8 @@ def zeilen(datei: str, art: str = "dump"):
                     yield zeile
 
 
-def orte_sammeln(ab_einwohnern: int) -> dict[tuple[str, str], list]:
-    """Orte je (Name, Land): DE/AT/CH vollständig, Europa ab N Einwohnern.
+def orte_sammeln(ab_einwohnern: int, vollstaendig: list[str]) -> dict[tuple[str, str], list]:
+    """Orte je (Name, Land): genannte Länder vollständig, Europa ab N Einwohnern.
 
     Bei gleichem Namen im selben Land gewinnt der größere Ort — dieselbe Regel,
     nach der auch ein Ortsverzeichnis den bekannteren zuerst nennt.
@@ -80,7 +91,7 @@ def orte_sammeln(ab_einwohnern: int) -> dict[tuple[str, str], list]:
             orte[schluessel] = [name, round(float(lat), 4), round(float(lon), 4),
                                 cc, einwohner]
 
-    for cc in FEIN:
+    for cc in vollstaendig:
         print(f"{cc}: alle Orte", flush=True)
         for r in zeilen(f"{cc}.zip"):
             if r[FCLASS] == "P" and r[FCODE] in ORTSARTEN:
@@ -89,7 +100,7 @@ def orte_sammeln(ab_einwohnern: int) -> dict[tuple[str, str], list]:
     datei = f"cities{ab_einwohnern}.zip"
     print(f"Europa: Orte ab {ab_einwohnern:,} Einwohnern".replace(",", "."), flush=True)
     for r in zeilen(datei):
-        if r[CC] in EUROPA and r[CC] not in FEIN:
+        if r[CC] in EUROPA and r[CC] not in vollstaendig:
             merken(r[NAME], r[LAT], r[LON], r[CC], r[POP])
             # Die Umschrift ohne Sonderzeichen ist oft die Schreibweise der
             # Quellen ("Zurich" statt "Zürich").
@@ -120,7 +131,7 @@ def postleitzahlen(laender: list[str] | None) -> list[list]:
 
 def main() -> None:
     # --- mitgeliefert: klein genug für site/data.js -----------------------
-    orte = orte_sammeln(15000)
+    orte = orte_sammeln(15000, FEIN)
     # Größte Orte zuerst: Bei mehrdeutigen Namen gewinnt in der Suche der
     # bekanntere. Die Einwohnerzahl dient nur der Sortierung.
     schlank = [e[:4] for e in sorted(orte.values(), key=lambda e: -e[4])]
@@ -133,7 +144,7 @@ def main() -> None:
     print(f"{PLZ}  ({PLZ.stat().st_size / 1e6:.2f} MB, {len(plz_dach)} Postleitzahlen)")
 
     # --- nur zum Bauen: so genau wie möglich ------------------------------
-    fein = orte_sammeln(1000)
+    fein = orte_sammeln(1000, FEIN_BAU)
     plz_europa = postleitzahlen(None)
     # Beide Tabellen in derselben Form wie die mitgelieferten:
     # Postleitzahl bzw. Name, dann Breite, Länge, Land.
