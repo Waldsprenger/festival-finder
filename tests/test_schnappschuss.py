@@ -53,6 +53,19 @@ class TestAblegen:
         schnappschuss.schreiben("festivalticker", [satz()])
         assert schnappschuss.datei("festivalticker").read_bytes() == erste
 
+    def test_reihenfolge_der_funde_aendert_nichts(self):
+        # Die Seiten kommen aus vier Faeden zurueck, also in wechselnder
+        # Reihenfolge. Ohne Sortieren gaebe es taeglich einen Commit, in dem
+        # kein einziges Festival anders ist.
+        a, b = satz("Alpha"), satz("Beta")
+        a["source_url"], b["source_url"] = "https://x/a", "https://x/b"
+        schnappschuss.schreiben("festivalticker", [a, b])
+        erste = schnappschuss.datei("festivalticker").read_bytes()
+        schnappschuss.schreiben("festivalticker", [b, a])
+        assert schnappschuss.datei("festivalticker").read_bytes() == erste
+        records, _ = schnappschuss.lesen("festivalticker")
+        assert [r["name"] for r in records] == ["Alpha", "Beta"]
+
     def test_datei_ist_lesbares_json(self):
         schnappschuss.schreiben("festivalticker", [satz()])
         roh = gzip.decompress(schnappschuss.datei("festivalticker").read_bytes())

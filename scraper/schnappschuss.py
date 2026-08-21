@@ -47,7 +47,12 @@ def schreiben(quelle: str, records: list[dict]) -> bool:
     inhalt = json.dumps({
         "quelle": quelle,
         "stand": datetime.now().astimezone().strftime("%Y-%m-%d"),
-        "records": records,
+        # Nach Adresse sortiert: Die Seiten kommen aus vier Fäden zurück, also
+        # in wechselnder Reihenfolge. Ohne das Sortieren unterschiede sich die
+        # Datei nach jedem Lauf und stünde als neue Fassung in der Geschichte,
+        # obwohl kein einziges Festival anders ist.
+        "records": sorted(records, key=lambda r: (r.get("source_url", ""),
+                                                  r.get("name", ""))),
     }, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
     # mtime auf 0: Sonst unterscheidet sich die gepackte Datei bei jedem Lauf,
     # auch wenn kein einziges Festival anders ist - und landete als neue
