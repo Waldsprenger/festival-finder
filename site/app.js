@@ -7,6 +7,27 @@
   'use strict';
 
   const D = window.DATA;
+  if (!D || !Array.isArray(D.festivals)) {
+    // data.js ist sechs Megabyte gross. Bleibt sie unterwegs haengen, stand
+    // hier bisher ein Absturz in der zweiten Zeile - die Seite blieb leer,
+    // ohne ein Wort dazu. Jetzt sagt sie, was los ist.
+    const sagen = () => {
+      const texte = (window.I18N && window.I18N.TEXTE['app.noData']) || {};
+      const kurz = (navigator.language || 'de').slice(0, 2);
+      const hinweis = document.createElement('p');
+      hinweis.className = 'hint err';
+      hinweis.style.margin = '2rem';
+      hinweis.textContent = texte[kurz] || texte.de ||
+        'Die Festivaldaten konnten nicht geladen werden. Bitte neu laden.';
+      (document.querySelector('main') || document.body).prepend(hinweis);
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', sagen);
+    } else {
+      sagen();
+    }
+    return;
+  }
   const F = D.festivals;
   const BANDS = D.bands;
   // Schlüssel der Genre-Oberbegriffe; die Namen stehen übersetzt in i18n.js
@@ -124,13 +145,27 @@
 
   const genreName = (i) => t('genre.' + GENRES[i]);
 
+  /* Dieselben Regeln wie fold() in scraper/text.py — die Suche soll Namen
+     genauso zusammenfassen wie die Daten selbst. Vorher unterschieden sich
+     beide bei jedem achten Bandnamen: Wer "2 Engel and Charlie" tippte, fand
+     "2 Engel & Charlie" nicht, obwohl es für die Daten dieselbe Band ist.
+     Wird hier etwas geändert, gehört es auch dorthin. */
+  const SONDERZEICHEN = [['ß', 'ss'], ['ø', 'o'], ['æ', 'ae'], ['œ', 'oe'],
+                         ['đ', 'd'], ['ħ', 'h'], ['ł', 'l'], ['ı', 'i'],
+                         ['þ', 'th'], ['ð', 'd']];
   const foldCache = new Map();
   const fold = (s) => {
     let v = foldCache.get(s);
     if (v === undefined) {
-      v = s.normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase()
-           .replace(/ß/g, 'ss').replace(/ø/g, 'o').replace(/æ/g, 'ae')
-           .replace(/[-.'’]/g, ' ').replace(/\s+/g, ' ').trim();
+      v = s.toLowerCase().normalize('NFKD').replace(/\p{M}+/gu, '');
+      for (const [a, b] of SONDERZEICHEN) v = v.split(a).join(b);
+      v = v.replace(/[&+]/g, ' and ').replace(/[’´`]/g, "'")
+           .replace(/[–—]/g, '-').replace(/…/g, '')
+           .replace(/\b(feat|ft|featuring|vs|with|und|and)\b/g, ' and ')
+           .replace(/[^\p{L}\p{N}]+/gu, ' ')
+           .replace(/\s+/g, ' ').trim()
+           .replace(/^(the|die|der|das|los|las|les) /, '')
+           .replace(/ (band|live|dj ?set|djset|acoustic)$/, '');
       foldCache.set(s, v);
     }
     return v;
@@ -387,7 +422,12 @@
     if (!row[FROM]) {
       if (!state.allowUnknownDate) return false;
     } else {
-      if (state.from && row[FROM] < state.from) return false;
+      // Der Zeitraum zählt, nicht der Beginn: Ein Festival, das gestern
+      // angefangen hat und bis Sonntag läuft, ist heute noch zu erreichen.
+      // Vorher fielen an einem beliebigen Tag rund hundert laufende
+      // Veranstaltungen aus der Liste, weil die Vorgabe "ab heute" lautet.
+      const ende = row[TO] || row[FROM];
+      if (state.from && ende < state.from) return false;
       if (state.to && row[FROM] > state.to) return false;
     }
 

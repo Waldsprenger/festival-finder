@@ -8,7 +8,9 @@ Was das Netz betrifft, steht in `netz.py`, was Namen betrifft, in `text.py`.
 from __future__ import annotations
 
 import json
+import os
 import re
+import sys
 from datetime import date
 from pathlib import Path
 
@@ -30,16 +32,36 @@ JAHRE = range(2006, JAHR_HEUTE + 6)
 # --------------------------------------------------------------------------
 
 def lies_json(pfad: Path, standard=None):
-    """JSON lesen; fehlt die Datei, kommt der Standardwert zurück."""
+    """JSON lesen; fehlt die Datei oder ist sie zerrissen, kommt der Standard.
+
+    Eine halb geschriebene Datei brachte bisher jeden Lauf zum Stehen, bis
+    jemand sie von Hand löschte. Sie wird stattdessen beiseitegelegt — was
+    darin steht, ist vielleicht noch zu retten.
+    """
     if not pfad.exists():
         return standard
-    return json.loads(pfad.read_text(encoding="utf-8"))
+    try:
+        return json.loads(pfad.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+        beiseite = pfad.with_name(pfad.name + ".kaputt")
+        pfad.replace(beiseite)
+        print(f"  ! {pfad.name} war nicht lesbar ({exc.__class__.__name__}); "
+              f"liegt jetzt als {beiseite.name} daneben", file=sys.stderr)
+        return standard
 
 
 def schreib_json(pfad: Path, inhalt, *, kompakt: bool = False) -> None:
+    """JSON schreiben: erst vollständig daneben, dann an seinen Platz rücken.
+
+    Bricht ein Lauf mitten im Schreiben ab, blieb sonst eine halbe Datei
+    zurück. Bei `preis_verlauf.json` hiesse das: die ganze beobachtete
+    Preisgeschichte weg — sie steht nirgends sonst.
+    """
     text = json.dumps(inhalt, ensure_ascii=False,
                       **({"separators": (",", ":")} if kompakt else {"indent": 2}))
-    pfad.write_text(text + ("" if kompakt else "\n"), encoding="utf-8")
+    daneben = pfad.with_name(pfad.name + ".neu")
+    daneben.write_text(text + ("" if kompakt else "\n"), encoding="utf-8")
+    os.replace(daneben, pfad)
 
 
 # --------------------------------------------------------------------------

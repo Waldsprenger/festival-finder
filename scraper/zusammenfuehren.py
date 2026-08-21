@@ -15,8 +15,9 @@ from urllib.parse import urlparse
 
 from gemeinsam import ausser_europa, land_code
 from quellen import RANG
-from text import (ALIAS_KEY, ALIAS_NAME, band_key, canonical_band, city_key,
-                  clean, festival_key, fold, genres_vereinen, tag_zahl,
+from text import (ALIAS_KEY, ALIAS_NAME, alias_abschalten, band_key,
+                  canonical_band, city_key, clean, festival_key, fold,
+                  genres_vereinen, tag_zahl,
                   tage_abstand)
 
 
@@ -56,7 +57,7 @@ def alias_kollisionen(records: list[dict]) -> list[str]:
                 break
             allein = True
         if allein and not zusammen:
-            ALIAS_KEY.pop(kurz)
+            alias_abschalten(kurz)
             kollidiert.append(kurz)
     return sorted(kollidiert)
 

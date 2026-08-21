@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import sys
 import threading
@@ -156,7 +157,12 @@ def datei_holen(url: str, ziel, was: str = "") -> bytes:
     r = requests.get(url, headers=HEADERS, timeout=300)
     r.raise_for_status()
     ziel.parent.mkdir(parents=True, exist_ok=True)
-    ziel.write_bytes(r.content)
+    # Erst daneben, dann an den Platz: Ein Abbruch mitten im Schreiben liesse
+    # sonst ein halbes ZIP zurück - und weil es Inhalt hat, gälte es beim
+    # nächsten Lauf als fertig heruntergeladen.
+    daneben = ziel.with_name(ziel.name + ".neu")
+    daneben.write_bytes(r.content)
+    os.replace(daneben, ziel)
     return r.content
 
 

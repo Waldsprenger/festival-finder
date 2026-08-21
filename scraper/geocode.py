@@ -12,6 +12,7 @@ Die Datei ist zugleich Cache — einmal aufgelöste Orte werden nie erneut gefra
 
 from __future__ import annotations
 
+import sys
 import time
 
 import requests
@@ -40,7 +41,14 @@ def key(city: str, country: str) -> str:
     return f"{city.strip()}|{country.strip()}"
 
 
-def lookup(session: requests.Session, city: str, country: str) -> dict | None:
+def lookup(session: requests.Session, city: str,
+           country: str) -> tuple[dict | None, bool]:
+    """Koordinaten - und ob der Dienst überhaupt geantwortet hat.
+
+    Beides auseinanderzuhalten ist wichtig: "kennt den Ort nicht" darf in den
+    Cache, "war gerade nicht erreichbar" nicht. Sonst schreibt ein einziger
+    Ausfall hunderte Orte auf Dauer als unauffindbar fest.
+    """
     code = cc(country)
     attempts = []
     if code:
@@ -51,6 +59,7 @@ def lookup(session: requests.Session, city: str, country: str) -> dict | None:
     attempts.append({"city": city, "countrycodes": EU_CODES})
     attempts.append({"q": city, "countrycodes": EU_CODES})
 
+    geantwortet = False
     for params in attempts:
         params |= {"format": "jsonv2", "limit": 1, "accept-language": "de"}
         try:
@@ -58,14 +67,15 @@ def lookup(session: requests.Session, city: str, country: str) -> dict | None:
             time.sleep(1.1)
             if r.status_code != 200:
                 continue
+            geantwortet = True
             hits = r.json()
             if hits:
                 h = hits[0]
                 return {"lat": float(h["lat"]), "lon": float(h["lon"]),
-                        "display": h.get("display_name", "")}
+                        "display": h.get("display_name", "")}, True
         except Exception:
             time.sleep(2.0)
-    return None
+    return None, geantwortet
 
 
 def main() -> None:
@@ -100,18 +110,26 @@ def main() -> None:
     session = requests.Session()
     session.headers.update({"User-Agent": UA, "Accept-Language": "de"})
 
-    hit = miss = 0
+    hit = miss = stumm = 0
     for i, (k, city, country) in enumerate(todo, 1):
-        res = lookup(session, city, country)
-        geo[k] = res or {}
-        hit, miss = (hit + 1, miss) if res else (hit, miss + 1)
+        res, geantwortet = lookup(session, city, country)
+        if res:
+            geo[k], hit = res, hit + 1
+        elif geantwortet:
+            geo[k], miss = {}, miss + 1      # kennt den Ort wirklich nicht
+        else:
+            stumm += 1                       # nicht merken, morgen wieder fragen
         if i % 50 == 0 or i == len(todo):
             schreib_json(GEO, geo)
-            print(f"  {i}/{len(todo)}  gefunden {hit}, ohne Treffer {miss}", flush=True)
+            print(f"  {i}/{len(todo)}  gefunden {hit}, ohne Treffer {miss}"
+                  + (f", ohne Antwort {stumm}" if stumm else ""), flush=True)
 
     schreib_json(GEO, geo)
     found = sum(1 for v in geo.values() if v)
     print(f"fertig: {found}/{len(geo)} Orte mit Koordinaten -> {GEO}")
+    if stumm:
+        print(f"  ! {stumm} Orte blieben ohne Antwort - beim nächsten Lauf erneut",
+              file=sys.stderr)
 
 
 if __name__ == "__main__":

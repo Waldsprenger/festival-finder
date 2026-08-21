@@ -23,6 +23,18 @@ window.I18N = {
       ru: 'Festival Finder — подбор фестивалей по любимым группам в Европе',
       tr: 'Festival Finder — Avrupa için kadro eşleştirme',
     },
+    'app.noData': {
+      de: 'Die Festivaldaten konnten nicht geladen werden. Bitte die Seite neu laden.',
+      en: 'The festival data could not be loaded. Please reload the page.',
+      fr: 'Les données des festivals n’ont pas pu être chargées. Veuillez recharger la page.',
+      es: 'No se han podido cargar los datos de los festivales. Recarga la página.',
+      it: 'Non è stato possibile caricare i dati dei festival. Ricarica la pagina.',
+      nl: 'De festivalgegevens konden niet worden geladen. Laad de pagina opnieuw.',
+      pl: 'Nie udało się wczytać danych o festiwalach. Odśwież stronę.',
+      pt: 'Não foi possível carregar os dados dos festivais. Recarrega a página.',
+      ru: 'Не удалось загрузить данные о фестивалях. Обнови страницу.',
+      tr: 'Festival verileri yüklenemedi. Lütfen sayfayı yeniden yükle.',
+    },
     'app.tagline': {
       de: 'Dein Lineup. Dein Radius. Dein Wochenende.',
       en: 'Your line-up. Your radius. Your weekend.',

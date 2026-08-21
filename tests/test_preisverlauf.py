@@ -51,11 +51,29 @@ def test_unveraenderter_preis_bleibt_ohne_zusatz(datei):
     assert f["price_start"] == ""
 
 
-def test_verschwundene_festivals_fallen_heraus(datei):
+def test_ein_fehlendes_festival_bleibt_erst_einmal_stehen(datei):
+    # An dem Tag, an dem eine Quelle den Lauf abwies, fehlten 800 Festivals auf
+    # einmal. Ihre Geschichte zu löschen hiesse, den Startpreis zu vergessen.
     preisverlauf.verfolgen([festival("89 €", name="Altfest")], heute="2026-08-21")
     preisverlauf.verfolgen([festival("89 €", name="Neufest")], heute="2026-08-22")
     verlauf = json.loads(datei.read_text(encoding="utf-8"))
+    assert sorted(verlauf) == ["altfest|2026|kiel", "neufest|2026|kiel"]
+
+
+def test_nach_zwei_monaten_faellt_es_heraus(datei):
+    preisverlauf.verfolgen([festival("89 €", name="Altfest")], heute="2026-06-01")
+    preisverlauf.verfolgen([festival("89 €", name="Neufest")], heute="2026-08-22")
+    verlauf = json.loads(datei.read_text(encoding="utf-8"))
     assert list(verlauf) == ["neufest|2026|kiel"]
+
+
+def test_der_startpreis_ueberlebt_eine_luecke(datei):
+    preisverlauf.verfolgen([festival("89 €")], heute="2026-06-01")
+    preisverlauf.verfolgen([], heute="2026-06-02")            # Quelle schweigt
+    fest = festival("99 €")
+    preisverlauf.verfolgen([fest], heute="2026-06-03")
+    assert fest["price_start"] == "89 €"
+    assert fest["price_start_seit"] == "2026-06-01"
 
 
 def test_festivals_ohne_preis_stehen_nicht_drin(datei):

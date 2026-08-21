@@ -1,0 +1,77 @@
+{
+ "festapp_1.html.gz": {
+  "festival": "Sonorama Ribera",
+  "quelle": "festapp",
+  "url": "https://festapp.io/festivals/sonorama-ribera/2026"
+ },
+ "festapp_2.html.gz": {
+  "festival": "Les Plages Electroniques",
+  "quelle": "festapp",
+  "url": "https://festapp.io/festivals/plages-electroniques/2026"
+ },
+ "festivalalarm_1.html.gz": {
+  "festival": "Reggae Jam",
+  "quelle": "festivalalarm",
+  "url": "https://www.festival-alarm.com/Festivals-2026/Reggae-Jam-Freitag-24.-Juli-2026-Bersenbrueck"
+ },
+ "festivalalarm_2.html.gz": {
+  "festival": "Rockharz Open Air",
+  "quelle": "festivalalarm",
+  "url": "https://www.festival-alarm.com/Festivals-2026/Rockharz-Festival-Mittwoch-01.-Juli-2026-Ballenstedt"
+ },
+ "festivalfinder_1.html.gz": {
+  "festival": "United Islands",
+  "quelle": "festivalfinder",
+  "url": "https://www.festivalfinder.eu/find-festival-organisations/united-islands-2026"
+ },
+ "festivalfinder_2.html.gz": {
+  "festival": "Sommerwerft - Theaterfestival am Fluss",
+  "quelle": "festivalfinder",
+  "url": "https://www.festivalfinder.eu/find-festival-organisations/sommerwerft-internationales-theater-festival-am-fluss"
+ },
+ "festivalflyer_1.html.gz": {
+  "festival": "ArcTanGent Festival",
+  "quelle": "festivalflyer",
+  "url": "https://festivalflyer.com/events/arctangent-2026/"
+ },
+ "festivalhopper_1.html.gz": {
+  "festival": "Rock Am Ring",
+  "quelle": "festivalhopper",
+  "url": "https://www.festivalhopper.de/festival/rock-am-ring-2026"
+ },
+ "festivalhopper_2.html.gz": {
+  "festival": "Summer Breeze Open Air",
+  "quelle": "festivalhopper",
+  "url": "https://www.festivalhopper.de/festival/summer-breeze-2026"
+ },
+ "festivalsunited_1.html.gz": {
+  "festival": "Reeperbahn Festival",
+  "quelle": "festivalsunited",
+  "url": "https://www.festivalsunited.com/festivals/reeperbahn-festival"
+ },
+ "festivalsunited_2.html.gz": {
+  "festival": "Rock am Ring",
+  "quelle": "festivalsunited",
+  "url": "https://www.festivalsunited.com/festivals/rock-am-ring"
+ },
+ "festivalticker_1.html.gz": {
+  "festival": "Blacksheep Sommerfest",
+  "quelle": "festivalticker",
+  "url": "https://www.festivalticker.de/festivals/blacksheep_sommerfest/"
+ },
+ "festivalticker_2.html.gz": {
+  "festival": "Afrikanisches Kulturfest Rebstockpark",
+  "quelle": "festivalticker",
+  "url": "https://www.festivalticker.de/festivals/afrikanisches_kulturfest_solmspark/"
+ },
+ "wannafest_1.html.gz": {
+  "festival": "Wacken Open Air",
+  "quelle": "wannafest",
+  "url": "https://wannafest.com/festivals/wacken-open-air"
+ },
+ "wannafest_2.html.gz": {
+  "festival": "Down The Rabbit Hole",
+  "quelle": "wannafest",
+  "url": "https://wannafest.com/festivals/down-the-rabbit-hole"
+ }
+}

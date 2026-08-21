@@ -95,3 +95,33 @@ def test_die_seite_ruft_nur_vorhandene_schluessel():
             if not s.endswith(".") and s not in vorhanden:
                 fehlt.add(f"{datei}: {s}")
     assert not fehlt, f"unbekannte Textschlüssel: {fehlt}"
+
+
+def test_keine_steuerzeichen_in_ausgelieferten_dateien():
+    """Ein Steuerzeichen im Quelltext sieht man nicht - es wirkt trotzdem.
+
+    In app.js stand einmal eine Pruefung auf "EUR" mit zwei Rueckschritt-
+    zeichen statt der Wortgrenzen, weil ein Patch die Backslashes gefressen
+    hatte. Die Pruefung traf nie, und jeder Preis erschien doppelt.
+    """
+    erlaubt = set("\t\n\r")
+    wurzel = SITE.parent
+    kaputt = []
+    for ordner, muster in ((SITE, "*.*"), (wurzel / "scraper", "*.py"),
+                           (wurzel / "tests", "*.py")):
+        for datei in sorted(ordner.glob(muster)):
+            if datei.is_dir() or datei.suffix in (".gz", ".png", ".webmanifest"):
+                continue
+            try:
+                inhalt = datei.read_text(encoding="utf-8")
+            except (UnicodeDecodeError, OSError):
+                kaputt.append(f"{datei.name}: nicht als UTF-8 lesbar")
+                continue
+            if inhalt.startswith("\ufeff"):
+                kaputt.append(f"{datei.name}: beginnt mit einer Byte-Reihenfolge-Marke")
+            for nr, zeile in enumerate(inhalt.splitlines(), 1):
+                schlimm = {z for z in zeile if ord(z) < 32 and z not in erlaubt}
+                if schlimm:
+                    zeichen = ", ".join(f"U+{ord(z):04X}" for z in sorted(schlimm))
+                    kaputt.append(f"{datei.name}:{nr}: {zeichen}")
+    assert not kaputt, "Steuerzeichen gefunden:\n" + "\n".join(kaputt)

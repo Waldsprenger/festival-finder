@@ -33,6 +33,23 @@ class TestFold:
         assert fold("Powerwolf Live") == "powerwolf"
         assert fold("Deichkind DJ Set") == "deichkind"
 
+    def test_andere_schriften_behalten_ihren_namen(self):
+        # "[^a-z0-9]" liess von kyrillischen Namen nichts uebrig: Der Act galt
+        # als namenlos und fiel aus jedem Lineup.
+        assert fold("Мумий Тролль") == "мумии тролль"
+        assert fold("Ленинград") == "ленинград"
+        assert fold("Ελλάδα") == "ελλαδα"
+
+    def test_griechischer_name_faellt_nicht_auf_band_zusammen(self):
+        # Sonst waeren alle so geschriebenen Acts dieselbe Band
+        assert fold("Ελλάδα Band") != fold("Καλημέρα Band")
+
+    def test_lateinische_namen_bleiben_wie_sie_waren(self):
+        for name, erwartet in [("AC/DC", "ac dc"), ("Sigur Rós", "sigur ros"),
+                               ("Małgorzata", "malgorzata"), ("!!!", ""),
+                               ("Motörhead", "motorhead"), ("P!nk", "p nk")]:
+            assert fold(name) == erwartet, name
+
 
 class TestBandKey:
     def test_getrennt_und_zusammen_ist_dieselbe_band(self):

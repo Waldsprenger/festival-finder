@@ -4,7 +4,6 @@ Die Ausschnitte sind auf das Nötige gekürzt; sie halten die Eigenheiten fest,
 an denen die Leser sich einmal verschluckt haben.
 """
 
-import pytest
 
 from quellen import (QUELLEN, RANG, datensatz, fa_lesen, fh_lesen, fp_lesen,
                      ft_bands, wf_lesen)

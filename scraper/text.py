@@ -51,7 +51,11 @@ def fold(value: str) -> str:
     for a, b in _ERSATZ.items():
         v = v.replace(a, b)
     v = re.sub(r"\b(feat|ft|featuring|vs|with|und|and)\b", " and ", v)
-    v = re.sub(r"[^a-z0-9]+", " ", v)
+    # Buchstaben aller Schriften bleiben stehen. "[^a-z0-9]" liess von
+    # "Мумий Тролль" nichts übrig - der Act galt damit als namenlos und fiel
+    # aus jedem Lineup; "Ελλάδα Band" schrumpfte auf "band" und wäre mit jeder
+    # anderen so verkürzten Band zusammengefallen.
+    v = re.sub(r"[\W_]+", " ", v)
     v = re.sub(r"\s+", " ", v).strip()
     v = re.sub(r"^(the|die|der|das|los|las|les)\s+", "", v)
     v = re.sub(r"\s+(band|live|dj ?set|djset|acoustic)$", "", v)
@@ -84,9 +88,34 @@ def _lade_aliase() -> tuple[dict[str, str], dict[str, str]]:
             {_zusammen(fold(v)): v for v in roh.values()})
 
 
-# ALIAS_KEY wird von zusammenfuehren.alias_kollisionen bereinigt, bevor die
-# Bandnamen vereinheitlicht werden.
 ALIAS_KEY, ALIAS_NAME = _lade_aliase()
+
+
+def alias_abschalten(kurz: str) -> None:
+    """Ein Kürzel gilt in diesem Lauf nicht mehr als Abkürzung.
+
+    `zusammenfuehren.alias_kollisionen` findet Kürzel, die eine andere Band
+    meinen — "LP" steht für die Sängerin, nicht für Linkin Park. Sie müssen aus
+    der Tabelle, bevor die Bandnamen vereinheitlicht werden.
+
+    Das ändert das Verhalten von `band_key` für den Rest des Prozesses. Genau
+    deshalb steht es hier als eigene Funktion und nicht als `pop()` mitten in
+    einer Schleife: Eine Tabelle, die sich unterwegs ändert, soll man sehen.
+    """
+    ALIAS_KEY.pop(kurz, None)
+
+
+def aliase_zuruecksetzen() -> None:
+    """Die Kürzeltabelle wieder wie beim Start — an Ort und Stelle.
+
+    Die Tabellen sind anderswo unter ihrem Namen eingebunden; sie werden
+    deshalb geleert und neu gefüllt, nicht ersetzt.
+    """
+    key, name = _lade_aliase()
+    ALIAS_KEY.clear()
+    ALIAS_KEY.update(key)
+    ALIAS_NAME.clear()
+    ALIAS_NAME.update(name)
 
 
 def band_key(name: str) -> str:
@@ -168,7 +197,9 @@ def valid_band(name: str) -> bool:
         return False
     if _BAND_FUELLWORT.match(n) or _BAND_DATUM.match(n) or _BAND_FELD.search(n):
         return False
-    if not re.search(r"[A-Za-zÀ-ÿ0-9]", n):
+    # Ein Buchstabe irgendeiner Schrift genügt: Vorher war nur das lateinische
+    # Alphabet gemeint, und "Мумий Тролль" galt deshalb nicht als Bandname.
+    if not re.search(r"[^\W_]", n):
         return False
     # Satzwörter erst ab einer Länge prüfen, die kein Bandname mehr hat -
     # "Werden Wir Uns Wiedersehen" soll nicht durchfallen.
@@ -210,6 +241,68 @@ def betrag(roh: str) -> float | None:
         return float(text)
     except ValueError:
         return None
+
+
+#: Freier Eintritt ist eine Preisangabe, auch ohne Zahl. "Spende" und "zahl was
+#: du willst" gehören dazu - der Eintritt kostet nichts.
+KOSTENLOS = re.compile(r"kostenlos|gratis|freier eintritt|umsonst|frei\b|spende|"
+                       r"zahl[,]?\s*was|pay what", re.I)
+
+
+def preis_text(roh: str) -> str:
+    """Der Preistext, sofern es überhaupt einer ist.
+
+    Auf einer Seite stand "Preis: Pop Punk" — das Genre war ins Preisfeld
+    gerutscht, und niemandem fiel es auf. Ein Preis nennt entweder eine Zahl
+    oder sagt, dass es nichts kostet; alles andere ist ein Feldsalat.
+    """
+    text = clean(roh)
+    if not text:
+        return ""
+    # Eine Ziffer allein genügt nicht: "ab EUR ,00" ist ein leer gebliebenes
+    # Feld, keine Preisangabe. Freier Eintritt sagt es dagegen mit Worten.
+    return text if re.search(r"[1-9]", text) or KOSTENLOS.search(text) else ""
+
+
+def besucherzahl(roh: str) -> str:
+    """Eine Besucherzahl - oder gar keine, wenn der Text mehrere Zahlen nennt.
+
+    Früher blieben schlicht alle Ziffern des Textes übrig. Auf Seiten, deren
+    Muster ins Leere griff, ergab das Zahlen mit 66 Stellen, zusammengeklebt
+    aus Datumsangaben. Eine unklare Angabe ist kein Wissen: Dann lieber nichts.
+    """
+    text = clean(roh)
+    if not text:
+        return ""
+    zahlen = [re.sub(r"\D", "", z) for z in re.findall(r"\d[\d.\s']*\d|\d", text)]
+    zahlen = [z for z in zahlen if z]
+    if len(zahlen) != 1:
+        return ""
+    wert = int(zahlen[0])
+    # Unter zehn ist keine Besucherzahl, über fünf Millionen auch nicht.
+    return str(wert) if 10 <= wert <= 5_000_000 else ""
+
+
+#: Wonach eine Spielstätte aussieht, wenn die Seite gar keine nennt: Dann steht
+#: dort der nächste Knopf ("Tickets Ticket" stand so auf acht Karten).
+KNOPFBESCHRIFTUNG = re.compile(
+    r"(?i)^(?:tickets?\b|get |buy |mehr\b|more |website\b|infos?\b|hier\b)")
+
+#: "104 45 Athen", "170 00 Prague" - Postleitzahl vor dem Ortsnamen
+PLZ_VORN = re.compile(r"^(\d{3,5}(?:\s?\d{2})?)\s+(?=\D)")
+
+
+def plz_und_stadt(city: str, plz: str) -> tuple[str, str]:
+    """Steht die Postleitzahl im Ortsfeld, gehört sie ins Postleitzahlfeld.
+
+    Sonst heißt der Ort "104 45 Athen", die Karte findet ihn nicht und auf der
+    Karte steht die Nummer mit.
+    """
+    stadt = clean(city)
+    treffer = PLZ_VORN.match(stadt)
+    if not treffer:
+        return stadt, clean(plz)
+    return stadt[treffer.end():].strip(), clean(plz) or treffer.group(1).replace(" ", "")
 
 
 # --------------------------------------------------------------------------

@@ -16,7 +16,7 @@ from datetime import datetime
 
 from gemeinsam import DATA, EUROPA_CODES, EUROPA_RAHMEN, SITE, land_code, lies_json
 from genres import OBERBEGRIFFE, oberbegriffe
-from text import fold
+from text import KOSTENLOS, fold
 
 # Spalten einer Festivalzeile - dieselbe Reihenfolge steht in site/app.js
 NAME, VON, BIS, ORT, LAND, VENUE, EURO, PREIS_TEXT, WEB, LAT, LON, \
@@ -34,11 +34,6 @@ REF_PLZ = "97209"
 KURSE = {"EUR": 1.0, "€": 1.0, "CHF": 1.06, "GBP": 1.17, "USD": 0.92,
          "DKK": 0.134, "SEK": 0.088, "NOK": 0.086, "PLN": 0.235,
          "CZK": 0.040, "HUF": 0.0025}
-
-# "Spende" und "Zahl was du willst" sind kein fehlender Preis, sondern freier
-# Eintritt mit Spendenbitte - für den Filter zählen sie als 0 EUR.
-KOSTENLOS = re.compile(r"kostenlos|gratis|freier eintritt|umsonst|frei\b|spende|"
-                       r"zahl[,]?\s*was|pay what", re.I)
 
 _ZAHL = r"\d{1,3}(?:\.\d{3})*(?:,\d{1,2})?|\d+(?:\.\d{1,2})?"
 _WAEHRUNG = r"€|EUR|CHF|GBP|USD|DKK|SEK|NOK|PLN|CZK|HUF"

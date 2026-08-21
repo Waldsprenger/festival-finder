@@ -43,7 +43,7 @@ als einer Quelle · [Änderungshistorie](https://github.com/Waldsprenger/festiva
 | `scraper/build_pwa.py` | Manifest, App-Symbole, Service Worker |
 | `scraper/build_artifact.py` | → `site/artifact.html`, alles in einer Datei |
 | `scraper/daily_update.py` | führt die Kette aus, protokolliert nach `data/update.log` |
-| `tests/` | 231 Tests für Schlüssel, Stufen, Leser, Preise, Sprachdatei und Wächter |
+| `tests/` | 522 Tests für Schlüssel, Stufen, Leser, Preise, Sprachdatei und Wächter |
 
 Und in `site/` die Seite selbst — reines HTML, CSS und JavaScript, kein
 Bauschritt, keine Bibliothek:
@@ -435,7 +435,7 @@ das andere wäre unsere eigene Ungeduld.
 pip install pytest && python -m pytest tests -q
 ```
 
-231 Tests in unter einer Sekunde, ohne Netz und ohne Datenbestand. Sie halten
+522 Tests in gut sechs Sekunden, ohne Netz und ohne Datenbestand. Sie halten
 fest, warum die Regeln so aussehen, wie sie aussehen — fast jeder Fall stand
 einmal falsch in den Daten:
 
@@ -452,9 +452,24 @@ einmal falsch in den Daten:
 | `tests/test_gazetteer.py` | welche Postleitzahlen mitgeliefert und welche nachgeladen werden |
 | `tests/test_oberflaeche.py` | die Sprachdatei: Anführungszeichen, zehn Sprachen, Platzhalter, Schlüssel |
 | `tests/test_schnappschuss.py` | der mitgebrachte Stand: füllen, lesen, nicht leeren lassen |
+| `tests/test_korpus.py` | die Leser an fünfzehn echten, eingefrorenen Seiten |
+| `tests/test_kette.py` | Schritt scheitert, Schritt hängt, Kette läuft weiter |
+| `tests/test_dateien.py` | JSON schreiben und lesen, auch bei Abbruch mittendrin |
+| `tests/test_geocode.py` | Ausfall des Kartendienstes ist kein „Ort unbekannt" |
+| `tests/test_zeitraeume.py` | laufende Festivals, Silvester, Jahrgangsschnitt |
+| `tests/test_verluste.py` | beim Zusammenführen geht keine Quelladresse verloren |
+| `tests/test_aliase.py` | Kürzel abschalten — und die Tabelle danach zurücksetzen |
 
 Der Workflow führt sie vor jedem Datenlauf aus: Ein Fehler in der Logik soll
 auffallen, bevor er sich in die veröffentlichten Daten schreibt.
+
+**An echten Seiten statt an Schnipseln.** Handgeschriebene Testschnipsel halten
+fest, was gemeint war — nicht, was die Quellen schicken. Genau dort sassen die
+letzten Fehler. In `tests/seiten/` liegen deshalb je Quelle zwei echte Seiten,
+eingefroren und gepackt (zusammen 0,5 MB). Jede wird gelesen und das Ergebnis
+gegen dieselben Regeln geprüft, die auch der Lauf anlegt; dazu kommt jede Seite
+noch einmal leer, abgeschnitten, ohne Auszeichnung und als bloßer Satz. Ein
+Leser darf dann nichts finden — abstürzen oder etwas erfinden darf er nicht.
 
 ## Wenn eine Quelle sich ändert
 
@@ -470,10 +485,31 @@ Einträge gekostet, bis er auffiel.
 **Und der Lauf prüft sein eigenes Ergebnis.** Nicht „wie beim letzten Mal",
 sondern „in sich stimmig": Passt das Jahr zum Termin, liegt das Ende nicht vor
 dem Anfang, steckt jede Koordinate in Europa, zählt das Lineup richtig, ist die
-Besucherzahl eine Zahl, blieb eine Dublette übrig? Jeder dieser Punkte war
-schon einmal falsch — zehn Koordinaten in Mexiko und Buenos Aires, ein Jahrgang
-2027 mit Termin im August 2026, eine Besucherzahl „2.000", eine doppelte
-Nachtwacht. Was die Prüfung findet, steht am Ende des Laufs im Protokoll.
+Besucherzahl plausibel, steht im Preisfeld ein Preis, blieb eine Dublette
+übrig? Jeder dieser Punkte war schon einmal falsch — zehn Koordinaten in Mexiko
+und Buenos Aires, ein Jahrgang 2027 mit Termin im August 2026, eine
+Besucherzahl mit 66 Stellen, „Pop Punk" als Preis, eine doppelte Nachtwacht.
+Was die Prüfung findet, steht am Ende des Laufs im Protokoll.
+
+### Die Prüfstelle für alle acht
+
+Jeder Fund geht durch `datensatz()` — und damit durch dieselbe Plausibilitäts-
+prüfung. Das ist Absicht: Was acht Leser einzeln beachten müssten, beachtet
+keiner zuverlässig.
+
+| Feld | Regel | Anlass |
+|---|---|---|
+| Land | als Kürzel, nicht als Name | sechs Leser lieferten `DE`, zwei „Deutschland" |
+| Besucherzahl | genau eine Zahl, 10 bis 5 Mio. | ein Muster griff ins Leere und klebte Datumsziffern zu 66 Stellen zusammen |
+| Preis | eine Zahl oder freier Eintritt | auf einer Seite stand „Preis: Pop Punk" |
+| Ort | Postleitzahl gehört ins eigene Feld | „104 45 Athen" fand keine Karte |
+| Spielstätte | keine Knopfbeschriftung | „Tickets Ticket" stand auf acht Karten |
+| Koordinate | innerhalb Europas | Buenos Aires für Lugano |
+
+**Was die Prüfung ans Licht brachte:** `Besucher:[^0-9]*([\d.]+)` sprang über
+ganze Absätze hinweg und holte die nächste Ziffer irgendwo auf der Seite. Auf
+Seiten mit dem Wort „Besucherinformationen" ergab das Zahlen mit bis zu 66
+Stellen. Das Muster fragt jetzt nur noch dicht am Wort.
 
 ## Was fehlt und warum
 
@@ -506,6 +542,71 @@ an, und wo ein Datenblatt steht, widersprach es kein einziges Mal. Die
 Datumsangaben im Fließtext meinen oft gar nicht das Festival, sondern
 Vorverkaufsstarts, Nebenveranstaltungen oder Nachrichten. **Bei einer
 Abweichung gilt deshalb der Bestand, nicht die Veranstalterseite.**
+
+## Fehler, die besondere Umstände brauchen
+
+Vier Klassen, die sich weder im Protokoll noch beim Lesen zeigen — nur im
+Vergleich, unter Zeitdruck oder an Eingaben, die es so noch nicht gab.
+
+**Ein Festival, das gerade läuft, verschwand.** Der Datumsfilter verglich nur
+den Beginn; die Vorgabe lautet „ab heute". An einem beliebigen Tag fielen damit
+rund hundert laufende Veranstaltungen aus der Liste — sie hatten gestern
+angefangen. Jetzt zählt der Zeitraum: Ein Fest ist dabei, solange es noch nicht
+vorbei ist. Dieselbe Regel beim Jahrgangsschnitt, sonst hätte der Neujahrstag
+jedes Fest verworfen, das über Silvester läuft.
+
+**Ein Ablaufplan als Bandliste legte den Lauf lahm.** Das Muster
+`([^()]+?)\s*\(…\)` sucht in einem Text ohne Klammern von jeder Stelle aus bis
+zum Ende: 1.000 Uhrzeiten kosteten 3 Sekunden, 4.000 schon 64, 10.000 über
+sechs Minuten. Der Namensteil ist jetzt begrenzt, und ohne Klammer im Text
+sucht das Muster gar nicht erst — aus 387 Sekunden werden 0,09.
+
+**Kyrillische und griechische Namen gab es nicht.** `fold()` behielt nur
+`[a-z0-9]`; von „Мумий Тролль" blieb nichts übrig, der Act galt als namenlos
+und fiel aus jedem Lineup. Schlimmer noch: „Ελλάδα Band" schrumpfte auf „band"
+und wäre mit jeder anderen so verkürzten Band zusammengefallen. Jetzt bleiben
+Buchstaben aller Schriften stehen. Für lateinische Namen ändert sich nichts —
+geprüft an allen 40.538 Bandnamen, 17 änderten ihren Schlüssel, jeder davon zum
+Besseren.
+
+**Zwei Faltungen, die auseinandergelaufen sind.** Dieselbe Aufgabe, zweimal
+umgesetzt: `fold()` in `scraper/text.py` bildet die Schlüssel, `fold()` in
+`site/app.js` normalisiert die Suche. Bei jedem achten Bandnamen kamen sie zu
+verschiedenen Ergebnissen — wer „2 Engel and Charlie" tippte, fand „2 Engel &
+Charlie" nicht, obwohl die Daten beide für dieselbe Band halten. Die Regeln
+stehen jetzt auf beiden Seiten gleich; nachgemessen im Browser: 0 Abweichungen
+bei 40.538 Bandnamen und 2.781 Orten.
+
+Dazu eine Stelle, die niemandem geschadet hat und trotzdem falsch war:
+`alias_kollisionen()` schaltete Kürzel ab, indem es eine Tabelle im Modul
+veränderte. Dieselbe Funktion `band_key` antwortete davor und danach
+verschieden. Der Vorgang heisst jetzt `alias_abschalten()`, und vor jedem Test
+wird die Tabelle zurückgesetzt — sonst hinge ein Testergebnis davon ab, welcher
+Test vorher lief.
+
+## Wenn etwas mittendrin abbricht
+
+Ein Lauf kann jederzeit enden: Stromausfall, geschlossener Deckel, ein
+abgebrochener Prozess. Drei Stellen sind darauf vorbereitet, weil an ihnen
+etwas hängt, das sich nicht wiederbeschaffen lässt.
+
+* **JSON wird erst daneben geschrieben und dann an seinen Platz gerückt.**
+  Ohne das bliebe eine halbe Datei zurück — bei `preis_verlauf.json` wäre die
+  ganze beobachtete Preisgeschichte weg, bei `geo.json` rund 2.000 einzeln
+  erfragte Koordinaten.
+* **Eine unlesbare Datei hält den Lauf nicht auf.** Sie wird als `.kaputt`
+  beiseitegelegt, gemeldet und neu aufgebaut, statt jeden weiteren Lauf
+  scheitern zu lassen, bis jemand sie von Hand löscht.
+* **Jeder Schritt der Kette hat eine Stunde Zeit.** Das Ortsverzeichnis lief
+  einmal vierzehn Stunden, weil eine Prüfung in einer Schleife stand; ein
+  hängender Schritt fällt niemandem auf, ein abgebrochener steht im Protokoll.
+
+Dazu zwei Fälle, in denen ein Ausfall sonst dauerhaft würde: Ein Festival, das
+in einem Lauf fehlt, behält seine Preisgeschichte noch zwei Monate — sonst
+hätte der Tag, an dem eine Quelle schwieg, den Startpreis von 800 Festivals
+vergessen. Und ein Ort, den der Kartendienst gerade nicht beantwortet, gilt
+nicht als „unbekannt": Nur eine echte Fehlanzeige kommt in den Cache, ein
+Ausfall wird morgen erneut gefragt.
 
 ## Bekannte Grenzen
 

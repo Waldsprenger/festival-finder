@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import concurrent.futures as cf
 import csv
+import re
 import sys
 import time
 from datetime import date, datetime
@@ -26,7 +27,8 @@ from gemeinsam import DATA, EUROPA_CODES, liegt_in_europa, lies_json, schreib_js
 from quellen import FT_STAMM, QUELLEN, Quelle
 from preisverlauf import verfolgen
 import schnappschuss
-from text import city_key, festival_key, tag_zahl
+from text import (KNOPFBESCHRIFTUNG, KOSTENLOS, PLZ_VORN, city_key,
+                  festival_key, tag_zahl)
 from zusammenfuehren import (alias_kollisionen, band_registry, zeitraum_ueberlappt,
                              zusammenfuehren)
 
@@ -161,7 +163,16 @@ def pruefe_stimmigkeit(festivals: list[dict]) -> list[str]:
               "Koordinate außerhalb Europas")
         merke(f["lineup_count"] == len(f["lineup"]), "Lineup falsch gezählt")
         merke(not f["visitors"] or f["visitors"].isdigit(), "Besucherzahl keine Zahl")
+        # "isdigit" allein liess Zahlen mit 66 Stellen durch, zusammengeklebt
+        # aus Datumsangaben - eine Zahl war es ja.
+        merke(not f["visitors"].isdigit()
+              or 10 <= int(f["visitors"]) <= 5_000_000, "Besucherzahl unplausibel")
         merke(not f["country"] or f["country"] in EUROPA_CODES, "Land außerhalb Europas")
+        merke(not PLZ_VORN.match(f["city"] or ""), "Postleitzahl im Ortsfeld")
+        merke(not f["price"] or bool(re.search(r"[1-9]", f["price"]))
+              or bool(KOSTENLOS.search(f["price"])), "Preis ohne Preis")
+        merke(not f["venue"] or not KNOPFBESCHRIFTUNG.match(f["venue"]),
+              "Spielstätte ist eine Knopfbeschriftung")
 
     # Dubletten: gleicher Name, gleicher Ort, sich überschneidender Termin.
     # Zwei Ausgaben desselben Festivals im selben Jahr gibt es wirklich
@@ -272,7 +283,8 @@ def main() -> None:
     # ohne bestätigtes Datum, keine vergangenen.
     vorher = len(festivals)
     festivals = [f for f in festivals
-                 if not f["date_from"] or int(f["date_from"][-4:]) >= args.since]
+                 if not f["date_from"]
+                 or int((f["date_to"] or f["date_from"])[-4:]) >= args.since]
     if vorher != len(festivals):
         print(f"  {vorher - len(festivals)} Einträge älter als {args.since} verworfen")
 

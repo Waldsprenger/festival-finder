@@ -16,8 +16,9 @@ from urllib.parse import parse_qs, urljoin, urlparse
 from gemeinsam import (EUROPA_CODES, JAHR_HEUTE, JAHRE, ausser_europa,
                        land_code, liegt_in_europa)
 from netz import fetch, endziel, json_ld_events, melde, sitemap_adressen, soup
-from text import (MONATE, betrag, clean, datum_de, datum_englisch,
-                  festival_name, genres_vereinen, valid_band)
+from text import (KNOPFBESCHRIFTUNG, MONATE, besucherzahl, betrag, clean,
+                  datum_de, datum_englisch, festival_name, genres_vereinen,
+                  plz_und_stadt, preis_text, valid_band)
 
 FT = "https://www.festivalticker.de"      # dichteste Abdeckung für Deutschland
 FU = "https://www.festivalsunited.com"    # Lineups, Preise, Datenblatt je Seite
@@ -41,22 +42,27 @@ def datensatz(quelle: str, url: str, name: str, *, date_from: str = "",
               lat: float | None = None, lon: float | None = None) -> dict:
     """Ein Fund, wie ihn alle Quellen abliefern.
 
-    Hier werden vier Dinge geradegezogen, die sonst jede Quelle einzeln
-    beachten müsste:
+    Hier wird geradegezogen, was sonst jede Quelle einzeln beachten müsste —
+    und hier steht die Plausibilitätsprüfung, die für alle acht gilt:
 
     * Der Name folgt der Liste in `data/festival_aliase.json`, falls er dort
       steht — für Fälle, die kein Buchstabenvergleich findet.
-
     * Das Jahr richtet sich nach dem Termin. Steht im Titel ein anderes als im
       Datum ("Sommer im Park Gera 2027" mit Termin im August 2026), gilt der
       Termin — er ist die genauere Angabe.
-    * Die Besucherzahl ist eine Zahl, keine Schreibweise: "2.000" wird 2000.
+    * Das Land als Kürzel, nicht als Name: "Deutschland" und "DE" sind
+      dieselbe Angabe und sollen auch dieselbe Schreibweise haben.
+    * Die Besucherzahl ist eine einzelne, plausible Zahl — oder keine.
+    * Der Preis nennt eine Zahl oder freien Eintritt; "Pop Punk" ist kein Preis.
+    * Steht die Postleitzahl im Ortsfeld ("104 45 Athen"), gehört sie ins
+      Postleitzahlfeld.
     * Eine Koordinate außerhalb Europas ist keine. Die Datenblätter der Quellen
       setzen dort schon mal Buenos Aires für Lugano; solche Punkte fliegen
       raus, statt später mühsam geprüft zu werden.
     """
     if not liegt_in_europa(lat, lon):
         lat = lon = None
+    city, plz = plz_und_stadt(city, plz)
     return {
         "source": quelle,
         "source_url": url,
@@ -65,15 +71,19 @@ def datensatz(quelle: str, url: str, name: str, *, date_from: str = "",
         "date_to": date_to or date_from,
         "year": date_from[-4:] if date_from else year,
         "city": city,
-        "country": country,
+        # Als Kürzel, gleich hier: Sechs Leser lieferten "DE", zwei
+        # "Deutschland", und geradegezogen wurde es erst beim Zusammenführen.
+        # Zwei Schreibweisen für dieselbe Sache sind eine Fehlerquelle, auch
+        # wenn am Ende beide richtig ankommen.
+        "country": land_code(country),
         "venue": venue,
         "plz": plz,
         "lat": lat,
         "lon": lon,
-        "price": price,
+        "price": preis_text(price),
         "website": website,
         "genre": genre,
-        "visitors": re.sub(r"\D", "", visitors),
+        "visitors": besucherzahl(visitors),
         "note": note,
         "cancelled": cancelled,
         "lineup": lineup or [],
@@ -115,7 +125,10 @@ FT_BANDS_ENDE = re.compile(
     r"Kategorie:|Preis:|Besucher:|Location:|Stil:|Plz:|Ort:|Strasse:|Land:|Website:)")
 
 # Bandlisten ohne Komma reihen "Bandname (Stilbeschreibung)" aneinander …
-FT_BANDS_KLAMMER = re.compile(r"([^()]+?)\s*\(([^()]{2,60})\)")
+# Der Namensteil ist begrenzt: Unbegrenzt (`[^()]+?`) sucht das Muster in einem
+# Text ohne Klammern von jeder Stelle aus bis zum Ende - bei einem Ablaufplan
+# mit 4.000 Uhrzeiten waren das 64 Sekunden, bei 10.000 über sechs Minuten.
+FT_BANDS_KLAMMER = re.compile(r"([^()]{1,80}?)\s*\(([^()]{2,60})\)")
 # … oder stehen als Ablaufplan "17:30 Band 19:45 Band" da.
 FT_BANDS_UHRZEIT = re.compile(r"\b\d{1,2}[:.]\d{2}\s*(?:Uhr)?\s*")
 
@@ -146,7 +159,11 @@ def ft_adressen(since: int) -> list[str]:
                 return datum_de(vt.get("title", "")) if vt else ""
 
             date_from = wert(ev.find("span", class_="dtstart"))
-            if since and date_from and int(date_from[-4:]) < since:
+            date_to = wert(ev.find("span", class_="dtend")) or date_from
+            # Nach dem Ende, nicht nach dem Beginn: Ein Fest vom 29.12. bis
+            # zum 1.1. läuft am Neujahrstag noch, sein Beginn liegt aber im
+            # alten Jahr - so fiele es genau dann heraus, wenn es stattfindet.
+            if since and date_to and int(date_to[-4:]) < since:
                 continue
             loc = ev.find("span", class_="location")
             place = clean(loc.get_text()) if loc else ""
@@ -155,7 +172,7 @@ def ft_adressen(since: int) -> list[str]:
             FT_STAMM[urljoin(url, a["href"])] = {
                 "name": clean(a.get_text()),
                 "date_from": date_from,
-                "date_to": wert(ev.find("span", class_="dtend")) or date_from,
+                "date_to": date_to,
                 "city": re.sub(r"^\d[\w\- ]*?\s+", "", place).strip() or place,
                 "country": (cm.group(1).upper() if cm else ""),
                 "genre": clean(stil.get("title")) if stil else "",
@@ -173,8 +190,9 @@ def ft_bands(blob: str) -> list[str]:
         return [clean(p) for p in blob.split(",") if valid_band(p)]
 
     # Kein Komma: Die Klammer hinter jedem Namen dient als Trenner.
-    # Erst ab zwei Treffern ist das Muster belastbar.
-    paare = FT_BANDS_KLAMMER.findall(blob)
+    # Erst ab zwei Treffern ist das Muster belastbar. Ohne Klammer im Text
+    # braucht es gar nicht erst zu suchen.
+    paare = FT_BANDS_KLAMMER.findall(blob) if "(" in blob and ")" in blob else []
     if len(paare) >= 2:
         namen = [clean(n) for n, _ in paare]
         rest = clean(blob[blob.rfind(")") + 1:])
@@ -657,7 +675,10 @@ FH_FELDER = {
     "genre":    r"Musikart:[^A-Za-z0-9]*(.*?)\s*(?:Region:|Festivalort:|Besucher:)",
     "region":   r"Region:[^A-Za-z0-9]*(.*?)\s*(?:Festivalort:|Besucher:|Tickets:)",
     "ort":      r"Festivalort:[^A-Za-z0-9]*(.*?)\s*(?:Besucher:|Tickets:|Infos)",
-    "besucher": r"Besucher:[^0-9]*([\d.]+)",
+    # Dicht am Wort: "Besucher:[^0-9]*" sprang ueber ganze Absaetze hinweg und
+    # holte die naechste Ziffer irgendwo auf der Seite - auf Seiten mit
+    # "Besucherinformationen" wurden daraus Zahlen mit 66 Stellen.
+    "besucher": r"Besucher:\s{0,3}([\d.]{1,9})",
     "preis":    r"Tickets:[^A-Za-z0-9]*(.*?)\s*(?:Infos zum|Anfahrt|Lineup)",
 }
 
@@ -831,9 +852,6 @@ WF_DRAUSSEN = {"outdoor", "buiten", "draussen", "draußen", "strand", "beach",
                "boot", "park"}
 WF_FESTIVALWORT = re.compile(r"(?i)festival|open ?air|openair|\bfest\b|"
                              r"weekender|\bdagen\b|\bdays\b|\bfestivals\b")
-#: Nennt die Seite keine Spielstätte, steht an ihrer Stelle der nächste Knopf.
-#: Ohne diesen Riegel stand auf acht Karten "Tickets Ticket" als Ort.
-WF_KEINE_STAETTE = re.compile(r"(?i)^(?:tickets?\b|get |buy |more |website\b|infos?\b)")
 
 
 def wf_adressen(since: int) -> list[str]:
@@ -895,7 +913,7 @@ def wf_lesen(url: str, html: str) -> dict | None:
         "wannafest", url, name,
         date_from=date_from, date_to=date_to,
         city=clean(lm.group(1)) if lm else "", country=country,
-        venue=venue if len(venue) <= 60 and not WF_KEINE_STAETTE.match(venue) else "",
+        venue=venue if len(venue) <= 60 and not KNOPFBESCHRIFTUNG.match(venue) else "",
         website=website,
     )
 

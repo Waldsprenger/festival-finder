@@ -12,8 +12,10 @@ Was bleibt, ist die eigene Beobachtung: Der Lauf holt die Quellseiten täglich.
 kann den heutigen Preis nennen und den ersten in Klammern dahinter.
 
 Ergebnis: `data/preis_verlauf.json`, je Festival der erste und der aktuelle
-Preis mit Datum. Festivals, die aus den Quellen verschwinden, fallen aus der
-Datei; sonst wüchse sie mit jedem Jahrgang.
+Preis mit Datum. Festivals, die aus den Quellen verschwinden, bleiben zwei
+Monate stehen und fallen dann heraus; sonst wüchse die Datei mit jedem
+Jahrgang - und ein einziger Tag, an dem eine Quelle schweigt, würde die
+Geschichte aller ihrer Festivals löschen.
 """
 
 from __future__ import annotations
@@ -24,6 +26,16 @@ from gemeinsam import DATA, lies_json, schreib_json
 from text import city_key, festival_key
 
 DATEI = DATA / "preis_verlauf.json"
+#: So lange bleibt ein Festival in der Beobachtung, auch wenn es gerade fehlt
+GEDULD_TAGE = 60
+
+
+def _tage_her(stand: str, heute: str) -> int:
+    """Tage zwischen zwei ISO-Daten; ohne lesbares Datum: unendlich lange her."""
+    try:
+        return (date.fromisoformat(heute) - date.fromisoformat(stand)).days
+    except ValueError:
+        return 10 ** 6
 
 
 def schluessel(f: dict) -> str:
@@ -61,6 +73,14 @@ def verfolgen(festivals: list[dict], heute: str | None = None) -> dict[str, int]
             f["price_start"] = eintrag["erst"]
             f["price_start_seit"] = eintrag["seit"]
             geaendert += 1
+
+    # Ein Festival, das in diesem Lauf fehlt, ist nicht unbedingt verschwunden:
+    # An dem Tag, an dem festivalticker den Serverlauf abwies, fehlten 800 auf
+    # einmal. Ihre Geschichte einfach zu löschen hiesse, den Startpreis beim
+    # nächsten Auftauchen neu zu erfinden. Also bleiben sie eine Weile stehen.
+    for k, alt in vorher.items():
+        if k not in verlauf and _tage_her(alt.get("stand", ""), heute) <= GEDULD_TAGE:
+            verlauf[k] = alt
 
     schreib_json(DATEI, verlauf)
     return {"beobachtet": len(verlauf), "geändert": geaendert,

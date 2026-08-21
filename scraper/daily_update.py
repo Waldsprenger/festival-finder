@@ -35,6 +35,11 @@ UMGEBUNG = {**os.environ, "PYTHONIOENCODING": "utf-8"}
 
 FRISCH = "--frisch" in sys.argv[1:]
 
+#: Zeitgrenze je Schritt. Der längste (die Festivaldaten mit frischem Abruf)
+#: braucht rund zwanzig Minuten; eine Stunde ist reichlich Luft und trotzdem
+#: kurz genug, dass ein hängender Schritt am selben Tag auffällt.
+STUNDE = 3600
+
 SCHRITTE = [
     ("Festivaldaten", ["festival_scraper.py", "--max-age", "24"]
                       + (["--frisch"] if FRISCH else [])),
@@ -61,9 +66,23 @@ def main() -> int:
 
     for name, args in SCHRITTE:
         t0 = time.time()
-        lauf = subprocess.run([sys.executable, "scraper/" + args[0], *args[1:]],
-                              cwd=BASE, capture_output=True, text=True,
-                              encoding="utf-8", errors="replace", env=UMGEBUNG)
+        try:
+            lauf = subprocess.run([sys.executable, "scraper/" + args[0], *args[1:]],
+                                  cwd=BASE, capture_output=True, text=True,
+                                  encoding="utf-8", errors="replace", env=UMGEBUNG,
+                                  timeout=STUNDE)
+        except subprocess.TimeoutExpired as abbruch:
+            # Ein Schritt, der nicht zurückkommt, ist schlimmer als einer, der
+            # scheitert: Er hält den ganzen Lauf auf und fällt niemandem auf.
+            # Das Ortsverzeichnis lief einmal vierzehn Stunden, weil eine
+            # Prüfung in einer Schleife stand.
+            fehler += 1
+            zeilen.append(f"[{name}] ABBRUCH nach {time.time() - t0:.0f}s "
+                          f"(Zeitgrenze {STUNDE}s)")
+            zeilen += [f"    {z}" for z in
+                       (abbruch.stdout or "").strip().splitlines()[-3:]]
+            print(f"[{name}] ABBRUCH", flush=True)
+            continue
         letzte = [z for z in (lauf.stdout or "").strip().splitlines() if z.strip()][-3:]
         stand = "ok" if lauf.returncode == 0 else f"FEHLER (exit {lauf.returncode})"
         # Warnungen stehen auf der Fehlerausgabe, auch wenn der Schritt gelingt -
