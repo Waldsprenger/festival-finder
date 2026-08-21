@@ -71,6 +71,21 @@ def haeuser(adressen: list[str]) -> dict[str, int]:
     return dict(sorted(zaehler.items(), key=lambda p: -p[1]))
 
 
+def gruende(adressen: list[str]) -> dict[str, int]:
+    """Woran es scheiterte, je Rechnername und Fehlerart.
+
+    Ein abgewiesener Zugriff (HTTPError) ist etwas anderes als eine Leitung,
+    die nicht zustande kommt (ConnectionError, Timeout) — und nur das eine
+    wäre eine Entscheidung des Betreibers.
+    """
+    zaehler: dict[str, int] = {}
+    for eintrag in adressen:
+        adresse, _, art = eintrag.partition(" ")
+        schluessel = f"{urlparse(adresse).netloc} {art.strip('()') or 'unbekannt'}"
+        zaehler[schluessel] = zaehler.get(schluessel, 0) + 1
+    return dict(sorted(zaehler.items(), key=lambda p: -p[1]))
+
+
 def pruefe_ausbeute(funde: dict[str, int], festivals: int) -> list[str]:
     """Vergleicht die Ausbeute mit dem letzten Lauf und meldet Einbrüche.
 
@@ -262,6 +277,7 @@ def main() -> None:
         "warnungen": warnungen,
         "nicht_ladbar": len(netz.FEHLGESCHLAGEN),
         "nicht_ladbar_je_haus": haeuser(netz.FEHLGESCHLAGEN),
+        "nicht_ladbar_grund": gruende(netz.FEHLGESCHLAGEN),
         "meldungen": netz.MELDUNGEN[:40],
     })
 

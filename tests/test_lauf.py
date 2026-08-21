@@ -52,6 +52,14 @@ class TestFehlerherkunft:
     def test_ohne_fehler_leeres_verzeichnis(self):
         assert lauf.haeuser([]) == {}
 
+    def test_fehlerart_steht_dabei(self):
+        # Abgewiesen zu werden ist etwas anderes, als keine Leitung zu bekommen
+        assert lauf.gruende([
+            "https://www.festivalticker.de/2026/ (ConnectionError)",
+            "https://www.festivalticker.de/alle-festivals/ (ConnectionError)",
+            "https://festapp.io/x (HTTPError)",
+        ]) == {"www.festivalticker.de ConnectionError": 2, "festapp.io HTTPError": 1}
+
 
 class TestEinbruchswaechter:
     def stand(self, tmp_path, monkeypatch, inhalt=None):
