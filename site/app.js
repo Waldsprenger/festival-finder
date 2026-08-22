@@ -183,6 +183,28 @@
     aliasVonBand.get(i).push(text);
   }
 
+  /* ---------------- Umkreis ----------------
+     Der Regler zeigt Kilometer, laeuft aber logarithmisch: Weltweit reicht
+     der Umkreis bis 20.000 km, gesucht wird fast immer unter 500. Linear
+     laegen diese ersten 500 km in den ersten zweieinhalb Prozent des Weges. */
+
+  const UMKREIS_MIN = 10;
+  const reglerMax = () => Math.max(100, D.maxDistanceKm || 3300);
+
+  /** Reglerstellung (0..1000) → Kilometer, auf runde Werte gebracht. */
+  function stellungZuKm(p) {
+    const roh = UMKREIS_MIN * Math.pow(reglerMax() / UMKREIS_MIN, p / 1000);
+    const schritt = roh < 200 ? 10 : roh < 1000 ? 50 : roh < 5000 ? 100 : 500;
+    return Math.min(reglerMax(), Math.round(roh / schritt) * schritt) || UMKREIS_MIN;
+  }
+
+  /** Kilometer → Reglerstellung, für die Voreinstellung und geteilte Links. */
+  function kmZuStellung(km) {
+    const wert = Math.min(Math.max(km, UMKREIS_MIN), reglerMax());
+    return Math.round(1000 * Math.log(wert / UMKREIS_MIN) /
+                      Math.log(reglerMax() / UMKREIS_MIN));
+  }
+
   /* ---------------- Entfernung ---------------- */
 
   function haversine(aLat, aLon, bLat, bLon) {
@@ -201,21 +223,21 @@
   /* ---------------- Wohnort bestimmen ---------------- */
 
   /* Das mitgelieferte Verzeichnis deckt DE/AT/CH vollständig ab und das
-     übrige Europa ab 15.000 Einwohnern. Alles darunter steht in site/orte.js
+     übrige Welt ab 15.000 Einwohnern. Alles darunter steht in site/orte.js
      und wird erst geholt, wenn jemand danach sucht - als <script>, damit es
      auch beim Öffnen per Doppelklick (file://) funktioniert, wo fetch()
      scheitert. In der gebündelten Einzelseite gibt es die Datei nicht; dort
      bleibt es beim kleinen Verzeichnis. */
   let europaVerzeichnis = null;
 
-  function ortsverzeichnisEuropa() {
+  function grossesOrtsverzeichnis() {
     if (europaVerzeichnis) return europaVerzeichnis;
     europaVerzeichnis = new Promise((fertig) => {
-      if (window.ORTE_EUROPA) return fertig(window.ORTE_EUROPA);
-      // Die Datei setzt window.ORTE_EUROPA = {orte, plz}
+      if (window.ORTE_WELT) return fertig(window.ORTE_WELT);
+      // Die Datei setzt window.ORTE_WELT = {orte, plz}
       const skript = document.createElement('script');
       skript.src = 'orte.js';
-      skript.onload = () => fertig(window.ORTE_EUROPA || null);
+      skript.onload = () => fertig(window.ORTE_WELT || null);
       skript.onerror = () => fertig(null);
       document.head.append(skript);
     });
@@ -224,7 +246,7 @@
 
   /** Postleitzahl im nachgeladenen Verzeichnis, sonst null. */
   async function plzNachladen(code, land) {
-    const europa = await ortsverzeichnisEuropa();
+    const europa = await grossesOrtsverzeichnis();
     const treffer = (europa && europa.plz || []).filter(
       (p) => p[0] === code && (!land || fold(p[4]) === land));
     if (!treffer.length) return null;
@@ -318,9 +340,9 @@
       return treffer;
     }
 
-    // 3. Kleinerer Ort in Europa: das große Verzeichnis nachladen und dort
+    // 3. Kleinerer Ort irgendwo auf der Welt: das große Verzeichnis
     //    dieselbe Suche noch einmal führen.
-    const europa = await ortsverzeichnisEuropa();
+    const europa = await grossesOrtsverzeichnis();
     if (europa && europa.orte) {
       const weiterer = ortSuchen(europa.orte, needle);
       if (weiterer) return weiterer;
@@ -1295,9 +1317,8 @@
     // Obergrenzen kommen aus den Daten: der Umkreis reicht bis zum entferntesten
     // Festival, der Preis bis zum teuersten gefundenen Ticket.
     const rad = $('radius'), pri = $('price');
-    if (D.maxDistanceKm) rad.max = String(D.maxDistanceKm);
     if (D.maxPriceEur) pri.max = String(D.maxPriceEur);
-    state.radius = +rad.value;
+    rad.value = String(kmZuStellung(state.radius));
     state.maxPrice = +pri.value;
     $('radius-out').textContent = `${state.radius.toLocaleString('de-DE')} km`;
     $('price-out').textContent = `${state.maxPrice} €`;
@@ -1315,7 +1336,7 @@
     $('home').addEventListener('keydown', (e) => { if (e.key === 'Enter') resolveHome(); });
 
     $('radius').addEventListener('input', (e) => {
-      state.radius = +e.target.value;
+      state.radius = stellungZuKm(+e.target.value);
       $('radius-out').textContent = `${state.radius.toLocaleString('de-DE')} km`;
       KARTE.zeichnen();
       render();
@@ -1438,6 +1459,7 @@
       sprache: () => sprache,
       wohnort: () => state.home,
       umkreis: () => state.radius,
+      datenRahmen: () => D.dataBox || null,
       welt: D.world,
       weltFein: D.worldFine,
       fineBox: D.fineBox,

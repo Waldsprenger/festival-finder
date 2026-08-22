@@ -7,6 +7,7 @@ bei den Quellen aus — und die Quellen tragen nur die Last, die nötig ist.
 
 from __future__ import annotations
 
+import gzip
 import hashlib
 import json
 import os
@@ -60,7 +61,42 @@ def session() -> requests.Session:
 
 
 def _cachedatei(url: str):
-    return CACHE / (hashlib.sha1(url.encode()).hexdigest() + ".html")
+    """Wohin eine Seite gespeichert wird: gepackt, benannt nach ihrer Adresse."""
+    return CACHE / (hashlib.sha1(url.encode()).hexdigest() + ".html.gz")
+
+
+def _lies_cache(pfad):
+    """Eine gespeicherte Seite lesen - gepackt oder noch in alter Form.
+
+    Ungepackte Dateien aus der Zeit davor werden beim ersten Zugriff
+    umgeschrieben. Das spart den erneuten Abruf von 24.589 Seiten.
+    """
+    if pfad.exists() and pfad.stat().st_size > 0:
+        try:
+            return gzip.decompress(pfad.read_bytes()).decode("utf-8", "replace")
+        except (OSError, EOFError):
+            return None
+    alt = pfad.with_suffix("")                     # ".html.gz" -> ".html"
+    if alt.exists() and alt.stat().st_size > 0:
+        text = alt.read_text(encoding="utf-8", errors="replace")
+        _schreib_cache(pfad, text)
+        alt.unlink(missing_ok=True)
+        return text
+    return None
+
+
+def _schreib_cache(pfad, text: str) -> None:
+    daneben = pfad.with_name(pfad.name + ".neu")
+    daneben.write_bytes(gzip.compress(text.encode("utf-8"), 6, mtime=0))
+    os.replace(daneben, pfad)
+
+
+def _cache_alter(pfad) -> float | None:
+    """Alter der gespeicherten Seite in Stunden, egal in welcher Form."""
+    for kandidat in (pfad, pfad.with_suffix("")):
+        if kandidat.exists() and kandidat.stat().st_size > 0:
+            return (time.time() - kandidat.stat().st_mtime) / 3600
+    return None
 
 
 def code_von(exc: Exception) -> int | None:
@@ -92,10 +128,11 @@ def abweisung_vermerken(url: str, code: int | None) -> bool:
 def fetch(url: str, retries: int = 3) -> str | None:
     """GET mit Plattencache; None, wenn die Seite nicht ladbar ist."""
     path = _cachedatei(url)
-    if not FRISCH and path.exists() and path.stat().st_size > 0:
-        alter_h = (time.time() - path.stat().st_mtime) / 3600
-        if MAX_AGE_H <= 0 or alter_h < MAX_AGE_H:
-            return path.read_text(encoding="utf-8", errors="replace")
+    alter_h = None if FRISCH else _cache_alter(path)
+    if alter_h is not None and (MAX_AGE_H <= 0 or alter_h < MAX_AGE_H):
+        gespeichert = _lies_cache(path)
+        if gespeichert is not None:
+            return gespeichert
     # Gespeicherte Seiten kommen weiter aus dem Cache; nur neu gefragt wird
     # dort nicht mehr, wo der Lauf ohnehin abgewiesen wird.
     if weist_ab(url):
@@ -109,7 +146,7 @@ def fetch(url: str, retries: int = 3) -> str | None:
                 return None
             r.raise_for_status()
             r.encoding = r.apparent_encoding or "utf-8"
-            path.write_text(r.text, encoding="utf-8", errors="replace")
+            _schreib_cache(path, r.text)
             return r.text
         except Exception as exc:
             # Mit dem Statuscode: 403 ist eine Entscheidung des Betreibers,
@@ -176,7 +213,8 @@ def cache_aufraeumen(seit: float) -> tuple[int, float]:
     antwortet, behält ihren alten Stand und fällt nicht gleich heraus.
     """
     weg, bytes_frei = 0, 0.0
-    for datei in list(CACHE.glob("*.html")) + list(CACHE.glob("*.txt")):
+    for datei in (list(CACHE.glob("*.html.gz")) + list(CACHE.glob("*.html"))
+                  + list(CACHE.glob("*.txt"))):
         if datei.stat().st_mtime < seit:
             bytes_frei += datei.stat().st_size
             datei.unlink()

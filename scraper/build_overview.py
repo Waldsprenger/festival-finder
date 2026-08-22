@@ -65,7 +65,7 @@ def main() -> None:
     doc = f"""<!doctype html>
 <html lang="de"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Festival-Übersicht Europa</title>
+<title>Festival-Übersicht weltweit</title>
 <style>
 :root {{ color-scheme: light dark; --bg:#fff; --fg:#16181d; --mut:#6b7280; --line:#e5e7eb; --acc:#2563eb; --chip:#f3f4f6; }}
 @media (prefers-color-scheme: dark) {{ :root {{ --bg:#0f1115; --fg:#e8eaed; --mut:#9aa1ab; --line:#272b33; --acc:#7aa2f7; --chip:#1b1f27; }} }}

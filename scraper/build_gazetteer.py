@@ -22,11 +22,12 @@ import csv
 import io
 import zipfile
 
-from gemeinsam import CACHE as SEITEN_CACHE, DATA, EUROPA_CODES, schreib_json
+from gemeinsam import CACHE as SEITEN_CACHE, DATA, schreib_json
 from netz import datei_holen
 
 CACHE = SEITEN_CACHE / "geonames"
 GAZETTEER = DATA / "gazetteer.json"
+LAENDER_DATEI = DATA / "laender.json"
 PLZ = DATA / "plz.json"
 VERORTUNG = DATA / "verortung.json"
 
@@ -37,15 +38,17 @@ ZIP = "https://download.geonames.org/export/zip/"
 # verschiedene Rücksichten kennen:
 #
 #   Im Browser zählt jedes Kilobyte - dort stehen DE/AT/CH vollständig, weil
-#   die Seite dort genutzt wird und der Wohnort von dort kommt.
+#   die Seite von dort genutzt wird und der Wohnort meist von dort kommt.
 #
 #   Beim Bauen zählt nur Genauigkeit. Dort kommt NL hinzu: wannafest liefert
 #   über tausend niederländische Festivals, viele in Dörfern unter tausend
 #   Einwohnern. Für Großbritannien lohnt es nicht - 3,6 MB Ortsdaten lösen
 #   22 offene Fälle.
+#
+# Alles andere gilt weltweit: Ein Festival in Tokio, Melbourne oder Sao Paulo
+# soll denselben Punkt auf der Karte bekommen wie eines in Kiel.
 FEIN = ["DE", "AT", "CH"]
 FEIN_BAU = FEIN + ["NL"]
-EUROPA = set(EUROPA_CODES)
 
 # Spalten des Ortsdatensatzes
 NAME, ASCII, LAT, LON, FCLASS, FCODE, CC, POP = 1, 2, 4, 5, 6, 7, 8, 14
@@ -54,6 +57,25 @@ Z_CC, Z_CODE, Z_ORT, Z_LAT, Z_LON = 0, 1, 2, 9, 10
 
 # Nur bewohnte Orte, keine Ortsteile/Farmen
 ORTSARTEN = {"PPL", "PPLA", "PPLA2", "PPLA3", "PPLA4", "PPLA5", "PPLC", "PPLG", "PPLS"}
+
+
+def laendertabelle() -> dict[str, dict]:
+    """Alle Staaten der Welt: Kürzel, englischer Name, Kontinent.
+
+    Die handgeschriebene Liste in gemeinsam.py kannte Europa und eine Handvoll
+    Namen darüber hinaus. Weltweit braucht es alle 252 - und den Kontinent
+    dazu, damit die Seite nach Erdteilen sortieren kann.
+    """
+    roh = datei_holen(DUMP + "countryInfo.txt", CACHE / "countryInfo.txt",
+                      "Länderliste")
+    tabelle = {}
+    for zeile in roh.decode("utf-8").splitlines():
+        if not zeile or zeile.startswith("#"):
+            continue
+        s = zeile.split("\t")
+        if len(s) > 8 and len(s[0]) == 2:
+            tabelle[s[0]] = {"name": s[4], "kontinent": s[8]}
+    return dict(sorted(tabelle.items()))
 
 
 def zeilen(datei: str, art: str = "dump"):
@@ -74,7 +96,7 @@ def zeilen(datei: str, art: str = "dump"):
 
 
 def orte_sammeln(ab_einwohnern: int, vollstaendig: list[str]) -> dict[tuple[str, str], list]:
-    """Orte je (Name, Land): genannte Länder vollständig, Europa ab N Einwohnern.
+    """Orte je (Name, Land): genannte Länder vollständig, die Welt ab N Einwohnern.
 
     Bei gleichem Namen im selben Land gewinnt der größere Ort — dieselbe Regel,
     nach der auch ein Ortsverzeichnis den bekannteren zuerst nennt.
@@ -98,9 +120,9 @@ def orte_sammeln(ab_einwohnern: int, vollstaendig: list[str]) -> dict[tuple[str,
                 merken(r[NAME], r[LAT], r[LON], r[CC], r[POP])
 
     datei = f"cities{ab_einwohnern}.zip"
-    print(f"Europa: Orte ab {ab_einwohnern:,} Einwohnern".replace(",", "."), flush=True)
+    print(f"Welt: Orte ab {ab_einwohnern:,} Einwohnern".replace(",", "."), flush=True)
     for r in zeilen(datei):
-        if r[CC] in EUROPA and r[CC] not in vollstaendig:
+        if r[CC] and r[CC] not in vollstaendig:
             merken(r[NAME], r[LAT], r[LON], r[CC], r[POP])
             # Die Umschrift ohne Sonderzeichen ist oft die Schreibweise der
             # Quellen ("Zurich" statt "Zürich").
@@ -110,7 +132,7 @@ def orte_sammeln(ab_einwohnern: int, vollstaendig: list[str]) -> dict[tuple[str,
 
 
 def postleitzahlen() -> list[list]:
-    """Je Postleitzahl der erste Zustellbereich, für ganz Europa.
+    """Je Postleitzahl der erste Zustellbereich, weltweit.
 
     Eine einzige Weltdatei statt vierzig Länderabrufe; gefiltert wird hier.
     """
@@ -118,7 +140,7 @@ def postleitzahlen() -> list[list]:
     print("Postleitzahlen: allCountries.zip", flush=True)
     for r in zeilen("allCountries.zip", art="zip"):
         code, cc = r[Z_CODE].strip().replace(" ", ""), r[Z_CC]
-        if not code or cc not in EUROPA or not r[Z_LAT] or not r[Z_LON]:
+        if not code or not cc or not r[Z_LAT] or not r[Z_LON]:
             continue
         gesehen.setdefault((code, cc), [code, r[Z_ORT].strip(),
                                         round(float(r[Z_LAT]), 4),
@@ -141,6 +163,10 @@ def kurze_codes(alle: list[list]) -> set[str]:
 
 
 def main() -> None:
+    laender = laendertabelle()
+    schreib_json(LAENDER_DATEI, laender)
+    print(f"{LAENDER_DATEI}  ({len(laender)} Länder)")
+
     # --- mitgeliefert: klein genug für site/data.js -----------------------
     orte = orte_sammeln(15000, FEIN)
     # Größte Orte zuerst: Bei mehrdeutigen Namen gewinnt in der Suche der

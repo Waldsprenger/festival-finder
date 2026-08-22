@@ -1,14 +1,15 @@
-# Festival-Übersicht Europa
+# Festival-Übersicht weltweit
 
-Acht Festivalverzeichnisse, zu einem Bestand zusammengeführt, plus eine
-statische Webseite, die daraus nach Band oder Genre filtert. Ein Datenlauf
-hält beides aktuell, ohne dass ein Rechner dafür laufen muss.
+Zwölf Festivalverzeichnisse, zu einem weltweiten Bestand zusammengeführt, plus
+eine statische Webseite, die daraus nach Band, Genre, Umkreis, Preis und
+Zeitraum filtert. Ein Datenlauf hält beides aktuell, ohne dass ein Rechner
+dafür laufen muss.
 
-**Stand:** 5.524 Festivals in 42 Ländern, 40.547 Acts, 1.571 Festivals aus mehr
+**Stand:** 13.435 Festivals in 135 Ländern, 81.004 Acts, 2.951 Festivals aus mehr
 als einer Quelle · [Änderungshistorie](https://github.com/Waldsprenger/festival-finder/commits/main)
 
 ```
-   acht Quellen
+   zwölf Quellen
         │  quellen.py         Adressen sammeln, Detailseiten auslesen
         ▼
    11.362 Funde
@@ -80,23 +81,29 @@ python scraper/festival_scraper.py --since 2006 # das komplette Archiv
 Die Webseite braucht keinen Server; `site/index.html` lässt sich per
 Doppelklick öffnen.
 
-## Die acht Quellen
+## Die zwölf Quellen
 
-| Quelle | Weg zu den Adressen | Seiten | Einträge | nur dort |
-|---|---|---:|---:|---:|
-| festivalsunited.com | Sitemap je Jahrgang **und** die europäischen Länderseiten | 3.226 | 2.776 | 1.528 |
-| festapp.io | Sitemaps der Festivals und der einzelnen Ausgaben | 2.977 | 740 | 377 |
-| wannafest.com | `sitemaps/festivals-1.xml` | 2.105 | 1.065 | 812 |
-| festivalfinder.eu | Trefferliste der European Festivals Association, geblättert | 2.069 | 396 | 370 |
-| festivalticker.de | alle Listenseiten: Jahres-, Monats-, Länder- und Statusarchive | 1.971 | 1.966 | 803 |
-| festival-alarm.com | Jahresseiten **und** die Regionsseiten je Land | 935 | 921 | 210 |
-| festivalhopper.de | `sitemap-festivals.xml`, Jahrgang steht in der Adresse | 728 | 683 | 71 |
-| festivalflyer.com | die Startseite, mehr ist nicht erreichbar | 12 | 1 | 0 |
+| Quelle | Weg zu den Adressen | Seiten | Einträge |
+|---|---|---:|---:|
+| festivism.com | Sitemap; ein Nachschlagewerk ohne Termine | 5.206 | 4.847 |
+| festivalsunited.com | Sitemap je Jahrgang **und** alle Länderseiten | 3.235 | 2.755 |
+| festivalabroad.com | Sitemap; Titel, wo das Datenblatt fehlt | 3.261 | 3.223 |
+| festapp.io | Sitemaps der Festivals und der einzelnen Ausgaben | 2.977 | 1.104 |
+| jambase.com | 131 Monatssitemaps, Jahrgang steht in der Adresse | 2.348 | 1.396 |
+| wannafest.com | `sitemaps/festivals-1.xml` | 2.113 | 1.072 |
+| festivalfinder.eu | Trefferliste der European Festivals Association, geblättert | 2.072 | 413 |
+| festivalticker.de | alle Listenseiten: Jahres-, Monats-, Länder- und Statusarchive | 1.971 | 1.966 |
+| festival-alarm.com | Jahresseiten **und** die Regionsseiten je Land | 935 | 930 |
+| festivalhopper.de | `sitemap-festivals.xml`, Jahrgang steht in der Adresse | 746 | 705 |
+| festivalnetworks.com | **eine** JSON-Datei hinter ihrer Karte | 1 | 616 |
+| festivalflyer.com | die Startseite, mehr ist nicht erreichbar | 12 | 1 |
 
-Der Wert einer Quelle steckt nicht in der Zahl ihrer Seiten, sondern in der
-Spalte „nur dort". Die zweiten Wege sind nachgemessen, nicht geraten: Über die
-Länderseiten von festivalsunited sind 30 Detailseiten erreichbar, die in der
-Sitemap fehlen — darunter das Exit Festival in Novi Sad.
+Die zweiten Wege sind nachgemessen, nicht geraten: Über die Länderseiten von
+festivalsunited sind 30 Detailseiten erreichbar, die in der Sitemap fehlen —
+darunter das Exit Festival in Novi Sad. Und festivalnetworks liefert alles in
+einer einzigen Datei; die zu lesen ist genauer und rücksichtsvoller, als 624
+Seiten einzeln abzurufen. Dafür hat `Quelle` ein zweites Standbein bekommen:
+`feed` gibt alle Datensätze auf einmal zurück.
 
 Was jede Quelle beiträgt und wo ihre Fallen liegen, steht im Kopf ihres
 Abschnitts in [quellen.py](scraper/quellen.py). Drei Beispiele:
@@ -112,12 +119,33 @@ Abschnitts in [quellen.py](scraper/quellen.py). Drei Beispiele:
 - **festivalhopper** nennt die Bands als einzelne Verweise. Die echten
   Bandkarten liegen unter `/bands/karten/`; die kürzeren `/bands/`-Adressen
   sind Menüpunkte, die sonst als Acts in 683 Lineups standen.
+- **jambase** bringt Nordamerika mit vollständigen Lineups — und nennt Acts
+  zweimal, die an zwei Tagen spielen. Entdoppelt wird zentral, in `datensatz()`.
+- **festivalabroad** hat für 2.334 seiner 3.261 Feste kein Datenblatt: nämlich
+  für die, deren nächster Termin noch aussteht („TBA — last edition: 8 Jul
+  2026"). Name, Ort und Land stehen dort im Seitentitel; sie kommen terminlos
+  mit. Schneidet der Titel das Land ab („United State…"), bleibt das Feld leer
+  statt falsch.
+- **festivism** ist ein Nachschlagewerk: Es führt das Fest, nicht seine nächste
+  Ausgabe, und nennt deshalb nie ein Datum. Seine 17 Veranstaltungen im Land
+  „XW" sind Konzerte in Minecraft und Roblox — die gibt es wirklich, hinfahren
+  kann man nicht.
 
-**Nicht erfasst** werden festicket.com, de.concerty.com und
-musicfestivalwizard.com (Cloudflare-Sperre, festicket nennt ClaudeBot
-ausdrücklich in seiner `robots.txt`), bachtrack.com (Liste wird im Browser
-zusammengesetzt, die Sitemap führt Kritiken) sowie festivalnetworks.com,
-musicfestadvisor.com und festivalcalendars.com (Listenartikel statt Datenbank).
+**Nicht erfasst** — geprüft wurden neunzehn weitere Adressen, jede mit
+robots.txt und einem Blick auf ihren Aufbau:
+
+| Quelle | Grund |
+|---|---|
+| bandsintown.com | **403**, robots.txt nennt ClaudeBot ausdrücklich |
+| festicket.com | **403**, ClaudeBot in der robots.txt |
+| musicfestivalwizard.com | **403**, selbst auf die robots.txt |
+| songkick.com | **406**, weist die Anfrage ab |
+| dice.fm | 22.209 Einzelveranstaltungen, überwiegend Clubabende und Musikquiz |
+| festivalplaner.com, timeout.com, viberate.com | redaktionelle Beiträge, keine Datenbank |
+| findyourfest.com, musicworldwidedirectory.com | im Browser zusammengesetzt bzw. reine Linksammlung |
+| tools4music.com | 79 Einträge, alle schon vorhanden |
+| bachtrack.com, de.concerty.com | Liste wird im Browser zusammengesetzt |
+| musicfestadvisor.com, festivalcalendars.com | Listenartikel statt Datenbank |
 Die Sperren werden nicht umgangen: Ein Cloudflare-Schutz ist eine Entscheidung
 des Betreibers. Dasselbe gilt für **festivalticker** — mit einer Besonderheit,
 die lange niemand sah: Vom eigenen Rechner antwortet die Seite normal (200),
@@ -125,6 +153,22 @@ dem täglichen Lauf auf GitHub-Servern dagegen mit **403 auf jede einzelne
 Listenseite**. Nach fünf Absagen fragt der Lauf dort für den Rest des
 Durchgangs nicht weiter — 213 abgewiesene Anfragen je Lauf sind niemandem
 gedient. Gespeicherte Seiten kommen weiter aus dem Cache.
+
+### Weltweit statt nur Europa
+
+Bis zuletzt hat der Lauf alles verworfen, was außerhalb Europas lag — an neun
+Stellen: in sechs Lesern, beim Zusammenführen, in der Selbstprüfung und im
+Geokodierer. An ihre Stelle ist die Frage getreten, die immer die eigentliche
+war: **Ist das überhaupt ein Land?** Sie hält „Bayern" und „Region Hannover"
+draußen, ohne einen Erdteil auszuschließen.
+
+Dafür kennt `gemeinsam.py` jetzt alle 252 Staaten samt Erdteil — die Liste
+entsteht in `build_gazetteer.py` aus der Länderdatei von GeoNames und liegt als
+`data/laender.json` bei. Deutsche Namen stehen weiter von Hand darin, weil die
+Quellen deutsch schreiben; die englischen kommen aus der Datei.
+
+Allein diese Öffnung brachte **538 Festivals in 30 zusätzlichen Ländern**, die
+die alten Quellen die ganze Zeit geliefert hatten und die weggeworfen wurden.
 
 ### Ein Stand, den der Lauf mitbringt
 
@@ -234,10 +278,12 @@ Beim Verbinden füllt jede Quelle die Lücken der anderen, Genres werden
 gesammelt statt ersetzt, eine Absage aus einer Quelle genügt, und der Zeitraum
 spannt vom frühesten Beginn bis zum spätesten Ende.
 
-**Außerhalb Europas** wird verworfen — über den Ländernamen *und* über den
-Code: Die Namensliste kannte „usa", nicht aber IN, CL, PY, CO, ZA, ID, KR, KZ,
-CR, CN oder TH. Unbekannte längere Angaben („Bayern", „Region Hannover")
-bleiben drin; ein Rauswurf auf Verdacht kostet echte Festivals.
+**Was kein Land ist, fliegt raus** — „Bayern" und „Region Hannover" stehen
+manchmal im Länderfeld. Die Prüfung fragt nicht mehr nach dem Erdteil, sondern
+ob hinter der Angabe ein Staat steht: `data/laender.json` führt alle 252 mit
+ISO-Kürzel und Erdteil, dazu kommen die deutschen Namen aus `gemeinsam.py`.
+Eine unbekannte längere Angabe kostet nur das Länderfeld, nicht das Festival:
+Ort und Koordinate bleiben.
 
 ## Genres
 
@@ -263,7 +309,7 @@ Verortet wird in vier Rängen:
 
 1. **Postleitzahl** — trifft den Zustellbereich und ist damit am genauesten.
 2. **Ortsname im Geo-Cache**, sofern Nominatim ihn schon einmal beantwortet hat.
-3. **Ortsname im Ortsverzeichnis** (`data/verortung.json`, ganz Europa ab 1.000
+3. **Ortsname im Ortsverzeichnis** (`data/verortung.json`, die Welt ab 1.000
    Einwohnern) — für alles, was der Cache noch nicht kennt.
 4. **Punkt aus dem Datenblatt** der Quellseite, aber nur, wenn er im Rahmen
    seines Landes liegt (Landesgrenzen aus dem Ortsverzeichnis, ein Grad
@@ -272,11 +318,11 @@ Verortet wird in vier Rängen:
    37 Einträgen sitzt er im falschen Land: Lugano in Buenos Aires, Basel in
    Berlin, Andorra in Mexiko.
 
-**Warum Postleitzahlen für ganz Europa.** Ortsnamen sind mehrdeutig — „Bernau"
+**Warum Postleitzahlen weltweit.** Ortsnamen sind mehrdeutig — „Bernau"
 gibt es dreimal in Deutschland, und welches gemeint ist, weiß weder ein
 Verzeichnis noch ein Suchdienst sicher. Eine Postleitzahl dagegen trifft genau
 einen Zustellbereich. Bis vor Kurzem lagen nur die Postleitzahlen von DE/AT/CH
-vor; seit die Tabelle ganz Europa abdeckt (410.185 Codes), bekommen **510
+vor; seit die Tabelle die Welt abdeckt (1.080.715 Codes), bekommen **510
 Festivals** statt eines geratenen Ortsmittelpunkts ihren Zustellbereich —
 Median 1,9 km genauer, in 31 Fällen lag der Ortsname um mehr als 25 km daneben.
 
@@ -333,13 +379,14 @@ im HTML standen und dort auseinanderliefen. Zahlen in diesen Texten kommen aus
 den Daten (`Für {ohnePreis} Festivals nennt die Quelle keinen Preis`), damit
 sie nicht in zehn Sprachen veralten.
 
-**Schritt 1 — Rahmen setzen.** Der Wohnort lässt sich in ganz Europa angeben,
-per Postleitzahl oder Ortsname; daraus rechnet die Seite jede Entfernung. Vier
+**Schritt 1 — Rahmen setzen.** Der Wohnort lässt sich überall auf der Welt
+angeben, per Postleitzahl oder Ortsname; daraus rechnet die Seite jede
+Entfernung. Vier
 Stufen, von der billigsten zur teuersten:
 
 1. **Mitgeliefert** (in `data.js`): die Postleitzahlen von DE/AT/CH und alle
-   Orte ab 15.000 Einwohnern in Europa, DE/AT/CH vollständig. Damit ist der
-   Normalfall ohne einen einzigen Netzabruf beantwortet.
+   Orte der Welt ab 15.000 Einwohnern, DE/AT/CH vollständig — 116.653 Stück.
+   Damit ist der Normalfall ohne einen einzigen Netzabruf beantwortet.
 2. **Nachgeladen** (`site/orte.js`, 1,9 MB übertragen): 155.344 Orte bis
    hinunter zu kleinen Gemeinden und 24.893 Postleitzahlen der Länder, deren
    Codes höchstens vierstellig sind. Die Datei kommt erst, wenn die kleine
@@ -459,6 +506,7 @@ einmal falsch in den Daten:
 | `tests/test_zeitraeume.py` | laufende Festivals, Silvester, Jahrgangsschnitt |
 | `tests/test_verluste.py` | beim Zusammenführen geht keine Quelladresse verloren |
 | `tests/test_aliase.py` | Kürzel abschalten — und die Tabelle danach zurücksetzen |
+| `tests/test_weltquellen.py` | die vier weltweiten Quellen und ihre Eigenheiten |
 
 Der Workflow führt sie vor jedem Datenlauf aus: Ein Fehler in der Logik soll
 auffallen, bevor er sich in die veröffentlichten Daten schreibt.
@@ -484,7 +532,7 @@ Einträge gekostet, bis er auffiel.
 
 **Und der Lauf prüft sein eigenes Ergebnis.** Nicht „wie beim letzten Mal",
 sondern „in sich stimmig": Passt das Jahr zum Termin, liegt das Ende nicht vor
-dem Anfang, steckt jede Koordinate in Europa, zählt das Lineup richtig, ist die
+dem Anfang, liegt jede Koordinate auf der Erde, zählt das Lineup richtig, ist die
 Besucherzahl plausibel, steht im Preisfeld ein Preis, blieb eine Dublette
 übrig? Jeder dieser Punkte war schon einmal falsch — zehn Koordinaten in Mexiko
 und Buenos Aires, ein Jahrgang 2027 mit Termin im August 2026, eine
@@ -504,7 +552,7 @@ keiner zuverlässig.
 | Preis | eine Zahl oder freier Eintritt | auf einer Seite stand „Preis: Pop Punk" |
 | Ort | Postleitzahl gehört ins eigene Feld | „104 45 Athen" fand keine Karte |
 | Spielstätte | keine Knopfbeschriftung | „Tickets Ticket" stand auf acht Karten |
-| Koordinate | innerhalb Europas | Buenos Aires für Lugano |
+| Koordinate | auf der Erde, nicht bei null Grad null | Buenos Aires für Lugano; 0/0 heißt „Feld leer" |
 
 **Was die Prüfung ans Licht brachte:** `Besucher:[^0-9]*([\d.]+)` sprang über
 ganze Absätze hinweg und holte die nächste Ziffer irgendwo auf der Seite. Auf
@@ -619,9 +667,10 @@ Ausfall wird morgen erneut gefragt.
   Aufteilung nach Leerzeichen würde raten und aus „Nebula Allstars" die Band
   „Nebula" machen. Erfundene Bandnamen wären schlimmer als fehlende.
 - Bei reinen Akronymen kann die Mehrheitsregel danebengreifen (`GANS` → `Gans`).
-- Die Geokodierung ist auf europäische Länder begrenzt. Ohne diese Grenze
-  liefert Nominatim bei mehrdeutigen Namen den weltweit bekanntesten Ort —
-  „Newark" wurde New Jersey statt England.
+- Die Geokodierung fragt zuerst mit dem Land aus der Quelle. Fehlt es, sucht
+  sie weltweit — und dann kann „Newark" in New Jersey statt in England landen.
+  Das Ortsverzeichnis fängt den Normalfall vorher ab; offen bleiben rund 850
+  Orte je Lauf.
 - Ein kompletter Archivlauf (`--since 2006`) erzeugt über 23.000 Abrufe und
   eine Datei, die für die Veröffentlichung zu groß wird. Vergangene Jahrgänge
   filtert die Webseite ohnehin heraus.

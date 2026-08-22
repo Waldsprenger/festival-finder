@@ -360,12 +360,22 @@ def datum_englisch(wert: str) -> str:
     return ""
 
 
-def _monat_kurz(name: str) -> int:
-    kurz = name.lower()[:3]
-    for voll, nr in _MONAT_EN.items():
-        if voll.startswith(kurz):
-            return nr
+def monat_nummer(name: str) -> int:
+    """Monatsnummer aus einem Namen, ausgeschrieben oder abgekürzt.
+
+    Deutsch wie englisch, denn beide Schreibweisen kommen vor: "Aug", "Aug.",
+    "August", "Mär", "March".
+    """
+    kurz = (name or "").lower().strip(". ")[:3]
+    for tabelle in (_MONAT_EN, {m: i for i, m in enumerate(MONATE, 1)}):
+        for voll, nr in tabelle.items():
+            if voll.startswith(kurz):
+                return nr
     return 0
+
+
+def _monat_kurz(name: str) -> int:
+    return monat_nummer(name)
 
 
 def tag_zahl(datum: str) -> int:

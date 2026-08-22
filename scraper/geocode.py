@@ -17,7 +17,7 @@ import time
 
 import requests
 
-from gemeinsam import DATA, EU_CODES, land_code, lies_json, schreib_json
+from gemeinsam import DATA, land_code, lies_json, schreib_json
 from text import fold
 
 GEO = DATA / "geo.json"
@@ -27,10 +27,10 @@ UA = "FestivalFinder/1.0 (privates Projekt; Kontakt: waldsprenger@gmail.com)"
 ENDPOINT = "https://nominatim.openstreetmap.org/search"
 
 
-# Ohne Laenderfilter liefert Nominatim bei mehrdeutigen Namen den weltweit
-# bekanntesten Ort: "Newark" wurde New Jersey statt England, "Hille" wurde
-# Hilla im Irak. Jede Suche bleibt deshalb auf Europa beschraenkt; die
-# Laenderzuordnung und EU_CODES stehen in gemeinsam.py.
+# Bei mehrdeutigen Namen liefert Nominatim den weltweit bekanntesten Ort:
+# "Newark" wurde New Jersey statt England, "Hille" wurde Hilla im Irak.
+# Dagegen hilft das Land aus der Quelle - es steht bei fast jedem Festival und
+# ist die genauere Angabe. Nur wenn keines dabei ist, wird weltweit gesucht.
 def cc(country: str) -> str:
     """Laendercode klein geschrieben, wie Nominatim ihn erwartet."""
     code = land_code(country)
@@ -53,11 +53,9 @@ def lookup(session: requests.Session, city: str,
     attempts = []
     if code:
         attempts.append({"city": city, "countrycodes": code})
-        # ebenfalls auf Europa begrenzt: bei falscher Landesangabe in der Quelle
-        # (Belfast steht dort unter Irland) darf nicht weltweit gesucht werden
-        attempts.append({"q": f"{city}, {code.upper()}", "countrycodes": EU_CODES})
-    attempts.append({"city": city, "countrycodes": EU_CODES})
-    attempts.append({"q": city, "countrycodes": EU_CODES})
+        attempts.append({"q": f"{city}, {code.upper()}"})
+    attempts.append({"city": city})
+    attempts.append({"q": city})
 
     geantwortet = False
     for params in attempts:

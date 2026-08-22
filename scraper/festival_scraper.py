@@ -23,7 +23,7 @@ from datetime import date, datetime
 from urllib.parse import urlparse
 
 import netz
-from gemeinsam import DATA, EUROPA_CODES, liegt_in_europa, lies_json, schreib_json
+from gemeinsam import DATA, ist_land, lies_json, schreib_json
 from quellen import FT_STAMM, QUELLEN, Quelle
 from preisverlauf import verfolgen
 import schnappschuss
@@ -159,15 +159,15 @@ def pruefe_stimmigkeit(festivals: list[dict]) -> list[str]:
               "Jahr passt nicht zum Termin")
         merke(not (f["date_from"] and f["date_to"])
               or tag_zahl(f["date_to"]) >= tag_zahl(f["date_from"]), "Ende vor Anfang")
-        merke(f["lat"] is None or liegt_in_europa(f["lat"], f["lon"]),
-              "Koordinate außerhalb Europas")
+        merke(f["lat"] is None or (abs(f["lat"]) <= 90 and abs(f["lon"]) <= 180),
+              "Koordinate ausserhalb der Erde")
         merke(f["lineup_count"] == len(f["lineup"]), "Lineup falsch gezählt")
         merke(not f["visitors"] or f["visitors"].isdigit(), "Besucherzahl keine Zahl")
         # "isdigit" allein liess Zahlen mit 66 Stellen durch, zusammengeklebt
         # aus Datumsangaben - eine Zahl war es ja.
         merke(not f["visitors"].isdigit()
               or 10 <= int(f["visitors"]) <= 5_000_000, "Besucherzahl unplausibel")
-        merke(not f["country"] or f["country"] in EUROPA_CODES, "Land außerhalb Europas")
+        merke(not f["country"] or ist_land(f["country"]), "Land nicht erkannt")
         merke(not PLZ_VORN.match(f["city"] or ""), "Postleitzahl im Ortsfeld")
         merke(not f["price"] or bool(re.search(r"[1-9]", f["price"]))
               or bool(KOSTENLOS.search(f["price"])), "Preis ohne Preis")
@@ -244,7 +244,9 @@ def main() -> None:
         print("Frischer Lauf: der Seitencache wird übergangen.", flush=True)
 
     print(f"Sammle Detail-Links ab Jahrgang {args.since} ...", flush=True)
-    adressen = {q.name: q.adressen(args.since) for q in QUELLEN}
+    # Quellen mit einer Sammeldatei haben keine Adressen je Festival - ihr
+    # Abruf steht weiter unten, wo auch die Seiten gelesen werden.
+    adressen = {q.name: ([] if q.feed else q.adressen(args.since)) for q in QUELLEN}
     print("  " + " | ".join(f"{name} {len(u)}" for name, u in adressen.items()),
           flush=True)
 
@@ -252,8 +254,13 @@ def main() -> None:
     funde: dict[str, int] = {}
     mitgebracht: dict[str, str] = {}
     for quelle in QUELLEN:
-        urls = adressen[quelle.name]
-        gefunden = einlesen(quelle, urls[:args.limit] if args.limit else urls)
+        if quelle.feed:
+            gefunden = quelle.feed(args.since)
+            print(f"  {quelle.name}: {len(gefunden)} Datensätze aus einer Datei",
+                  flush=True)
+        else:
+            urls = adressen[quelle.name]
+            gefunden = einlesen(quelle, urls[:args.limit] if args.limit else urls)
         funde[quelle.name] = len(gefunden)
         if gefunden:
             # Was dieser Lauf erreicht hat, bekommt der nächste mit, der es

@@ -15,7 +15,7 @@ import re
 from pathlib import Path
 
 import pytest
-from gemeinsam import EUROPA_CODES, liegt_in_europa
+from gemeinsam import ist_land
 from quellen import QUELLEN
 from text import KNOPFBESCHRIFTUNG, betrag, tag_zahl, valid_band
 
@@ -44,9 +44,12 @@ def fund(request):
     return rec
 
 
-def test_alle_quellen_sind_vertreten():
+def test_jede_quelle_hat_eine_echte_probe():
+    """Quellen mit Seiten liegen als HTML bei, Sammelquellen als ganze Datei."""
     abgedeckt = {e["quelle"] for e in VERZEICHNIS.values()}
-    assert abgedeckt == set(LESER), f"ohne echte Seite: {set(LESER) - abgedeckt}"
+    mit_feed = {name for name, q in LESER.items() if q.feed}
+    assert abgedeckt | mit_feed == set(LESER),         f"ohne echte Probe: {set(LESER) - abgedeckt - mit_feed}"
+    assert (SEITEN / "festivalnetworks_feed.json.gz").exists()
 
 
 class TestJederFund:
@@ -67,9 +70,10 @@ class TestJederFund:
         if fund["date_from"]:
             assert fund["year"] == fund["date_from"][-4:]
 
-    def test_ort_liegt_in_europa(self, fund):
-        assert not fund["country"] or fund["country"] in EUROPA_CODES
-        assert fund["lat"] is None or liegt_in_europa(fund["lat"], fund["lon"])
+    def test_ort_ist_ein_ort_auf_der_erde(self, fund):
+        assert not fund["country"] or ist_land(fund["country"])
+        assert fund["lat"] is None or (abs(fund["lat"]) <= 90
+                                       and abs(fund["lon"]) <= 180)
 
     def test_postleitzahl_ist_eine(self, fund):
         assert not fund["plz"] or re.fullmatch(r"[A-Z0-9 \-]{3,8}", fund["plz"])

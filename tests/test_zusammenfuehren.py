@@ -235,9 +235,9 @@ class TestAufraeumenAmEnde:
         a = fund("festivalhopper", "Sommer im Park", von="27.08.2026", stadt="Gera", year="2027")
         assert fuehre_zusammen(a)[0]["year"] == "2026"
 
-    def test_koordinate_ausserhalb_europas_faellt_weg(self):
+    def test_unmoegliche_koordinate_faellt_weg(self):
         a = fund("festivalsunited", "LongLake Festival", von="01.07.2026", stadt="Lugano",
-                 land="CH", lat=-34.68, lon=-58.49)
+                 land="CH", lat=91.0, lon=-58.49)
         assert fuehre_zusammen(a)[0]["lat"] is None
 
     def test_besucherzahl_wird_zur_zahl(self):
@@ -252,9 +252,12 @@ class TestAufraeumenAmEnde:
         assert ergebnis["country"] == "DE"
         assert ergebnis["location"] == "Kiel, DE"
 
-    def test_ausserhalb_europas_wird_verworfen(self):
-        a = fund("festapp", "Hulaween", von="30.10.2026", stadt="Live Oak", land="US")
-        assert fuehre_zusammen(a) == []
+    def test_die_ganze_welt_kommt_mit(self):
+        funde = [fund("festapp", "Hulaween", von="30.10.2026", stadt="Live Oak", land="US"),
+                 fund("festapp", "Fuji Rock", von="24.07.2026", stadt="Yuzawa", land="JP"),
+                 fund("festapp", "Rock in Rio", von="18.09.2026", stadt="Rio", land="BR")]
+        laender = {f["country"] for f in fuehre_zusammen(*funde)}
+        assert laender == {"US", "JP", "BR"}
 
     def test_chronologisch_sortiert(self):
         spaet = fund("festivalticker", "Spaetfest", von="01.09.2026", stadt="Kiel")

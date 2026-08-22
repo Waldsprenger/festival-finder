@@ -25,6 +25,7 @@ site/icons/
 #   data/geo.json       - erspart ~2000 Nominatim-Anfragen je Lauf
 #   data/gazetteer.json - Ortsverzeichnis, ändert sich kaum
 #   data/plz.json       - Postleitzahlen DE/AT/CH
+#   data/laender.json   - alle 252 Staaten mit Erdteil, aendert sich nie
 #   data/welt_*.json    - Kartenumrisse in zwei Aufloesungen, statisch
 
 # lokale Werkzeug-Einstellungen, geraetespezifisch

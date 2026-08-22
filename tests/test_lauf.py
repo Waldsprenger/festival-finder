@@ -23,10 +23,10 @@ class TestSelbstpruefung:
         ({"sources": {}}, "ohne Quelle"),
         ({"year": "2027"}, "Jahr passt nicht zum Termin"),
         ({"date_to": "01.05.2026"}, "Ende vor Anfang"),
-        ({"lat": -34.6, "lon": -58.4}, "Koordinate außerhalb Europas"),
+        ({"lat": 91.0, "lon": -58.4}, "Koordinate ausserhalb der Erde"),
         ({"lineup": ["Powerwolf"], "lineup_count": 0}, "Lineup falsch gezählt"),
         ({"visitors": "2.000"}, "Besucherzahl keine Zahl"),
-        ({"country": "US"}, "Land außerhalb Europas"),
+        ({"country": "Bayern"}, "Land nicht erkannt"),
     ])
     def test_jeder_widerspruch_wird_gemeldet(self, kaputt, meldung):
         gefunden = lauf.pruefe_stimmigkeit([festival(**kaputt)])

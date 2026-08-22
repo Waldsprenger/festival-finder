@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Festival Finder — Lineup-Abgleich für Europa</title>
+<title>Festival Finder — Lineup-Abgleich weltweit</title>
 <meta name="description" content="Finde Festivals nach Wohnort, Radius, Ticketpreis und deinen Lieblingsbands.">
 <link rel="stylesheet" href="fonts.css">
 <link rel="stylesheet" href="style.css">
@@ -67,7 +67,8 @@
         <label for="radius"><span data-i18n="radius.label">Umkreis</span> <output id="radius-out">200 km</output>
           <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="radius.help">?</button>
         </label>
-        <input type="range" id="radius" min="10" max="3300" step="10" value="200">
+        <input type="range" id="radius" min="0" max="1000" step="1" value="0"
+               aria-describedby="radius-out">
         <p class="hint" data-i18n="radius.hint">Luftlinie ab Wohnort.</p>
       </div>
 

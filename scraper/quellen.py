@@ -8,17 +8,17 @@ Eigenheiten liegen.
 
 from __future__ import annotations
 
+import json
 import re
 from dataclasses import dataclass
 from typing import Callable
 from urllib.parse import parse_qs, urljoin, urlparse
 
-from gemeinsam import (EUROPA_CODES, JAHR_HEUTE, JAHRE, ausser_europa,
-                       land_code, liegt_in_europa)
+from gemeinsam import JAHR_HEUTE, JAHRE, ist_land, land_code
 from netz import fetch, endziel, json_ld_events, melde, sitemap_adressen, soup
 from text import (KNOPFBESCHRIFTUNG, MONATE, besucherzahl, betrag, clean,
                   datum_de, datum_englisch, festival_name, genres_vereinen,
-                  plz_und_stadt, preis_text, valid_band)
+                  monat_nummer, plz_und_stadt, preis_text, valid_band)
 
 FT = "https://www.festivalticker.de"      # dichteste Abdeckung für Deutschland
 FU = "https://www.festivalsunited.com"    # Lineups, Preise, Datenblatt je Seite
@@ -28,6 +28,10 @@ FP = "https://festapp.io"                 # Frankreich, Italien, Spanien
 WF = "https://wannafest.com"              # Elektronisches, Benelux
 FL = "https://festivalflyer.com"          # Großbritannien und Irland
 FF = "https://www.festivalfinder.eu"      # European Festivals Association
+FB = "https://www.festivalabroad.com"     # weltweit, mit Koordinaten und Genres
+JB = "https://www.jambase.com"            # Nordamerika, mit vollen Lineups
+FV = "https://www.festivism.com"          # Nachschlagewerk ohne Termine
+FN = "https://festivalnetworks.com"       # 624 Festivals in einer Datei
 
 
 # --------------------------------------------------------------------------
@@ -53,14 +57,15 @@ def datensatz(quelle: str, url: str, name: str, *, date_from: str = "",
     * Das Land als Kürzel, nicht als Name: "Deutschland" und "DE" sind
       dieselbe Angabe und sollen auch dieselbe Schreibweise haben.
     * Die Besucherzahl ist eine einzelne, plausible Zahl — oder keine.
+    * Ein Act steht einmal im Lineup, auch wenn er an zwei Tagen spielt.
     * Der Preis nennt eine Zahl oder freien Eintritt; "Pop Punk" ist kein Preis.
     * Steht die Postleitzahl im Ortsfeld ("104 45 Athen"), gehört sie ins
       Postleitzahlfeld.
-    * Eine Koordinate außerhalb Europas ist keine. Die Datenblätter der Quellen
-      setzen dort schon mal Buenos Aires für Lugano; solche Punkte fliegen
-      raus, statt später mühsam geprüft zu werden.
+    * Eine Koordinate muss auf der Erde liegen und nicht bei null Grad null:
+      Der Punkt im Golf von Guinea ist die Handschrift eines leeren Feldes,
+      nicht ein Ort.
     """
-    if not liegt_in_europa(lat, lon):
+    if not koordinate_plausibel(lat, lon):
         lat = lon = None
     city, plz = plz_und_stadt(city, plz)
     return {
@@ -86,8 +91,37 @@ def datensatz(quelle: str, url: str, name: str, *, date_from: str = "",
         "visitors": besucherzahl(visitors),
         "note": note,
         "cancelled": cancelled,
-        "lineup": lineup or [],
+        # Ohne Wiederholungen, Reihenfolge wie geliefert: jambase nennt
+        # einzelne Acts zweimal, wenn sie an mehreren Tagen spielen.
+        "lineup": list(dict.fromkeys(lineup or [])),
     }
+
+
+def datum_iso(wert) -> str:
+    """"2026-07-03" oder "2026-07-03T18:00" → "03.07.2026"."""
+    m = re.match(r"(\d{4})-(\d{2})-(\d{2})", str(wert or ""))
+    return f"{m.group(3)}.{m.group(2)}.{m.group(1)}" if m else ""
+
+
+def zahl_oder_nichts(wert) -> float | None:
+    """Koordinaten stehen mal als Zahl, mal als Zeichenkette im Datenblatt."""
+    try:
+        return float(wert)
+    except (TypeError, ValueError):
+        return None
+
+
+def koordinate_plausibel(lat: float | None, lon: float | None) -> bool:
+    """Ein Punkt auf der Erde - und nicht der Nullpunkt.
+
+    0/0 liegt im Golf von Guinea und steht in Datenblättern für "kein Wert
+    eingetragen". Ein Festival war dort noch nie.
+    """
+    if lat is None or lon is None:
+        return False
+    if abs(lat) > 90 or abs(lon) > 180:
+        return False
+    return not (abs(lat) < 0.01 and abs(lon) < 0.01)
 
 
 @dataclass(frozen=True)
@@ -98,6 +132,9 @@ class Quelle:
     lesen: Callable[..., dict | None]
     #: festivalticker liefert Stammdaten schon in der Liste, die der Leser braucht
     mit_stammdaten: bool = False
+    #: Manche Quellen legen alles in eine Datei. Dann gibt es keine Adressen
+    #: je Festival, sondern einen Abruf, der alle Datensätze zurückgibt.
+    feed: Callable[[int], list[dict]] | None = None
 
 
 # --------------------------------------------------------------------------
@@ -323,15 +360,13 @@ def fu_slug(adresse: str) -> str:
 def fu_laender() -> list[str]:
     """Länderseiten; die außereuropäischen spart der Lauf sich.
 
-    Verworfen wird nur, was erkennbar außerhalb Europas liegt - eine
-    unbekannte Schreibweise soll kein ganzes Land aus der Liste kippen.
-    "international" ist eine Sammelseite, kein Land.
+    "international" ist eine Sammelseite, kein Land - alles andere kommt mit,
+    von Argentinien bis Neuseeland.
     """
     seiten = re.findall(r"<loc>(https://www\.festivalsunited\.com/festivals/"
                         r"countries/([a-z\-]+))</loc>",
                         fetch(f"{FU}/sitemap-listings.xml") or "")
-    return [u for u, slug in seiten
-            if slug != "international" and not ausser_europa(slug.replace("-", " "))]
+    return [u for u, slug in seiten if slug != "international"]
 
 
 def fu_adressen(since: int) -> list[str]:
@@ -599,7 +634,7 @@ def fa_adressen(since: int) -> list[str]:
 
         for pfad, code in set(re.findall(
                 rf'href="(/festival/region/[^"]+/{jahr}/([A-Z]{{2}}))"', html)):
-            if code not in EUROPA_CODES:
+            if not ist_land(code):
                 continue
             for href in re.findall(rf'href="(/Festivals-{jahr}/[^"]+)"',
                                    fetch(urljoin(FA, pfad)) or ""):
@@ -718,8 +753,8 @@ def fh_lesen(url: str, html: str) -> dict | None:
     # davor, das kein Buchstabe ist.
     land_roh = feld.get("region", "").split(",")[-1]
     land = land_code(clean(re.sub(r"[^\w ÄÖÜäöüß-]", " ", land_roh)))
-    if land and land not in EUROPA_CODES:
-        return None                       # nur Europa wird gesammelt
+    if land and not ist_land(land):
+        return None                       # "Bayern" ist kein Land
 
     # "91550 Dinkelsbühl", aber auch "CH-8152 Glattbrugg" oder "A-1010 Wien"
     ort_roh = feld.get("ort", "")
@@ -816,8 +851,8 @@ def fp_lesen(url: str, html: str) -> dict | None:
         city = re.sub(r"^[A-Z]{0,2}[-\s]?\d[\w\s-]*?\s+", "",
                       teile[-2] if len(teile) > 1 else teile[0])
     country = land_code(teile[-1]) if len(teile) > 1 else ""
-    if country not in EUROPA_CODES:
-        return None                       # nur Europa wird gesammelt
+    if not ist_land(country):
+        return None                       # ohne erkennbares Land kein Eintrag
 
     angebot = d.get("offers") or {}
     if isinstance(angebot, list):
@@ -873,7 +908,7 @@ def wf_land_und_ort(rest: str) -> tuple[str, str]:
     woerter = rest.split()
     for laenge in (3, 2, 1):
         code = land_code(" ".join(woerter[:laenge]))
-        if code in EUROPA_CODES:
+        if ist_land(code):
             return code, clean(" ".join(woerter[laenge:]))
     return (land_code(" ".join(woerter[:2])) if woerter else ""), ""
 
@@ -895,7 +930,7 @@ def wf_lesen(url: str, html: str) -> dict | None:
     lm = re.search(r"Location\s+([^,]{2,40}),\s*(.*?)\s*"
                    r"(?:Place Type|Website|Past events)", flach)
     country, venue = wf_land_und_ort(clean(lm.group(2))) if lm else ("", "")
-    if country not in EUROPA_CODES:
+    if not ist_land(country):
         return None
 
     art = re.search(r"Place Type\s+([A-Za-zÄÖÜäöü]+)", flach)
@@ -953,7 +988,7 @@ def fl_lesen(url: str, html: str) -> dict | None:
     anschrift = clean(str(ort.get("name", ""))) if isinstance(ort, dict) else ""
     teile = [t.strip() for t in anschrift.split(",") if t.strip()]
     country = land_code(teile[-1]) if len(teile) > 1 else ""
-    if country not in EUROPA_CODES:
+    if not ist_land(country):
         return None
     # britische Postleitzahlen stehen vor dem Ort: "BS40 6LD Compton Martin"
     stadt_roh = teile[-2] if len(teile) > 1 else ""
@@ -1030,7 +1065,7 @@ def ff_lesen(url: str, html: str) -> dict | None:
         if om:
             city = clean(om.group(1))
             country = land_code(clean(om.group(2)))
-    if country not in EUROPA_CODES:
+    if not ist_land(country):
         return None
 
     website = ""
@@ -1052,6 +1087,234 @@ def ff_lesen(url: str, html: str) -> dict | None:
 
 #: Reihenfolge zählt: Sie entscheidet beim Zusammenführen, wessen Schreibweise
 #: gewinnt - die drei gepflegten Verzeichnisse zuerst, die Ergänzungen danach.
+
+# --------------------------------------------------------------------------
+# festivalabroad.com — 3.261 Festivals weltweit, jedes mit Datenblatt
+# --------------------------------------------------------------------------
+# Die vollständigste der neuen Quellen: Termin, Koordinate, offizielle
+# Adresse, Kapazität und Genres stehen im Datenblatt der Seite.
+
+def fb_adressen(since: int) -> list[str]:
+    """Alle Festivalseiten aus der Sitemap; der Termin steht erst auf der Seite."""
+    index = sitemap_adressen(fetch(f"{FB}/sitemap.xml"))
+    if not index:
+        melde(f"Sitemap nicht ladbar: {FB}")
+        return []
+    adressen: set[str] = set()
+    for karte in index:
+        if not karte.endswith(".xml"):
+            continue
+        for u in sitemap_adressen(fetch(karte)):
+            if re.search(r"/festivals/[^/]+$", u):
+                adressen.add(u)
+    return sorted(adressen)
+
+
+#: "2000trees – Gloucestershire, United Kingdom 2027"
+FB_TITEL = re.compile(r"^(.*?)\s+[–-]\s+(.*?)(?:\s+(\d{4}))?$")
+
+
+def fb_ohne_datenblatt(url: str, html: str) -> dict | None:
+    """Feste, deren nächster Termin noch aussteht.
+
+    Für sie liefert die Seite kein Datenblatt - alles Nötige steht aber im
+    Titel: Name, Ort, Land. Ohne Termin, denn den gibt es noch nicht ("TBA -
+    last edition: 8 Jul 2026").
+    """
+    s = soup(html)
+    titel = clean(s.title.get_text()) if s.title else ""
+    titel = re.sub(r"\s*[|–-]\s*Festival Abroad\s*$", "", titel)
+    m = FB_TITEL.match(titel)
+    if not m:
+        return None
+    name = clean(m.group(1))
+    ort_land = [t.strip(" .…") for t in (m.group(2) or "").split(",") if t.strip(" .…")]
+    if not name or len(ort_land) < 2:
+        return None
+    # Lange Titel schneidet die Seite mit Auslassungszeichen ab: aus
+    # "United States" wird "United State…". Was dann kein Land mehr ergibt,
+    # bleibt lieber leer als falsch.
+    land = ort_land[-1]
+    return datensatz("festivalabroad", url, name,
+                     city=ort_land[0], country=land if ist_land(land) else "")
+
+
+def fb_lesen(url: str, html: str) -> dict | None:
+    for d in json_ld_events(html):
+        name = clean(str(d.get("name", "")))
+        if not name:
+            continue
+        ort = d.get("location") or {}
+        anschrift = ort.get("address") or {}
+        geo = ort.get("geo") or {}
+        # "Dresden, Germany" - der Ort steht vorn, das Land dahinter
+        stadt = clean(str(anschrift.get("addressLocality", ""))).split(",")[0]
+        angebot = d.get("offers") or {}
+        if isinstance(angebot, list):
+            angebot = angebot[0] if angebot else {}
+        return datensatz(
+            "festivalabroad", url, name,
+            date_from=datum_iso(d.get("startDate")),
+            date_to=datum_iso(d.get("endDate")),
+            city=stadt, country=str(anschrift.get("addressCountry", "")),
+            venue=clean(str(ort.get("name", ""))),
+            lat=zahl_oder_nichts(geo.get("latitude")),
+            lon=zahl_oder_nichts(geo.get("longitude")),
+            website=str(d.get("url", "")),
+            genre=clean(str(d.get("keywords", ""))),
+            visitors=str(d.get("maximumAttendeeCapacity", "") or ""),
+            price="Eintritt frei" if d.get("isAccessibleForFree") is True else "",
+            cancelled="cancel" in str(d.get("eventStatus", "")).lower())
+    return fb_ohne_datenblatt(url, html)
+
+
+# --------------------------------------------------------------------------
+# jambase.com — Nordamerika, mit vollständigen Lineups
+# --------------------------------------------------------------------------
+# Die Sitemap ist nach Monaten geteilt, der Jahrgang steht am Ende der
+# Adresse ("/festival/the-yarnival-2026"). Danach wird gefiltert, sonst holte
+# der Lauf 26.000 Seiten, von denen die meisten vergangene Jahrgänge sind.
+
+def jb_adressen(since: int) -> list[str]:
+    index = sitemap_adressen(fetch(f"{JB}/sitemap.xml"))
+    karten = [k for k in index if "pt-festival" in k]
+    if not karten:
+        melde(f"Sitemap ohne Festivalkarten: {JB}")
+        return []
+    adressen: set[str] = set()
+    for karte in karten:
+        for u in sitemap_adressen(fetch(karte)):
+            jahr = re.search(r"-(\d{4})/?$", u)
+            if jahr and int(jahr.group(1)) >= since:
+                adressen.add(u)
+    return sorted(adressen)
+
+
+#: Adressen, die keine offizielle Festivalseite sind
+JB_KEINE_SEITE = re.compile(
+    r"(?i)facebook|twitter|x\.com|instagram|tiktok|youtube|spotify|google\.|"
+    r"jambase|ticketmaster|seetickets|eventbrite|theticketing|axs\.com|"
+    r"bandsintown|linktr\.ee")
+
+
+def jb_website(html: str) -> str:
+    """Die offizielle Seite unter den ausgehenden Verweisen."""
+    for a in soup(html).find_all("a", href=True):
+        ziel = a["href"].strip()
+        if ziel.startswith("http") and not JB_KEINE_SEITE.search(ziel):
+            return ziel
+    return ""
+
+
+def jb_lesen(url: str, html: str) -> dict | None:
+    for d in json_ld_events(html):
+        name = clean(str(d.get("name", "")))
+        if not name:
+            continue
+        ort = d.get("location") or {}
+        anschrift = ort.get("address") or {}
+        geo = ort.get("geo") or {}
+        acts = [clean(str(p.get("name", ""))) for p in (d.get("performer") or [])
+                if isinstance(p, dict)]
+        # Region statt Land: "NY" gehört zu US, nicht zu Norwegen
+        land = str(anschrift.get("addressCountry", ""))
+        return datensatz(
+            "jambase", url, name,
+            date_from=datum_iso(d.get("startDate")),
+            date_to=datum_iso(d.get("endDate")),
+            city=clean(str(anschrift.get("addressLocality", ""))),
+            country=land,
+            venue=clean(str(ort.get("name", ""))),
+            plz=clean(str(anschrift.get("postalCode", ""))),
+            lat=zahl_oder_nichts(geo.get("latitude")),
+            lon=zahl_oder_nichts(geo.get("longitude")),
+            website=jb_website(html),
+            price="Eintritt frei" if d.get("isAccessibleForFree") is True else "",
+            lineup=[b for b in acts if valid_band(b)],
+            cancelled="cancel" in str(d.get("eventStatus", "")).lower())
+    return None
+
+
+# --------------------------------------------------------------------------
+# festivism.com — ein Nachschlagewerk ohne Termine
+# --------------------------------------------------------------------------
+# 5.207 Festivals aus aller Welt, jedes mit Ort, Land und Gründungsjahr, aber
+# ohne Datum. Das ist kein Mangel dieser Quelle, sondern ihr Zweck: Sie führt
+# das Fest, nicht seine nächste Ausgabe. Für den Bestand heißt das, dass ihre
+# Einträge terminlos bleiben - und in Stufe 6 mit dem datierten Zwilling
+# zusammenfinden, wo es einen gibt.
+
+def fv_adressen(since: int) -> list[str]:
+    adressen = [u for u in sitemap_adressen(fetch(f"{FV}/sitemap.xml"))
+                if re.search(r"/festivals/[^/]+$", u)]
+    if not adressen:
+        melde(f"Sitemap ohne Festivalseiten: {FV}")
+    return sorted(set(adressen))
+
+
+def fv_lesen(url: str, html: str) -> dict | None:
+    for d in json_ld_events(html):
+        name = clean(str(d.get("name", "")))
+        if not name:
+            continue
+        ort = d.get("location") or {}
+        anschrift = ort.get("address") or {}
+        land = str(anschrift.get("addressCountry", ""))
+        # "XW" steht bei dieser Quelle für die Spielwelt: Konzerte in Minecraft
+        # und Roblox. Die gibt es wirklich - hinfahren kann man nicht.
+        if land.upper() == "XW" or "online" in str(
+                d.get("eventAttendanceMode", "")).lower():
+            return None
+        stadt = clean(str(anschrift.get("addressLocality", ""))).split(",")[0]
+        return datensatz("festivism", url, name, city=stadt, country=land)
+    return None
+
+
+# --------------------------------------------------------------------------
+# festivalnetworks.com — 624 Festivals in einer Datei
+# --------------------------------------------------------------------------
+# Die Karte der Seite lädt ihre Punkte aus einer JSON-Datei. Die zu lesen ist
+# genauer und schonender als 624 Seiten einzeln abzurufen.
+
+#: "27-Aug-26"
+FN_DATUM = re.compile(r"^(\d{1,2})-([A-Za-z]{3})-(\d{2})$")
+
+
+def fn_datum(roh: str) -> str:
+    m = FN_DATUM.match(clean(roh))
+    if not m:
+        return ""
+    monat = monat_nummer(m.group(2))
+    return f"{int(m.group(1)):02d}.{monat:02d}.20{m.group(3)}" if monat else ""
+
+
+def fn_feed(since: int) -> list[dict]:
+    roh = fetch(f"{FN}/data-api.php?r=festivals")
+    try:
+        eintraege = json.loads(roh or "[]")
+    except json.JSONDecodeError:
+        melde(f"Datei nicht lesbar: {FN}")
+        return []
+    funde = []
+    for e in eintraege:
+        name = clean(str(e.get("Festival Name", "")))
+        von = fn_datum(str(e.get("Start Date", "")))
+        if not name or (von and int(von[-4:]) < since):
+            continue
+        preis = e.get("Ticket Price (EUR)")
+        funde.append(datensatz(
+            "festivalnetworks", f"{FN}/#{name}", name,
+            date_from=von, date_to=fn_datum(str(e.get("End Date", ""))),
+            city=clean(str(e.get("City/Region", ""))).split(",")[0],
+            country=str(e.get("Country", "")),
+            lat=zahl_oder_nichts(e.get("Latitude")),
+            lon=zahl_oder_nichts(e.get("Longitude")),
+            website=str(e.get("Website", "")),
+            genre=genres_vereinen(str(e.get("Genre", "")), str(e.get("Sub-Genre", ""))),
+            visitors=str(e.get("Capacity", "") or ""),
+            price=f"ca. {preis} €" if isinstance(preis, (int, float)) and preis else ""))
+    return funde
+
 QUELLEN = [
     Quelle("festivalticker", ft_adressen, ft_lesen, mit_stammdaten=True),
     Quelle("festivalsunited", fu_adressen, fu_lesen),
@@ -1061,6 +1324,13 @@ QUELLEN = [
     Quelle("wannafest", wf_adressen, wf_lesen),
     Quelle("festivalflyer", fl_adressen, fl_lesen),
     Quelle("festivalfinder", ff_adressen, ff_lesen),
+    # Weltweit. Sie stehen hinten, weil die deutschsprachigen Quellen die
+    # gewohnte Schreibweise deutscher Festivals führen - der Rang entscheidet,
+    # welcher Name gewinnt.
+    Quelle("festivalabroad", fb_adressen, fb_lesen),
+    Quelle("jambase", jb_adressen, jb_lesen),
+    Quelle("festivalnetworks", lambda _since: [], lambda *_a: None, feed=fn_feed),
+    Quelle("festivism", fv_adressen, fv_lesen),
 ]
 
 #: Rang je Quelle für das Zusammenführen

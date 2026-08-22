@@ -63,16 +63,27 @@ window.KARTE = (() => {
     };
   }
 
-  /** Sichtbare Höhe in Kilometern: um den Wohnort der Umkreis, sonst Europa. */
+  /* Ohne Wohnort zeigt die Karte, wo die Daten liegen. Früher stand dort fest
+     Mitteleuropa; seit die Sammlung weltweit ist, käme das einer Karte gleich,
+     die neun Zehntel ihres Inhalts verschweigt. */
+  const datenRahmen = () => (cfg.datenRahmen && cfg.datenRahmen()) || null;
+
+  /** Sichtbare Höhe in Kilometern: um den Wohnort der Umkreis, sonst alles. */
   function grundspanne() {
     const wohnort = cfg.wohnort();
-    return wohnort ? cfg.umkreis() * 1.35 : 2100;
+    if (wohnort) return cfg.umkreis() * 1.35;
+    const box = datenRahmen();
+    // 111 km je Breitengrad, ein Zehntel Rand
+    return box ? Math.max(2100, (box[1] - box[0]) * 111 * 1.1) : 2100;
   }
 
   function mittelpunkt() {
     if (karte.center) return karte.center;
     const wohnort = cfg.wohnort();
-    return wohnort ? { lat: wohnort.lat, lon: wohnort.lon } : { lat: 52.5, lon: 12.0 };
+    if (wohnort) return { lat: wohnort.lat, lon: wohnort.lon };
+    const box = datenRahmen();
+    return box ? { lat: (box[0] + box[1]) / 2, lon: (box[2] + box[3]) / 2 }
+               : { lat: 52.5, lon: 12.0 };
   }
 
   /* ---------------- Zeichnen ---------------- */

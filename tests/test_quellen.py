@@ -29,13 +29,23 @@ class TestDatensatz:
         assert datensatz("festivalticker", "u", "X", visitors="ca. 18.000")["visitors"] \
             == "18000"
 
-    def test_koordinate_ausserhalb_europas_faellt_weg(self):
-        rec = datensatz("festivalsunited", "u", "X", lat=-34.6, lon=-58.4)
-        assert (rec["lat"], rec["lon"]) == (None, None)
+    def test_koordinate_auf_der_erde_bleibt(self):
+        for lat, lon in [(46.0, 8.9),        # Lugano
+                         (-34.6, -58.4),     # Buenos Aires
+                         (35.7, 139.7),      # Tokio
+                         (-33.9, 151.2)]:    # Sydney
+            rec = datensatz("festivalsunited", "u", "X", lat=lat, lon=lon)
+            assert (rec["lat"], rec["lon"]) == (lat, lon)
 
-    def test_koordinate_in_europa_bleibt(self):
-        rec = datensatz("festivalsunited", "u", "X", lat=46.0, lon=8.9)
-        assert (rec["lat"], rec["lon"]) == (46.0, 8.9)
+    def test_unmoegliche_koordinate_faellt_weg(self):
+        for lat, lon in [(91.0, 0.0), (0.0, 181.0), (None, 8.9), (46.0, None)]:
+            rec = datensatz("festivalsunited", "u", "X", lat=lat, lon=lon)
+            assert (rec["lat"], rec["lon"]) == (None, None)
+
+    def test_nullpunkt_ist_keine_koordinate(self):
+        # 0/0 liegt im Golf von Guinea und heisst "Feld nicht ausgefüllt"
+        rec = datensatz("festivalsunited", "u", "X", lat=0.0, lon=0.0)
+        assert (rec["lat"], rec["lon"]) == (None, None)
 
 
 class TestFtBands:
@@ -114,8 +124,14 @@ class TestFestivalhopper:
         assert rec["city"] == "Dinkelsbühl"
         assert rec["visitors"] == "45000"
 
-    def test_ausserhalb_europas_wird_verworfen(self):
+    def test_japan_wird_gelesen_wie_deutschland(self):
         seite = self.SEITE.replace("Deutschland", "Japan")
+        rec = fh_lesen("https://www.festivalhopper.de/festival/x-2026", seite)
+        assert rec is not None and rec["country"] == "JP"
+
+    def test_ohne_erkennbares_land_kein_eintrag(self):
+        # "Bayern" ist kein Land - dann fehlt die Ortsangabe ganz
+        seite = self.SEITE.replace("Deutschland", "Bayern")
         assert fh_lesen("https://www.festivalhopper.de/festival/x-2026", seite) is None
 
 

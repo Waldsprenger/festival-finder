@@ -13,7 +13,7 @@ from __future__ import annotations
 import difflib
 from urllib.parse import urlparse
 
-from gemeinsam import ausser_europa, land_code
+from gemeinsam import land_code
 from quellen import RANG
 from text import (ALIAS_KEY, ALIAS_NAME, alias_abschalten, band_key,
                   canonical_band, city_key, clean, festival_key, fold,
@@ -246,8 +246,6 @@ def stufe1_exakt(records: list[dict], registry: dict[str, str]) -> dict:
     """
     merged: dict[tuple[str, str, str], dict] = {}
     for rec in records:
-        if ausser_europa(rec["country"]):
-            continue
         key = (festival_key(rec["name"]), rec["year"], city_key(rec["city"]))
         cur = merged.get(key)
         if cur is None:

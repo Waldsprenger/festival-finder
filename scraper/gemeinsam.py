@@ -138,18 +138,67 @@ EUROPA_CODES = sorted(set(LAENDER.values()) | {"GG", "JE", "IM"})
 # Kleingeschrieben für Nominatim
 EU_CODES = ",".join(c.lower() for c in EUROPA_CODES)
 
-# Ausgeschriebene Namen außereuropäischer Länder. Kürzel stehen hier nicht:
-# Die kennt `ausser_europa` schon daran, dass sie nicht zu Europa gehören.
-NICHT_EUROPA = {
-    "usa", "vereinigte staaten", "united states", "kanada", "canada", "mexiko",
-    "mexico", "brasilien", "brazil", "argentinien", "argentina", "chile",
-    "kolumbien", "colombia", "peru", "uruguay", "paraguay", "ecuador",
-    "costa rica", "australien", "australia", "neuseeland", "new zealand",
-    "japan", "china", "indien", "india", "indonesien", "indonesia", "thailand",
-    "vietnam", "philippinen", "singapur", "suedafrika", "südafrika",
-    "south africa", "south korea", "kazakhstan", "aegypten", "ägypten",
-    "marokko", "tunesien", "israel", "katar", "vereinigte arabische emirate",
+# Deutsche Namen für die Welt jenseits Europas. Die Quellen schreiben deutsch;
+# die englischen Namen aller 252 Staaten kommen aus data/laender.json dazu.
+WELT_DEUTSCH = {
+    "usa": "US", "vereinigte staaten": "US", "vereinigte staaten von amerika": "US",
+    "kanada": "CA", "mexiko": "MX", "brasilien": "BR", "argentinien": "AR",
+    "kolumbien": "CO", "peru": "PE", "chile": "CL", "uruguay": "UY",
+    "paraguay": "PY", "ecuador": "EC", "bolivien": "BO", "venezuela": "VE",
+    "kuba": "CU", "jamaika": "JM", "dominikanische republik": "DO",
+    "australien": "AU", "neuseeland": "NZ", "japan": "JP", "china": "CN",
+    "indien": "IN", "indonesien": "ID", "thailand": "TH", "vietnam": "VN",
+    "philippinen": "PH", "singapur": "SG", "malaysia": "MY", "suedkorea": "KR",
+    "südkorea": "KR", "nordkorea": "KP", "taiwan": "TW", "kasachstan": "KZ",
+    "usbekistan": "UZ", "georgien": "GE", "armenien": "AM", "aserbaidschan": "AZ",
+    "suedafrika": "ZA", "südafrika": "ZA", "aegypten": "EG", "ägypten": "EG",
+    "marokko": "MA", "tunesien": "TN", "algerien": "DZ", "libyen": "LY",
+    "kenia": "KE", "tansania": "TZ", "uganda": "UG", "ghana": "GH",
+    "nigeria": "NG", "senegal": "SN", "aethiopien": "ET", "äthiopien": "ET",
+    "israel": "IL", "katar": "QA", "vereinigte arabische emirate": "AE",
+    "saudi-arabien": "SA", "libanon": "LB", "jordanien": "JO", "iran": "IR",
+    "irak": "IQ", "pakistan": "PK", "bangladesch": "BD", "nepal": "NP",
+    "sri lanka": "LK", "mongolei": "MN", "kambodscha": "KH", "laos": "LA",
+    "myanmar": "MM", "costa rica": "CR", "panama": "PA", "guatemala": "GT",
+    "honduras": "HN", "nicaragua": "NI", "el salvador": "SV", "belize": "BZ",
+    "fidschi": "FJ", "papua-neuguinea": "PG",
 }
+
+
+def _welttabelle() -> tuple[dict[str, dict], dict[str, str]]:
+    """data/laender.json: alle Staaten mit Kontinent, dazu ihre Namen.
+
+    Die Datei entsteht in build_gazetteer.py aus der Länderliste von GeoNames.
+    Fehlt sie (frischer Klon vor dem ersten Lauf), bleibt es bei den
+    handgeschriebenen Namen — der Lauf soll daran nicht scheitern.
+    """
+    roh = {}
+    pfad = DATA / "laender.json"
+    if pfad.exists():
+        try:
+            roh = json.loads(pfad.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            roh = {}
+    namen = {}
+    for code, eintrag in roh.items():
+        namen[code.lower()] = code
+        name = (eintrag.get("name") or "").lower()
+        if name:
+            namen[name] = code
+    return roh, namen
+
+
+WELT, _WELT_NAMEN = _welttabelle()
+
+#: Alle gültigen Länderkürzel. Ohne die Datei zählt, was hier steht.
+ISO_CODES = set(WELT) | set(LAENDER.values()) | set(WELT_DEUTSCH.values())
+
+#: Kürzel → Kontinent (EU, NA, SA, AS, AF, OC, AN)
+KONTINENT = {code: e.get("kontinent", "") for code, e in WELT.items()}
+
+# Reihenfolge: handgeschriebene Namen zuerst, dann die Welt. So bleibt
+# "england" bei GB, obwohl GeoNames "United Kingdom" führt.
+LAENDER = {**_WELT_NAMEN, **WELT_DEUTSCH, **LAENDER}
 
 
 def land_code(country: str) -> str:
@@ -165,21 +214,17 @@ def land_code(country: str) -> str:
     return roh
 
 
-def ausser_europa(country: str) -> bool:
-    """Liegt das Land außerhalb Europas?
+def ist_land(country: str) -> bool:
+    """Ist das ein Staat, den es gibt?
 
-    Die Namensliste allein genügte nicht: Sie kannte "usa", aber nicht die
-    Kürzel IN, CL, PY, CO, ZA, ID, KR, KZ, CR, CN oder TH, die in den Quellen
-    ebenso vorkommen. Deshalb zählt zusätzlich jedes gültige Zweibuchstaben-
-    kürzel, das nicht zu Europa gehört. Längere unbekannte Angaben ("Bayern",
-    "Region Hannover") bleiben ausdrücklich drin — sie sind keine Länder, und
-    ein Rauswurf auf Verdacht kostet echte Festivals.
+    Früher hiess die Frage "liegt das in Europa?" und entschied darüber, was in
+    den Bestand kam. Jetzt zählt nur noch, ob hinter der Angabe ein Land steht:
+    "Bayern" und "Region Hannover" sind keine, "Japan" und "BR" schon.
     """
-    roh = (country or "").strip().lower()
-    if not roh:
-        return False
-    if roh in NICHT_EUROPA:
-        return True
-    code = land_code(country)
-    return len(code) == 2 and code.isalpha() and code.upper() not in EUROPA_CODES
+    return land_code(country) in ISO_CODES
+
+
+def kontinent(country: str) -> str:
+    """Erdteil eines Landes, leer wenn unbekannt."""
+    return KONTINENT.get(land_code(country), "")
 

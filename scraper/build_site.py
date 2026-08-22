@@ -14,7 +14,8 @@ import re
 import sys
 from datetime import datetime
 
-from gemeinsam import DATA, EUROPA_CODES, EUROPA_RAHMEN, SITE, land_code, lies_json
+from gemeinsam import (DATA, EUROPA_RAHMEN, ISO_CODES, KONTINENT, SITE,
+                       land_code, lies_json)
 from genres import OBERBEGRIFFE, oberbegriffe
 from text import KOSTENLOS, fold
 
@@ -137,6 +138,22 @@ def max_entfernung_km(zeilen: list, plz: list) -> int:
 def max_preis_eur(zeilen: list) -> int:
     """Teuerstes ausgelesenes Ticket, aufgerundet."""
     return aufrunden(max((z[EURO] for z in zeilen if z[EURO] is not None), default=0))
+
+
+def datenrahmen(zeilen: list) -> list[float]:
+    """Das Rechteck um alle Festivals mit Koordinate: lat0, lat1, lon0, lon1.
+
+    Es bestimmt den Kartenausschnitt, solange kein Wohnort eingetragen ist.
+    Fest verdrahtet war dort Mitteleuropa - bei weltweiten Daten zeigte die
+    Karte damit einen Bruchteil dessen, was sie hat.
+    """
+    punkte = [(z[LAT], z[LON]) for z in zeilen if z[LAT] is not None]
+    if not punkte:
+        return [EUROPA_RAHMEN[0], EUROPA_RAHMEN[1], EUROPA_RAHMEN[2], EUROPA_RAHMEN[3]]
+    lats = [p[0] for p in punkte]
+    lons = [p[1] for p in punkte]
+    return [round(min(lats), 2), round(max(lats), 2),
+            round(min(lons), 2), round(max(lons), 2)]
 
 
 def frueheste_monatsgrenze(zeilen: list) -> str:
@@ -409,14 +426,19 @@ def main() -> None:
         "festivals": zeilen,
         "places": [[n, round(la, 3), round(lo, 3), cc] for n, la, lo, cc in orte],
         # Damit die Seite "1012 NL" (Land) von "1012 AB" (niederländischer
-        # Postleitzahlteil) unterscheiden kann
-        "laender": EUROPA_CODES,
+        # Postleitzahlteil) unterscheiden kann - weltweit, sonst gilt "US"
+        # als Ortsname.
+        "laender": sorted(ISO_CODES),
+        # Kürzel → Erdteil, für die Einordnung auf der Karte und in der Liste
+        "kontinente": {c: k for c, k in sorted(KONTINENT.items()) if k},
         "plz": [[c, o, round(la, 3), round(lo, 3), cc] for c, o, la, lo, cc in plz],
         "world": lies_json(DATA / "welt_grob.json", []),
         "worldFine": lies_json(DATA / "welt_fein.json", []),
         # Ausschnitt, für den feine Umrisse vorliegen: lon0, lon1, lat0, lat1
         "fineBox": [EUROPA_RAHMEN[2], EUROPA_RAHMEN[3],
                     EUROPA_RAHMEN[0], EUROPA_RAHMEN[1]],
+        # Ausschnitt der Karte ohne Wohnort: lat0, lat1, lon0, lon1
+        "dataBox": datenrahmen(zeilen),
         "maxDistanceKm": max_entfernung_km(zeilen, plz),
         "maxPriceEur": max_preis_eur(zeilen),
         "minDate": frueheste_monatsgrenze(zeilen),
@@ -429,7 +451,7 @@ def main() -> None:
     plz_europa = verortung.get("plz_nachladen") or []
     orte_ziel = SITE / "orte.js"
     orte_ziel.write_text(
-        "window.ORTE_EUROPA = " + json.dumps({
+        "window.ORTE_WELT = " + json.dumps({
             "orte": [[n, round(la, 3), round(lo, 3), cc] for n, la, lo, cc in europa],
             "plz": [[c, o, round(la, 3), round(lo, 3), cc]
                     for c, o, la, lo, cc in plz_europa],

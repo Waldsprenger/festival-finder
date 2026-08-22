@@ -9,6 +9,16 @@
   "quelle": "festapp",
   "url": "https://festapp.io/festivals/plages-electroniques/2026"
  },
+ "festivalabroad_1.html.gz": {
+  "festival": "Jazztage Dresden",
+  "quelle": "festivalabroad",
+  "url": "https://www.festivalabroad.com/festivals/jazztage-dresden"
+ },
+ "festivalabroad_2.html.gz": {
+  "festival": "Cinetrip Sparty",
+  "quelle": "festivalabroad",
+  "url": "https://www.festivalabroad.com/festivals/cinetrip-sparty"
+ },
  "festivalalarm_1.html.gz": {
   "festival": "Reggae Jam",
   "quelle": "festivalalarm",
@@ -63,6 +73,26 @@
   "festival": "Afrikanisches Kulturfest Rebstockpark",
   "quelle": "festivalticker",
   "url": "https://www.festivalticker.de/festivals/afrikanisches_kulturfest_solmspark/"
+ },
+ "festivism_1.html.gz": {
+  "festival": "Internationales Dixieland Festival Dresden",
+  "quelle": "festivism",
+  "url": "https://www.festivism.com/festivals/internationales-dixieland-festival-dresden-de"
+ },
+ "festivism_2.html.gz": {
+  "festival": "Klavier-Festival Ruhr",
+  "quelle": "festivism",
+  "url": "https://www.festivism.com/festivals/klavier-festival-ruhr-de"
+ },
+ "jambase_1.html.gz": {
+  "festival": "Adirondack Independence Music Festival",
+  "quelle": "jambase",
+  "url": "https://www.jambase.com/festival/adirondack-independence-music-festival-2026"
+ },
+ "jambase_2.html.gz": {
+  "festival": "Ballhooter Festival",
+  "quelle": "jambase",
+  "url": "https://www.jambase.com/festival/ballhooter-festival-2026"
  },
  "wannafest_1.html.gz": {
   "festival": "Wacken Open Air",

@@ -66,6 +66,18 @@ def test_nach_einem_abbruch_laufen_die_uebrigen_weiter(kette):
 
 
 def test_jeder_schritt_hat_eine_zeitgrenze():
-    # Die Grenze muss über der Dauer des längsten Schritts liegen: Der volle
-    # Abruf der Festivaldaten braucht rund zwanzig Minuten.
     assert 1800 <= daily_update.STUNDE <= 7200
+
+
+def test_das_einsammeln_hat_mehr_zeit():
+    # Zwölf Quellen, 24.000 Seiten: Der erste weltweite Lauf ohne
+    # Zwischenspeicher brauchte knapp zwei Stunden.
+    schritt = daily_update.SCHRITTE[0]
+    assert schritt[0] == "Festivaldaten"
+    assert len(schritt) > 2 and schritt[2] >= 4 * 3600
+
+
+def test_die_uebrigen_schritte_erben_die_stunde(kette):
+    # Ohne eigene Angabe gilt STUNDE - geprüft am Verhalten, nicht am Wert
+    code, log = kette([("Endlos", "import time; time.sleep(30)")], grenze=1)
+    assert "Zeitgrenze 1s" in log
