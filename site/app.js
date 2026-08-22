@@ -137,7 +137,8 @@
     genre: { an: false, auswahl: new Set(), ohneGenre: false },
 
     karte: false,
-    sortierung: 'date',
+    // null heisst: noch nicht selbst gewaehlt, es gilt die Vorgabe
+    sortierung: null,
   };
 
   // Lineups als Set für schnelle Treffersuche
@@ -865,13 +866,31 @@
   const gewichtet = () => (state.bands.an && state.bands.auswahl.size) ||
                           (state.genre.an && state.genre.auswahl.size);
 
-  const sortierungen = () => gewichtet()
-    ? ['match', 'date', 'distance', 'price']
-    : ['date', 'distance', 'price'];
+  /** Was sich zu ordnen lohnt: Uebereinstimmung, Entfernung, Preis, Datum.
 
+      Weggelassen wird, was nichts ordnen kann - ohne Band- oder Genreauswahl
+      gibt es keine Uebereinstimmung, ohne Wohnort keine Entfernung. Eine
+      Auswahl anzubieten, die alle Zeilen gleich behandelt, waere eine
+      Behauptung ueber eine Ordnung, die es nicht gibt. */
+  const sortierungen = () => {
+    const liste = [];
+    if (gewichtet()) liste.push('match');
+    if (state.home) liste.push('distance');
+    liste.push('price', 'date');
+    return liste;
+  };
+
+  /** Die geltende Sortierung: die eigene Wahl, sonst die erste moegliche.
+
+      Die Vorgabe muss mitwandern. Frueher hatte jede Filterart ihre eigene
+      gemerkte Sortierung; mit der Kette gibt es nur noch eine, und die stand
+      vor der Bandauswahl auf "Datum". Kam danach eine Band dazu, blieb sie
+      dort stehen - die Liste ordnete nach Termin, waehrend die Prozentzahl
+      danebenstand und niemand sie zu Gesicht bekam. */
   function sortierung() {
     const erlaubt = sortierungen();
-    return erlaubt.includes(state.sortierung) ? state.sortierung : erlaubt[0];
+    return (state.sortierung && erlaubt.includes(state.sortierung))
+      ? state.sortierung : erlaubt[0];
   }
 
   // Fehlende Angaben ans Ende, egal wonach sortiert wird: Ein Festival ohne
@@ -909,7 +928,6 @@
       wahl.append(o);
     }
     wahl.value = aktiv;
-    state.sortierung = aktiv;
   }
 
   /** "Zeitraum, Umkreis und Preis" - in der Sprache, die gerade gilt. */
@@ -968,6 +986,9 @@
   function zeichnen() {
     ketteZeichnen();
     if ($('s-ergebnis').hidden) return;
+
+    // Was zu ordnen ist, aendert sich mit der Auswahl - die Liste also auch.
+    sortierungZeichnen();
 
     const pool = gefiltert();
 

@@ -34,14 +34,20 @@
 
   <h2>Ortssuche</h2>
   <p>
-    Ihre Eingabe wird gegen <b>mitgelieferte Verzeichnisse</b> aufgelöst: rund 16.700
-    Postleitzahlen für Deutschland, Österreich und die Schweiz sowie rund 85.000
-    Ortsnamen, beides aus dem GeoNames-Datenbestand. Dieser Abgleich läuft vollständig
-    in Ihrem Browser — die eingegebene Postleitzahl oder Ortsangabe verlässt Ihr Gerät
-    dabei nicht und wird auch nicht gespeichert.
+    Ihre Eingabe wird gegen <b>mitgelieferte Verzeichnisse</b> aufgelöst, beide aus dem
+    GeoNames-Datenbestand. Mit der Seite kommen rund 16.700 Postleitzahlen für
+    Deutschland, Österreich und die Schweiz sowie rund 116.000 Ortsnamen. Findet sich
+    dort nichts, lädt die Seite von <b>demselben Server</b> ein größeres Verzeichnis
+    nach: rund 38.700 weitere Postleitzahlen aus 33 Ländern — darunter Norwegen,
+    Bulgarien, die Niederlande, Südafrika, Australien, Ungarn, das Vereinigte
+    Königreich, die Philippinen, Argentinien und Neuseeland — sowie rund 260.000
+    Ortsnamen weltweit. Beide Abgleiche laufen vollständig in Ihrem Browser: Die
+    eingegebene Postleitzahl oder Ortsangabe verlässt Ihr Gerät dabei nicht, sie wird
+    weder übertragen noch gespeichert. Nachgeladen wird stets die ganze Datei, nie eine
+    Anfrage zu Ihrer Eingabe.
   </p>
   <p>
-    Nur falls dort weder Postleitzahl noch Ortsname passen, fragt die Seite ergänzend den
+    Nur falls auch dort weder Postleitzahl noch Ortsname passen, fragt die Seite den
     Geokodierungsdienst <b>Nominatim</b> der OpenStreetMap Foundation (St John's Innovation
     Centre, Cowley Road, Cambridge, CB4 0WS, Vereinigtes Königreich) an. In diesem Fall
     werden Ihre IP-Adresse, der Suchbegriff und technische Angaben Ihres Browsers dorthin
@@ -51,9 +57,12 @@
     Einzelheiten: <a href="https://osmfoundation.org/wiki/Privacy_Policy" target="_blank" rel="noopener">Datenschutzerklärung der OpenStreetMap Foundation</a>.
   </p>
   <p>
-    In der über claude.ai veröffentlichten Fassung unterbindet die dortige
+    In der über claude.ai veröffentlichten Einzelseiten-Fassung unterbindet die dortige
     Sicherheitsrichtlinie sämtliche Aufrufe fremder Server. Dort findet die Ortssuche
     ausnahmslos lokal statt, eine Übermittlung an Nominatim ist technisch ausgeschlossen.
+    Das große Verzeichnis liegt dieser Fassung nicht bei; sie kennt deshalb nur die
+    Postleitzahlen von Deutschland, Österreich und der Schweiz und die rund 116.000
+    mitgelieferten Ortsnamen.
   </p>
 
   <h2>Reichweitenmessung (nur bei aktivierter Zählung)</h2>

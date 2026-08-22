@@ -212,6 +212,32 @@ def test_die_karte_kennt_den_bereich_statt_eines_umkreises():
         assert f"{handgriff}:" in app, f"app.js liefert {handgriff} nicht"
 
 
+def test_die_sortierung_folgt_dem_filter():
+    """Übereinstimmung, Entfernung, Preis, Datum — und die Vorgabe wandert mit.
+
+    Die Vorgabe muss dem folgen, was eingestellt ist. Als sie in einem festen
+    Wert steckte, stand dort vor der Bandauswahl „Datum"; kam danach eine Band
+    dazu, blieb „Datum" stehen, weil es weiter erlaubt war — die Liste ordnete
+    nach Termin, während die Prozentzahl danebenstand.
+    """
+    skript = (SITE / "app.js").read_text(encoding="utf-8")
+
+    assert re.search(r"sortierung:\s*null", skript), \
+        "die Sortierung startet mit einem festen Wert statt mit der Vorgabe"
+
+    m = re.search(r"const sortierungen = \(\) => \{(.*?)\n  \};", skript, re.S)
+    assert m, "sortierungen() nicht gefunden"
+    reihenfolge = re.findall(r"'(match|distance|price|date)'", m.group(1))
+    assert reihenfolge == ["match", "distance", "price", "date"], reihenfolge
+
+    # Nur anbieten, was auch ordnen kann
+    assert "if (gewichtet()) liste.push('match')" in skript
+    assert "if (state.home) liste.push('distance')" in skript
+
+    # Die eigene Wahl schlägt die Vorgabe, aber nur wenn es eine gibt
+    assert "state.sortierung && erlaubt.includes(state.sortierung)" in skript
+
+
 def test_die_karte_zoomt_nicht_ueber_die_erde_hinaus():
     """Jenseits der Pole rechnet die Projektion weiter - und zieht Schlieren.
 
