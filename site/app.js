@@ -114,7 +114,12 @@
 
   const state = {
     home: null,              // {lat, lon, label}
+    // Umkreis und Preis filtern nur, wenn man es verlangt. Voreingestellt
+    // zeigt die Seite, was es gibt - nicht, was in 200 km und unter 150 Euro
+    // liegt.
+    radiusAktiv: false,
     radius: 200,
+    preisAktiv: false,
     maxPrice: 150,
     allowUnknownPrice: true,
     allowUnknownGeo: false,
@@ -432,14 +437,16 @@
 
   function passes(row) {
     if (row[CANCELLED] && !state.showCancelled) return false;
-    if (state.home) {
+    if (state.home && state.radiusAktiv) {
       const d = distanceOf(row);
       if (d === null) { if (!state.allowUnknownGeo) return false; }
       else if (d > state.radius) return false;
     }
-    const p = row[EUR];
-    if (p === null) { if (!state.allowUnknownPrice) return false; }
-    else if (p > state.maxPrice) return false;
+    if (state.preisAktiv) {
+      const p = row[EUR];
+      if (p === null) { if (!state.allowUnknownPrice) return false; }
+      else if (p > state.maxPrice) return false;
+    }
 
     if (!row[FROM]) {
       if (!state.allowUnknownDate) return false;
@@ -752,15 +759,32 @@
     state.sort[state.mode] = aktiv;
   }
 
+  /** "Zeitraum, Umkreis und Preis" - in der Sprache, die gerade gilt. */
+  function aufzaehlen(teile) {
+    try {
+      return new Intl.ListFormat(sprache, { style: 'long', type: 'conjunction' })
+        .format(teile);
+    } catch (_) {
+      return teile.join(', ');   // aeltere Browser bekommen die Kommafassung
+    }
+  }
+
   function render() {
     const pool = filtered();
     const total = state.selected.size
       ? [...state.selected.values()].reduce((a, b) => a + b, 0) : 0;
 
+    // Nur nennen, was auch filtert: Der Zeitraum gilt immer, Umkreis und
+    // Preis erst mit ihrem Schalter.
+    const kriterien = [t('filter.critDate')];
+    if (state.home && state.radiusAktiv) kriterien.push(t('filter.critRadius'));
+    if (state.preisAktiv) kriterien.push(t('filter.critPrice'));
+
     $('filter-stat').innerHTML =
       t('filter.stat', { n: pool.length.toLocaleString(sprache),
-                         gesamt: F.length.toLocaleString(sprache) }) +
-      (state.home ? '' : t('filter.noHome'));
+                         gesamt: F.length.toLocaleString(sprache),
+                         kriterien: aufzaehlen(kriterien) }) +
+      (state.home || !state.radiusAktiv ? '' : t('filter.noHome'));
 
     const list = $('festival-list');
     list.innerHTML = '';
@@ -1335,6 +1359,19 @@
     $('locate').addEventListener('click', resolveHome);
     $('home').addEventListener('keydown', (e) => { if (e.key === 'Enter') resolveHome(); });
 
+    $('radius-on').addEventListener('change', (e) => {
+      state.radiusAktiv = e.target.checked;
+      $('radius-teil').hidden = !e.target.checked;
+      KARTE.zeichnen();
+      render();
+    });
+
+    $('price-on').addEventListener('change', (e) => {
+      state.preisAktiv = e.target.checked;
+      $('price-teil').hidden = !e.target.checked;
+      render();
+    });
+
     $('radius').addEventListener('input', (e) => {
       state.radius = stellungZuKm(+e.target.value);
       $('radius-out').textContent = `${state.radius.toLocaleString('de-DE')} km`;
@@ -1459,6 +1496,7 @@
       sprache: () => sprache,
       wohnort: () => state.home,
       umkreis: () => state.radius,
+      umkreisAktiv: () => state.radiusAktiv,
       datenRahmen: () => D.dataBox || null,
       welt: D.world,
       weltFein: D.worldFine,

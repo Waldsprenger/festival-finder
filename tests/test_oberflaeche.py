@@ -97,6 +97,64 @@ def test_die_seite_ruft_nur_vorhandene_schluessel():
     assert not fehlt, f"unbekannte Textschlüssel: {fehlt}"
 
 
+def test_auch_die_umwegigen_schluessel_gibt_es():
+    """Nicht jeder Schlüssel steht direkt in t() - manche über eine Variable.
+
+    Die Kartenbeschriftung wählt ihren Schlüssel je nach Zahl der Pins aus
+    drei Möglichkeiten aus; keine davon fände die Prüfung darüber. Also alle
+    Zeichenketten nehmen, die aussehen wie ein Schlüssel: Was mit einem
+    bekannten Namensraum beginnt ('map.', 'card.', …), muss es auch geben.
+    """
+    vorhanden = set(texte())
+    raeume = {s.split(".", 1)[0] for s in vorhanden}
+    fehlt = set()
+    for datei in ("app.js", "index.html", "karte.js"):
+        inhalt = (SITE / datei).read_text(encoding="utf-8")
+        for s in re.findall(r"'([a-z][A-Za-z0-9]*\.[A-Za-z0-9.]+)'", inhalt):
+            if s.split(".", 1)[0] in raeume and s not in vorhanden:
+                fehlt.add(f"{datei}: {s}")
+    assert not fehlt, f"unbekannte Textschlüssel: {fehlt}"
+
+
+def test_die_seite_greift_nur_nach_vorhandenen_feldern():
+    """$('radius') auf ein Feld, das umbenannt wurde, wirft erst im Browser.
+
+    Beim Verstecken der Regler hinter Schaltern sind Felder umgezogen. Ein
+    Tippfehler in einer der Kennungen bliebe still: Das Skript bricht beim
+    ersten Zugriff ab, und die Seite bleibt leer.
+    """
+    seite = (SITE / "index.html").read_text(encoding="utf-8")
+    kennungen = set(re.findall(r"id=\"([\w-]+)\"", seite))
+    fehlt = set()
+    for datei in ("app.js", "karte.js"):
+        inhalt = (SITE / datei).read_text(encoding="utf-8")
+        gesucht = re.findall(r"\$\('([\w-]+)'\)", inhalt)
+        gesucht += re.findall(r"getElementById\('([\w-]+)'\)", inhalt)
+        for kennung in gesucht:
+            if kennung not in kennungen:
+                fehlt.add(f"{datei}: #{kennung}")
+    assert not fehlt, f"Felder fehlen in index.html: {fehlt}"
+
+
+def test_umkreis_und_preis_filtern_nur_auf_wunsch():
+    """Voreingestellt zeigt die Seite, was es gibt - nicht, was nahe liegt.
+
+    Zwei von drei Festivals nennen keinen Preis, und ein Umkreis von 200 km
+    verbirgt weltweit fast alles. Beides bleibt deshalb aus, bis jemand den
+    Schalter umlegt.
+    """
+    seite = (SITE / "index.html").read_text(encoding="utf-8")
+    skript = (SITE / "app.js").read_text(encoding="utf-8")
+    for schalter, teil in (("radius-on", "radius-teil"), ("price-on", "price-teil")):
+        marke = re.search(rf"<input type=\"checkbox\" id=\"{schalter}\"([^>]*)>", seite)
+        assert marke, f"Schalter #{schalter} fehlt"
+        assert "checked" not in marke.group(1), f"#{schalter} ist voreingestellt an"
+        assert re.search(rf"id=\"{teil}\" hidden", seite), f"#{teil} startet sichtbar"
+    assert "radiusAktiv: false" in skript
+    assert "preisAktiv: false" in skript
+    assert "state.home && state.radiusAktiv" in skript
+
+
 def test_keine_steuerzeichen_in_ausgelieferten_dateien():
     """Ein Steuerzeichen im Quelltext sieht man nicht - es wirkt trotzdem.
 

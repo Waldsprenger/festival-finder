@@ -169,7 +169,8 @@ window.KARTE = (() => {
     // Radiuskreis. Die Projektion ist in beiden Achsen maßstabsgleich,
     // ein Bildschirmkreis entspricht also einer echten Luftlinie.
     const wohnort = cfg.wohnort();
-    if (wohnort) {
+    const umkreisGilt = !cfg.umkreisAktiv || cfg.umkreisAktiv();
+    if (wohnort && umkreisGilt) {
       const hx = v.x(wohnort.lon), hy = v.y(wohnort.lat);
       ctx.beginPath();
       ctx.ellipse(hx, hy, v.kmZuPxY(cfg.umkreis()), v.kmZuPxY(cfg.umkreis()), 0, 0, Math.PI * 2);
@@ -244,6 +245,13 @@ window.KARTE = (() => {
         + (zeiger.dist === null ? '' : `, ${zeiger.dist.toLocaleString(cfg.sprache())} km`);
     } else if (!wohnort) {
       cap.textContent = t('map.captionNoHome') + zoomInfo;
+    } else if (cfg.umkreisAktiv && !cfg.umkreisAktiv()) {
+      // Ohne Umkreisfilter waere "im Umkreis von 200 km" eine Behauptung,
+      // die nicht stimmt - die Liste reicht dann weiter.
+      const schluessel = karte.pins.length === 0 ? 'map.captionOhneUmkreisLeer'
+                       : karte.pins.length === 1 ? 'map.captionOhneUmkreis1'
+                                                 : 'map.captionOhneUmkreis';
+      cap.textContent = t(schluessel, { n: karte.pins.length, ort: wohnort.label }) + zoomInfo;
     } else if (!karte.pins.length) {
       cap.textContent = t('map.captionRadius', { km, ort: wohnort.label }) + zoomInfo;
     } else {

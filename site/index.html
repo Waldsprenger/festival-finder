@@ -56,32 +56,46 @@
                   data-i18n-title="home.searchTitle">Suchen</button>
         </div>
         <p class="hint" id="home-status" data-i18n="home.statusStart">Postleitzahl eingeben und „Suchen“ drücken.</p>
-        <label class="check">
-          <input type="checkbox" id="geo-unknown">
-          <span data-i18n="geoUnknown.label">Festivals ohne Ortskoordinaten mitzeigen</span>
-          <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="geoUnknown.help">?</button>
-        </label>
       </div>
 
       <div class="field">
-        <label for="radius"><span data-i18n="radius.label">Umkreis</span> <output id="radius-out">200 km</output>
-          <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="radius.help">?</button>
+        <label class="check schalter">
+          <input type="checkbox" id="radius-on">
+          <span data-i18n="radius.toggle">Nur Festivals im Umkreis</span>
+          <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="radius.toggleHelp">?</button>
         </label>
-        <input type="range" id="radius" min="0" max="1000" step="1" value="0"
-               aria-describedby="radius-out">
-        <p class="hint" data-i18n="radius.hint">Luftlinie ab Wohnort.</p>
+        <div id="radius-teil" hidden>
+          <label for="radius"><span data-i18n="radius.label">Umkreis</span> <output id="radius-out">200 km</output>
+            <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="radius.help">?</button>
+          </label>
+          <input type="range" id="radius" min="0" max="1000" step="1" value="0"
+                 aria-describedby="radius-out">
+          <p class="hint" data-i18n="radius.hint">Luftlinie ab Wohnort.</p>
+          <label class="check">
+            <input type="checkbox" id="geo-unknown">
+            <span data-i18n="geoUnknown.label">Festivals ohne Ortskoordinaten mitzeigen</span>
+            <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="geoUnknown.help">?</button>
+          </label>
+        </div>
       </div>
 
       <div class="field">
-        <label for="price"><span data-i18n="price.label">Ticket maximal</span> <output id="price-out">150 €</output>
-          <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="price.help">?</button>
+        <label class="check schalter">
+          <input type="checkbox" id="price-on">
+          <span data-i18n="price.toggle">Nur Festivals bis zu einem Preis</span>
+          <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="price.toggleHelp">?</button>
         </label>
-        <input type="range" id="price" min="0" max="1600" step="10" value="150">
-        <label class="check">
-          <input type="checkbox" id="price-unknown" checked>
-          <span data-i18n="priceUnknown.label">Festivals ohne Preisangabe mitzeigen</span>
-          <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="priceUnknown.help">?</button>
-        </label>
+        <div id="price-teil" hidden>
+          <label for="price"><span data-i18n="price.label">Ticket maximal</span> <output id="price-out">150 €</output>
+            <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="price.help">?</button>
+          </label>
+          <input type="range" id="price" min="0" max="1600" step="10" value="150">
+          <label class="check">
+            <input type="checkbox" id="price-unknown" checked>
+            <span data-i18n="priceUnknown.label">Festivals ohne Preisangabe mitzeigen</span>
+            <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="priceUnknown.help">?</button>
+          </label>
+        </div>
       </div>
 
       <div class="field">

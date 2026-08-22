@@ -223,6 +223,16 @@ input[type=range] { width: 100%; accent-color: var(--red); }
 
 .check input { accent-color: var(--red); }
 
+/* Umkreis und Preis sind Angebote, keine Vorgaben: Erst der Schalter holt den
+   Regler hervor. Der Schalter steht deshalb oben im Feld und traegt es. */
+.check.schalter {
+  margin-top: 0;
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.check.schalter + div { margin-top: .9rem; }
+
 button {
   font: inherit;
   font-weight: 700;
