@@ -136,23 +136,94 @@ def test_die_seite_greift_nur_nach_vorhandenen_feldern():
     assert not fehlt, f"Felder fehlen in index.html: {fehlt}"
 
 
-def test_umkreis_und_preis_filtern_nur_auf_wunsch():
-    """Voreingestellt zeigt die Seite, was es gibt - nicht, was nahe liegt.
+#: Die Kette, in der Reihenfolge, in der sie gestellt wird
+SCHRITTE = ("ort", "zeit", "entfernung", "preis", "bands", "genre")
 
-    Zwei von drei Festivals nennen keinen Preis, und ein Umkreis von 200 km
-    verbirgt weltweit fast alles. Beides bleibt deshalb aus, bis jemand den
-    Schalter umlegt.
+
+def test_die_kette_steht_in_der_richtigen_reihenfolge():
+    """Erst der Ort, dann der Zeitraum, dann die drei Filterfragen.
+
+    Die Reihenfolge steht an zwei Stellen: als Abschnitte in index.html und als
+    Liste KETTE in app.js. Laufen sie auseinander, erscheint ein Schritt, den
+    das Skript nicht kennt - oder umgekehrt.
     """
     seite = (SITE / "index.html").read_text(encoding="utf-8")
     skript = (SITE / "app.js").read_text(encoding="utf-8")
-    for schalter, teil in (("radius-on", "radius-teil"), ("price-on", "price-teil")):
-        marke = re.search(rf"<input type=\"checkbox\" id=\"{schalter}\"([^>]*)>", seite)
-        assert marke, f"Schalter #{schalter} fehlt"
-        assert "checked" not in marke.group(1), f"#{schalter} ist voreingestellt an"
-        assert re.search(rf"id=\"{teil}\" hidden", seite), f"#{teil} startet sichtbar"
-    assert "radiusAktiv: false" in skript
-    assert "preisAktiv: false" in skript
-    assert "state.home && state.radiusAktiv" in skript
+
+    in_der_seite = tuple(re.findall(r'data-schritt="(\w+)"', seite))
+    assert in_der_seite == SCHRITTE, f"index.html: {in_der_seite}"
+
+    m = re.search(r"const KETTE = \[([^\]]+)\]", skript)
+    assert m, "app.js kennt keine KETTE"
+    im_skript = tuple(re.findall(r"'(\w+)'", m.group(1)))
+    assert im_skript == SCHRITTE, f"app.js: {im_skript}"
+
+
+def test_jeder_schritt_hat_seine_teile():
+    """Ein Schritt ohne Koerper klappt weder auf noch zu.
+
+    Die drei Filterfragen brauchen ausserdem ihr Ja/Nein und den Kasten, den
+    das Ja hervorholt - dessen Kennung leitet das Skript aus dem Namen ab
+    ("entfernung" -> "entfernung-inhalt").
+    """
+    seite = (SITE / "index.html").read_text(encoding="utf-8")
+    for name in SCHRITTE:
+        abschnitt = re.search(
+            rf'data-schritt="{name}"(.*?)</section>', seite, re.S)
+        assert abschnitt, f"Abschnitt fuer {name} fehlt"
+        assert 'class="koerper"' in abschnitt.group(1), f"{name}: kein Koerper"
+    for name in ("entfernung", "preis", "bands", "genre"):
+        assert f'data-wahl="{name}" data-wert="ja"' in seite, f"{name}: kein Ja"
+        assert f'data-wahl="{name}" data-wert="nein"' in seite, f"{name}: kein Nein"
+        assert f'id="{name}-inhalt" hidden' in seite, \
+            f"{name}-inhalt fehlt oder startet sichtbar"
+
+
+def test_nur_der_erste_schritt_ist_zu_beginn_sichtbar():
+    """Die Kette baut sich auf - sie liegt nicht fertig da.
+
+    Waeren alle Abschnitte von Anfang an sichtbar, waere es dieselbe lange
+    Seite wie vorher, nur mit mehr Ueberschriften.
+    """
+    seite = (SITE / "index.html").read_text(encoding="utf-8")
+    for name in SCHRITTE[1:]:
+        assert re.search(rf'data-schritt="{name}"[^>]*\shidden', seite), \
+            f"{name} ist von Anfang an sichtbar"
+    assert not re.search(r'data-schritt="ort"[^>]*\shidden', seite), \
+        "Schritt 1 ist versteckt - dann beginnt gar nichts"
+    assert re.search(r'id="s-ergebnis"[^>]*\shidden', seite), \
+        "Die Treffer stehen schon da, bevor gefragt wurde"
+    assert re.search(r'id="karte-block"[^>]*\shidden', seite), \
+        "Die Karte ist eingeblendet, obwohl sie nur auf Wunsch kommt"
+
+
+def test_die_karte_kennt_den_bereich_statt_eines_umkreises():
+    """Entfernung ist jetzt von-bis; die Karte zeichnet einen Ring.
+
+    Ein einzelner Kreis wuerde eine untere Grenze verschweigen: Wer 300 bis
+    600 km sucht, saehe einen Kreis um sich herum, der auch die naechsten
+    300 km einschliesst.
+    """
+    karte = (SITE / "karte.js").read_text(encoding="utf-8")
+    for handgriff in ("umkreisVon", "umkreisBis", "umkreisAktiv"):
+        assert f"cfg.{handgriff}()" in karte, f"karte.js fragt {handgriff} nicht"
+    app = (SITE / "app.js").read_text(encoding="utf-8")
+    for handgriff in ("umkreisVon", "umkreisBis", "umkreisAktiv"):
+        assert f"{handgriff}:" in app, f"app.js liefert {handgriff} nicht"
+
+
+def test_die_karte_zoomt_nicht_ueber_die_erde_hinaus():
+    """Jenseits der Pole rechnet die Projektion weiter - und zieht Schlieren.
+
+    Der kleinste Zoom reichte bis 105.000 km halber Hoehe, das Fuenffache des
+    Erddurchmessers. Sichtbar war das als wanderndes Streifenmuster, sobald
+    der Massstabsbalken ueber 500 km sprang.
+    """
+    karte = (SITE / "karte.js").read_text(encoding="utf-8")
+    assert "WELT_HALB_KM" in karte, "keine Obergrenze fuer den Ausschnitt"
+    assert re.search(r"Math\.min\(WELT_HALB_KM,", karte), \
+        "die Obergrenze wird nirgends angewandt"
+    assert "mittelpunktImBild" in karte, "der Mittelpunkt wird nicht geklemmt"
 
 
 def test_keine_steuerzeichen_in_ausgelieferten_dateien():

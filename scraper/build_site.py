@@ -36,6 +36,18 @@ KURSE = {"EUR": 1.0, "€": 1.0, "CHF": 1.06, "GBP": 1.17, "USD": 0.92,
          "DKK": 0.134, "SEK": 0.088, "NOK": 0.086, "PLN": 0.235,
          "CZK": 0.040, "HUF": 0.0025}
 
+# Welche Währung in welchem Land gilt. Nur die, für die oben ein Kurs steht:
+# Ein Feld "von - bis" in einer Währung, die niemand umrechnen kann, wäre eine
+# Zahl ohne Bedeutung. Alles Übrige rechnet in Euro.
+WAEHRUNG_LAND = {
+    "CH": "CHF", "LI": "CHF",
+    "GB": "GBP", "GG": "GBP", "JE": "GBP", "IM": "GBP", "GI": "GBP",
+    "US": "USD", "EC": "USD", "SV": "USD", "PA": "USD",
+    "DK": "DKK", "GL": "DKK", "FO": "DKK",
+    "SE": "SEK", "NO": "NOK", "SJ": "NOK",
+    "PL": "PLN", "CZ": "CZK", "HU": "HUF",
+}
+
 _ZAHL = r"\d{1,3}(?:\.\d{3})*(?:,\d{1,2})?|\d+(?:\.\d{1,2})?"
 _WAEHRUNG = r"€|EUR|CHF|GBP|USD|DKK|SEK|NOK|PLN|CZK|HUF"
 
@@ -442,6 +454,11 @@ def main() -> None:
         "maxDistanceKm": max_entfernung_km(zeilen, plz),
         "maxPriceEur": max_preis_eur(zeilen),
         "minDate": frueheste_monatsgrenze(zeilen),
+        # Preisgrenzen darf man in seiner eigenen Währung eingeben. Verglichen
+        # wird intern immer in Euro, deshalb reisen die Kurse mit - und die
+        # Zuordnung, welches Land welche Währung führt.
+        "kurse": {w: k for w, k in sorted(KURSE.items()) if w != "€"},
+        "waehrungLand": dict(sorted(WAEHRUNG_LAND.items())),
     }
     pruefe_zeilen(zeilen, bands, genre_keys)
     # Das große Ortsverzeichnis kommt in eine eigene Datei: Wer eine

@@ -223,15 +223,6 @@ input[type=range] { width: 100%; accent-color: var(--red); }
 
 .check input { accent-color: var(--red); }
 
-/* Umkreis und Preis sind Angebote, keine Vorgaben: Erst der Schalter holt den
-   Regler hervor. Der Schalter steht deshalb oben im Feld und traegt es. */
-.check.schalter {
-  margin-top: 0;
-  color: var(--fg);
-  font-weight: 600;
-}
-
-.check.schalter + div { margin-top: .9rem; }
 
 button {
   font: inherit;
@@ -249,6 +240,134 @@ button:hover { background: #ff2f24; }
 button.ghost { background: transparent; color: var(--fg); border-color: var(--line); }
 button.ghost:hover { border-color: var(--amber); color: var(--amber); }
 button.small { padding: .3rem .6rem; font-size: .8rem; }
+
+/* "hidden" muss hidden bleiben. Die Browservorgabe [hidden]{display:none}
+   hat dieselbe Staerke wie eine Klasse - jede eigene Regel mit display:flex
+   schlaegt sie und blendet das Element wieder ein. Genau das ist passiert:
+   Die Kurzzeile eines aufgeklappten Schritts stand doppelt in der
+   Ueberschrift. */
+[hidden] { display: none !important; }
+
+/* ---------- Die Kette ----------
+   Eine Frage nach der anderen. Beantwortete Schritte klappen zu einer Zeile
+   zusammen: Sechs offene Panels uebereinander waeren dieselbe lange Seite wie
+   vorher, nur langsamer aufgedeckt. */
+
+.schritt { transition: border-left-color .2s; }
+
+/* Der Schritt, der gerade dran ist, traegt den roten Balken; erledigte einen
+   ruhigen. So sieht man auf einen Blick, wo man steht. */
+.schritt.erledigt { border-left-color: var(--line); }
+.schritt.dran { border-left-color: var(--amber); }
+
+.schritt.erledigt > h2 { margin-bottom: 0; font-size: 1.15rem; opacity: .75; }
+.schritt.erledigt > h2 .help { display: none; }
+.schritt.erledigt { padding: .85rem 1.5rem; margin-bottom: .6rem; }
+.schritt.erledigt .num { width: 1.5rem; height: 1.5rem; font-size: .8rem; }
+
+.kurz {
+  display: flex;
+  align-items: baseline;
+  gap: .75rem;
+  flex-wrap: wrap;
+  margin-left: auto;
+  font-family: var(--body);
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: .9rem;
+  font-weight: 400;
+}
+
+.kurz-text { color: var(--amber); }
+.kurz-text.aus { color: var(--mut); }
+
+/* Ja oder Nein - gross genug, dass man am Telefon nicht danebentippt */
+.wahl { display: flex; gap: .6rem; margin: 0 0 1rem; }
+
+.wahl button {
+  flex: 0 0 auto;
+  min-width: 7rem;
+  padding: .7rem 1.4rem;
+  background: transparent;
+  border-color: var(--line);
+  color: var(--fg);
+}
+
+.wahl button:hover { border-color: var(--amber); color: var(--amber); background: transparent; }
+
+.wahl button[aria-pressed="true"] {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+}
+
+.wahl button.nein[aria-pressed="true"] {
+  background: var(--line);
+  border-color: var(--line);
+  color: var(--fg);
+}
+
+.wahl-inhalt { margin-bottom: .4rem; }
+
+/* Von - bis nebeneinander. Die Felder duerfen schmal sein: Dort stehen Zahlen,
+   keine Saetze. */
+.field.spanne {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  flex-wrap: wrap;
+}
+
+.field.spanne label {
+  margin: 0;
+  flex: none;
+}
+
+.field.spanne input[type=number] {
+  width: 7rem;
+  padding: .65rem .75rem;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  color: var(--fg);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
+.field.spanne input[type=number]:focus {
+  outline: 2px solid var(--amber);
+  outline-offset: 1px;
+}
+
+.field.spanne .einheit { color: var(--mut); font-size: .9rem; }
+
+.field.spanne select {
+  padding: .6rem .5rem;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  color: var(--fg);
+  font: inherit;
+}
+
+.schritt-fuss {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+/* Wie viele Festivals nach diesem Schritt uebrig sind. Ohne diese Zahl
+   klickt man sechs Fragen durch, ohne zu sehen, was sie bewirken. */
+.rest {
+  margin: 0;
+  font-size: .85rem;
+  color: var(--mut);
+  font-variant-numeric: tabular-nums;
+}
+
+.rest b { color: var(--amber); font-weight: 700; }
 
 .hint { margin: .5rem 0 0; font-size: .82rem; color: var(--mut); }
 .hint.ok { color: var(--ok); }

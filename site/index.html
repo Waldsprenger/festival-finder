@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Festival Finder — Lineup-Abgleich weltweit</title>
-<meta name="description" content="Finde Festivals nach Wohnort, Radius, Ticketpreis und deinen Lieblingsbands.">
+<meta name="description" content="Finde Festivals Schritt für Schritt: Wohnort, Zeitraum, Entfernung, Preis, Bands, Genre.">
 <link rel="stylesheet" href="fonts.css">
 <link rel="stylesheet" href="style.css">
 
@@ -39,73 +39,47 @@
 
 <main>
 
-  <!-- ============ Schritt 1: Filter ============ -->
-  <section class="panel" id="step-filter">
-    <h2><span class="num">1</span> <span data-i18n="step1.title">Wo, wie weit, wie teuer, ab wann</span></h2>
-
-    <div class="grid">
+  <!-- ============ Schritt 1: Wohnort ============
+       Die Kette baut sich Frage für Frage auf. Jede beantwortete Frage klappt
+       zu einer Zeile zusammen; erst danach erscheint die nächste. -->
+  <section class="panel schritt" id="s-ort" data-schritt="ort">
+    <h2><span class="num">1</span> <span data-i18n="s1.title">Wo startest du?</span>
+      <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="home.help">?</button>
+    </h2>
+    <div class="koerper">
+      <p class="lead" data-i18n="s1.lead">Postleitzahl oder Ort. Daraus ergeben sich Entfernungen und die
+        Vorauswahl der Währung. Ohne Wohnort geht es auch — dann entfällt der Entfernungsfilter.</p>
       <div class="field">
-        <label for="home"><span data-i18n="home.label">Postleitzahl oder Ort</span>
-          <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="home.help">?</button>
-        </label>
         <div class="row">
           <input type="text" id="home" data-i18n-ph="home.placeholder"
                  placeholder="z. B. 97209 oder Amsterdam"
                  autocomplete="postal-code">
-          <button type="button" id="locate" class="ghost" data-i18n="home.search"
+          <button type="button" id="locate" data-i18n="home.search"
                   data-i18n-title="home.searchTitle">Suchen</button>
         </div>
         <p class="hint" id="home-status" data-i18n="home.statusStart">Postleitzahl eingeben und „Suchen“ drücken.</p>
       </div>
-
-      <div class="field">
-        <label class="check schalter">
-          <input type="checkbox" id="radius-on">
-          <span data-i18n="radius.toggle">Nur Festivals im Umkreis</span>
-          <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="radius.toggleHelp">?</button>
-        </label>
-        <div id="radius-teil" hidden>
-          <label for="radius"><span data-i18n="radius.label">Umkreis</span> <output id="radius-out">200 km</output>
-            <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="radius.help">?</button>
-          </label>
-          <input type="range" id="radius" min="0" max="1000" step="1" value="0"
-                 aria-describedby="radius-out">
-          <p class="hint" data-i18n="radius.hint">Luftlinie ab Wohnort.</p>
-          <label class="check">
-            <input type="checkbox" id="geo-unknown">
-            <span data-i18n="geoUnknown.label">Festivals ohne Ortskoordinaten mitzeigen</span>
-            <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="geoUnknown.help">?</button>
-          </label>
-        </div>
+      <div class="schritt-fuss">
+        <button type="button" id="ort-skip" class="ghost" data-i18n="s1.skip"
+                data-i18n-title="s1.skipTitle">Ohne Wohnort weiter</button>
       </div>
+    </div>
+  </section>
 
+  <!-- ============ Schritt 2: Zeitraum ============ -->
+  <section class="panel schritt" id="s-zeit" data-schritt="zeit" hidden>
+    <h2><span class="num">2</span> <span data-i18n="s2.title">Wann hast du Zeit?</span>
+      <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="date.help">?</button>
+    </h2>
+    <div class="koerper">
+      <p class="lead" data-i18n="s2.lead">Voreingestellt ist „ab heute“. Ein Festival zählt, sobald es in
+        deinen Zeitraum hineinreicht — auch wenn es vorher begonnen hat.</p>
       <div class="field">
-        <label class="check schalter">
-          <input type="checkbox" id="price-on">
-          <span data-i18n="price.toggle">Nur Festivals bis zu einem Preis</span>
-          <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="price.toggleHelp">?</button>
-        </label>
-        <div id="price-teil" hidden>
-          <label for="price"><span data-i18n="price.label">Ticket maximal</span> <output id="price-out">150 €</output>
-            <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="price.help">?</button>
-          </label>
-          <input type="range" id="price" min="0" max="1600" step="10" value="150">
-          <label class="check">
-            <input type="checkbox" id="price-unknown" checked>
-            <span data-i18n="priceUnknown.label">Festivals ohne Preisangabe mitzeigen</span>
-            <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="priceUnknown.help">?</button>
-          </label>
-        </div>
-      </div>
-
-      <div class="field">
-        <label for="from"><span data-i18n="date.label">Zeitraum</span>
-          <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="date.help">?</button>
-        </label>
         <div class="row dates">
           <input type="date" id="from" data-i18n-aria="date.from" aria-label="Frühester Start">
           <span class="bis" data-i18n="date.between">bis</span>
-          <input type="date" id="to" data-i18n-aria="date.to" aria-label="Spätester Start"></div>
+          <input type="date" id="to" data-i18n-aria="date.to" aria-label="Spätester Start">
+        </div>
         <p class="hint" id="date-hint"></p>
         <label class="check">
           <input type="checkbox" id="date-unknown">
@@ -118,9 +92,179 @@
           <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="cancelled.help">?</button>
         </label>
       </div>
+      <div class="schritt-fuss">
+        <button type="button" class="weiter" data-weiter="zeit" data-i18n="s.next">Weiter</button>
+        <p class="rest" data-rest="zeit"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Schritt 3: Entfernung ============ -->
+  <section class="panel schritt" id="s-entfernung" data-schritt="entfernung" hidden>
+    <h2><span class="num">3</span> <span data-i18n="s3.title">Nach Entfernung filtern?</span>
+      <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="s3.help">?</button>
+    </h2>
+    <div class="koerper">
+      <p class="lead" data-i18n="s3.lead">Luftlinie ab deinem Wohnort. Zwei Felder statt eines Reglers: Bei
+        Entfernungen bis 18.000 km trifft man mit einem Regler nichts mehr.</p>
+      <p class="hint err" id="entfernung-ohne-ort" hidden data-i18n="s3.needHome">Dafür fehlt der Wohnort — geh
+        zurück zu Schritt 1 oder überspring diese Frage.</p>
+      <div class="wahl" role="group" data-i18n-aria="s.choiceGroup" aria-label="Auswahl">
+        <button type="button" class="ja" data-wahl="entfernung" data-wert="ja"
+                aria-pressed="false" data-i18n="s.yes">Ja</button>
+        <button type="button" class="nein" data-wahl="entfernung" data-wert="nein"
+                aria-pressed="false" data-i18n="s.no">Nein</button>
+      </div>
+      <div class="wahl-inhalt" id="entfernung-inhalt" hidden>
+        <div class="field spanne">
+          <label for="km-von" data-i18n="s.from">von</label>
+          <input type="number" id="km-von" min="0" step="10" inputmode="numeric"
+                 data-i18n-ph="s3.fromPh" placeholder="0">
+          <label for="km-bis" data-i18n="s.to">bis</label>
+          <input type="number" id="km-bis" min="0" step="10" inputmode="numeric"
+                 data-i18n-ph="s3.toPh" placeholder="200">
+          <span class="einheit">km</span>
+        </div>
+        <p class="hint" id="km-hint"></p>
+        <label class="check">
+          <input type="checkbox" id="geo-unknown">
+          <span data-i18n="geoUnknown.label">Festivals ohne Ortskoordinaten mitzeigen</span>
+          <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="geoUnknown.help">?</button>
+        </label>
+      </div>
+      <div class="schritt-fuss">
+        <p class="rest" data-rest="entfernung"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Schritt 4: Preis ============ -->
+  <section class="panel schritt" id="s-preis" data-schritt="preis" hidden>
+    <h2><span class="num">4</span> <span data-i18n="s4.title">Nach Preis filtern?</span>
+      <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="s4.help">?</button>
+    </h2>
+    <div class="koerper">
+      <p class="lead" data-i18n="s4.lead">Der günstigste Einstiegspreis. Zwei von drei Festivals nennen gar
+        keinen — die fallen sonst heraus, sofern du sie nicht mitzeigen lässt.</p>
+      <div class="wahl" role="group" data-i18n-aria="s.choiceGroup" aria-label="Auswahl">
+        <button type="button" class="ja" data-wahl="preis" data-wert="ja"
+                aria-pressed="false" data-i18n="s.yes">Ja</button>
+        <button type="button" class="nein" data-wahl="preis" data-wert="nein"
+                aria-pressed="false" data-i18n="s.no">Nein</button>
+      </div>
+      <div class="wahl-inhalt" id="preis-inhalt" hidden>
+        <div class="field spanne">
+          <label for="preis-von" data-i18n="s.from">von</label>
+          <input type="number" id="preis-von" min="0" step="5" inputmode="numeric"
+                 data-i18n-ph="s4.fromPh" placeholder="0">
+          <label for="preis-bis" data-i18n="s.to">bis</label>
+          <input type="number" id="preis-bis" min="0" step="5" inputmode="numeric"
+                 data-i18n-ph="s4.toPh" placeholder="150">
+          <select id="preis-waehrung" data-i18n-title="s4.currencyTitle"
+                  data-i18n-aria="s4.currency" aria-label="Währung"></select>
+        </div>
+        <p class="hint" id="preis-hint"></p>
+        <label class="check">
+          <input type="checkbox" id="price-unknown" checked>
+          <span data-i18n="priceUnknown.label">Festivals ohne Preisangabe mitzeigen</span>
+          <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="priceUnknown.help">?</button>
+        </label>
+      </div>
+      <div class="schritt-fuss">
+        <p class="rest" data-rest="preis"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Schritt 5: Bands ============ -->
+  <section class="panel schritt" id="s-bands" data-schritt="bands" hidden>
+    <h2><span class="num">5</span> <span data-i18n="s5.title">Nach Bands filtern?</span>
+      <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="s5.help">?</button>
+    </h2>
+    <div class="koerper">
+      <p class="lead" data-i18n-html="bands.lead">Suchen, anklicken, auswählen. Ein zweiter Klick auf <b>×2</b> gewichtet
+        eine Band doppelt — sie zählt dann doppelt so stark für die Übereinstimmung.</p>
+      <div class="wahl" role="group" data-i18n-aria="s.choiceGroup" aria-label="Auswahl">
+        <button type="button" class="ja" data-wahl="bands" data-wert="ja"
+                aria-pressed="false" data-i18n="s.yes">Ja</button>
+        <button type="button" class="nein" data-wahl="bands" data-wert="nein"
+                aria-pressed="false" data-i18n="s.no">Nein</button>
+      </div>
+      <div class="wahl-inhalt" id="bands-inhalt" hidden>
+        <div class="field">
+          <label for="band-search"><span data-i18n="bands.searchLabel">Band suchen</span>
+            <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="bands.searchHelp">?</button>
+          </label>
+          <input type="text" id="band-search" data-i18n-ph="bands.placeholder"
+                 placeholder="z. B. Powerwolf, Wolf Alice, Sportfreunde Stiller …">
+          <p class="hint" id="band-hint"></p>
+        </div>
+
+        <ul class="results" id="band-results"></ul>
+
+        <div class="chosen">
+          <div class="chosen-head">
+            <h3><span data-i18n="bands.chosen">Ausgewählt</span> <span class="badge" id="chosen-count">0</span></h3>
+            <button type="button" id="clear-bands" class="ghost small" data-i18n="bands.clear"
+                    data-i18n-title="bands.clearTitle">Alle entfernen</button>
+          </div>
+          <ul class="chips" id="chosen-list"></ul>
+        </div>
+      </div>
+      <div class="schritt-fuss">
+        <p class="rest" data-rest="bands"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Schritt 6: Genre ============ -->
+  <section class="panel schritt" id="s-genre" data-schritt="genre" hidden>
+    <h2><span class="num">6</span> <span data-i18n="s6.title">Nach Genre filtern?</span>
+      <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="s6.help">?</button>
+    </h2>
+    <div class="koerper">
+      <p class="lead" data-i18n="genre.lead">Die Musikrichtungen der Quellen sind zu Oberbegriffen zusammengefasst.
+        Mehrere lassen sich anklicken — je mehr davon ein Festival abdeckt, desto weiter oben steht es.</p>
+      <div class="wahl" role="group" data-i18n-aria="s.choiceGroup" aria-label="Auswahl">
+        <button type="button" class="ja" data-wahl="genre" data-wert="ja"
+                aria-pressed="false" data-i18n="s.yes">Ja</button>
+        <button type="button" class="nein" data-wahl="genre" data-wert="nein"
+                aria-pressed="false" data-i18n="s.no">Nein</button>
+      </div>
+      <div class="wahl-inhalt" id="genre-inhalt" hidden>
+        <ul class="chips genres" id="genre-list"></ul>
+        <div class="chosen-head genre-actions">
+          <p class="hint" id="genre-hint"></p>
+          <button type="button" id="clear-genres" class="ghost small" data-i18n="genre.clear"
+                  data-i18n-title="genre.clearTitle">Alle entfernen</button>
+        </div>
+        <label class="check">
+          <input type="checkbox" id="genre-unknown">
+          <span data-i18n="genreUnknown.label">Festivals ohne Genreangabe mitzeigen</span>
+          <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="genreUnknown.help">?</button>
+        </label>
+      </div>
+      <div class="schritt-fuss">
+        <p class="rest" data-rest="genre"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Ergebnis ============ -->
+  <section class="panel" id="s-ergebnis" hidden>
+    <h2><span class="num">★</span> <span data-i18n="step3.title">Deine Festivals</span></h2>
+
+    <p class="stat" id="filter-stat">—</p>
+
+    <div class="sort-row">
+      <label for="sort" data-i18n="sort.label">Sortieren nach</label>
+      <select id="sort"></select>
+      <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="sort.help">?</button>
+      <button type="button" id="karte-schalter" class="ghost" aria-expanded="false"
+              data-i18n="map.show" data-i18n-title="map.showTitle">Karte einblenden</button>
     </div>
 
-    <figure class="map-wrap">
+    <figure class="map-wrap" id="karte-block" hidden>
       <canvas id="map" width="1000" height="440"></canvas>
       <div class="map-tools">
         <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="map.help">?</button>
@@ -132,87 +276,7 @@
       <figcaption id="map-caption" data-i18n="map.captionNoHome">Wohnort eingeben, um den Suchradius zu sehen.</figcaption>
     </figure>
 
-    <p class="stat" id="filter-stat">—</p>
-  </section>
-
-  <!-- ============ Schritt 2: Bands oder Genre ============ -->
-  <section class="panel" id="step-bands">
-    <h2><span class="num">2</span> <span data-i18n="step2.title">Bands oder Genre wählen</span></h2>
-
-    <div class="toggle-row">
-      <div class="modes" role="radiogroup" data-i18n-aria="mode.group" aria-label="Wonach gefiltert wird">
-        <label class="mode">
-          <input type="radio" name="filter-mode" value="bands" checked>
-          <span data-i18n="mode.bands">Nach Bands</span>
-        </label>
-        <label class="mode">
-          <input type="radio" name="filter-mode" value="genre">
-          <span data-i18n="mode.genre">Nach Genre</span>
-        </label>
-        <label class="mode">
-          <input type="radio" name="filter-mode" value="off">
-          <span data-i18n="mode.off">Ohne beides</span>
-        </label>
-      </div>
-      <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="mode.help">?</button>
-    </div>
-
-    <div id="band-block">
-      <p class="lead" data-i18n-html="bands.lead">Suchen, anklicken, auswählen. Ein zweiter Klick auf <b>×2</b> gewichtet
-        eine Band doppelt — sie zählt dann doppelt so stark für die Übereinstimmung.</p>
-
-      <div class="field">
-        <label for="band-search"><span data-i18n="bands.searchLabel">Band suchen</span>
-          <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="bands.searchHelp">?</button>
-        </label>
-        <input type="text" id="band-search" data-i18n-ph="bands.placeholder"
-               placeholder="z. B. Powerwolf, Wolf Alice, Sportfreunde Stiller …">
-        <p class="hint" id="band-hint"></p>
-      </div>
-
-      <ul class="results" id="band-results"></ul>
-
-      <div class="chosen">
-        <div class="chosen-head">
-          <h3><span data-i18n="bands.chosen">Ausgewählt</span> <span class="badge" id="chosen-count">0</span></h3>
-          <button type="button" id="clear-bands" class="ghost small" data-i18n="bands.clear"
-                  data-i18n-title="bands.clearTitle">Alle entfernen</button>
-        </div>
-        <ul class="chips" id="chosen-list"></ul>
-      </div>
-    </div>
-
-    <div id="genre-block" hidden>
-      <p class="lead" data-i18n="genre.lead">Die Musikrichtungen der Quellen sind zu Oberbegriffen zusammengefasst.
-        Mehrere lassen sich anklicken — je mehr davon ein Festival abdeckt, desto weiter oben steht es.</p>
-
-      <ul class="chips genres" id="genre-list"></ul>
-
-      <div class="chosen-head genre-actions">
-        <p class="hint" id="genre-hint"></p>
-        <button type="button" id="clear-genres" class="ghost small" data-i18n="genre.clear"
-                data-i18n-title="genre.clearTitle">Alle entfernen</button>
-      </div>
-
-      <label class="check">
-        <input type="checkbox" id="genre-unknown">
-        <span data-i18n="genreUnknown.label">Festivals ohne Genreangabe mitzeigen</span>
-        <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="genreUnknown.help">?</button>
-      </label>
-    </div>
-  </section>
-
-  <!-- ============ Schritt 3: Treffer ============ -->
-  <section class="panel" id="step-results">
-    <h2><span class="num">3</span> <span data-i18n="step3.title">Deine Festivals</span></h2>
-
-    <div class="sort-row">
-      <label for="sort" data-i18n="sort.label">Sortieren nach</label>
-      <select id="sort"></select>
-      <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="sort.help">?</button>
-    </div>
-
-    <p class="stat" id="result-stat" data-i18n="res.needBand">Wähle mindestens eine Band.</p>
+    <p class="stat" id="result-stat" data-i18n="res.none">Keine Treffer.</p>
     <ol class="festivals" id="festival-list"></ol>
   </section>
 
@@ -288,8 +352,12 @@
       <a href="https://www.festivalhopper.de" target="_blank" rel="noopener">festivalhopper.de</a>,
       <a href="https://festapp.io" target="_blank" rel="noopener">festapp.io</a>,
       <a href="https://wannafest.com" target="_blank" rel="noopener">wannafest.com</a>,
-      <a href="https://festivalflyer.com" target="_blank" rel="noopener">festivalflyer.com</a> und
-      <a href="https://www.festivalfinder.eu" target="_blank" rel="noopener">festivalfinder.eu</a>.
+      <a href="https://festivalflyer.com" target="_blank" rel="noopener">festivalflyer.com</a>,
+      <a href="https://www.festivalfinder.eu" target="_blank" rel="noopener">festivalfinder.eu</a>,
+      <a href="https://www.festivalabroad.com" target="_blank" rel="noopener">festivalabroad.com</a>,
+      <a href="https://www.jambase.com" target="_blank" rel="noopener">jambase.com</a>,
+      <a href="https://festivalnetworks.com" target="_blank" rel="noopener">festivalnetworks.com</a> und
+      <a href="https://www.festivism.com" target="_blank" rel="noopener">festivism.com</a>.
       Ortskoordinaten aus <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>
       (ODbL), Orts- und Postleitzahlenverzeichnis von
       <a href="https://www.geonames.org" target="_blank" rel="noopener">GeoNames</a> (CC BY 4.0),
