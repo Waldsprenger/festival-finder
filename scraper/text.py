@@ -11,6 +11,7 @@ import json
 import re
 import unicodedata
 from datetime import date
+from html import unescape
 
 from gemeinsam import DATA
 
@@ -21,10 +22,18 @@ UNSICHTBAR = re.compile(r"[\u00a0\u200b-\u200f\u2028\u2029\u202a-\u202e\ufeff]")
 
 
 def clean(text: str | None) -> str:
-    """Ein Name in einer Zeile: unsichtbare Zeichen weg, Leerraum vereinheitlicht."""
+    """Ein Name in einer Zeile: entschlüsselt, ohne unsichtbare Zeichen, ohne
+    doppelten Leerraum.
+
+    Entschlüsselt heisst: HTML-Ersatzschreibweisen werden aufgelöst. Datenblätter
+    aus WordPress liefern sie mit - "Shaq&#8217;s Fun House" und "Larry &amp;
+    Joe" standen so auf 236 Karten. Im HTML-Fliesstext nimmt der Parser sie
+    einem ab, im JSON-Datenblatt nicht.
+    """
     if not text:
         return ""
-    return re.sub(r"\s+", " ", UNSICHTBAR.sub(" ", text)).strip()
+    entschluesselt = unescape(text)
+    return re.sub(r"\s+", " ", UNSICHTBAR.sub(" ", entschluesselt)).strip()
 
 
 # --------------------------------------------------------------------------
@@ -43,8 +52,12 @@ _SONDERZEICHEN = (("ß", "ss"), ("ø", "o"), ("æ", "ae"), ("œ", "oe"), ("đ", 
 
 
 def fold(value: str) -> str:
-    """Aggressiver Schlüssel für den Namensvergleich."""
-    v = unicodedata.normalize("NFKD", value.lower())
+    """Aggressiver Schlüssel für den Namensvergleich.
+
+    Beginnt mit `clean()`: Ohne das wäre "Larry &amp; Joe" ein anderer Act als
+    "Larry & Joe" - der Schlüssel sähe die Ersatzschreibweise als Wort.
+    """
+    v = unicodedata.normalize("NFKD", clean(value).lower())
     v = "".join(c for c in v if not unicodedata.combining(c))
     for a, b in _SONDERZEICHEN:
         v = v.replace(a, b)

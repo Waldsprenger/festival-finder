@@ -1,11 +1,16 @@
 """Aus vielen Funden ein Festival machen.
 
-Acht Quellen beschreiben dieselbe Veranstaltung verschieden: anderer Ort
+Zwölf Quellen beschreiben dieselbe Veranstaltung verschieden: anderer Ort
 ("Kronach" gegen "Burg Lichtenberg"), anderer Anreisetag, andere Schreibweise
-("Reloadfestival"). Sieben Stufen führen sie zusammen, jede mit einer eigenen
-Sicherung gegen falsche Treffer — Tour-Formate wie das Irish Spring Festival
-laufen unter einem Namen an 30 Orten und müssen getrennt bleiben, und zwei
-Festivals gleichen Namens in verschiedenen Städten erst recht.
+("Reloadfestival"), andere Sprache ("Posen" gegen "Poznań"). Acht Stufen führen
+sie zusammen, jede mit einer eigenen Sicherung gegen falsche Treffer —
+Tour-Formate wie das Irish Spring Festival laufen unter einem Namen an 30 Orten
+und müssen getrennt bleiben, und zwei Festivals gleichen Namens in
+verschiedenen Städten erst recht.
+
+Die Reihenfolge der Funde ist festgelegt, bevor die erste Stufe läuft: Die
+Stufen sind nicht vollständig reihenfolgeunabhängig, und ohne feste Sortierung
+unterschieden sich zwei Läufe über denselben Funden um bis zu 29 Festivals.
 """
 
 from __future__ import annotations
@@ -13,7 +18,7 @@ from __future__ import annotations
 import difflib
 from urllib.parse import urlparse
 
-from gemeinsam import land_code
+from gemeinsam import koordinate_passt_zum_land, land_code
 from quellen import RANG
 from text import (ALIAS_KEY, ALIAS_NAME, alias_abschalten, band_key,
                   canonical_band, city_key, clean, festival_key, fold,
@@ -490,6 +495,47 @@ def stufe6_ohne_termin(merged: dict) -> None:
                 merged.pop(drop_key, None)
 
 
+def namen_verwandt(a: str, b: str) -> bool:
+    """Steckt ein Name im anderen - oder sind es zwei Schreibweisen desselben?"""
+    fa, fb = fold(a), fold(b)
+    if len(fa) >= 5 and len(fb) >= 5 and (fa in fb or fb in fa):
+        return True
+    return schreibweise_gleich(a, b)
+
+
+def stufe8_gleicher_punkt(merged: dict) -> None:
+    """Dieselbe Koordinate, derselbe Tag, ein verwandter Name.
+
+    "Das Fest" und "DAS FEST Karlsruhe" stehen auf demselben Punkt am selben
+    Tag; die Namensstufen greifen nicht, weil vom Schlüssel nur "das" übrig
+    bleibt. Die Koordinate ist hier das stärkere Zeichen.
+
+    Der Name muss trotzdem passen: In Attard auf Malta liegen am 11. September
+    zwei verschiedene Veranstaltungen auf demselben Punkt, und die gehören
+    auseinander.
+    """
+    punkte: dict[tuple, list[tuple]] = {}
+    for key, rec in merged.items():
+        if rec["lat"] is None or not rec["date_from"]:
+            continue
+        punkte.setdefault((round(rec["lat"], 2), round(rec["lon"], 2),
+                           rec["date_from"]), []).append((key, rec))
+
+    for gruppe in punkte.values():
+        if len(gruppe) < 2:
+            continue
+        quellen = [q for _, rec in gruppe for q in rec["sources"]]
+        if len(set(quellen)) != len(quellen):
+            continue
+        gruppe = sorted(gruppe, key=lambda kr: kr[1]["_rang"])
+        _, keep = gruppe[0]
+        for drop_key, drop in gruppe[1:]:
+            if drop_key not in merged or not namen_verwandt(keep["name"], drop["name"]):
+                continue
+            verschmelzen(keep, drop)
+            merged.pop(drop_key, None)
+
+
 def stufe7_gleiche_quelle(merged: dict) -> None:
     """Dieselbe Quelle führt dasselbe Festival zweimal.
 
@@ -517,7 +563,21 @@ def stufe7_gleiche_quelle(merged: dict) -> None:
 
 
 def zusammenfuehren(records: list[dict], registry: dict[str, str]) -> list[dict]:
-    """Alle Funde zu Festivals bündeln, chronologisch sortiert."""
+    """Alle Funde zu Festivals bündeln, chronologisch sortiert.
+
+    Zuerst wird die Reihenfolge festgelegt. Die Seiten kommen aus vier Fäden
+    zurück, also jedes Mal anders, und die Stufen sind nicht vollständig
+    reihenfolgeunabhängig: Verschmilzt A mit B, findet C danach vielleicht
+    keinen Partner mehr. Bei acht Quellen fiel das nicht auf, bei zwölf
+    unterschieden sich zwei Läufe über denselben Funden um bis zu 29
+    Festivals — ohne dass sich an den Quellen etwas geändert hätte.
+
+    Die Sortierung nach Rang und Adresse macht daraus ein festes Ergebnis:
+    Dieselben Funde ergeben denselben Bestand, gleich in welcher Reihenfolge
+    sie hereinkommen.
+    """
+    records = sorted(records, key=lambda r: (RANG.get(r["source"], 99),
+                                             r.get("source_url", ""), r["name"]))
     merged = stufe1_exakt(records, registry)
     stufe2_quellenpaare(merged)
     stufe3_gleicher_start(merged)
@@ -525,11 +585,18 @@ def zusammenfuehren(records: list[dict], registry: dict[str, str]) -> list[dict]
     stufe5_schreibweise(merged)
     stufe6_ohne_termin(merged)
     stufe7_gleiche_quelle(merged)
+    stufe8_gleicher_punkt(merged)
 
     festivals = []
     for rec in merged.values():
         rec.pop("_rang", None)
         rec["country"] = land_code(rec["country"])
+        # Noch einmal, jetzt gegen das zusammengetragene Land: Beim Verschmelzen
+        # kann die Koordinate der einen Quelle auf das Land der anderen treffen.
+        # So stand Lollapalooza Berlin in Chicago, obwohl jede Quelle für sich
+        # stimmig war.
+        if not koordinate_passt_zum_land(rec["lat"], rec["lon"], rec["country"]):
+            rec["lat"] = rec["lon"] = None
         rec["location"] = ", ".join(x for x in (rec["city"], rec["country"]) if x)
         # Wird von preisverlauf.verfolgen() gefüllt, sobald sich ein Preis ändert
         rec["price_start"] = ""

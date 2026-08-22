@@ -138,6 +138,23 @@ def pruefe_ausbeute(funde: dict[str, int], festivals: int,
     return warnungen
 
 
+#: Ein Jahr im Festivalnamen ("Big Day Out 2000 Auckland")
+JAHR_IM_NAMEN = re.compile(r"\b(19\d\d|20\d\d)\b")
+
+
+def gewesene_ausgabe(f: dict, since: int) -> bool:
+    """Terminlos, aber mit vergangenem Jahr im Namen - das war einmal.
+
+    Nachschlagewerke führen auch, was gewesen ist. Ohne Termin sähe der
+    Eintrag auf der Seite aus wie eine offene Ankündigung; der Jahrgang im
+    Namen sagt, dass er keine ist.
+    """
+    if f["date_from"]:
+        return False
+    jahre = [int(j) for j in JAHR_IM_NAMEN.findall(f["name"])]
+    return bool(jahre) and max(jahre) < since
+
+
 def pruefe_stimmigkeit(festivals: list[dict]) -> list[str]:
     """Widersprüche im Ergebnis finden, bevor sie auf die Seite kommen.
 
@@ -287,11 +304,14 @@ def main() -> None:
     # Vergangene Ausgaben aussortieren: Über die Länderseiten tauchen Seiten
     # auf, deren letzte Ausgabe Jahre zurückliegt ("Weekend Festival Baltic
     # 2018"). Einträge ohne Termin bleiben - das sind angekündigte Festivals
-    # ohne bestätigtes Datum, keine vergangenen.
+    # ohne bestätigtes Datum -, es sei denn, ihr Name nennt ein vergangenes
+    # Jahr: "Big Day Out 2000 Auckland" ist keine offene Ankündigung, sondern
+    # ein Nachschlagewerkeintrag über ein gewesenes Fest.
     vorher = len(festivals)
     festivals = [f for f in festivals
-                 if not f["date_from"]
-                 or int((f["date_to"] or f["date_from"])[-4:]) >= args.since]
+                 if (not f["date_from"]
+                     or int((f["date_to"] or f["date_from"])[-4:]) >= args.since)
+                 and not gewesene_ausgabe(f, args.since)]
     if vorher != len(festivals):
         print(f"  {vorher - len(festivals)} Einträge älter als {args.since} verworfen")
 

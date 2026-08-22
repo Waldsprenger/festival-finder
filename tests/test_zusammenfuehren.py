@@ -1,4 +1,4 @@
-"""Die sieben Stufen: Was gehört zusammen — und was ausdrücklich nicht.
+"""Die acht Stufen: Was gehört zusammen — und was ausdrücklich nicht.
 
 Die Fälle sind echte: Jeder stand einmal falsch in den Daten und hat eine
 Stufe oder eine Sicherung nach sich gezogen.

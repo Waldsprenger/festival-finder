@@ -28899,5 +28899,20 @@
     "lat": 34.2963089,
     "lon": 135.8816819,
     "display": "Präfektur Nara, Japan"
+  },
+  "T'bilisi|GE": {
+    "lat": 41.6934591,
+    "lon": 44.8014495,
+    "display": "Tiflis, Georgien"
+  },
+  "Green Gables|CA": {
+    "lat": 48.4186952,
+    "lon": -123.3485984,
+    "display": "Green Gables, Fairfield, Victoria, Capital Regional District, Britisch-Kolumbien, Kanada"
+  },
+  "Mulhurst|CA": {
+    "lat": 53.0561536,
+    "lon": -113.997448,
+    "display": "Hamlet of Mulhurst, County of Wetaskiwin, Alberta, Kanada"
   }
 }

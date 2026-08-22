@@ -46,6 +46,19 @@ window.KARTE = (() => {
     return r;
   }
 
+  /** Längenunterschied über die Datumsgrenze hinweg: immer der kurze Weg.
+
+      Bei 180 Grad springt die Länge auf -180. Wer in Suva sitzt (178 Ost),
+      hätte Honolulu (158 West) sonst 336 Grad entfernt statt 24 - der Pin
+      läge weit außerhalb des Bildes, obwohl er in der Liste 5.090 km
+      entfernt steht. */
+  function lonAbstand(lon, mitteLon) {
+    let d = lon - mitteLon;
+    while (d > 180) d -= 360;
+    while (d < -180) d += 360;
+    return d;
+  }
+
   // Mittabstandstreue Zylinderprojektion, an der Bildmitte ausgerichtet.
   // Für Ausschnitte bis ~2000 km ist die Verzerrung vernachlässigbar.
   function sicht(mitteLat, mitteLon, spanneKm, w, h) {
@@ -53,11 +66,17 @@ window.KARTE = (() => {
     const kmProGradLon = kmProGradLat * Math.cos(mitteLat * Math.PI / 180);
     const halbKmY = spanneKm, halbKmX = spanneKm * (w / h);
     const sx = (w / 2) / halbKmX, sy = (h / 2) / halbKmY;
+    const zurueck = (px) => {
+      let lon = mitteLon + (px - w / 2) / (kmProGradLon * sx);
+      while (lon > 180) lon -= 360;
+      while (lon < -180) lon += 360;
+      return lon;
+    };
     return {
       w, h,
-      x: (lon) => w / 2 + (lon - mitteLon) * kmProGradLon * sx,
+      x: (lon) => w / 2 + lonAbstand(lon, mitteLon) * kmProGradLon * sx,
       y: (lat) => h / 2 - (lat - mitteLat) * kmProGradLat * sy,
-      lon: (px) => mitteLon + (px - w / 2) / (kmProGradLon * sx),
+      lon: zurueck,
       lat: (py) => mitteLat - (py - h / 2) / (kmProGradLat * sy),
       kmZuPxY: (km) => km * sy,
     };

@@ -159,3 +159,22 @@ class TestEinbruchswaechter:
         assert gemerkt["quellen"]["festivalticker"] == 1000
         # ... und der nächste Lauf warnt deshalb erneut
         assert lauf.pruefe_ausbeute({"festivalticker": 500}, 890)
+
+class TestGeweseneAusgaben:
+    """Nachschlagewerke fuehren auch, was gewesen ist.
+
+    Ohne Termin sieht "Big Day Out 2000 Auckland" auf der Seite aus wie eine
+    offene Ankuendigung - der Jahrgang im Namen sagt, dass es keine ist.
+    """
+
+    @pytest.mark.parametrize("name,termin,gewesen", [
+        ("Big Day Out 2000 Auckland", "", True),
+        ("Blip Festival Tokyo 2010-09-04", "", True),
+        ("Anders Zorns Fiedelwettbewerb 1906", "", True),
+        ("Klavier-Festival Ruhr", "", False),
+        ("Rock am Ring", "", False),
+        ("Festival 2027", "", False),                 # kuenftig, kein Rueckblick
+        ("Wacken Open Air 2018", "01.08.2026", False),  # datiert: der Termin gilt
+    ])
+    def test_was_gewesen_ist(self, name, termin, gewesen):
+        assert lauf.gewesene_ausgabe({"name": name, "date_from": termin}, 2026) is gewesen

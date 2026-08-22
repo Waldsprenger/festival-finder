@@ -228,3 +228,34 @@ def kontinent(country: str) -> str:
     """Erdteil eines Landes, leer wenn unbekannt."""
     return KONTINENT.get(land_code(country), "")
 
+
+def _laender_rahmen() -> dict[str, tuple[float, float, float, float]]:
+    """Der Kasten je Land: lat0, lat1, lon0, lon1, aus dem Ortsverzeichnis."""
+    roh = lies_json(DATA / "laender_rahmen.json", {}) or {}
+    return {cc: tuple(werte) for cc, werte in roh.items() if len(werte) == 4}
+
+
+LAENDER_RAHMEN = _laender_rahmen()
+
+#: Zuschlag auf jeden Kasten. Ein Festival kann dicht hinter der Grenze
+#: liegen, und das Ortsverzeichnis kennt nicht jede Insel.
+RAHMEN_ZUSCHLAG = 2.0
+
+
+def koordinate_passt_zum_land(lat: float | None, lon: float | None,
+                              country: str) -> bool:
+    """Liegt der Punkt in dem Land, das die Quelle nennt?
+
+    Ohne Land oder ohne Kasten gilt der Punkt als in Ordnung - geraten wird
+    nicht. Bekannt ist der Kasten für die Länder aus dem Ortsverzeichnis;
+    er stammt aus 116.653 Orten und ist bewusst weit.
+    """
+    if lat is None or lon is None:
+        return False
+    kasten = LAENDER_RAHMEN.get(land_code(country))
+    if not kasten:
+        return True
+    lat0, lat1, lon0, lon1 = kasten
+    return (lat0 - RAHMEN_ZUSCHLAG <= lat <= lat1 + RAHMEN_ZUSCHLAG
+            and lon0 - RAHMEN_ZUSCHLAG <= lon <= lon1 + RAHMEN_ZUSCHLAG)
+

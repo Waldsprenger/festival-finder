@@ -170,3 +170,24 @@ class TestGenresVereinen:
 def test_clean_glaettet_umbrueche():
     assert clean("  Rock \n  am   Ring ") == "Rock am Ring"
     assert clean(None) == ""
+
+class TestEntschluesseln:
+    """HTML-Ersatzschreibweisen aus Datenblaettern.
+
+    Im Fliesstext nimmt der Parser sie einem ab, im JSON-Datenblatt nicht:
+    "Shaq&#8217;s Fun House" und "Larry &amp; Joe" standen so auf 236 Karten.
+    """
+
+    @pytest.mark.parametrize("roh,erwartet", [
+        ("Shaq&#8217;s Fun House", "Shaq’s Fun House"),
+        ("Larry &amp; Joe", "Larry & Joe"),
+        ("Moon Palace Golf &#038; Spa", "Moon Palace Golf & Spa"),
+        ("VVV &#91;Trippin&#39;you&#93;", "VVV [Trippin'you]"),
+        ("ganz normal", "ganz normal"),
+        ("", ""),
+    ])
+    def test_entschluesselt(self, roh, erwartet):
+        assert clean(roh) == erwartet
+
+    def test_bandnamen_finden_dadurch_zusammen(self):
+        assert band_key("Larry &amp; Joe") == band_key("Larry & Joe")

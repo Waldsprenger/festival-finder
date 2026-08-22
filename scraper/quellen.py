@@ -14,7 +14,8 @@ from dataclasses import dataclass
 from typing import Callable
 from urllib.parse import parse_qs, urljoin, urlparse
 
-from gemeinsam import JAHR_HEUTE, JAHRE, ist_land, land_code
+from gemeinsam import (JAHR_HEUTE, JAHRE, ist_land, koordinate_passt_zum_land,
+                       land_code)
 from netz import fetch, endziel, json_ld_events, melde, sitemap_adressen, soup
 from text import (KNOPFBESCHRIFTUNG, MONATE, besucherzahl, betrag, clean,
                   datum_de, datum_englisch, festival_name, genres_vereinen,
@@ -61,11 +62,12 @@ def datensatz(quelle: str, url: str, name: str, *, date_from: str = "",
     * Der Preis nennt eine Zahl oder freien Eintritt; "Pop Punk" ist kein Preis.
     * Steht die Postleitzahl im Ortsfeld ("104 45 Athen"), gehört sie ins
       Postleitzahlfeld.
-    * Eine Koordinate muss auf der Erde liegen und nicht bei null Grad null:
-      Der Punkt im Golf von Guinea ist die Handschrift eines leeren Feldes,
-      nicht ein Ort.
+    * Eine Koordinate muss auf der Erde liegen, nicht bei null Grad null - und
+      in dem Land, das die Quelle nennt. Sonst steht Lollapalooza Berlin in
+      Chicago und das LongLake Festival Lugano in Buenos Aires.
     """
-    if not koordinate_plausibel(lat, lon):
+    if not koordinate_plausibel(lat, lon) or not koordinate_passt_zum_land(
+            lat, lon, country):
         lat = lon = None
     city, plz = plz_und_stadt(city, plz)
     return {

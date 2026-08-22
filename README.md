@@ -5,7 +5,7 @@ eine statische Webseite, die daraus nach Band, Genre, Umkreis, Preis und
 Zeitraum filtert. Ein Datenlauf hält beides aktuell, ohne dass ein Rechner
 dafür laufen muss.
 
-**Stand:** 13.496 Festivals in 135 Ländern, 84.747 Acts, 3.004 Festivals aus mehr
+**Stand:** 13.339 Festivals in 135 Ländern, 86.266 Acts, 3.049 Festivals aus mehr
 als einer Quelle · [Änderungshistorie](https://github.com/Waldsprenger/festival-finder/commits/main)
 
 ```
@@ -29,7 +29,7 @@ als einer Quelle · [Änderungshistorie](https://github.com/Waldsprenger/festiva
 | `scraper/netz.py` | Seiten abrufen und zwischenspeichern, HTML und Datenblätter lesen |
 | `scraper/text.py` | Namen vereinheitlichen: Schlüssel, Bandnamen, Kürzel, Datum |
 | `scraper/quellen.py` | die zwölf Verzeichnisse — je Quelle: Adressen finden, Seite auslesen |
-| `scraper/zusammenfuehren.py` | aus vielen Funden ein Festival: sechs Stufen |
+| `scraper/zusammenfuehren.py` | aus vielen Funden ein Festival: acht Stufen |
 | `scraper/festival_scraper.py` | Ablauf und Ausgaben → `data/festivals.json` + CSV |
 | `scraper/genres.py` | Genre-Freitext → 17 Oberbegriffe |
 | `scraper/preisverlauf.py` | merkt sich, was ein Ticket zuerst und was es heute kostet |
@@ -44,7 +44,7 @@ als einer Quelle · [Änderungshistorie](https://github.com/Waldsprenger/festiva
 | `scraper/build_pwa.py` | Manifest, App-Symbole, Service Worker |
 | `scraper/build_artifact.py` | → `site/artifact.html`, alles in einer Datei |
 | `scraper/daily_update.py` | führt die Kette aus, protokolliert nach `data/update.log` |
-| `tests/` | 651 Tests für Schlüssel, Stufen, Leser, Preise, Sprachdatei und Wächter |
+| `tests/` | 700 Tests für Schlüssel, Stufen, Leser, Preise, Sprachdatei und Wächter |
 
 Und in `site/` die Seite selbst — reines HTML, CSS und JavaScript, kein
 Bauschritt, keine Bibliothek:
@@ -252,6 +252,7 @@ Ausnahme davon:
 | 5 | ähnliche Schreibweise (82 %), gleicher Ort, überlappender Zeitraum | „SonneMondSterne", „Elbriot", „Szigit" |
 | 6 | gleicher Name, eine Quelle ohne Termin, gleicher Ort **oder dieselbe offizielle Adresse** | Übersichtsseiten ohne bestätigtes Datum |
 | 7 | dieselbe Quelle, identischer Name, gleicher Ort, überlappender Termin | „Nacht Wacht XL" und „Nachtwacht XL", beide von wannafest |
+| 8 | gleiche Koordinate, gleicher Tag, verwandter Name | „Hard Summer" und „HARD Summer Music Festival"; „BitterSweet" in Poznań und in Posen |
 
 Die Stadt gehört ab Stufe 1 zum Schlüssel, sonst verschmölze das *Irish Spring
 Festival* seine 30 Auftrittsorte zu einem Eintrag. Stufe 2 verzichtet auf den
@@ -288,7 +289,7 @@ Ort und Koordinate bleiben.
 ### Finden alte und neue Quellen zusammen?
 
 Vier neue Verzeichnisse in einen gewachsenen Bestand zu kippen, ist die Probe
-aufs Exempel für die sieben Stufen. Nachgezählt:
+aufs Exempel für die Stufen. Nachgezählt:
 
 | | |
 |---|---:|
@@ -529,14 +530,14 @@ das andere wäre unsere eigene Ungeduld.
 pip install pytest && python -m pytest tests -q
 ```
 
-651 Tests in gut acht Sekunden, ohne Netz und ohne Datenbestand. Sie halten
+700 Tests in gut acht Sekunden, ohne Netz und ohne Datenbestand. Sie halten
 fest, warum die Regeln so aussehen, wie sie aussehen — fast jeder Fall stand
 einmal falsch in den Daten:
 
 | Datei | prüft |
 |---|---|
 | `tests/test_text.py` | Namen, Schlüssel, Bandnamen, Preise, Datumsformate |
-| `tests/test_zusammenfuehren.py` | die sieben Stufen, jede mit ihrer Sicherung |
+| `tests/test_zusammenfuehren.py` | die acht Stufen, jede mit ihrer Sicherung |
 | `tests/test_quellen.py` | die Leser an gespeicherten Seitenausschnitten |
 | `tests/test_build_site.py` | Preisdeutung, Verortung, Auslieferung als JS |
 | `tests/test_genres.py` | Freitext zu Oberbegriffen, samt Irreführern |
@@ -554,6 +555,7 @@ einmal falsch in den Daten:
 | `tests/test_verluste.py` | beim Zusammenführen geht keine Quelladresse verloren |
 | `tests/test_aliase.py` | Kürzel abschalten — und die Tabelle danach zurücksetzen |
 | `tests/test_weltquellen.py` | die vier weltweiten Quellen und ihre Eigenheiten |
+| `tests/test_koordinaten.py` | Koordinate gegen Land, vor und nach dem Verschmelzen |
 
 Der Workflow führt sie vor jedem Datenlauf aus: Ein Fehler in der Logik soll
 auffallen, bevor er sich in die veröffentlichten Daten schreibt.
@@ -638,6 +640,60 @@ Datumsangaben im Fließtext meinen oft gar nicht das Festival, sondern
 Vorverkaufsstarts, Nebenveranstaltungen oder Nachrichten. **Bei einer
 Abweichung gilt deshalb der Bestand, nicht die Veranstalterseite.**
 
+### Was der Weltmaßstab an Fehlern mitbrachte
+
+Nach dem Umbau noch einmal alles durchgesehen — die acht bekannten Datenklassen
+standen auf null, vier neue kamen zum Vorschein.
+
+**Die Koordinate muss zum Land passen.** Solange nur Europa gesammelt wurde,
+hielt der europäische Rahmen die groben Verwechslungen ab. Ohne ihn stand
+Budapest Park in Berlin, das Kolibri Festival in Delaware und das LongLake
+Festival Lugano wieder in Buenos Aires — 41 Fälle. An die Stelle des Rahmens
+tritt die richtige Frage: Liegt der Punkt in dem Land, das die Quelle nennt?
+Die Kästen dafür entstehen aus dem Ortsverzeichnis (`data/laender_rahmen.json`,
+244 Länder) und sind bewusst weit: Las Palmas gehört zu Spanien, Funchal zu
+Portugal.
+
+Geprüft wird zweimal — bei jedem Fund und noch einmal nach dem Verschmelzen.
+Denn Land und Koordinate können aus verschiedenen Quellen stammen: Eine nannte
+Berlin ohne Land, eine andere Deutschland ohne Koordinate, und zusammen ergab
+das Lollapalooza Berlin in Chicago.
+
+**Nachschlagewerke führen auch, was gewesen ist.** 185 Einträge von festivism
+tragen ein vergangenes Jahr im Namen — „Big Day Out 2000 Auckland", „Anders
+Zorns Fiedelwettbewerb 1906". Ohne Termin sahen sie auf der Seite aus wie
+offene Ankündigungen. Terminlos plus vergangenes Jahr im Namen heißt: gewesen.
+
+**Gleicher Punkt, gleicher Tag.** Elf Paare standen nebeneinander, die
+zusammengehören: „Hard Summer" und „HARD Summer Music Festival", „BitterSweet"
+in Poznań und in Posen. Dafür gibt es jetzt Stufe 8 — die Koordinate ist dort
+das stärkere Zeichen als der Name. Der Name muss trotzdem passen: In Attard auf
+Malta liegen am 11. September zwei verschiedene Veranstaltungen auf demselben
+Punkt. Sechs Paare fanden so zusammen, drei Abkürzungen stehen in der
+Aliasliste (`ESNS`, `M3F`, `Das Fest`).
+
+**Ersatzschreibweisen aus dem Datenblatt.** „Shaq&#8217;s Fun House",
+„Larry &amp; Joe", „Moon Palace Golf &#038; Spa" — 236 Felder trugen
+HTML-Ersatzschreibweisen. Im Fließtext nimmt der Parser sie einem ab, im
+JSON-Datenblatt nicht. `clean()` löst sie jetzt auf, und `fold()` beginnt mit
+`clean()`: Sonst wäre „Larry &amp; Joe" ein anderer Act als „Larry & Joe".
+
+**Die Karte kannte die Datumsgrenze nicht.** Bei 180 Grad springt die Länge auf
+-180; wer in Suva sitzt (178 Ost), hätte Honolulu 336 Grad entfernt gesehen
+statt 24 — der Pin lag außerhalb des Bildes, während die Liste korrekt 5.090 km
+anzeigte. Kein Randfall: Von 832 Festivals im Umkreis von 9.000 km um Suva
+liegen 175 jenseits der Grenze. Die Entfernungen selbst stimmten immer, nur die
+Projektion nicht.
+
+**Und der schwerste Fund war ein Verhaltensfehler:** Das Zusammenführen hing
+von der Reihenfolge der Funde ab. Zwei Läufe über dieselben 23.781 Funde
+ergaben 15.483 und 15.512 Festivals — die Seiten kommen aus vier Fäden in
+wechselnder Folge zurück, also hätte sich der Bestand täglich verändert, ohne
+dass sich an den Quellen etwas ändert. Gegen die alte Fassung gemessen war der
+Fehler schon vorher da (21 und 29 Abweichungen); mit acht Quellen fiel er nicht
+auf, mit zwölf schon. Seitdem legt `zusammenfuehren()` die Reihenfolge selbst
+fest, nach Rang und Adresse. Gemischte Eingabe, gleiches Ergebnis.
+
 ## Fehler, die besondere Umstände brauchen
 
 Vier Klassen, die sich weder im Protokoll noch beim Lesen zeigen — nur im
@@ -678,6 +734,21 @@ veränderte. Dieselbe Funktion `band_key` antwortete davor und danach
 verschieden. Der Vorgang heisst jetzt `alias_abschalten()`, und vor jedem Test
 wird die Tabelle zurückgesetzt — sonst hinge ein Testergebnis davon ab, welcher
 Test vorher lief.
+
+### Was nachweislich in Ordnung ist
+
+Nicht jede Prüfung findet etwas, und das ist auch ein Ergebnis. Nachgemessen
+und ohne Befund:
+
+| Frage | Messung |
+|---|---|
+| Verlieren vier Fäden Meldungen? | 4 × 500 Einträge → genau 2.000 |
+| Merkt der Wächter einen Einbruch? | halbe Ausbeute → alle zwölf Quellen gemeldet |
+| Übersteht der Lauf eine kaputte Sammeldatei? | keine Antwort und ungültiges JSON → 0 Datensätze, kein Absturz |
+| Verschieben Zeitzonen den Tag? | festapp schreibt UTC-Abendzeiten, der Leser nimmt das Hauptdatenblatt — „ArtikFest 19.–21. Feb" stimmt |
+| Stimmen Entfernungen über die Datumsgrenze? | Suva–Honolulu 5.090 km, Auckland–Santiago 9.670 km |
+| Hält die Seite 13.500 Festivals aus? | 568 ms Laden, 646 ms für 8.375 Treffer, 63 MB Speicher |
+| Passt die Preisvorgabe von 150 € noch? | Median 62,50 €, 82 % der Festivals mit Preis bleiben sichtbar |
 
 ## Wenn etwas mittendrin abbricht
 

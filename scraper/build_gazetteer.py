@@ -28,6 +28,7 @@ from netz import datei_holen
 CACHE = SEITEN_CACHE / "geonames"
 GAZETTEER = DATA / "gazetteer.json"
 LAENDER_DATEI = DATA / "laender.json"
+RAHMEN_DATEI = DATA / "laender_rahmen.json"
 PLZ = DATA / "plz.json"
 VERORTUNG = DATA / "verortung.json"
 
@@ -175,6 +176,18 @@ def main() -> None:
     schreib_json(GAZETTEER, schlank, kompakt=True)
     print(f"{GAZETTEER}  ({GAZETTEER.stat().st_size / 1e6:.1f} MB, "
           f"{len(schlank)} Orte)")
+
+    # Der Kasten je Land: Er entscheidet später, ob eine Koordinate zum Land
+    # der Quelle passt. Grosszügig gerechnet - Frankreich reicht bis
+    # Französisch-Guayana -, damit nur grobe Verwechslungen auffallen.
+    rahmen: dict[str, list[float]] = {}
+    for name, lat, lon, cc, _pop in orte.values():
+        r = rahmen.setdefault(cc, [90.0, -90.0, 180.0, -180.0])
+        r[0], r[1] = min(r[0], lat), max(r[1], lat)
+        r[2], r[3] = min(r[2], lon), max(r[3], lon)
+    schreib_json(RAHMEN_DATEI, {cc: [round(v, 2) for v in r]
+                                for cc, r in sorted(rahmen.items())})
+    print(f"{RAHMEN_DATEI}  ({len(rahmen)} Länderkästen)")
 
     plz_europa = postleitzahlen()
     plz_dach = [e for e in plz_europa if e[4] in FEIN]
