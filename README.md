@@ -34,7 +34,6 @@ als einer Quelle · [Änderungshistorie](https://github.com/Waldsprenger/festiva
 | `scraper/genres.py` | Genre-Freitext → 17 Oberbegriffe |
 | `scraper/preisverlauf.py` | merkt sich, was ein Ticket zuerst und was es heute kostet |
 | `scraper/schnappschuss.py` | legt den Stand einer Quelle ab, die nicht jeder Lauf erreicht |
-| `scraper/stand_auffrischen.py` | frischt genau diesen Stand auf, sonst nichts (`.ps1`: samt Veröffentlichen) |
 | `scraper/geocode.py` | Ortskoordinaten von Nominatim → `data/geo.json` |
 | `scraper/build_gazetteer.py` | Ortsverzeichnisse aus GeoNames: klein für den Browser, groß fürs Verorten |
 | `scraper/build_map.py` | Kartenumrisse aus Natural Earth |
@@ -191,17 +190,27 @@ Der Wächter meldet für eine mitgebrachte Quelle nicht mehr ihr Schweigen,
 sondern das Alter ihres Standes: ab drei Wochen steht es als Warnung im
 Bericht und in der Zusammenfassung des Laufs.
 
-Aufgefrischt wird er von diesem Rechner, ohne Handgriff: Eine Aufgabe der
-Windows-Aufgabenplanung startet abends `scraper/stand_auffrischen.ps1`, das
-holt nur diese eine Quelle (`scraper/stand_auffrischen.py`, wenige Minuten),
-und veröffentlicht das Ergebnis nur, wenn es sich geändert hat. War der
-Rechner aus, holt die Aufgabe den Lauf beim nächsten Einschalten nach. Der
-Push stößt zugleich den Serverlauf an, der den neuen Stand dann mitliest.
+#### Seit dem 22. August 2026: eingefroren
 
-Der Stand ist so frisch wie der letzte Lauf zu Hause. Vom Aufräumen des
-Caches ist er nicht betroffen: Das löscht nur Dateien unter `cache/`, nur beim
-sonntäglichen `--frisch`-Lauf und nur, was seit einer Woche niemand angefasst
-hat. `data/schnappschuss/` liegt in der Versionsverwaltung, nicht im Cache.
+Bis dahin frischte eine Aufgabe der Windows-Aufgabenplanung den Stand jeden
+Abend vom eigenen Rechner auf und veröffentlichte ihn, wenn er sich geändert
+hatte. Seit dem 22. August weist festivalticker auch diesen Rechner ab — eine
+einzelne Anfrage von hier beantwortet die Seite mit 403, genau wie die des
+Servers. Damit gibt es nichts mehr aufzufrischen; die Aufgabe und die beiden
+Skripte dahinter sind entfernt.
+
+Die abgelegte Datei bleibt. Sie ist die letzte Abschrift dessen, was die
+Quelle beantwortet hat: 1.971 Datensätze vom 22. August 2026. Ohne sie fehlen
+der Seite rund 1.900 Festivals von einem Tag auf den anderen — mit ihr altern
+sie sichtbar. Vergangene Termine fallen ohnehin heraus, und ab drei Wochen
+steht das Datum des Standes als Warnung im Laufbericht. Wann diese Daten zu
+alt sind, um sie noch zu zeigen, bleibt damit eine Entscheidung, die jemand
+trifft — und keine, die still passiert.
+
+Vom Aufräumen des Caches ist die Datei nicht betroffen: Das löscht nur Dateien
+unter `cache/`, nur beim sonntäglichen `--frisch`-Lauf und nur, was seit einer
+Woche niemand angefasst hat. `data/schnappschuss/` liegt in der
+Versionsverwaltung, nicht im Cache.
 
 ## Vom Fund zum Festival
 
@@ -546,9 +555,11 @@ einmal falsch in den Daten:
 | `tests/test_preisverlauf.py` | erster und heutiger Preis über mehrere Läufe |
 | `tests/test_gazetteer.py` | welche Postleitzahlen mitgeliefert und welche nachgeladen werden |
 | `tests/test_oberflaeche.py` | die Sprachdatei: Anführungszeichen, zehn Sprachen, Platzhalter, Schlüssel |
+| `tests/test_rechtstexte.py` | Datenschutz und Fußnote gegen die Daten, die es wirklich gibt |
 | `tests/test_schnappschuss.py` | der mitgebrachte Stand: füllen, lesen, nicht leeren lassen |
 | `tests/test_korpus.py` | die Leser an fünfzehn echten, eingefrorenen Seiten |
 | `tests/test_kette.py` | Schritt scheitert, Schritt hängt, Kette läuft weiter |
+| `tests/test_dokumentation.py` | das README gegen das Projekt, das es wirklich gibt |
 | `tests/test_dateien.py` | JSON schreiben und lesen, auch bei Abbruch mittendrin |
 | `tests/test_geocode.py` | Ausfall des Kartendienstes ist kein „Ort unbekannt" |
 | `tests/test_zeitraeume.py` | laufende Festivals, Silvester, Jahrgangsschnitt |

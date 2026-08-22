@@ -1,21 +1,30 @@
 """Ein Stand je Quelle, für den Fall, dass sie einen Lauf nicht bedient.
 
-festivalticker antwortet dem eigenen Rechner mit 200 und dem täglichen Lauf
-auf GitHub-Servern mit 403 — eine Entscheidung des Betreibers gegenüber
-Rechenzentrums-Adressen, die geachtet wird. Ohne diese Datei fehlen der
-veröffentlichten Fassung dadurch rund 800 Festivals.
+Lange galt: festivalticker antwortet dem eigenen Rechner mit 200 und dem
+täglichen Lauf auf GitHub-Servern mit 403 — eine Entscheidung des Betreibers
+gegenüber Rechenzentrums-Adressen. Was der Lauf zu Hause ohnehin holte, wurde
+hier abgelegt und mitversioniert; der Serverlauf las es, wenn seine eigene
+Anfrage nichts einbrachte. Umgangen wurde dabei nichts.
 
-Der Ausweg braucht keine Sperre zu umgehen: Was der Lauf zu Hause ohnehin
-holt, wird hier abgelegt und mitversioniert. Der Serverlauf liest es, wenn
-seine eigene Anfrage nichts einbringt.
+Seit dem 22. August 2026 weist festivalticker auch den Rechner zu Hause ab.
+Damit lässt sich der Stand nicht mehr auffrischen: Die Datei in
+`data/schnappschuss/` ist die letzte Abschrift dessen, was die Quelle
+beantwortet hat, und sie altert. Sie bleibt trotzdem — ohne sie fehlen der
+Seite rund 1.900 Festivals von einem Tag auf den anderen.
+
+Dass sie altert, bleibt sichtbar: Ab `ALTERSGRENZE_TAGE` meldet der Wächter in
+`festival_scraper.pruefe_ausbeute` nicht mehr das Schweigen der Quelle,
+sondern das Datum ihres Standes — im Laufbericht und in der Zusammenfassung.
+Wann diese Daten zu alt sind, um sie noch zu zeigen, ist damit eine
+Entscheidung, die jemand trifft, und keine, die still passiert.
 
 Zwei Regeln halten das ehrlich:
 
 * Geschrieben wird nur, was auch wirklich gefunden wurde. Ein Lauf ohne
-  Funde darf den Stand nicht leeren — sonst löschte der Server, was der
-  eigene Rechner mitgebracht hat.
-* Gelesen wird nur, wenn die Quelle im Lauf selbst nichts hergibt. Solange
-  sie antwortet, gilt ihre Antwort.
+  Funde darf den Stand nicht leeren — sonst löschte ausgerechnet der Lauf,
+  der nichts erreicht, die letzte Abschrift.
+* Gelesen wird nur, wenn die Quelle im Lauf selbst nichts hergibt. Sollte sie
+  wieder antworten, gilt ihre Antwort.
 """
 
 from __future__ import annotations
