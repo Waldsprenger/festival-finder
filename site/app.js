@@ -866,7 +866,7 @@
   const gewichtet = () => (state.bands.an && state.bands.auswahl.size) ||
                           (state.genre.an && state.genre.auswahl.size);
 
-  /** Was sich zu ordnen lohnt: Uebereinstimmung, Entfernung, Preis, Datum.
+  /** Was sich zu ordnen lohnt: Uebereinstimmung, Entfernung, Datum, Preis.
 
       Weggelassen wird, was nichts ordnen kann - ohne Band- oder Genreauswahl
       gibt es keine Uebereinstimmung, ohne Wohnort keine Entfernung. Eine
@@ -876,7 +876,7 @@
     const liste = [];
     if (gewichtet()) liste.push('match');
     if (state.home) liste.push('distance');
-    liste.push('price', 'date');
+    liste.push('date', 'price');
     return liste;
   };
 

@@ -213,7 +213,7 @@ def test_die_karte_kennt_den_bereich_statt_eines_umkreises():
 
 
 def test_die_sortierung_folgt_dem_filter():
-    """Übereinstimmung, Entfernung, Preis, Datum — und die Vorgabe wandert mit.
+    """Übereinstimmung, Entfernung, Datum, Preis — und die Vorgabe wandert mit.
 
     Die Vorgabe muss dem folgen, was eingestellt ist. Als sie in einem festen
     Wert steckte, stand dort vor der Bandauswahl „Datum"; kam danach eine Band
@@ -228,7 +228,7 @@ def test_die_sortierung_folgt_dem_filter():
     m = re.search(r"const sortierungen = \(\) => \{(.*?)\n  \};", skript, re.S)
     assert m, "sortierungen() nicht gefunden"
     reihenfolge = re.findall(r"'(match|distance|price|date)'", m.group(1))
-    assert reihenfolge == ["match", "distance", "price", "date"], reihenfolge
+    assert reihenfolge == ["match", "distance", "date", "price"], reihenfolge
 
     # Nur anbieten, was auch ordnen kann
     assert "if (gewichtet()) liste.push('match')" in skript
