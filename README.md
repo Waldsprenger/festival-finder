@@ -44,7 +44,7 @@ als einer Quelle · [Änderungshistorie](https://github.com/Waldsprenger/festiva
 | `scraper/build_pwa.py` | Manifest, App-Symbole, Service Worker |
 | `scraper/build_artifact.py` | → `site/artifact.html`, alles in einer Datei |
 | `scraper/daily_update.py` | führt die Kette aus, protokolliert nach `data/update.log` |
-| `tests/` | 700 Tests für Schlüssel, Stufen, Leser, Preise, Sprachdatei und Wächter |
+| `tests/` | 711 Tests für Schlüssel, Stufen, Leser, Preise, Sprachdatei und Wächter |
 
 Und in `site/` die Seite selbst — reines HTML, CSS und JavaScript, kein
 Bauschritt, keine Bibliothek:
@@ -530,7 +530,7 @@ das andere wäre unsere eigene Ungeduld.
 pip install pytest && python -m pytest tests -q
 ```
 
-700 Tests in gut acht Sekunden, ohne Netz und ohne Datenbestand. Sie halten
+711 Tests in gut acht Sekunden, ohne Netz und ohne Datenbestand. Sie halten
 fest, warum die Regeln so aussehen, wie sie aussehen — fast jeder Fall stand
 einmal falsch in den Daten:
 
@@ -556,6 +556,7 @@ einmal falsch in den Daten:
 | `tests/test_aliase.py` | Kürzel abschalten — und die Tabelle danach zurücksetzen |
 | `tests/test_weltquellen.py` | die vier weltweiten Quellen und ihre Eigenheiten |
 | `tests/test_koordinaten.py` | Koordinate gegen Land, vor und nach dem Verschmelzen |
+| `tests/test_abrufen.py` | 403, 429 und Netzfehler: was der Lauf daraus macht |
 
 Der Workflow führt sie vor jedem Datenlauf aus: Ein Fehler in der Logik soll
 auffallen, bevor er sich in die veröffentlichten Daten schreibt.
@@ -734,6 +735,26 @@ veränderte. Dieselbe Funktion `band_key` antwortete davor und danach
 verschieden. Der Vorgang heisst jetzt `alias_abschalten()`, und vor jedem Test
 wird die Tabelle zurückgesetzt — sonst hinge ein Testergebnis davon ab, welcher
 Test vorher lief.
+
+### Was der erste Serverlauf noch fand
+
+**429 heisst „zu schnell" — und das ist unsere Schuld.** Der erste weltweite
+Lauf auf GitHub-Servern verlangte jambase 2.348 Seiten in kurzer Folge ab und
+bekam dafür **1.575-mal ein 429**; nur 766 Seiten kamen an. Kein fremdes
+Verbot, sondern eigene Ungeduld — und die richtige Antwort darauf ist warten,
+nicht lauter fragen.
+
+Der Lauf merkt sich jetzt je Rechner eine Wartezeit. Sie beginnt bei null,
+wächst mit jeder Bitte um Ruhe (oder auf den Wert, den ein `Retry-After`
+nennt), gilt für alle weiteren Anfragen an denselben Rechner und ist bei acht
+Sekunden gedeckelt. Eine Bitte um Ruhe zählt dabei **nicht** als Fehlversuch:
+Sonst wären nach drei Bitten die drei regulären Versuche aufgebraucht und die
+Seite fiele still heraus.
+
+Nebenbei bestätigte derselbe Lauf, dass festivalticker den Serverlauf wieder
+bedient — 1.971 Funde, kein mitgebrachter Stand nötig. Die Sperre von gestern
+war keine dauerhafte Entscheidung, sondern vermutlich dieselbe Ungeduld von
+unserer Seite.
 
 ### Was nachweislich in Ordnung ist
 

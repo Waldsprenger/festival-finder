@@ -42,6 +42,12 @@ MELDUNGEN: list[str] = []
 ABGEWIESEN: dict[str, int] = {}
 #: So oft wird eine Ablehnung hingenommen, dann bleibt der Rechner in Ruhe
 SPERRE_AB = 5
+#: Wartezeit je Rechner, in Sekunden - waechst, wenn er "zu schnell" meldet
+VERZOEGERUNG: dict[str, float] = {}
+#: Weiter als so wird nicht gebremst; darueber lohnt der Lauf nicht mehr
+VERZOEGERUNG_MAX = 8.0
+#: So oft wird eine Bitte um Ruhe erfuellt, bevor die Seite liegen bleibt
+GEDULD_429 = 4
 
 
 def einstellen(max_age_h: float, frisch: bool) -> None:
@@ -109,6 +115,30 @@ def weist_ab(url: str) -> bool:
     return ABGEWIESEN.get(urlparse(url).netloc, 0) >= SPERRE_AB
 
 
+def _wartezeit(url: str) -> float:
+    return VERZOEGERUNG.get(urlparse(url).netloc, 0.0)
+
+
+def langsamer_werden(url: str, antwort=None) -> float:
+    """Nach einem "zu viele Anfragen" kuenftig warten, bevor gefragt wird.
+
+    Die Wartezeit wächst mit jedem Mal und gilt für den Rest des Laufs. Nennt
+    der Server ein "Retry-After", zählt seine Angabe.
+    """
+    haus = urlparse(url).netloc
+    gewuenscht = 0.0
+    if antwort is not None:
+        try:
+            gewuenscht = float(antwort.headers.get("Retry-After", "") or 0)
+        except (ValueError, AttributeError):
+            gewuenscht = 0.0
+    neu = min(VERZOEGERUNG_MAX, max(VERZOEGERUNG.get(haus, 0.0) + 1.0, gewuenscht))
+    if not VERZOEGERUNG.get(haus):
+        melde(f"{haus} bittet um Ruhe (429) - ab jetzt {neu:.0f}s zwischen den Anfragen")
+    VERZOEGERUNG[haus] = neu
+    return neu
+
+
 def abweisung_vermerken(url: str, code: int | None) -> bool:
     """Eine Ablehnung zählen; True, sobald der Rechner als abweisend gilt.
 
@@ -137,12 +167,26 @@ def fetch(url: str, retries: int = 3) -> str | None:
     # dort nicht mehr, wo der Lauf ohnehin abgewiesen wird.
     if weist_ab(url):
         return None
-    for versuch in range(retries):
+    versuch = gebeten = 0
+    while versuch < retries:
         try:
             with BREMSE:
+                warten = _wartezeit(url)
+                if warten:
+                    time.sleep(warten)
                 r = session().get(url, timeout=45)
                 time.sleep(0.3)
             if r.status_code in (404, 410):
+                return None
+            if r.status_code == 429:
+                # "Zu viele Anfragen" ist kein Fehlschlag, sondern eine Bitte.
+                # Sie bekommt eigene Anläufe: Sonst wären nach drei Bitten die
+                # regulären Versuche aufgebraucht.
+                gebeten += 1
+                time.sleep(langsamer_werden(url, r))
+                if gebeten <= GEDULD_429:
+                    continue
+                FEHLGESCHLAGEN.append(f"{url} (HTTPError 429)")
                 return None
             r.raise_for_status()
             r.encoding = r.apparent_encoding or "utf-8"
@@ -150,15 +194,16 @@ def fetch(url: str, retries: int = 3) -> str | None:
             return r.text
         except Exception as exc:
             # Mit dem Statuscode: 403 ist eine Entscheidung des Betreibers,
-            # 429 oder 503 heißt "zu schnell" - das eine ist zu achten, das
-            # andere abzustellen. Gegen ein 403 hilft auch kein zweiter Anlauf.
+            # 503 heißt "gerade nicht" - das eine ist zu achten, das andere
+            # abzuwarten. Gegen ein 403 hilft auch kein zweiter Anlauf.
             code = code_von(exc)
-            if versuch == retries - 1 or code == 403:
+            versuch += 1
+            if versuch >= retries or code == 403:
                 art = exc.__class__.__name__ + (f" {code}" if code else "")
                 FEHLGESCHLAGEN.append(f"{url} ({art})")
                 abweisung_vermerken(url, code)
                 return None
-            time.sleep(2.0 * (versuch + 1))
+            time.sleep(2.0 * versuch)
     return None
 
 
