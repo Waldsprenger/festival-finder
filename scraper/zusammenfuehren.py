@@ -329,9 +329,17 @@ def stufe2_quellenpaare(merged: dict) -> None:
         nach_name.setdefault((key[0], key[1]), []).append((key, rec))
 
     for gruppe in nach_name.values():
-        if len(gruppe) < 2 or any(len(rec["sources"]) != 1 for _, rec in gruppe):
+        if len(gruppe) < 2:
             continue
-        quellen = [next(iter(rec["sources"])) for _, rec in gruppe]
+        # Keine Quelle darf zwei der Kandidaten führen: Wer dasselbe Fest
+        # zweimal listet, meint zwei verschiedene ("Krach am Bach" steht bei
+        # festivalticker für drei Feste in drei Orten).
+        #
+        # Früher musste dafür jeder Kandidat aus genau einer Quelle stammen.
+        # Das schloss die Fälle aus, in denen der Beweis am stärksten ist:
+        # Beim San Hejmo Festival standen fünf Quellen für "Weeze" gegen eine
+        # für "Airport Weeze" - und blieben getrennt.
+        quellen = [q for _, rec in gruppe for q in rec["sources"]]
         if len(set(quellen)) != len(quellen):
             continue
         if not termine_passen(gruppe):
@@ -393,7 +401,7 @@ def stufe5_schreibweise(merged: dict) -> None:
     """Derselbe Name, andere Schreibweise.
 
     "Sonne Mond Sterne" gegen "SonneMondSterne", "Sziget" gegen "Szigit" — mit
-    acht Quellen treffen solche Varianten regelmäßig aufeinander. Der
+    zwölf Quellen treffen solche Varianten regelmäßig aufeinander. Der
     Ortsvergleich hält gleichnamige Feste in anderen Städten auseinander.
     """
     gruppen: dict[tuple[str, str], list[tuple]] = {}

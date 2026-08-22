@@ -5,7 +5,7 @@ eine statische Webseite, die daraus nach Band, Genre, Umkreis, Preis und
 Zeitraum filtert. Ein Datenlauf hält beides aktuell, ohne dass ein Rechner
 dafür laufen muss.
 
-**Stand:** 13.435 Festivals in 135 Ländern, 81.004 Acts, 2.951 Festivals aus mehr
+**Stand:** 13.496 Festivals in 135 Ländern, 84.747 Acts, 3.004 Festivals aus mehr
 als einer Quelle · [Änderungshistorie](https://github.com/Waldsprenger/festival-finder/commits/main)
 
 ```
@@ -28,7 +28,7 @@ als einer Quelle · [Änderungshistorie](https://github.com/Waldsprenger/festiva
 | `scraper/gemeinsam.py` | Pfade, Länderwissen, JSON lesen und schreiben |
 | `scraper/netz.py` | Seiten abrufen und zwischenspeichern, HTML und Datenblätter lesen |
 | `scraper/text.py` | Namen vereinheitlichen: Schlüssel, Bandnamen, Kürzel, Datum |
-| `scraper/quellen.py` | die acht Verzeichnisse — je Quelle: Adressen finden, Seite auslesen |
+| `scraper/quellen.py` | die zwölf Verzeichnisse — je Quelle: Adressen finden, Seite auslesen |
 | `scraper/zusammenfuehren.py` | aus vielen Funden ein Festival: sechs Stufen |
 | `scraper/festival_scraper.py` | Ablauf und Ausgaben → `data/festivals.json` + CSV |
 | `scraper/genres.py` | Genre-Freitext → 17 Oberbegriffe |
@@ -44,7 +44,7 @@ als einer Quelle · [Änderungshistorie](https://github.com/Waldsprenger/festiva
 | `scraper/build_pwa.py` | Manifest, App-Symbole, Service Worker |
 | `scraper/build_artifact.py` | → `site/artifact.html`, alles in einer Datei |
 | `scraper/daily_update.py` | führt die Kette aus, protokolliert nach `data/update.log` |
-| `tests/` | 522 Tests für Schlüssel, Stufen, Leser, Preise, Sprachdatei und Wächter |
+| `tests/` | 651 Tests für Schlüssel, Stufen, Leser, Preise, Sprachdatei und Wächter |
 
 Und in `site/` die Seite selbst — reines HTML, CSS und JavaScript, kein
 Bauschritt, keine Bibliothek:
@@ -285,6 +285,53 @@ ISO-Kürzel und Erdteil, dazu kommen die deutschen Namen aus `gemeinsam.py`.
 Eine unbekannte längere Angabe kostet nur das Länderfeld, nicht das Festival:
 Ort und Koordinate bleiben.
 
+### Finden alte und neue Quellen zusammen?
+
+Vier neue Verzeichnisse in einen gewachsenen Bestand zu kippen, ist die Probe
+aufs Exempel für die sieben Stufen. Nachgezählt:
+
+| | |
+|---|---:|
+| Festivals aus **alter und neuer** Quelle | 1.340 |
+| nur aus neuen Quellen | 7.359 |
+| nur aus alten Quellen | 4.736 |
+| verdächtige Paare, die noch getrennt stehen | 13 |
+
+Die häufigsten Begegnungen sind festivalsunited + jambase (474),
+festivalsunited + festivalabroad (470) und festapp + jambase (415) — die neuen
+Quellen bestätigen also massenhaft Bestehendes, statt danebenzustehen.
+
+**Die 13 Übriggebliebenen waren ein Fund.** Von 54 Paaren mit gleichem Namen
+und deckungsgleichem Ort liegen 45 über neunzig Tage auseinander: verschiedene
+Jahrgänge und echte Zweitausgaben, die getrennt bleiben müssen. Neun liegen
+unter 25 Tagen und meinen dasselbe Fest — „Weeze" gegen „Airport Weeze",
+„Brügge" gegen „Zeebrugge", „Athen" gegen „Athens", „Hockenheim" gegen
+„Hockenheimring".
+
+Der Grund: Stufe 2 verlangte, dass **jeder** Kandidat aus genau einer Quelle
+stammt. Ausgerechnet dort, wo der Beweis am stärksten ist — fünf Quellen sagen
+„Weeze", eine sagt „Airport Weeze" —, griff sie nicht. Jetzt zählt stattdessen,
+dass keine Quelle zwei der Kandidaten führt.
+
+Gegengeprüft an denselben 23.458 Funden, einmal mit der alten und einmal mit
+der neuen Regel: **36 Festivals gehen zusammen**, darunter „Rock in Rio Lisboa"
+mit „Rock In Rio Lisbon" und „Les Eurockéennes" mit „Les Eurockéennes de
+Belfort". „Krach am Bach" bleibt vierfach, weil festivalticker drei der vier
+Orte selbst führt — die Regel schützt genau diesen Fall.
+
+Drei Paare bleiben getrennt, jedes aus einem Grund, der die Regel nicht
+aufweicht:
+
+| Paar | Warum getrennt |
+|---|---|
+| Release Athens, 1.6. und 17.6. | 16 Tage; die Frist liegt bei 14 |
+| Land Beyond Festival, 1.5. und 24.5. | 23 Tage |
+| „Nig Rock Festival" / „Nigrock" | Schlüssel „nig rock" gegen „nigrock" — die Stufe für Schreibweisen verlangt denselben Ort, hier steht „Geestland - Bad Bederkesa" gegen „Bad Bederkesa" |
+
+Drei von 13.496 sind die Grenze dessen, was ohne Raten zu holen ist. Jede
+weitere Lockerung träfe auch die 45 Paare, die zwei Jahrgänge oder zwei
+Ausgaben desselben Jahres sind — und die gehören auseinander.
+
 ## Genres
 
 Die Quellen schreiben das Genre als Freitext — 1.544 verschiedene Angaben von
@@ -482,7 +529,7 @@ das andere wäre unsere eigene Ungeduld.
 pip install pytest && python -m pytest tests -q
 ```
 
-522 Tests in gut sechs Sekunden, ohne Netz und ohne Datenbestand. Sie halten
+651 Tests in gut acht Sekunden, ohne Netz und ohne Datenbestand. Sie halten
 fest, warum die Regeln so aussehen, wie sie aussehen — fast jeder Fall stand
 einmal falsch in den Daten:
 
@@ -539,15 +586,15 @@ und Buenos Aires, ein Jahrgang 2027 mit Termin im August 2026, eine
 Besucherzahl mit 66 Stellen, „Pop Punk" als Preis, eine doppelte Nachtwacht.
 Was die Prüfung findet, steht am Ende des Laufs im Protokoll.
 
-### Die Prüfstelle für alle acht
+### Die Prüfstelle für alle zwölf
 
 Jeder Fund geht durch `datensatz()` — und damit durch dieselbe Plausibilitäts-
-prüfung. Das ist Absicht: Was acht Leser einzeln beachten müssten, beachtet
+prüfung. Das ist Absicht: Was zwölf Leser einzeln beachten müssten, beachtet
 keiner zuverlässig.
 
 | Feld | Regel | Anlass |
 |---|---|---|
-| Land | als Kürzel, nicht als Name | sechs Leser lieferten `DE`, zwei „Deutschland" |
+| Land | als Kürzel, und es muss ein Staat sein | sechs Leser lieferten `DE`, zwei „Deutschland" |
 | Besucherzahl | genau eine Zahl, 10 bis 5 Mio. | ein Muster griff ins Leere und klebte Datumsziffern zu 66 Stellen zusammen |
 | Preis | eine Zahl oder freier Eintritt | auf einer Seite stand „Preis: Pop Punk" |
 | Ort | Postleitzahl gehört ins eigene Feld | „104 45 Athen" fand keine Karte |
@@ -657,6 +704,20 @@ nicht als „unbekannt": Nur eine echte Fehlanzeige kommt in den Cache, ein
 Ausfall wird morgen erneut gefragt.
 
 ## Bekannte Grenzen
+
+- **Die Seite wiegt 3,4 MB** (gepackt; 9,1 MB roh). Das ist der Preis dafür,
+  dass alles in einer Datei steht und ohne Server läuft: 13.435 Festivals,
+  81.004 Acts, 116.653 Orte. Nach dem ersten Besuch liegt sie im
+  Anwendungsspeicher; unterwegs beim ersten Mal ist es viel.
+- **5.621 Festivals haben keinen Termin.** Sie kommen aus festivism und aus
+  den festivalabroad-Seiten, deren nächste Ausgabe noch nicht feststeht.
+  Voreingestellt sind sie ausgeblendet; der Schalter „Festivals ohne Termin
+  mitzeigen" holt sie herein.
+- **Lineups gibt es für 4.611 Festivals**, überwiegend aus festivalsunited,
+  festivalhopper und jambase. festivalabroad hat 10.000 Künstlerseiten, die
+  Auftritte nennen könnten — in einer Stichprobe von acht hatte genau eine
+  einen Eintrag. 10.000 Abrufe für schätzungsweise 1.500 Zeilen wären der
+  Quelle gegenüber unverhältnismäßig.
 
 - festivalticker zeigt für vergangene Jahrgänge nur je 40 Einträge; mehr gibt
   die Seite nicht her.

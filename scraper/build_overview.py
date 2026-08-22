@@ -108,7 +108,7 @@ tr.cancelled .nm {{ text-decoration:line-through; }}
 </style></head><body>
 <h1>Festival-Übersicht Europa</h1>
 <div class="meta">{len(festivals)} Festivals · {with_lineup} mit Lineup · {mehrfach} aus mehreren Quellen ·
-{len(band_count)} normalisierte Acts · acht Quellen</div>
+{len(band_count)} normalisierte Acts · zwölf Quellen</div>
 
 <div class="tags">{''.join(f'<span class="tag">{esc(b)} <b>{c}×</b></span>' for b, c in shared)}</div>
 

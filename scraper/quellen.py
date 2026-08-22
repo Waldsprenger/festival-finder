@@ -1,4 +1,4 @@
-"""Die acht Verzeichnisse: Adressen einsammeln, Detailseiten auslesen.
+"""Die zwölf Verzeichnisse: Adressen einsammeln, Detailseiten auslesen.
 
 Jede Quelle liefert dieselbe Art Datensatz (`datensatz()`), damit das
 Zusammenführen sie nicht auseinanderhalten muss. Was sie unterscheidet, steht
