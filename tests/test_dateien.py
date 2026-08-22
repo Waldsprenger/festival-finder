@@ -8,7 +8,8 @@ Koordinaten. Eine halb geschriebene Datei kostet beides.
 import json
 
 import pytest
-from gemeinsam import lies_json, schreib_json
+
+from festivalfinder.pfade import lies_json, schreib_bytes, schreib_json, schreib_text
 
 
 def test_hin_und_zurueck(tmp_path):
@@ -56,3 +57,13 @@ def test_nach_dem_beiseitelegen_laesst_sich_neu_schreiben(tmp_path):
     lies_json(ziel, {})
     schreib_json(ziel, {"wieder": "da"})
     assert json.loads(ziel.read_text(encoding="utf-8")) == {"wieder": "da"}
+
+
+def test_text_und_bytes_gehen_denselben_weg(tmp_path):
+    """Auch site/data.js und die gepackten Stände werden atomar geschrieben —
+    eine halbe data.js hieße: leere Seite."""
+    schreib_text(tmp_path / "a.txt", "hallo")
+    schreib_bytes(tmp_path / "b.bin", b"\x00\x01")
+    assert (tmp_path / "a.txt").read_text(encoding="utf-8") == "hallo"
+    assert (tmp_path / "b.bin").read_bytes() == b"\x00\x01"
+    assert sorted(p.name for p in tmp_path.iterdir()) == ["a.txt", "b.bin"]

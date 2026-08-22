@@ -78,10 +78,10 @@ jobs:
             echo "Nur Veraltetes nachladen"
           fi
 
-      # Die Reihenfolge der Schritte steht in scraper/daily_update.py - damit
+      # Die Reihenfolge der Schritte steht in festivalfinder/cli.py - damit
       # ein Lauf hier und ein Lauf am eigenen Rechner dasselbe tun.
       - name: Datenlauf
-        run: python scraper/daily_update.py ${{ steps.art.outputs.frisch }}
+        run: python -m festivalfinder alles ${{ steps.art.outputs.frisch }}
 
       # Warnungen sollen sichtbar sein, ohne dass jemand ins Protokoll steigt.
       - name: Protokoll in die Zusammenfassung
@@ -90,7 +90,17 @@ jobs:
           {
             echo "### Datenlauf"
             echo '```'
-            grep -E '^\[|^ +!|^=== Ende' data/update.log | tail -40 || true
+            python - <<'EOF'
+          import json, pathlib
+          d = json.loads(pathlib.Path("data/lauf.json").read_text(encoding="utf-8"))
+          print(f"Stand {d['stand']} - {d['festivals']} Festivals")
+          for name, n in d["quellen"].items():
+              print(f"  {name:<18} {n:>6}")
+          for w in d["warnungen"]:
+              print(f"  ! {w}")
+          for m in d["meldungen"][:10]:
+              print(f"  ! {m}")
+          EOF
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 

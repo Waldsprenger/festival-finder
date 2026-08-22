@@ -8,7 +8,6 @@ data/lineups.csv
 data/bands.csv
 data/band_normalisierung.json
 data/uebersicht.html
-data/update.log
 data/failed.txt
 data/lauf.json
 data/verortung.json

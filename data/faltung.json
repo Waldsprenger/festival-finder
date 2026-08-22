@@ -1,0 +1,34 @@
+{
+  "_": [
+    "Die Regeln, nach denen ein Name zu einem Vergleichsschlüssel wird.",
+    "Sie stehen hier und nicht im Code, weil zwei Programme sie brauchen: der",
+    "Sammler in Python (festivalfinder/kern/text.py) und die Suche im Browser",
+    "(site/js/text.js). Als beide ihre eigene Tabelle pflegten, sind sie",
+    "auseinandergelaufen - bei 5.172 von 40.538 Bandnamen. Wer '2 Engel and",
+    "Charlie' tippte, fand '2 Engel & Charlie' nicht.",
+    "Die Datei reist in site/data.js mit; die Seite liest sie von dort. Eine",
+    "Änderung hier wirkt damit auf beiden Seiten zugleich."
+  ],
+
+  "_sonderzeichen": "Buchstaben, die NFKD nicht zerlegt. Ohne sie fielen sie ersatzlos weg und 'Aħna' würde zu 'Ana'.",
+  "sonderzeichen": [
+    ["ß", "ss"], ["ø", "o"], ["æ", "ae"], ["œ", "oe"], ["đ", "d"],
+    ["ħ", "h"], ["ł", "l"], ["ı", "i"], ["þ", "th"], ["ð", "d"]
+  ],
+
+  "_ersatz": "Zeichen, die dasselbe meinen wie ein anderes.",
+  "ersatz": [
+    ["&", " and "], ["+", " and "],
+    ["’", "'"], ["´", "'"], ["`", "'"],
+    ["–", "-"], ["—", "-"], ["…", ""]
+  ],
+
+  "_verbinder": "Wörter zwischen zwei Acts. Alle werden zu 'and', damit 'X feat. Y' und 'X & Y' denselben Schlüssel ergeben.",
+  "verbinder": ["feat", "ft", "featuring", "vs", "with", "und", "and"],
+
+  "_artikel": "Fällt am Anfang weg: 'The Beatles' und 'Beatles' sind dieselbe Band.",
+  "artikel": ["the", "die", "der", "das", "los", "las", "les"],
+
+  "_zusatz": "Fällt am Ende weg: 'Powerwolf Live' ist Powerwolf.",
+  "zusatz": ["band", "live", "dj ?set", "djset", "acoustic"]
+}

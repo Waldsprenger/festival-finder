@@ -1,0 +1,19 @@
+[project]
+name = "festivalfinder"
+version = "2.0"
+description = "Festivals weltweit sammeln, zusammenführen und als Webseite ausliefern"
+requires-python = ">=3.11"
+dependencies = ["requests", "beautifulsoup4", "pillow"]
+
+[project.scripts]
+festivalfinder = "festivalfinder.cli:main"
+
+[tool.pytest.ini_options]
+# Das Paket liegt im Projektverzeichnis; ohne diese Zeile fände pytest es nur
+# nach einer Installation. Früher stand dafür ein sys.path.insert in conftest.
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.setuptools.packages.find]
+include = ["festivalfinder*"]

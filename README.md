@@ -1,80 +1,130 @@
 # Festival-Übersicht weltweit
 
 Zwölf Festivalverzeichnisse, zu einem weltweiten Bestand zusammengeführt, plus
-eine statische Webseite, die daraus nach Band, Genre, Umkreis, Preis und
-Zeitraum filtert. Ein Datenlauf hält beides aktuell, ohne dass ein Rechner
-dafür laufen muss.
+eine statische Webseite, die daraus Schritt für Schritt nach Ort, Zeitraum,
+Entfernung, Preis, Bands und Genre filtert. Ein Datenlauf hält beides aktuell,
+ohne dass ein Rechner dafür laufen muss.
 
 **Stand:** 13.339 Festivals in 135 Ländern, 86.266 Acts, 3.049 Festivals aus mehr
 als einer Quelle · [Änderungshistorie](https://github.com/Waldsprenger/festival-finder/commits/main)
 
 ```
    zwölf Quellen
-        │  quellen.py         Adressen sammeln, Detailseiten auslesen
+        │  quellen/          je Quelle eine Datei: Adressen finden, Seite lesen
         ▼
-   11.362 Funde
-        │  zusammenfuehren.py sechs Stufen gegen Dubletten
+   23.805 Funde              Fund: eingefrorener Datensatz mit festen Feldern
+        │  bund/             acht Stufen gegen Dubletten
         ▼
-   data/festivals.json
-        │  build_site.py      Koordinaten, Preise, Genres, Zahlenreihen
+   13.339 Festivals   →   data/festivals.json
+        │  ausgabe/          Koordinaten, Preise, Genres, Zahlenreihen
         ▼
    site/data.js  →  die Webseite
 ```
 
-## Die Dateien
+## Der Aufbau
 
-| Datei | Aufgabe |
+Ein Paket mit einer Tür. Die Kernschicht kennt keine Dateien und kein Netz, die
+Quellen kennen kein Zusammenführen, die Ausgabe kennt keine Quellen — was
+zusammengehört, liegt beieinander, und was nichts miteinander zu tun hat, weiß
+nichts voneinander.
+
+| Modul | Aufgabe |
 |---|---|
-| `scraper/gemeinsam.py` | Pfade, Länderwissen, JSON lesen und schreiben |
-| `scraper/netz.py` | Seiten abrufen und zwischenspeichern, HTML und Datenblätter lesen |
-| `scraper/text.py` | Namen vereinheitlichen: Schlüssel, Bandnamen, Kürzel, Datum |
-| `scraper/quellen.py` | die zwölf Verzeichnisse — je Quelle: Adressen finden, Seite auslesen |
-| `scraper/zusammenfuehren.py` | aus vielen Funden ein Festival: acht Stufen |
-| `scraper/festival_scraper.py` | Ablauf und Ausgaben → `data/festivals.json` + CSV |
-| `scraper/genres.py` | Genre-Freitext → 17 Oberbegriffe |
-| `scraper/preisverlauf.py` | merkt sich, was ein Ticket zuerst und was es heute kostet |
-| `scraper/schnappschuss.py` | legt den Stand einer Quelle ab, die nicht jeder Lauf erreicht |
-| `scraper/geocode.py` | Ortskoordinaten von Nominatim → `data/geo.json` |
-| `scraper/build_gazetteer.py` | Ortsverzeichnisse aus GeoNames: klein für den Browser, groß fürs Verorten |
-| `scraper/build_map.py` | Kartenumrisse aus Natural Earth |
-| `scraper/fetch_fonts.py` | Display-Schrift als data-URI |
-| `scraper/build_site.py` | → `site/data.js` |
-| `scraper/build_overview.py` | → `data/uebersicht.html`, Kontrolltabelle |
-| `scraper/build_pwa.py` | Manifest, App-Symbole, Service Worker |
-| `scraper/build_artifact.py` | → `site/artifact.html`, alles in einer Datei |
-| `scraper/daily_update.py` | führt die Kette aus, protokolliert nach `data/update.log` |
-| `tests/` | 711 Tests für Schlüssel, Stufen, Leser, Preise, Sprachdatei und Wächter |
+| `festivalfinder/pfade.py` | Pfade; JSON, Text und Bytes atomar schreiben |
+| **`kern/`** | **die Regeln — ohne Ein- und Ausgabe** |
+| `festivalfinder/kern/zeit.py` | jede Schreibweise der Quellen → ein `date` |
+| `festivalfinder/kern/text.py` | Namen vereinheitlichen: Schlüssel, Bandnamen, Kürzel |
+| `festivalfinder/kern/geld.py` | Preise lesen, prüfen, in Euro umrechnen |
+| `festivalfinder/kern/orte.py` | Länder, Erdteile, Länderkästen, Koordinatenprüfung |
+| `festivalfinder/kern/genres.py` | Genre-Freitext → 17 Oberbegriffe |
+| `festivalfinder/kern/fund.py` | `Fund`: was eine Quelle liefert, samt Trichter |
+| `festivalfinder/kern/festival.py` | `Festival`: was daraus wird, samt Ausgabeform |
+| **`netz/`** | **Abruf** |
+| `festivalfinder/netz/abrufer.py` | `Abrufer`: holen, zwischenspeichern, 403 achten, 429 abwarten |
+| `festivalfinder/netz/lesen.py` | Elementbaum, Sitemap, Datenblatt (schema.org) |
+| **`quellen/`** | **eine Datei je Verzeichnis** |
+| `festivalfinder/quellen/basis.py` | was alle zwölf gemeinsam haben |
+| `festivalfinder/quellen/festivalticker.py` | dichteste Abdeckung für Deutschland |
+| `festivalfinder/quellen/festivalsunited.py` | Lineups, Preise, Datenblatt je Seite |
+| `festivalfinder/quellen/festivalalarm.py` | Spielstätte, Besucherzahl, Preise |
+| `festivalfinder/quellen/festivalhopper.py` | deutschsprachig, Lineups als Verweise |
+| `festivalfinder/quellen/festapp.py` | Frankreich, Italien, Spanien |
+| `festivalfinder/quellen/wannafest.py` | Elektronisches, Benelux |
+| `festivalfinder/quellen/festivalflyer.py` | Großbritannien und Irland |
+| `festivalfinder/quellen/festivalfinder_eu.py` | Klassik, Theater, Osteuropa |
+| `festivalfinder/quellen/festivalabroad.py` | weltweit, mit Koordinaten und Genres |
+| `festivalfinder/quellen/jambase.py` | Nordamerika, mit vollen Lineups |
+| `festivalfinder/quellen/festivalnetworks.py` | 624 Festivals in einer Datei |
+| `festivalfinder/quellen/festivism.py` | Nachschlagewerk ohne Termine |
+| **`bund/`** | **zusammenführen** |
+| `festivalfinder/bund/bandnamen.py` | verbindliche Schreibweisen, Kürzelkollisionen |
+| `festivalfinder/bund/regeln.py` | wann zwei Einträge dasselbe Fest meinen |
+| `festivalfinder/bund/stufen.py` | die acht Stufen |
+| `festivalfinder/bund/lauf.py` | Reihenfolge festlegen, Stufen ausführen |
+| **`ausgabe/`** | **was der Lauf hinterlässt** |
+| `festivalfinder/ausgabe/dateien.py` | `data/festivals.json` und drei CSV-Tabellen |
+| `festivalfinder/ausgabe/verorten.py` | vier Ränge auf dem Weg zur Koordinate |
+| `festivalfinder/ausgabe/daten_js.py` | → `site/data.js` und `site/orte.js` |
+| `festivalfinder/ausgabe/seitenteile.py` | welche Dateien die Seite lädt — aus ihr selbst gelesen |
+| `festivalfinder/ausgabe/uebersicht.py` | → `data/uebersicht.html`, Kontrolltabelle |
+| `festivalfinder/ausgabe/pwa.py` | Manifest, App-Symbole, Service Worker |
+| `festivalfinder/ausgabe/artefakt.py` | → `site/artifact.html`, alles in einer Datei |
+| **`werkzeug/`** | **was seltener läuft** |
+| `festivalfinder/werkzeug/gazetteer.py` | Ortsverzeichnisse aus GeoNames |
+| `festivalfinder/werkzeug/weltkarte.py` | Kartenumrisse aus Natural Earth |
+| `festivalfinder/werkzeug/geokodieren.py` | Ortskoordinaten von Nominatim → `data/geo.json` |
+| `festivalfinder/werkzeug/schriften.py` | Display-Schrift als data-URI |
+| `festivalfinder/werkzeug/preisverlauf.py` | was ein Ticket zuerst und was es heute kostet |
+| `festivalfinder/werkzeug/schnappschuss.py` | der Stand einer Quelle, die nicht jeder Lauf erreicht |
+| **oben** | |
+| `festivalfinder/sammeln.py` | der Sammellauf über alle Quellen |
+| `festivalfinder/pruefung.py` | Stimmigkeit des Ergebnisses, Einbruch gegenüber gestern |
+| `festivalfinder/cli.py` | ein Einstiegspunkt für alles |
+| `festivalfinder/__main__.py` | macht `python -m festivalfinder` möglich |
 
 Und in `site/` die Seite selbst — reines HTML, CSS und JavaScript, kein
-Bauschritt, keine Bibliothek:
+Bauschritt, keine Bibliothek. Die Reihenfolge in `index.html` ist verbindlich:
+Der Service Worker und die gebündelte Einzelseite lesen genau diese Liste.
 
 | Datei | Aufgabe |
 |---|---|
-| `site/index.html` | das Gerüst: drei Schritte, Rückmeldung, Fuß |
+| `site/index.html` | das Gerüst: sechs Schritte, Ergebnis, Rückmeldung, Fuß |
 | `site/style.css` | Aussehen, inklusive der Regeln fürs Telefon |
-| `site/karte.js` | die Landkarte auf Canvas: Umrisse, Umkreis, Pins, Zoom |
-| `site/app.js` | Sprache, Filter, Auswahl, Trefferliste, Rahmen |
-| `site/i18n.js` | 189 Texte in zehn Sprachen |
-| `site/config.js` | einzige Einstellung: Kennung für die Zugriffszählung |
-| `site/data.js` | die Daten, von `build_site.py` erzeugt |
+| `site/js/config.js` | einzige Einstellung: Kennung für die Zugriffszählung |
+| `site/js/i18n.js` | rund 220 Texte in zehn Sprachen |
+| `site/js/daten.js` | `window.DATA`, Spaltennamen, abgeleitete Register |
+| `site/js/text.js` | `fold` nach den Regeln aus `data/faltung.json`, Formatierung |
+| `site/js/sprache.js` | Übersetzen und Umschalten |
+| `site/js/zustand.js` | was eingestellt ist, was daraus folgt, wie sortiert wird |
+| `site/js/wohnort.js` | von einer Eingabe zu einem Punkt auf der Erde |
+| `site/js/karte.js` | die Landkarte auf Canvas: Umrisse, Bereich, Pins, Zoom |
+| `site/js/kette.js` | die sechs Schritte: aufklappen, zusammenklappen, weiterreichen |
+| `site/js/auswahl.js` | Bandsuche und Genreauswahl |
+| `site/js/liste.js` | Treffer: Satz, Sortierung, Karten |
+| `site/js/oberflaeche.js` | Hilfetexte, Installation, Zählung, Rückmeldung, Rechtstexte |
+| `site/js/start.js` | die Verdrahtung |
+| `site/data.js` | die Daten, von `ausgabe/daten_js.py` erzeugt |
 | `site/orte.js` | das große Ortsverzeichnis, nur bei Bedarf nachgeladen |
 
 ## Selbst bauen
 
 ```bash
 pip install requests beautifulsoup4 pillow
-python scraper/daily_update.py
+python -m festivalfinder alles
 ```
 
-Der erste Lauf dauert rund 35 Minuten (11.300 Detailseiten, vier parallele
-Verbindungen); jede Seite landet unter `cache/`, ein zweiter Lauf am selben Tag
-ist damit in gut vier Minuten durch. Einzelne Schritte lassen sich auch
-getrennt starten — jedes Skript ist für sich lauffähig.
+Der erste Lauf dauert rund 40 Minuten (24.000 Detailseiten, vier parallele
+Verbindungen); jede Seite landet gepackt unter `cache/`, ein zweiter Lauf am
+selben Tag ist damit in gut acht Minuten durch. Einzelne Schritte lassen sich
+auch getrennt starten:
 
 ```bash
-python scraper/festival_scraper.py --limit 20   # Testlauf mit wenigen Seiten
-python scraper/festival_scraper.py --frisch     # jede Seite neu abrufen
-python scraper/festival_scraper.py --since 2006 # das komplette Archiv
+python -m festivalfinder sammeln --limit 20   # Testlauf mit wenigen Seiten
+python -m festivalfinder sammeln --frisch     # jede Seite neu abrufen
+python -m festivalfinder sammeln --since 2006 # das komplette Archiv
+python -m festivalfinder bauen                # nur die Webseite
+python -m festivalfinder verzeichnis          # Ortsverzeichnis erneuern
+python -m festivalfinder karte                # Kartengrenzen erneuern
 ```
 
 Die Webseite braucht keinen Server; `site/index.html` lässt sich per
@@ -105,7 +155,7 @@ Seiten einzeln abzurufen. Dafür hat `Quelle` ein zweites Standbein bekommen:
 `feed` gibt alle Datensätze auf einmal zurück.
 
 Was jede Quelle beiträgt und wo ihre Fallen liegen, steht im Kopf ihres
-Abschnitts in [quellen.py](scraper/quellen.py). Drei Beispiele:
+Abschnitts in [quellen/](festivalfinder/quellen/). Drei Beispiele:
 
 - **festivalsunited** legt jeder Seite ein Datenblatt nach schema.org bei. Der
   Fließtext hat Vorrang — er beschreibt die dargestellte Ausgabe —, das
@@ -346,7 +396,7 @@ Ausgaben desselben Jahres sind — und die gehören auseinander.
 
 Die Quellen schreiben das Genre als Freitext — 1.544 verschiedene Angaben von
 „Rock" bis „Psychedelic Minimal Techno". Danach sucht niemand, deshalb bildet
-[genres.py](scraper/genres.py) sie auf 17 Oberbegriffe ab, zweistufig: Erst die
+[kern/genres.py](festivalfinder/kern/genres.py) sie auf 17 Oberbegriffe ab, zweistufig: Erst die
 Fälle, in denen ein Stichwort in die Irre führt („Hardcore Techno" ist kein
 Punk, „Classic Rock" keine Klassik), dann die Stichwörter. Mehrere Treffer sind
 Absicht: „Ska Punk" gehört zu Punk und zu Reggae/Ska. Bleibt nichts übrig, gilt
@@ -415,7 +465,7 @@ einzige** einen lesbaren Preis — die Shops laden per JavaScript nach oder
 liegen bei Ticketanbietern.
 
 Was bleibt, ist die eigene Beobachtung: Der Lauf holt die Quellseiten täglich.
-[preisverlauf.py](scraper/preisverlauf.py) hält je Festival fest, was zuerst
+[werkzeug/preisverlauf.py](festivalfinder/werkzeug/preisverlauf.py) hält je Festival fest, was zuerst
 dastand und was heute dasteht (`data/preis_verlauf.json`). Ändert eine Quelle
 ihren Preis, zeigt die Karte den heutigen und dahinter in Klammern den ersten:
 „VVK 129 € (zum Start: VVK 89 €)". Festivals, die aus den Quellen
@@ -428,7 +478,7 @@ Alle Daten stehen in `site/data.js` als Zahlenreihen: Bands und Genres nur als
 Index, das drückt 5.524 Festivals mit 40.547 Acts auf 6,1 MB (2,1 MB über die
 Leitung, weil GitHub Pages komprimiert).
 
-Der Code liegt in zwei Teilen: `karte.js` zeichnet die Landkarte und kennt vom
+Der Code liegt in elf Teilen: `karte.js` zeichnet die Landkarte und kennt vom
 Rest nur vier Handgriffe (`start`, `zeichnen`, `setzePins`, `zentrieren`);
 `app.js` kümmert sich um alles andere. Deutsche Texte stehen ausschließlich in
 `i18n.js` — auch die Hilfetexte hinter den Fragezeichen, die früher zusätzlich
@@ -487,10 +537,10 @@ Hintergrund weiter, statt am leeren Bildschirm zu warten. Ortsverzeichnis und
 Postleitzahlen werden auf drei Nachkommastellen gekürzt — 110 Meter genügen für
 einen Wohnort, den ein Umkreisfilter in Kilometern auswertet.
 
-Dazu: zehn Sprachen ([i18n.js](site/i18n.js), 190 Schlüssel), Hilfetexte an
+Dazu: zehn Sprachen ([js/i18n.js](site/js/i18n.js), 190 Schlüssel), Hilfetexte an
 jedem Regler, Installation als App mit Offline-Betrieb, Rückmeldung per
 `mailto` und eine Zugriffszählung, die nur startet, wenn in
-[config.js](site/config.js) eine GoatCounter-Kennung steht **und** die Seite
+[js/config.js](site/js/config.js) eine GoatCounter-Kennung steht **und** die Seite
 eigenständig über HTTPS läuft. Der Stand bleibt im GoatCounter-Konto; die Seite
 zeigt ihn nirgends.
 
@@ -545,29 +595,28 @@ einmal falsch in den Daten:
 
 | Datei | prüft |
 |---|---|
-| `tests/test_text.py` | Namen, Schlüssel, Bandnamen, Preise, Datumsformate |
-| `tests/test_zusammenfuehren.py` | die acht Stufen, jede mit ihrer Sicherung |
-| `tests/test_quellen.py` | die Leser an gespeicherten Seitenausschnitten |
-| `tests/test_build_site.py` | Preisdeutung, Verortung, Auslieferung als JS |
-| `tests/test_genres.py` | Freitext zu Oberbegriffen, samt Irreführern |
-| `tests/test_lauf.py` | Selbstprüfung und Einbruchsmeldung |
-| `tests/test_ausgabe.py` | die Prüfung der Zahlenreihen vor dem Ausliefern |
-| `tests/test_preisverlauf.py` | erster und heutiger Preis über mehrere Läufe |
-| `tests/test_gazetteer.py` | welche Postleitzahlen mitgeliefert und welche nachgeladen werden |
-| `tests/test_oberflaeche.py` | die Sprachdatei: Anführungszeichen, zehn Sprachen, Platzhalter, Schlüssel |
-| `tests/test_rechtstexte.py` | Datenschutz und Fußnote gegen die Daten, die es wirklich gibt |
-| `tests/test_schnappschuss.py` | der mitgebrachte Stand: füllen, lesen, nicht leeren lassen |
-| `tests/test_korpus.py` | die Leser an fünfzehn echten, eingefrorenen Seiten |
-| `tests/test_kette.py` | Schritt scheitert, Schritt hängt, Kette läuft weiter |
-| `tests/test_dokumentation.py` | das README gegen das Projekt, das es wirklich gibt |
+| `tests/kern/test_zeit.py` | jede Schreibweise der Quellen, und was kein Datum ist |
+| `tests/kern/test_text.py` | Namen, Schlüssel, Bandnamen, Entschlüsseln |
+| `tests/kern/test_geld.py` | Preise aus Freitext, Spannen, freier Eintritt, Währungen |
+| `tests/kern/test_orte.py` | Länderschreibweisen, Koordinate gegen Land |
+| `tests/kern/test_genres.py` | Freitext zu Oberbegriffen, samt Irreführern |
+| `tests/kern/test_fund.py` | der Trichter — und was ein eingefrorener Datensatz zusagt |
+| `tests/netz/test_abrufer.py` | 403, 429 und Netzfehler: was der Lauf daraus macht |
+| `tests/quellen/test_korpus.py` | alle Leser an 21 echten, eingefrorenen Seiten |
+| `tests/quellen/test_eigenheiten.py` | was einzelne Quellen anders machen als alle anderen |
+| `tests/bund/test_stufen.py` | die acht Stufen, jede mit ihrer Sicherung |
+| `tests/bund/test_bandnamen.py` | Kürzel abschalten, ohne dass es abfärbt |
+| `tests/bund/test_verluste.py` | beim Zusammenführen geht keine Quelladresse verloren |
+| `tests/ausgabe/test_daten_js.py` | die Prüfung der Zahlenreihen vor dem Ausliefern |
+| `tests/ausgabe/test_verorten.py` | vier Ränge auf dem Weg zur Koordinate |
+| `tests/seite/test_sprachdatei.py` | Anführungszeichen, zehn Sprachen, Platzhalter, Schlüssel |
+| `tests/seite/test_aufbau.py` | Kette, Felder, Sortierung, Karte, Module, Faltung |
+| `tests/seite/test_rechtstexte.py` | Datenschutz und Fußnote gegen die Daten, die es wirklich gibt |
+| `tests/test_pruefung.py` | Selbstprüfung und Einbruchsmeldung |
+| `tests/test_werkzeug.py` | Preisgeschichte und mitgebrachter Stand |
+| `tests/test_werkzeug_netz.py` | Ausfall des Kartendienstes ist kein „Ort unbekannt" |
 | `tests/test_dateien.py` | JSON schreiben und lesen, auch bei Abbruch mittendrin |
-| `tests/test_geocode.py` | Ausfall des Kartendienstes ist kein „Ort unbekannt" |
-| `tests/test_zeitraeume.py` | laufende Festivals, Silvester, Jahrgangsschnitt |
-| `tests/test_verluste.py` | beim Zusammenführen geht keine Quelladresse verloren |
-| `tests/test_aliase.py` | Kürzel abschalten — und die Tabelle danach zurücksetzen |
-| `tests/test_weltquellen.py` | die vier weltweiten Quellen und ihre Eigenheiten |
-| `tests/test_koordinaten.py` | Koordinate gegen Land, vor und nach dem Verschmelzen |
-| `tests/test_abrufen.py` | 403, 429 und Netzfehler: was der Lauf daraus macht |
+| `tests/test_dokumentation.py` | das README gegen das Projekt, das es wirklich gibt |
 
 Der Workflow führt sie vor jedem Datenlauf aus: Ein Fehler in der Logik soll
 auffallen, bevor er sich in die veröffentlichten Daten schreibt.
@@ -733,8 +782,8 @@ geprüft an allen 40.538 Bandnamen, 17 änderten ihren Schlüssel, jeder davon z
 Besseren.
 
 **Zwei Faltungen, die auseinandergelaufen sind.** Dieselbe Aufgabe, zweimal
-umgesetzt: `fold()` in `scraper/text.py` bildet die Schlüssel, `fold()` in
-`site/app.js` normalisiert die Suche. Bei jedem achten Bandnamen kamen sie zu
+umgesetzt: `fold()` im Sammler bildete die Schlüssel, `fold()` im Browser
+normalisierte die Suche. Bei jedem achten Bandnamen kamen sie zu
 verschiedenen Ergebnissen — wer „2 Engel and Charlie" tippte, fand „2 Engel &
 Charlie" nicht, obwohl die Daten beide für dieselbe Band halten. Die Regeln
 stehen jetzt auf beiden Seiten gleich; nachgemessen im Browser: 0 Abweichungen
