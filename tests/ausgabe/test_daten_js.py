@@ -125,59 +125,57 @@ class TestGrenzen:
 
 
 class TestNeuigkeiten:
-    """`site/neu.json` — was die Seite gegen ihre gemerkten Wunschlisten hält."""
+    """`D.neu` — seit wann die Seite welches Festival und welche Band kennt."""
 
     @pytest.fixture(autouse=True)
-    def eigene_dateien(self, tmp_path, monkeypatch):
-        monkeypatch.setattr(neuheiten, "TAGEBUCH", tmp_path / "neuheiten.json")
-        monkeypatch.setattr(daten_js, "SITE", tmp_path)
+    def eigene_datei(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(neuheiten, "DATEI", tmp_path / "bestand_verlauf.json")
         return tmp_path
 
-    def eintraege(self, tmp_path):
-        return json.loads((tmp_path / "neu.json").read_text(encoding="utf-8"))
+    def aufzeichnen(self, laeufe):
+        """Mehrere Laeufe nacheinander: [(datum, [Festival, ...]), ...]"""
+        for datum, feste in laeufe:
+            neuheiten.verfolgen(feste, heute=datum)
 
-    def test_ein_neuzugang_kommt_mit(self, tmp_path):
-        f = Festival(name="Neufest", jahr="2026", stadt="Kiel")
-        neuheiten.TAGEBUCH.write_text(json.dumps(
-            [{"k": f.kennung, "seit": "2026-08-25", "grund": "neu",
-              "bands": ["Powerwolf"]}]), encoding="utf-8")
+    def test_ein_neuzugang_zeigt_auf_seine_zeile(self):
+        alt, neu = Festival(name="Altfest", jahr="2026", stadt="Kiel"),             Festival(name="Neufest", jahr="2026", stadt="Kiel")
+        self.aufzeichnen([("2026-08-24", [alt]), ("2026-08-27", [alt, neu])])
 
-        anzahl = daten_js.neuigkeiten([f], [zeile(name="Neufest")], "2026-08-25T05:00")
-        assert anzahl == 1
-        inhalt = self.eintraege(tmp_path)
-        assert inhalt["stand"] == "2026-08-25T05:00"
-        assert inhalt["eintraege"][0]["g"] == "neu"
-        assert inhalt["eintraege"][0]["b"] == ["Powerwolf"]
-        assert inhalt["eintraege"][0]["z"][0] == "Neufest"
+        d = daten_js.neuigkeiten([alt, neu], {})
+        assert d["beginn"] == "2026-08-24"
+        assert d["feste"] == [[1, 3]], "Zeile 1, drei Tage nach dem Beginn"
+        assert d["bands"] == []
 
-    def test_die_lineupnummern_bleiben_draussen(self, tmp_path):
-        """Sie werden bei jedem Bauen neu vergeben — eine gemerkte 4711 meinte
-        morgen eine andere Band. Was dazukam, steht als Name daneben."""
-        f = Festival(name="Neufest", jahr="2026", stadt="Kiel")
-        neuheiten.TAGEBUCH.write_text(json.dumps(
-            [{"k": f.kennung, "seit": "2026-08-25", "grund": "lineup",
-              "bands": ["Ghost"]}]), encoding="utf-8")
-        daten_js.neuigkeiten([f], [zeile(lineup=[3, 7])], "2026-08-25T05:00")
-        assert self.eintraege(tmp_path)["eintraege"][0]["z"][LINEUP] == []
+    def test_eine_bestaetigte_band_zeigt_auf_ihre_nummer(self):
+        def wacken(*bands):
+            return Festival(name="Wacken", jahr="2026", stadt="Wacken",
+                            bands={b.lower(): b for b in bands})
+        self.aufzeichnen([("2026-08-24", [wacken("Ghost")]),
+                          ("2026-08-25", [wacken("Ghost", "Powerwolf")])])
 
-    def test_die_zeile_behaelt_ihre_spaltenordnung(self, tmp_path):
-        """Es soll nur eine Zeilenform geben — sonst prüft die Seite zweierlei
-        Zeilen mit zweierlei Regeln."""
-        f = Festival(name="Neufest", jahr="2026", stadt="Kiel")
-        neuheiten.TAGEBUCH.write_text(json.dumps(
-            [{"k": f.kennung, "seit": "2026-08-25", "grund": "neu", "bands": []}]),
-            encoding="utf-8")
-        daten_js.neuigkeiten([f], [zeile()], "2026-08-25T05:00")
-        assert len(self.eintraege(tmp_path)["eintraege"][0]["z"]) == len(zeile())
+        d = daten_js.neuigkeiten([wacken("Ghost", "Powerwolf")],
+                                 {"Ghost": 0, "Powerwolf": 7})
+        assert d["feste"] == [], "das Festival selbst ist nicht neu"
+        assert d["bands"] == [[0, 7, 1]], "Zeile 0, Band 7, einen Tag nach dem Beginn"
 
-    def test_was_es_nicht_mehr_gibt_kommt_nicht_mit(self, tmp_path):
-        """Ein Festival, das inzwischen wieder verschwunden ist, muss niemand
-        gemeldet bekommen."""
-        neuheiten.TAGEBUCH.write_text(json.dumps(
-            [{"k": "verschwunden|2026|kiel", "seit": "2026-08-25",
-              "grund": "neu", "bands": []}]), encoding="utf-8")
-        assert daten_js.neuigkeiten([], [], "2026-08-25T05:00") == 0
+    def test_der_anfangsbestand_kommt_nicht_vor(self):
+        """Sonst waere beim ersten Lauf alles neu."""
+        f = Festival(name="Testival", jahr="2026", stadt="Kiel",
+                     bands={"ghost": "Ghost"})
+        self.aufzeichnen([("2026-08-24", [f]), ("2026-08-25", [f])])
+        d = daten_js.neuigkeiten([f], {"Ghost": 0})
+        assert (d["feste"], d["bands"]) == ([], [])
 
-    def test_ohne_tagebuch_bleibt_die_datei_leer(self, tmp_path):
-        assert daten_js.neuigkeiten([], [], "2026-08-25T05:00") == 0
-        assert self.eintraege(tmp_path)["eintraege"] == []
+    def test_eine_band_ohne_nummer_faellt_weg(self):
+        """Sie kann aus allen Quellen verschwunden sein — dann gibt es keine
+        Zeile, auf die sich die Meldung beziehen koennte."""
+        def f(*bands):
+            return Festival(name="Testival", jahr="2026", stadt="Kiel",
+                            bands={b.lower(): b for b in bands})
+        self.aufzeichnen([("2026-08-24", [f("Ghost")]),
+                          ("2026-08-25", [f("Ghost", "Powerwolf")])])
+        assert daten_js.neuigkeiten([f("Ghost")], {"Ghost": 0})["bands"] == []
+
+    def test_ohne_aufzeichnung_bleibt_es_leer(self):
+        d = daten_js.neuigkeiten([], {})
+        assert d == {"beginn": "", "feste": [], "bands": []}

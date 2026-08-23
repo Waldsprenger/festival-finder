@@ -12,7 +12,7 @@ erst nach, wenn die kleine Liste nichts hergibt.
 import json
 import math
 import sys
-from datetime import datetime
+from datetime import date, datetime
 
 from ..kern import zeit
 from ..kern.festival import Festival
@@ -131,35 +131,44 @@ def als_javascript(name: str, payload: dict) -> str:
     return f"window.{name} = JSON.parse('{text}');\n"
 
 
-def neuigkeiten(festivals: list[Festival], zeilen: list, stand: str) -> int:
-    """`site/neu.json`: was in den letzten dreißig Tagen dazugekommen ist.
+def neuigkeiten(festivals: list[Festival], band_nr) -> dict:
+    """Seit wann wir was kennen — als Teil von `data.js`.
 
-    Die Zeilen haben dieselbe Spaltenordnung wie in `data.js` — es soll nur
-    eine Zeilenform geben, sonst prüft die Seite zweierlei Zeilen mit
-    zweierlei Regeln. Was die Datei nicht mitnimmt, sind die Lineup-Nummern:
-    Sie werden bei jedem Bauen neu vergeben. Dazugekommene Bands stehen als
-    Namen daneben.
+    Nicht als eigene Datei. Die Angaben zeigen mit Zeilen- und Bandnummern in
+    `data.js` hinein, und die werden bei jedem Bauen neu vergeben; zwei
+    getrennte Dateien können deshalb aus zwei verschiedenen Läufen stammen.
+    Genau das wäre der Normalfall gewesen, nicht die Ausnahme: Der Service
+    Worker gibt dem Netz 2,5 Sekunden, und die 9,2 MB von `data.js` verlieren
+    dieses Rennen auf dem Telefon fast immer, während eine kleine Nebendatei es
+    gewinnt. In der installierten App hätte die Meldung damit meistens
+    geschwiegen — ohne ein Wort dazu. In einer Datei kann das nicht passieren.
 
-    Der Zeitstempel ist eine Sicherung: Liefert der Anwendungsspeicher eine
-    Fassung aus einem anderen Lauf, passen die Genre-Nummern nicht mehr
-    zusammen — dann gilt die Datei als ungültig, statt falsch zu melden.
+    Nur, was es heute noch gibt: Ein Festival, das inzwischen wieder
+    verschwunden ist, muss niemand gemeldet bekommen. Damit begrenzt sich die
+    Angabe von selbst, ohne Rückblickgrenze — wer nach vierzig Tagen
+    wiederkommt, bekommt die Änderungen aus vierzig Tagen, wer nach einem
+    halben Jahr, die aus einem halben Jahr.
+
+    Die Daten sind Tagesnummern ab `beginn`, nicht Datumsangaben: Aus
+    „2027-03-14" (12 Zeichen) wird eine dreistellige Zahl.
     """
-    tagebuch = lies_json(neuheiten.TAGEBUCH, []) or []
-    # Nur, was es heute noch gibt: Ein Festival, das inzwischen wieder
-    # verschwunden ist, muss niemand mehr gemeldet bekommen.
-    nach_kennung = {f.kennung: n for n, f in enumerate(festivals)}
-    eintraege = []
-    for e in tagebuch:
-        n = nach_kennung.get(e.get("k"))
-        if n is None:
-            continue
-        zeile = list(zeilen[n])
-        zeile[LINEUP] = []
-        eintraege.append({"g": e["grund"], "seit": e["seit"],
-                          "b": e.get("bands") or [], "z": zeile})
-    schreib_json(SITE / "neu.json", {"stand": stand, "eintraege": eintraege},
-                 kompakt=True)
-    return len(eintraege)
+    zustand = neuheiten.lesen()
+    beginn = zustand["beginn"]
+    if not beginn:
+        return {"beginn": "", "feste": [], "bands": []}
+
+    tag0 = date.fromisoformat(beginn)
+    nr = lambda datum: (date.fromisoformat(datum) - tag0).days   # noqa: E731
+
+    feste, bands = [], []
+    for n, f in enumerate(festivals):
+        seit, dazu = neuheiten.zugaenge(zustand, f.kennung)
+        if seit:
+            feste.append([n, nr(seit)])
+        for name, datum in sorted(dazu.items()):
+            if (b := band_nr.get(name)) is not None:
+                bands.append([n, b, nr(datum)])
+    return {"beginn": beginn, "feste": feste, "bands": bands}
 
 
 def bauen(festivals: list[Festival]) -> dict:
@@ -244,6 +253,9 @@ def bauen(festivals: list[Festival]) -> dict:
         # Die Faltungsregeln der Namenssuche. Sie stehen in data/faltung.json
         # und reisen mit, damit Browser und Sammler nicht auseinanderlaufen.
         "faltung": REGELN,
+        # Seit wann wir welches Festival und welche Band kennen — die Grundlage
+        # fuer „was ist neu seit deinem letzten Besuch".
+        "neu": neuigkeiten(festivals, band_ix),
     }
     pruefe(zeilen, bands, genre_keys)
 
@@ -263,7 +275,8 @@ def bauen(festivals: list[Festival]) -> dict:
 
     return {
         "festivals": len(zeilen),
-        "neuigkeiten": neuigkeiten(festivals, zeilen, payload["generated"]),
+        "neue_festivals": len(payload["neu"]["feste"]),
+        "neue_bands": len(payload["neu"]["bands"]),
         "mit_koordinaten": verorten.gefunden,
         "aus_plz": verorten.aus_plz,
         "aus_cache": verorten.aus_cache,

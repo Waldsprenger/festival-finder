@@ -122,7 +122,7 @@ def befehl_sammeln(args) -> int:
           f"seit dem ersten Mal geändert: {preise['geändert']}")
     print(f"Seit gestern dazu        : {neues['festivals']} Festivals, "
           f"{neues['bands']} bestätigte Bands "
-          f"({neues['tagebuch']} Einträge im Tagebuch)")
+          f"({neues['bekannt']} aufgezeichnet)")
     print(f"\nFestivals gesamt        : {len(festivals)}")
     print(f"  aus mehreren Quellen  : {sum(1 for f in festivals if len(f.quellen) > 1)}")
     print(f"  mit Lineup            : {sum(1 for f in festivals if f.lineup)}")
@@ -193,6 +193,8 @@ def befehl_bauen(args) -> int:
           f"mit Preis in EUR {z['mit_preis']} | Acts {z['acts']} | "
           f"Orte {z['orte']} | PLZ {z['plz']}")
     print(f"  Genre zugeordnet {z['mit_genre']} | Bandkürzel {z['bandkuerzel']}")
+    print(f"  Als neu vermerkt: {z['neue_festivals']} Festivals, "
+          f"{z['neue_bands']} bestätigte Bands")
     print(f"  Grenzen: Entfernung bis {z['max_km']} km (ab {ausgabe.daten_js.REF_PLZ}), "
           f"Preis bis {z['max_preis']} EUR, Kalender ab {z['ab_datum'] or 'unbegrenzt'}")
 

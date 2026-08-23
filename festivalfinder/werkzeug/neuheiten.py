@@ -1,25 +1,30 @@
-"""Was seit gestern dazugekommen ist — und was davon eine Meldung wert ist.
+"""Seit wann kennen wir das? — die Grundlage für „was ist neu".
 
 Zwei Arten von Neuigkeit, und die zweite ist die interessantere:
 
-* **Ein Festival ist neu** — es stand gestern in keiner Quelle.
-* **Eine Band ist bestätigt** — das Festival steht längst in der Liste, aber
-  im Lineup steht jetzt jemand, der gestern noch nicht darin stand. Wacken
-  kennt jeder; interessant wird es, wenn dort Powerwolf dazukommt.
+* **Ein Festival ist neu** — es stand vorher in keiner Quelle.
+* **Eine Band ist bestätigt** — das Festival steht längst in der Liste, aber im
+  Lineup steht jetzt jemand, der vorher nicht darin stand. Wacken kennt jeder;
+  interessant wird es, wenn dort Powerwolf dazukommt.
 
-Dafür zwei Dateien, jede mit einer Aufgabe:
+Festgehalten wird deshalb nicht, *was an welchem Tag passiert ist*, sondern
+*seit wann wir etwas kennen*: je Festival ein Datum, je Band im Lineup ein
+Datum. Das ist dieselbe Auskunft, aber einmal je Sache statt einmal je
+Ereignis — und damit ohne Zeitfenster. Wer nach vierzig Tagen wiederkommt,
+bekommt die Änderungen aus vierzig Tagen; wer nach einem halben Jahr
+wiederkommt, die aus einem halben Jahr. Ein Tagebuch mit Rückblickgrenze
+konnte das nicht: Was älter war als die Grenze, fiel still heraus.
 
-* `data/bestand_verlauf.json` — der **Zustand**: welche Festivals es gibt und
-  wer bei ihnen spielt. Daran wird verglichen.
-* `data/neuheiten.json` — das **Tagebuch**: was an welchem Tag dazukam, dreißig
-  Tage weit zurück. Daraus entsteht beim Bauen `site/neu.json`, gegen das die
-  Seite ihre gemerkten Wunschlisten hält.
+Begrenzt wird trotzdem, nur an der richtigen Stelle: Ein Festival, das aus
+allen Quellen verschwunden ist, fliegt nach `GEDULD_TAGE` heraus. Damit wächst
+die Datei nicht mit den Jahrgängen, sondern bleibt so groß wie der Bestand.
 
 Zwei Regeln halten das ruhig:
 
 * **Der erste Lauf meldet nichts.** Ohne einen Zustand zum Vergleichen wäre
-  jedes der 13.338 Festivals neu — das Tagebuch stünde voll und die Meldung
-  wäre wertlos.
+  jedes der 13.338 Festivals neu. Der Tag, an dem die Aufzeichnung begann,
+  steht als `beginn` in der Datei; alles, was dieses Datum trägt, gilt als
+  „schon immer da" — dauerhaft, nicht nur beim ersten Mal.
 * **Ein Festival, das einen Lauf lang fehlt, ist nicht verschwunden.** An dem
   Tag, an dem festivalticker den Serverlauf abwies, fehlten 1.900 auf einmal.
   Ohne Geduld wären sie am Tag darauf allesamt „neu" gewesen.
@@ -30,15 +35,11 @@ from datetime import date
 from ..kern.festival import Festival
 from ..pfade import DATA, lies_json, schreib_json
 
-#: Der Zustand: was es gibt und wer dort spielt
-ZUSTAND = DATA / "bestand_verlauf.json"
-#: Das Tagebuch: was an welchem Tag dazukam
-TAGEBUCH = DATA / "neuheiten.json"
+#: Seit wann wir welches Festival und welche Band kennen
+DATEI = DATA / "bestand_verlauf.json"
 
-#: So lange bleibt ein Festival im Zustand stehen, auch wenn es gerade fehlt
+#: So lange bleibt ein Festival stehen, auch wenn es gerade in keiner Quelle ist
 GEDULD_TAGE = 60
-#: So weit reicht das Tagebuch zurück — so lange darf ein Gerät auch aus sein
-TAGEBUCH_TAGE = 30
 
 
 def _tage_her(stand: str, heute: str) -> int:
@@ -49,43 +50,66 @@ def _tage_her(stand: str, heute: str) -> int:
         return 10 ** 6
 
 
-def verfolgen(festivals: list[Festival], heute: str | None = None) -> dict[str, int]:
-    """Den Bestand mit dem letzten Lauf vergleichen und das Tagebuch fortschreiben."""
-    heute = heute or date.today().isoformat()
-    # Beim Lesen altern, nicht erst beim Schreiben: Sonst hinge die Geduld
-    # daran, wie oft der Lauf zwischendurch stattgefunden hat — nach einem
-    # halben Jahr Pause stünde der Zustand von damals noch als „gestern" da.
-    vorher = {k: e for k, e in (lies_json(ZUSTAND, {}) or {}).items()
-              if _tage_her(e.get("stand", ""), heute) <= GEDULD_TAGE}
-    # Ohne Vergleichsstand wird nichts gemeldet. Das gilt auch, wenn der letzte
-    # Lauf so lange her ist, dass nichts davon übrig blieb — dann weiß niemand
-    # mehr, was in der Zwischenzeit dazugekommen ist.
-    erster_lauf = not vorher
+def lesen() -> dict:
+    """Der aufgezeichnete Stand: `{"beginn": …, "stand": …, "feste": {…}}`."""
+    roh = lies_json(DATEI, {}) or {}
+    return {"beginn": roh.get("beginn", ""), "stand": roh.get("stand", ""),
+            "feste": roh.get("feste") or {}}
 
-    tagebuch = [e for e in (lies_json(TAGEBUCH, []) or [])
-                if _tage_her(e.get("seit", ""), heute) <= TAGEBUCH_TAGE]
-    zustand: dict[str, dict] = {}
+
+def verfolgen(festivals: list[Festival], heute: str | None = None) -> dict[str, int]:
+    """Aufzeichnen, seit wann wir was kennen; gibt die Zugänge dieses Laufs zurück."""
+    heute = heute or date.today().isoformat()
+    vorher = lesen()
+    beginn = vorher["beginn"] or heute
+    # Ein Lauf nach langer Pause richtet sich neu aus, statt zu urteilen. Die
+    # Geduld fragt „wie lange hat keine Quelle das mehr geliefert" — und wenn
+    # zwei Monate lang gar nicht gesammelt wurde, hat niemand gefragt. Ohne
+    # diese Ausnahme wäre nach einer Pause der ganze Bestand „neu"; GitHub
+    # schaltet zeitgesteuerte Läufe nach 60 Tagen ohne Aktivität ab, die Pause
+    # ist also keine Erfindung.
+    pause = _tage_her(vorher["stand"], heute) if vorher["stand"] else 0
+    bekannt = dict(vorher["feste"]) if pause > GEDULD_TAGE else {
+        k: e for k, e in vorher["feste"].items()
+        if _tage_her(e.get("stand", ""), heute) <= GEDULD_TAGE}
+
+    feste: dict[str, dict] = {}
     neue_feste = neue_bands = 0
 
     for f in festivals:
-        k = f.kennung
-        alt = vorher.get(k)
-        bands = f.lineup
-        zustand[k] = {"seit": (alt or {}).get("seit", heute), "stand": heute,
-                      "bands": bands}
-        if erster_lauf:
-            continue
-        if alt is None:
-            # Neu: Das ganze Lineup ist neu, auch wenn es leer ist.
-            tagebuch.append({"k": k, "seit": heute, "grund": "neu", "bands": bands})
+        alt = bekannt.get(f.kennung)
+        seit = (alt or {}).get("seit", heute)
+        alte_bands = (alt or {}).get("bands") or {}
+        # Bands, die es beim ersten Sehen des Festivals schon gab, tragen
+        # dessen Datum: Sie sind keine eigene Neuigkeit.
+        bands = {name: alte_bands.get(name, heute) for name in f.lineup}
+
+        feste[f.kennung] = {"seit": seit, "stand": heute, "bands": bands}
+        if alt is None and seit > beginn:
             neue_feste += 1
-        elif (dazu := [b for b in bands if b not in set(alt.get("bands") or ())]):
-            tagebuch.append({"k": k, "seit": heute, "grund": "lineup", "bands": dazu})
-            neue_bands += len(dazu)
+        elif alt is not None:
+            neue_bands += sum(1 for name in bands if name not in alte_bands)
 
-    for k, alt in vorher.items():
-        zustand.setdefault(k, alt)
+    for kennung, alt in bekannt.items():
+        feste.setdefault(kennung, alt)
 
-    schreib_json(ZUSTAND, zustand, kompakt=True)
-    schreib_json(TAGEBUCH, tagebuch, kompakt=True)
-    return {"festivals": neue_feste, "bands": neue_bands, "tagebuch": len(tagebuch)}
+    schreib_json(DATEI, {"beginn": beginn, "stand": heute, "feste": feste},
+                 kompakt=True)
+    return {"festivals": neue_feste, "bands": neue_bands, "bekannt": len(feste)}
+
+
+def zugaenge(zustand: dict, kennung: str) -> tuple[str, dict[str, str]]:
+    """Seit wann es dieses Festival gibt, und welche Band seit wann dazu.
+
+    Zurück kommt nur, was nach dem Beginn der Aufzeichnung liegt — und bei den
+    Bands nur, was später kam als das Festival selbst. Wer beim ersten Sehen
+    schon im Lineup stand, ist keine eigene Meldung wert.
+    """
+    beginn = zustand["beginn"]
+    eintrag = zustand["feste"].get(kennung)
+    if not eintrag:
+        return "", {}
+    seit = eintrag["seit"] if eintrag["seit"] > beginn else ""
+    bands = {name: datum for name, datum in (eintrag.get("bands") or {}).items()
+             if datum > beginn and datum > eintrag["seit"]}
+    return seit, bands

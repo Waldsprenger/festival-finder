@@ -13,7 +13,6 @@ data/lauf.json
 data/verortung.json
 site/data.js
 site/orte.js
-site/neu.json
 site/artifact.html
 site/fonts.css
 site/manifest.webmanifest
@@ -36,4 +35,3 @@ __pycache__/
 data/quellen_stand.json
 data/preis_verlauf.json
 data/bestand_verlauf.json
-data/neuheiten.json

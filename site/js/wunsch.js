@@ -10,16 +10,17 @@
    gemerkte 4711 meinte morgen eine andere Band. Genauso bei den Genres: dort
    steht der Schlüssel, nicht die Spaltennummer.
 
-   `neu.json` bringt mit, was in den letzten dreißig Tagen dazugekommen ist:
-   ganze Festivals und einzeln bestätigte Bands. Geprüft wird damit über
-   `FF.PRUEFUNG` — dieselben Regeln wie für die Liste, nur mit dem gemerkten
-   Filter statt dem eingestellten. */
+   `D.neu` bringt mit, seit wann wir welches Festival und welche Band kennen —
+   ohne Rückblickgrenze. Wer nach vierzig Tagen wiederkommt, bekommt die
+   Änderungen aus vierzig Tagen; wer nach einem halben Jahr, die aus einem
+   halben Jahr. Geprüft wird damit über `FF.PRUEFUNG` — dieselben Regeln wie
+   für die Liste, nur mit dem gemerkten Filter statt dem eingestellten. */
 
 (() => {
   'use strict';
   if (FF.keineDaten) return;
 
-  const { $, t, zahl, D, BANDS, GENRES, SPALTE, state, PRUEFUNG } = FF;
+  const { $, t, zahl, D, F, BANDS, GENRES, SPALTE, sets, state, PRUEFUNG } = FF;
 
   const SPEICHER = 'ff.listen.v1';
   //: So viele Suchen darf man merken — mehr verwaltet niemand
@@ -156,44 +157,64 @@
 
   /* ---------------- Was ist dazugekommen? ---------------- */
 
-  let neuigkeiten = null;
+  const NEU = D.neu || { beginn: '', feste: [], bands: [] };
 
-  /** `neu.json` holen. Fehlt sie oder stammt sie aus einem anderen Lauf,
-      bleibt es bei nichts: Ihre Genre-Nummern gälten sonst für eine andere
-      data.js, und die Meldung wäre schlicht falsch. */
-  async function laden() {
-    if (neuigkeiten) return neuigkeiten;
-    try {
-      const res = await fetch('neu.json', { cache: 'no-cache' });
-      const inhalt = res.ok ? await res.json() : null;
-      neuigkeiten = inhalt && inhalt.stand === D.generated
-        ? (inhalt.eintraege || []) : [];
-    } catch (_) {
-      neuigkeiten = [];             // offline oder per file:// geöffnet
-    }
-    return neuigkeiten;
+  /** Ein Datum als Tagesnummer seit dem Beginn der Aufzeichnung.
+
+      Vor dem Beginn gibt es nichts zu melden: Was damals schon dastand, ist
+      keine Neuigkeit, sondern der Anfangsbestand. */
+  function tagNr(iso) {
+    if (!NEU.beginn || !iso) return 0;
+    const tag = 86400000;
+    return Math.max(0, Math.round(
+      (Date.parse(iso + 'T00:00:00Z') - Date.parse(NEU.beginn + 'T00:00:00Z')) / tag));
   }
 
   /** Die Neuzugänge, auf die eine gemerkte Suche zutrifft.
 
       Die Bandregel ist hier eine andere als in der Liste, und das mit Absicht:
-      Bei einem Festival, das gestern schon dastand, zählt nur, wer seither
+      Bei einem Festival, das schon vorher dastand, zählt nur, wer seither
       dazukam — sonst meldete Wacken jeden Tag aufs Neue dieselbe Band. Ein
       ganz neues Festival dagegen ist auch ohne Bandauswahl eine Meldung wert;
       es erfüllt ja die übrigen Bedingungen. */
-  function treffer(eintrag, alle) {
+  function treffer(eintrag) {
     const f = auspacken(eintrag.filter);
-    const seit = eintrag.gesehen || '';
-    const gewuenscht = new Set([...f.bands.auswahl.keys()].map((nr) => BANDS[nr]));
-    const nachBands = f.bands.an && gewuenscht.size;
+    const seit = tagNr(eintrag.gesehen);
+    const nachBands = f.bands.an && f.bands.auswahl.size;
+    const raus = new Map();
 
-    return (alle || neuigkeiten || []).filter((e) => {
-      if (e.seit <= seit) return false;
-      if (e.g === 'lineup' && !nachBands) return false;
-      if (nachBands && !e.b.some((name) => gewuenscht.has(name))) return false;
-      return PRUEFUNG.zeit(f, e.z) && PRUEFUNG.entfernung(f, e.z)
-          && PRUEFUNG.preis(f, e.z) && PRUEFUNG.genre(f, e.z);
-    });
+    const passt = (i) => {
+      const row = F[i];
+      return PRUEFUNG.zeit(f, row) && PRUEFUNG.entfernung(f, row)
+          && PRUEFUNG.preis(f, row) && PRUEFUNG.genre(f, row);
+    };
+
+    for (const [i, tag] of NEU.feste) {
+      if (tag <= seit) continue;
+      if (nachBands && !PRUEFUNG.bands(f, F[i], i)) continue;
+      if (!passt(i)) continue;
+      // Bei einem neuen Festival ist das ganze Lineup neu — genannt werden
+      // die, wegen denen es hier steht.
+      const meine = [...f.bands.auswahl.keys()]
+        .filter((b) => sets[i].has(b)).map((b) => BANDS[b]);
+      raus.set(i, { i, grund: 'neu', bands: meine });
+    }
+
+    if (nachBands) {
+      for (const [i, b, tag] of NEU.bands) {
+        if (tag <= seit || !f.bands.auswahl.has(b)) continue;
+        const schon = raus.get(i);
+        if (schon) continue;        // steht schon als ganz neues Festival da
+        if (passt(i)) raus.set(i, { i, grund: 'lineup', bands: [] });
+      }
+      for (const [i, b, tag] of NEU.bands) {
+        const e = raus.get(i);
+        if (e && e.grund === 'lineup' && tag > seit && f.bands.auswahl.has(b)) {
+          e.bands.push(BANDS[b]);
+        }
+      }
+    }
+    return [...raus.values()];
   }
 
   /* ---------------- Verwalten ---------------- */
@@ -240,20 +261,21 @@
 
   /** Ein Neuzugang mit Termin und Ort — wer nachsieht, will beides mitlesen. */
   function neuzeile(e) {
+    const row = F[e.i];
     const li = document.createElement('li');
     const name = document.createElement('b');
-    name.textContent = e.z[SPALTE.NAME];
-    const wo = [FF.termin(e.z),
-                [e.z[SPALTE.STADT], e.z[SPALTE.LAND]].filter(Boolean).join(', ')]
+    name.textContent = row[SPALTE.NAME];
+    const wo = [FF.termin(row),
+                [row[SPALTE.STADT], row[SPALTE.LAND]].filter(Boolean).join(', ')]
       .filter(Boolean).join(' · ');
     const rest = document.createElement('span');
     rest.textContent = wo ? ' — ' + wo : '';
     li.append(name, rest);
-    if (e.b.length) {
+    if (e.bands.length) {
       const bands = document.createElement('div');
       bands.className = 'hint';
-      bands.textContent = t(e.g === 'neu' ? 'lists.withBands' : 'lists.newBands',
-                            { bands: e.b.slice(0, 8).join(', ') });
+      bands.textContent = t(e.grund === 'neu' ? 'lists.withBands' : 'lists.newBands',
+                            { bands: e.bands.slice(0, 8).join(', ') });
       li.append(bands);
     }
     return li;
@@ -368,7 +390,7 @@
   }
 
   /** Beim Laden: eine geteilte Suche übernehmen, dann alles zeichnen. */
-  async function start() {
+  function start() {
     $('merk-speichern').addEventListener('click', speichern);
     $('merk-name').addEventListener('input', merkenZeichnen);
     $('merk-name').addEventListener('keydown', (e) => {
@@ -379,7 +401,6 @@
     // ist, bekommt keinen Seitenaufbau — nur ein neues Adressfeld.
     window.addEventListener('hashchange', geteiltesUebernehmen);
     geteiltesUebernehmen();
-    await laden();
     zeichnen();
   }
 
@@ -395,6 +416,6 @@
 
   Object.assign(FF, {
     wunsch: { start, zeichnen, alle, merken, loeschen, gesehen, anwenden,
-              alsLink, ausLink, treffer, laden, verfuegbar, HOECHSTENS },
+              alsLink, ausLink, treffer, tagNr, verfuegbar, NEU, HOECHSTENS },
   });
 })();

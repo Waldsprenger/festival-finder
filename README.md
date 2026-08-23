@@ -75,7 +75,7 @@ nichts voneinander.
 | `festivalfinder/werkzeug/geokodieren.py` | Ortskoordinaten von Nominatim → `data/geo.json` |
 | `festivalfinder/werkzeug/schriften.py` | Display-Schrift als data-URI |
 | `festivalfinder/werkzeug/preisverlauf.py` | was ein Ticket zuerst und was es heute kostet |
-| `festivalfinder/werkzeug/neuheiten.py` | was seit gestern dazukam: Festivals und bestätigte Bands |
+| `festivalfinder/werkzeug/neuheiten.py` | seit wann wir welches Festival und welche Band kennen |
 | `festivalfinder/werkzeug/schnappschuss.py` | der Stand einer Quelle, die nicht jeder Lauf erreicht |
 | **oben** | |
 | `festivalfinder/sammeln.py` | der Sammellauf über alle Quellen |
@@ -581,7 +581,21 @@ verglichen wird im Browser; es gibt kein Konto, keinen Server und keine
 Anmeldung. Wer eine Suche auf ein zweites Gerät bringen will, nimmt den Link:
 Der Filter steht darin, base64-verpackt hinter `#l=`.
 
-Drei Entscheidungen, die dahinterstehen:
+**Ohne Rückblickgrenze.** Die Seite wird über den Winter oft aufgerufen, weil
+dann die Lineups kommen, und im Frühling kaum. Wer nach vierzig Tagen
+wiederkommt, bekommt die Änderungen aus vierzig Tagen; wer nach einem halben
+Jahr wiederkommt, die aus einem halben Jahr. Möglich ist das, weil nicht
+festgehalten wird, *was an welchem Tag passiert ist*, sondern *seit wann wir
+etwas kennen*: je Festival ein Datum, je Band im Lineup ein Datum. Dieselbe
+Auskunft, aber einmal je Sache statt einmal je Ereignis — und damit ohne
+Zeitfenster, das irgendwann abläuft und Änderungen still verschluckt.
+
+Begrenzt wird trotzdem, nur an der richtigen Stelle: Ein Festival, das aus
+allen Quellen verschwunden ist, fällt nach 60 Tagen heraus. Die Aufzeichnung
+wächst deshalb nicht mit den Jahrgängen, sondern bleibt so groß wie der
+Bestand.
+
+Vier Entscheidungen, die dahinterstehen:
 
 * **Bands als Namen, nicht als Nummern.** `band_nr()` vergibt die Indizes bei
   jedem Bau neu, in der Reihenfolge des Auftretens — eine gemerkte 4711 meinte
@@ -592,24 +606,39 @@ Drei Entscheidungen, die dahinterstehen:
   ihn sich aus `state` zu holen. Eine gemerkte Suche ist derselbe Filter, nur
   nicht der gerade eingestellte, und wird mit denselben Regeln geprüft — nicht
   mit einer zweiten Fassung, die irgendwann davonläuft.
-* **Ein Zeitstempel als Sicherung.** `neu.json` trägt den Stand des Laufs, aus
-  dem sie stammt. Liefert der Anwendungsspeicher eine Fassung aus einem anderen
-  Lauf, gälten ihre Genre-Nummern für eine andere `data.js` — dann gilt die
-  Datei als ungültig, statt falsch zu melden.
+* **Die Neuigkeiten reisen in `data.js` mit, nicht in einer eigenen Datei.**
+  Sie zeigen mit Zeilen- und Bandnummern in `data.js` hinein, und die werden
+  bei jedem Bau neu vergeben; zwei getrennte Dateien können aus zwei
+  verschiedenen Läufen stammen. Genau das wäre der Normalfall gewesen, nicht
+  die Ausnahme: Der Service Worker gibt dem Netz 2,5 Sekunden, und die 9,2 MB
+  von `data.js` verlieren dieses Rennen auf dem Telefon fast immer, während
+  eine kleine Nebendatei es gewinnt. In der installierten App hätte die
+  Meldung damit meistens geschwiegen — ohne ein Wort dazu. In einer Datei kann
+  das nicht passieren, und die gebündelte Einzelseite bekommt sie gratis mit.
+* **Ein Lauf nach langer Pause urteilt nicht.** Die 60 Tage Geduld fragen „wie
+  lange hat keine Quelle das mehr geliefert" — wurde zwei Monate lang gar
+  nicht gesammelt, hat niemand gefragt. Ohne diese Ausnahme wäre nach einer
+  Laufpause der ganze Bestand „neu". GitHub schaltet zeitgesteuerte Läufe nach
+  60 Tagen ohne Aktivität im Projekt ab; die Pause ist keine Erfindung.
 
 Was dazugekommen ist, rechnet der Lauf aus, nicht der Browser:
 [werkzeug/neuheiten.py](festivalfinder/werkzeug/neuheiten.py) hält in
-`data/bestand_verlauf.json` fest, welche Festivals es gibt und wer bei ihnen
-spielt, und schreibt die Unterschiede als Tagebuch nach `data/neuheiten.json`,
-dreißig Tage weit zurück — so lange darf ein Gerät auch aus sein. Beim Bauen
-wird daraus `site/neu.json`, mit denselben Zeilen wie `data.js`, damit die
-Seite nicht zweierlei Zeilenformen kennen muss.
+`data/bestand_verlauf.json` fest, seit wann es welches Festival gibt und seit
+wann welche Band in seinem Lineup steht. Beim Bauen wird daraus `D.neu` —
+Tagesnummern ab dem Beginn der Aufzeichnung, nicht Datumsangaben: Aus
+„2027-03-14" wird eine dreistellige Zahl.
 
-Zwei Regeln halten das Tagebuch ruhig: Der erste Lauf meldet nichts — ohne
-Vergleichsstand wären alle 13.338 Festivals neu. Und ein Festival, das einen
-Lauf lang fehlt, ist nicht verschwunden: An dem Tag, an dem festivalticker den
-Serverlauf abwies, fehlten 1.900 auf einmal; ohne Geduld wären sie am Tag
-darauf allesamt „neu" gewesen.
+Zwei Regeln halten die Aufzeichnung ruhig: Der erste Lauf meldet nichts — ohne
+Vergleichsstand wären alle 13.338 Festivals neu; der Tag, an dem sie begann,
+steht als `beginn` in der Datei, und was dieses Datum trägt, gilt dauerhaft als
+„schon immer da". Und ein Festival, das einen Lauf lang fehlt, ist nicht
+verschwunden: An dem Tag, an dem festivalticker den Serverlauf abwies, fehlten
+1.900 auf einmal; ohne Geduld wären sie am Tag darauf allesamt „neu" gewesen.
+
+**Die App bekommt dasselbe.** „App installieren" ist der übliche
+PWA-Weg — dieselbe Seite, derselbe Anwendungsspeicher, derselbe Service
+Worker. Gemerkte Suchen und Neuigkeiten funktionieren dort genauso, auch
+offline: `data.js` liegt mitsamt `D.neu` im Vorrat des Service Workers.
 
 **Was es (noch) nicht gibt: Push und E-Mail.** Beides ginge, kostet aber sehr
 Verschiedenes. Eine Push-Meldung darf inhaltsleer sein — der Service Worker
@@ -691,7 +720,7 @@ einmal falsch in den Daten:
 | `tests/test_sammeln.py` | der Ablauf des Laufs: Parsefehler, Schweigen, Zwischenspeicher |
 | `tests/test_pruefung.py` | Selbstprüfung und Einbruchsmeldung |
 | `tests/test_werkzeug.py` | Preisgeschichte und mitgebrachter Stand |
-| `tests/test_neuheiten.py` | das Tagebuch der Neuzugänge — und wann es schweigt |
+| `tests/test_neuheiten.py` | seit wann wir was kennen — und wann das schweigt |
 | `tests/test_werkzeug_netz.py` | Ausfall des Kartendienstes ist kein „Ort unbekannt" |
 | `tests/test_dateien.py` | JSON schreiben und lesen, auch bei Abbruch mittendrin |
 | `tests/test_dokumentation.py` | das README gegen das Projekt, das es wirklich gibt |
