@@ -125,3 +125,27 @@ class TestAusbeute:
         heute = date.today().isoformat()
         assert pruefung.ausbeute({"festivalticker": 1900}, 900,
                                  {"festivalticker": heute}) == []
+
+
+class TestDubletten:
+    """Die Prüfung fragt nach dem Namenskern, nicht nach dem Schlüssel.
+
+    Sonst prüfte sie genau das, was das Zusammenführen ohnehin schon
+    zusammengelegt hat — und könnte nie anschlagen.
+    """
+
+    def test_umlautschreibung_faellt_auf(self):
+        a = festival(name="Glücksgefühle Festival", stadt="Hockenheim")
+        b = festival(name="Gluecksgefuehle Festival", stadt="Hockenheim")
+        assert any("Dublette" in z for z in pruefung.stimmigkeit([a, b]))
+
+    def test_land_im_namen_faellt_auf(self):
+        a = festival(name="Time Warp Festival", stadt="Mannheim")
+        b = festival(name="Time Warp Germany", stadt="Mannheim")
+        assert any("Dublette" in z for z in pruefung.stimmigkeit([a, b]))
+
+    def test_zwei_feste_am_selben_tag_sind_keine_dublette(self):
+        a = festival(name="Gay Pride Festival", stadt="Amsterdam", land="NL")
+        b = festival(name="Hunkering Gay Pride Festival", stadt="Amsterdam",
+                     land="NL")
+        assert pruefung.stimmigkeit([a, b]) == []

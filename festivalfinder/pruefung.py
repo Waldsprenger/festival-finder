@@ -12,10 +12,11 @@ Zwei verschiedene Fragen, deshalb zwei Funktionen:
 
 import re
 
+from .bund.regeln import dieselbe_veranstaltung
 from .kern.festival import Festival
 from .kern.geld import KOSTENLOS
 from .kern.orte import ist_land
-from .kern.text import KNOPFBESCHRIFTUNG, PLZ_VORN, city_key, festival_key
+from .kern.text import KNOPFBESCHRIFTUNG, PLZ_VORN, city_key
 from .kern.zeit import ueberlappt
 from .pfade import DATA, lies_json, schreib_json
 from .werkzeug import schnappschuss
@@ -81,17 +82,22 @@ def stimmigkeit(festivals: list[Festival]) -> list[str]:
         merke(not f.webseite or f.webseite.lower().startswith("http"),
               "Webseite ist keine Adresse")
 
-    # Dubletten: gleicher Name, gleicher Ort, sich überschneidender Termin.
-    # Zwei Ausgaben desselben Festivals im selben Jahr gibt es wirklich
+    # Dubletten: derselbe Namenskern, gleicher Ort, sich überschneidender
+    # Termin. Zwei Ausgaben desselben Festivals im selben Jahr gibt es wirklich
     # (Heartbeatz im Juni und im September) — die dürfen bleiben.
-    gruppen: dict[tuple[str, str, str], list[Festival]] = {}
+    #
+    # Gefragt wird nach dem Kern, nicht nach dem Schlüssel: Sonst prüfte diese
+    # Stelle genau das, was das Zusammenführen ohnehin schon zusammengelegt
+    # hat, und könnte nie anschlagen. „Glücksgefühle" gegen „Gluecksgefuehle"
+    # in Hockenheim stand ein halbes Jahr unbemerkt doppelt in den Daten.
+    gruppen: dict[tuple[str, str], list[Festival]] = {}
     for f in festivals:
-        gruppen.setdefault((festival_key(f.name).replace(" ", ""), f.jahr,
-                            city_key(f.stadt)), []).append(f)
+        gruppen.setdefault((f.jahr, city_key(f.stadt)), []).append(f)
     for gleiche in gruppen.values():
         for i, a in enumerate(gleiche):
             for b in gleiche[i + 1:]:
-                merke(not ueberlappt(a.von, a.bis, b.von, b.bis),
+                merke(not (ueberlappt(a.von, a.bis, b.von, b.bis)
+                           and dieselbe_veranstaltung(a.name, b.name, a.stadt)),
                       "Dublette übrig geblieben")
 
     return [f"{n}x {was}" for was, n in sorted(zaehler.items())]

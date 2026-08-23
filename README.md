@@ -323,7 +323,7 @@ Ausnahme davon:
 | 4 | überlappender Zeitraum + Ort **oder Spielstätte**, Name steckt im anderen | um einen Tag versetzte Termine (Neuborn Open Air), Gemeinde gegen Spielstätte (Thallichtenberg / Burg Lichtenberg) |
 | 5 | ähnliche Schreibweise (82 %), gleicher Ort, überlappender Zeitraum | „SonneMondSterne", „Elbriot", „Szigit" |
 | 6 | gleicher Name, eine Quelle ohne Termin, gleicher Ort **oder dieselbe offizielle Adresse** | Übersichtsseiten ohne bestätigtes Datum |
-| 7 | dieselbe Quelle, identischer Name, gleicher Ort, überlappender Termin | „Nacht Wacht XL" und „Nachtwacht XL", beide von wannafest |
+| 7 | derselbe Namenskern, gleicher Ort, überlappender Termin — auch aus einer Quelle | „Glücksgefühle" und „Gluecksgefuehle" in Hockenheim; „Time Warp Festival" und „Time Warp Germany" in Mannheim |
 | 8 | gleiche Koordinate, gleicher Tag, verwandter Name | „Hard Summer" und „HARD Summer Music Festival"; „BitterSweet" in Poznań und in Posen |
 
 Die Stadt gehört ab Stufe 1 zum Schlüssel, sonst verschmölze das *Irish Spring
@@ -342,10 +342,30 @@ der früheste Termin. Vier von fünf terminlosen Einträgen nennen allerdings au
 keinen Ort — mit dem Ortsvergleich allein blieben 222 Doppeleinträge stehen,
 Karten ohne Termin, ohne Stadt, ohne Preis. Sie nennen aber die offizielle
 Adresse, und `kosmosfestival.fi` gehört genau einem Fest; führt dieselbe
-Adresse zu mehreren Städten, bleibt der Eintrag lieber stehen. Stufe 7 lässt zum Schluss auch zwei Einträge derselben
-Quelle zusammen, aber nur bei identischem Namensschlüssel, gleichem Ort und
-überlappendem Termin — zwei Ausgaben desselben Festivals im selben Jahr
-(Heartbeatz im Juni und im September) bleiben dadurch getrennt.
+Adresse zu mehreren Städten, bleibt der Eintrag lieber stehen. Und nennt ein
+terminloser Eintrag weder Ort noch Adresse — 2.493 tun das —, zählt allein der
+Name, aber nur, wenn er im ganzen Land auf eine einzige Stadt zeigt.
+
+Stufe 7 lässt zum Schluss auch zwei Einträge derselben Quelle zusammen. Das ist
+die ausdrückliche Ausnahme von der Regel, dass eine Quelle kein Fest doppelt
+führt; sie sichert sich stattdessen am **Namenskern**.
+
+**Der Namenskern** ist der Name ohne das, was zwei Quellen verschieden
+handhaben: die Ausgabenummer („37. Fränkische Musiktage"), den Ort im Namen
+(„Fränkische Musiktage Alzenau"), das Land („Time Warp Germany") und den
+Unterschied zwischen „ü" und „ue" („Glücksgefühle" gegen „Gluecksgefuehle").
+Alle vier standen doppelt in den Daten.
+
+Er verzeiht aber nichts darüber hinaus. Ein zusätzliches Wort mit eigener
+Bedeutung bleibt ein Unterschied: „Gay Pride Festival" und „Hunkering Gay Pride
+Festival" stehen am selben Tag in Amsterdam und sind zwei Veranstaltungen. Eine
+Ziffer ebenfalls: „ИОНОСФЕРА №15" und „№24" sind zwei Abende einer Reihe und zu
+90 % dieselbe Zeichenkette — nennen beide Namen Zahlen und sind es andere,
+gehören sie auseinander. Und der Ort fällt nur weg, wenn er auch der Ort des
+Festivals ist, sonst verlöre „Rock am Ring" seinen Ring.
+
+Zwei Ausgaben desselben Festivals im selben Jahr (Heartbeatz im Juni und im
+September) trennt weiterhin der Termin.
 
 Beim Verbinden füllt jede Quelle die Lücken der anderen, Genres werden
 gesammelt statt ersetzt, eine Absage aus einer Quelle genügt, und der Zeitraum

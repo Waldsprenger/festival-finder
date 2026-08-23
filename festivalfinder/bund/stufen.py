@@ -15,7 +15,8 @@ from ..kern import zeit
 from ..kern.festival import Festival
 from ..kern.fund import Fund
 from ..kern.text import city_key, clean, eng, festival_key, fold, genres_vereinen
-from .regeln import (adresse, name_deckt_sich, namen_verwandt, ort_deckt_sich,
+from .regeln import (adresse, dieselbe_veranstaltung, name_deckt_sich,
+                     name_steckt_drin, namen_verwandt, ort_deckt_sich,
                      schreibweise_gleich)
 
 #: Schlüssel einer Gruppe: Namensschlüssel, Jahr, Ortsschlüssel
@@ -58,12 +59,15 @@ def verschmelzen(keep: Festival, drop: Festival, spanne: bool = False) -> None:
     keep.bands.update(drop.bands)
 
 
-def _paarweise(bestand: Bestand, gruppen: dict, passt, spanne: bool = False) -> None:
+def _paarweise(bestand: Bestand, gruppen: dict, passt, spanne: bool = False,
+               quelle_egal: bool = False) -> None:
     """Jede Gruppe paarweise prüfen; was zusammengehört, wird verschmolzen.
 
     Gemeinsam für die Stufen 3 bis 5: Zwei Einträge derselben Quelle bleiben
     immer getrennt — dieselbe Quelle führt kein Festival zweimal, wohl aber
-    zwei gleichnamige an verschiedenen Orten.
+    zwei gleichnamige an verschiedenen Orten. Stufe 7 hebt das mit
+    `quelle_egal` auf; sie ist die ausdrückliche Ausnahme dafür und sichert
+    sich stattdessen am Namenskern.
     """
     for gruppe in gruppen.values():
         if len(gruppe) < 2:
@@ -76,7 +80,7 @@ def _paarweise(bestand: Bestand, gruppen: dict, passt, spanne: bool = False) -> 
                 kb, b = gruppe[j]
                 if kb not in bestand or ka not in bestand:
                     continue
-                if set(a.quellen) & set(b.quellen):
+                if not quelle_egal and set(a.quellen) & set(b.quellen):
                     continue
                 if not passt(ka, a, kb, b):
                     continue
@@ -278,27 +282,64 @@ def stufe6_ohne_termin(bestand: Bestand) -> None:
         a, b = adresse(mit.webseite), adresse(ohne.webseite)
         return bool(a and a == b)
 
-    datiert: dict[str, list[tuple]] = {}
+    def namentlich(mit: Festival, ohne: Festival) -> bool:
+        """Derselbe Name — großzügiger als sonst, weil der Ort schon feststeht.
+
+        Eine terminlose Seite ist die Übersichtsseite eines Festes und trägt
+        oft einen Zusatz: „BigCityBeats World Club Dome" gegen „World Club
+        Dome", „Rock the Ocean's Tortuga Music Festival" gegen „Tortuga Music
+        Festival".
+        """
+        return (schreibweise_gleich(mit.name, ohne.name)
+                or dieselbe_veranstaltung(mit.name, ohne.name,
+                                          mit.stadt or ohne.stadt)
+                or name_steckt_drin(mit.name, ohne.name))
+
+    # Nach Ort suchen, nicht nach Namensanfang: „BigCityBeats World Club Dome"
+    # und „World Club Dome" beginnen verschieden und träfen sich sonst nie.
+    nach_ort: dict[str, list[tuple]] = {}
+    nach_adresse: dict[str, list[tuple]] = {}
+    nach_land: dict[tuple[str, str], list[tuple]] = {}
     for key, rec in bestand.items():
-        if rec.von:
-            datiert.setdefault(eng(key[0])[:5], []).append((key, rec))
+        if not rec.von:
+            continue
+        for o in {city_key(rec.stadt), city_key(rec.ort)}:
+            if o:
+                nach_ort.setdefault(o, []).append((key, rec))
+        if (a := adresse(rec.webseite)):
+            nach_adresse.setdefault(a, []).append((key, rec))
+        nach_land.setdefault((key[0], rec.land), []).append((key, rec))
 
     for ohne_key in [k for k, r in bestand.items() if not r.von]:
         ohne = bestand.get(ohne_key)
         if ohne is None:
             continue
-        schluessel = eng(ohne_key[0])
-        gleichnamig = [(k, r) for k, r in datiert.get(schluessel[:5], [])
-                       if k in bestand
-                       and (eng(k[0]) == schluessel
-                            or schreibweise_gleich(r.name, ohne.name))]
-        treffer = [(k, r) for k, r in gleichnamig if ort_passt(r, ohne)]
+        ort = city_key(ohne.stadt)
+        gleichnamig = [(k, r) for k, r in nach_ort.get(ort, []) if k in bestand]
+        treffer = [(k, r) for k, r in gleichnamig
+                   if ort_passt(r, ohne) and namentlich(r, ohne)]
         if not treffer:
+            gleichnamig = [(k, r) for k, r in
+                           nach_adresse.get(adresse(ohne.webseite), [])
+                           if k in bestand and namentlich(r, ohne)]
             # Vier von fünf terminlosen Einträgen nennen gar keinen Ort — wohl
             # aber die offizielle Adresse. Sie gehört genau einem Fest und ist
             # damit der bessere Anker. Nur wenn alle Kandidaten in derselben
             # Stadt liegen: sonst wäre offen, welches Fest gemeint ist.
             treffer = [(k, r) for k, r in gleichnamig if webseite_passt(r, ohne)]
+            if len({city_key(r.stadt) for _, r in treffer}) > 1:
+                treffer = []
+        if not treffer and ohne.land and not adresse(ohne.webseite):
+            # Weder Ort noch Adresse: 2.493 terminlose Einträge nennen nur
+            # Name und Land. Dann trägt allein der Name — und nur, wenn er im
+            # ganzen Land auf eine einzige Stadt zeigt. Das „Irish Spring
+            # Festival" läuft unter einem Namen in dreißig Orten und bliebe
+            # sonst nicht auseinander.
+            #
+            # Wer eine Adresse nennt, fällt nicht hierher: Eine andere Adresse
+            # ist ein Gegenbeweis, kein fehlender Beweis.
+            treffer = [(k, r) for k, r in nach_land.get((ohne_key[0], ohne.land), [])
+                       if k in bestand]
             if len({city_key(r.stadt) for _, r in treffer}) > 1:
                 treffer = []
         if not treffer:
@@ -308,21 +349,23 @@ def stufe6_ohne_termin(bestand: Bestand) -> None:
         bestand.pop(ohne_key, None)
 
     # Bleiben mehrere terminlose Einträge desselben Festivals übrig — etwa weil
-    # noch kein Jahrgang datiert ist — werden auch sie zusammengelegt.
+    # noch kein Jahrgang datiert ist — werden auch sie zusammengelegt. Auch
+    # hier zählt der Ort, nicht der Namensanfang: festivism führt „37.
+    # Fränkische Musiktage" und „Fränkische Musiktage Alzenau" als zwei.
     offen: dict[str, list[tuple]] = {}
     for key, rec in bestand.items():
-        if not rec.von:
-            offen.setdefault(eng(key[0]), []).append((key, rec))
+        if not rec.von and city_key(rec.stadt):
+            offen.setdefault(city_key(rec.stadt), []).append((key, rec))
 
     for gruppe in offen.values():
         if len(gruppe) < 2:
             continue
         gruppe = sorted(gruppe, key=lambda kr: kr[1].rang)
-        _, keep = gruppe[0]
-        for weg, drop in gruppe[1:]:
-            if city_key(keep.stadt) == city_key(drop.stadt):
-                verschmelzen(keep, drop)
-                bestand.pop(weg, None)
+        for i, (_, keep) in enumerate(gruppe):
+            for weg, drop in gruppe[i + 1:]:
+                if weg in bestand and namentlich(keep, drop):
+                    verschmelzen(keep, drop)
+                    bestand.pop(weg, None)
 
 
 def stufe7_gleiche_quelle(bestand: Bestand) -> None:
@@ -330,25 +373,27 @@ def stufe7_gleiche_quelle(bestand: Bestand) -> None:
 
     Sonst gilt: Zwei Einträge derselben Quelle bleiben getrennt, weil eine
     Quelle kein Festival doppelt führt — wohl aber zwei gleichnamige an
-    verschiedenen Orten. wannafest tut es doch, mit unterschiedlicher
-    Schreibweise („Nacht Wacht XL" und „Nachtwacht XL", Arnheim, derselbe Tag).
-    Deshalb zum Schluss diese eine, eng gefasste Ausnahme: identischer
-    Namensschlüssel ohne Leerzeichen, gleicher Ort, überlappender Zeitraum.
+    verschiedenen Orten. Mehrere tun es doch: wannafest mit „Nacht Wacht XL"
+    und „Nachtwacht XL" (Arnheim, derselbe Tag), festivalabroad mit
+    „Glücksgefühle Festival" und „Gluecksgefuehle Festival" (Hockenheim) und
+    mit „Time Warp Festival" und „Time Warp Germany" (Mannheim).
+
+    Deshalb zum Schluss diese Ausnahme, an drei Seiten gesichert: gleiche
+    Stadt, gleicher Jahrgang, überlappender Zeitraum — und derselbe Namenskern.
+    Der Kern verzeiht Ausgabenummer, Orts- und Landesnamen im Titel und die
+    Umlautschreibung, sonst nichts: „Gay Pride Festival" und „Hunkering Gay
+    Pride Festival" stehen am selben Tag in Amsterdam und bleiben zwei.
     """
-    gruppen: dict[tuple[str, str, str], list[tuple]] = {}
+    gruppen: dict[tuple[str, str], list[tuple]] = {}
     for key, rec in bestand.items():
         if rec.von and rec.stadt:
-            gruppen.setdefault((eng(key[0]), key[1], key[2]), []).append((key, rec))
+            gruppen.setdefault((key[1], key[2]), []).append((key, rec))
 
-    for gruppe in gruppen.values():
-        if len(gruppe) < 2:
-            continue
-        gruppe = sorted(gruppe, key=lambda kr: kr[1].rang)
-        _, keep = gruppe[0]
-        for weg, drop in gruppe[1:]:
-            if weg in bestand and ueberlappt(keep, drop):
-                verschmelzen(keep, drop, spanne=True)
-                bestand.pop(weg, None)
+    _paarweise(bestand, gruppen,
+               lambda ka, a, kb, b: (ueberlappt(a, b)
+                                     and dieselbe_veranstaltung(a.name, b.name,
+                                                                a.stadt)),
+               spanne=True, quelle_egal=True)
 
 
 def stufe8_gleicher_punkt(bestand: Bestand) -> None:

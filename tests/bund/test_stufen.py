@@ -7,8 +7,10 @@ Stufe oder eine Sicherung nach sich gezogen.
 import pytest
 
 from festivalfinder.bund.lauf import vorbereiten, zusammenfuehren
-from festivalfinder.bund.regeln import (name_deckt_sich, ort_deckt_sich,
-                                        schreibweise_gleich)
+from festivalfinder.bund.regeln import (dieselbe_veranstaltung, kernname,
+                                        name_deckt_sich, name_steckt_drin,
+                                        ort_deckt_sich, schreibweise_gleich,
+                                        zahlen_passen)
 from festivalfinder.kern.fund import fund
 from festivalfinder.kern.zeit import aus_deutsch, ueberlappt
 
@@ -290,3 +292,137 @@ class TestVergleiche:
         a0, a1 = aus_deutsch("19.08.2026"), aus_deutsch("22.08.2026")
         b0, b1 = aus_deutsch("22.08.2026"), aus_deutsch("24.08.2026")
         assert ueberlappt(a0, a1, b0, b1) == ueberlappt(b0, b1, a0, a1) is True
+
+
+class TestDieselbeVeranstaltung:
+    """Was zwei Quellen am Namen verschieden handhaben — und was nicht.
+
+    Alle vier Fälle standen doppelt in den Daten: Time Warp in Mannheim,
+    Glücksgefühle in Hockenheim, World Club Dome in Frankfurt und die
+    Fränkischen Musiktage in Alzenau.
+    """
+
+    @pytest.mark.parametrize("a,b,ort", [
+        # Umlaut einmal so, einmal so
+        ("Glücksgefühle Festival", "Gluecksgefuehle Festival", "Hockenheim"),
+        # Ausgabenummer davor
+        ("37. Fränkische Musiktage", "Fränkische Musiktage", "Alzenau"),
+        ("77th Dubrovnik Summer Festival", "Dubrovnik Summer Festival", "Dubrovnik"),
+        # Ort im Namen
+        ("Fränkische Musiktage Alzenau", "37. Fränkische Musiktage", "Alzenau"),
+        ("Lollapalooza", "Lollapalooza Festival Berlin", "Berlin"),
+        ("Riot Fest", "Riot Fest Chicago", "Chicago"),
+        # Land im Namen
+        ("Time Warp Festival", "Time Warp Germany", "Mannheim"),
+    ])
+    def test_dasselbe(self, a, b, ort):
+        assert dieselbe_veranstaltung(a, b, ort)
+        assert dieselbe_veranstaltung(b, a, ort)
+
+    @pytest.mark.parametrize("a,b,ort", [
+        # Ein Wort mit eigener Bedeutung — zwei Feste am selben Tag
+        ("Gay Pride Festival", "Hunkering Gay Pride Festival", "Amsterdam"),
+        ("Amsterdam Open Air", "Amsterdam Dance Event", "Amsterdam"),
+        # Zwei Abende einer nummerierten Reihe
+        ("ИОНОСФЕРА №15", "ИОНОСФЕРА №24", "Sankt-Peterburg"),
+        ("26. Internationales Gitarrenfestival", "27. Internationales Gitarrenfestival",
+         "Hersbruck"),
+    ])
+    def test_nicht_dasselbe(self, a, b, ort):
+        assert not dieselbe_veranstaltung(a, b, ort)
+
+    def test_der_ort_faellt_nur_als_ort_weg(self):
+        """„Rock am Ring" verlöre sonst seinen Ring."""
+        assert kernname("Rock am Ring", "Nürburg") == "rockamring"
+
+
+class TestNameStecktDrin:
+    @pytest.mark.parametrize("a,b", [
+        ("World Club Dome", "BigCityBeats World Club Dome"),
+        ("Tortuga Music Festival", "Rock the Ocean's Tortuga Music Festival"),
+        ("Trans Musicales", "Rencontres Trans Musicales"),
+    ])
+    def test_der_zusatz_macht_kein_neues_fest(self, a, b):
+        assert name_steckt_drin(a, b) and name_steckt_drin(b, a)
+
+    def test_ein_einzelnes_wort_genuegt_nicht(self):
+        """„Awakenings Upclose" ist eine eigene Reihe, nicht die
+        Übersichtsseite von „Awakenings"."""
+        assert not name_steckt_drin("Awakenings", "Awakenings Upclose")
+
+
+class TestZahlenPassen:
+    def test_verschiedene_zahlen_trennen(self):
+        assert not zahlen_passen("ИОНОСФЕРА №15", "ИОНОСФЕРА №24")
+        assert not zahlen_passen("Total Music Meeting ’91", "Total Music Meeting ’96")
+        assert not schreibweise_gleich("Total Music Meeting ’91",
+                                       "Total Music Meeting ’96")
+
+    def test_nur_einer_nennt_eine_zahl(self):
+        assert zahlen_passen("Wacken Open Air 2026", "Wacken Open Air")
+
+    def test_dieselbe_zahl_trennt_nicht(self):
+        assert zahlen_passen("70000 Tons Of Metal", "70000 Tons of Metal")
+
+
+class TestDubletteAusEinerQuelle:
+    def test_eine_quelle_mit_zwei_schreibweisen(self):
+        """festivalabroad führt „Glücksgefühle" und „Gluecksgefuehle"."""
+        a = f("festivalabroad", "Glücksgefühle Festival", von="03.09.2026",
+              stadt="Hockenheim")
+        b = f("festivalabroad", "Gluecksgefuehle Festival", von="03.09.2026",
+              stadt="Hockenheim")
+        assert len(bund(a, b)) == 1
+
+    def test_eine_quelle_mit_land_im_namen(self):
+        """festivalabroad führt „Time Warp Festival" und „Time Warp Germany"."""
+        a = f("festivalabroad", "Time Warp Festival", von="03.04.2027",
+              stadt="Mannheim")
+        b = f("festivalabroad", "Time Warp Germany", von="03.04.2027",
+              stadt="Mannheim")
+        assert len(bund(a, b)) == 1
+
+    def test_zwei_feste_am_selben_tag_bleiben_zwei(self):
+        """„Gay Pride Festival" und „Hunkering Gay Pride Festival" stehen am
+        selben Tag in Amsterdam."""
+        a = f("wannafest", "Gay Pride Festival", von="01.08.2026",
+              stadt="Amsterdam", land="NL")
+        b = f("wannafest", "Hunkering Gay Pride Festival", von="01.08.2026",
+              stadt="Amsterdam", land="NL")
+        assert len(bund(a, b)) == 2
+
+    def test_zwei_ausgaben_im_jahr_bleiben_zwei(self):
+        """Heartbeatz gibt es im Juni und im September — der Termin trennt."""
+        a = f("festivalticker", "Heartbeatz Festival", von="14.06.2026",
+              stadt="München")
+        b = f("festivalticker", "Heart BeatZ Festival", von="05.09.2026",
+              stadt="München")
+        assert len(bund(a, b)) == 2
+
+
+class TestTerminlosOhneOrt:
+    def test_nur_name_und_land_genuegen_wenn_es_eindeutig_ist(self):
+        """2.493 terminlose Einträge nennen weder Ort noch Adresse."""
+        a = f("festivalticker", "Glücksgefühle Festival", von="03.09.2026",
+              stadt="Hockenheim")
+        b = f("festivism", "Glücksgefühle Festival")
+        [ergebnis] = bund(a, b)
+        assert ergebnis.stadt == "Hockenheim"
+        assert len(ergebnis.quellen) == 2
+
+    def test_derselbe_name_in_zwei_staedten_bleibt_offen(self):
+        """Das „Irish Spring Festival" läuft unter einem Namen in dreißig
+        Orten — welches gemeint ist, steht nicht fest."""
+        a = f("festivalticker", "Irish Spring Festival", von="01.03.2026",
+              stadt="Bonn")
+        b = f("festivalticker", "Irish Spring Festival", von="05.03.2026",
+              stadt="Kiel")
+        c = f("festivism", "Irish Spring Festival")
+        assert len(bund(a, b, c)) == 3
+
+    def test_eine_andere_adresse_bleibt_ein_gegenbeweis(self):
+        """Wer eine Adresse nennt, fällt nicht auf die Landesregel zurück."""
+        a = f("festivalticker", "Beispielfest", von="09.07.2026", stadt="Bonn",
+              webseite="https://beispielfest-bonn.de")
+        b = f("festivalsunited", "Beispielfest", webseite="https://beispielfest.at")
+        assert len(bund(a, b)) == 2

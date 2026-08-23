@@ -264,8 +264,14 @@ ALLES = [
 
 
 def befehl_alles(args) -> int:
+    # Ein Push aendert Code, keine Termine: Dann faellt nur der Sammellauf weg,
+    # alles Uebrige wird neu erzeugt. Frueher lief dabei allein `bauen` - und
+    # scheiterte an site/fonts.css, die ein anderer Schritt erzeugt und die
+    # nicht mitversioniert wird.
+    schritte = [s for s in ALLES
+                if not (args.ohne_sammeln and s[1] is befehl_sammeln)]
     fehler = 0
-    for name, funktion in ALLES:
+    for name, funktion in schritte:
         print(f"\n=== {name} " + "=" * (60 - len(name)), flush=True)
         t0 = time.time()
         try:
@@ -292,6 +298,8 @@ def main(argv=None) -> int:
                     help="jede Seite neu abrufen und verwaisten Cache löschen")
     ap.add_argument("--since", type=int, default=date.today().year,
                     help="frühester Jahrgang; 2006 holt das komplette Archiv")
+    ap.add_argument("--ohne-sammeln", action="store_true",
+                    help="alles außer dem Sammellauf — für einen reinen Bauschritt")
     ap.add_argument("befehl", nargs="?", default="alles",
                     choices=["alles", "sammeln", "bauen", "verzeichnis", "karte",
                              "schrift", "orte"])

@@ -41,9 +41,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
@@ -62,7 +62,7 @@ jobs:
       # weiterer Speicherstand von einem halben Gigabyte heran.
       - name: Zwischenspeicher zurückholen
         id: speicher
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: |
             cache
@@ -80,9 +80,11 @@ jobs:
           key: festival-cache-${{ github.run_id }}
           restore-keys: festival-cache-
 
-      # Drei Laufarten. Ein Push baut nur — es sei denn, der Bestand der letzten
-      # Nacht fehlt (Zwischenspeicher abgelaufen): Dann gaebe es nichts zu
-      # bauen, und der volle Lauf ist der einzige Weg.
+      # Drei Laufarten. Ein Push laesst nur das Sammeln weg - erzeugt aber
+      # alles Uebrige neu, denn site/fonts.css und die Symbole entstehen in
+      # eigenen Schritten und werden nicht mitversioniert. Fehlt der Bestand
+      # der letzten Nacht (Zwischenspeicher abgelaufen), gaebe es nichts zu
+      # bauen: dann der volle Lauf.
       - name: Laufart bestimmen
         id: art
         run: |
@@ -91,8 +93,8 @@ jobs:
             echo "befehl=alles --frisch" >> "$GITHUB_OUTPUT"
             echo "Kompletter Neuabruf"
           elif [ "${{ github.event_name }}" = "push" ] && [ -s data/festivals.json ]; then
-            echo "befehl=bauen" >> "$GITHUB_OUTPUT"
-            echo "Nur bauen - es gilt der Bestand der letzten Nacht"
+            echo "befehl=alles --ohne-sammeln" >> "$GITHUB_OUTPUT"
+            echo "Ohne Sammeln - es gilt der Bestand der letzten Nacht"
           else
             echo "befehl=alles" >> "$GITHUB_OUTPUT"
             echo "Voller Lauf, nur Veraltetes nachladen"
@@ -105,8 +107,8 @@ jobs:
 
       # Nur nach einem Sammellauf: Ein Bauschritt hat nichts geholt.
       - name: Zwischenspeicher ablegen
-        if: steps.art.outputs.befehl != 'bauen'
-        uses: actions/cache/save@v4
+        if: steps.art.outputs.befehl != 'alles --ohne-sammeln'
+        uses: actions/cache/save@v6
         with:
           path: |
             cache
@@ -183,7 +185,7 @@ jobs:
           cp data/festivals.csv data/lineups.csv data/bands.csv \
              data/festivals.json data/uebersicht.html data/lauf.json site/daten/
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: site
 
@@ -195,4 +197,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
