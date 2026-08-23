@@ -31,15 +31,13 @@
       case 'entfernung': {
         const e = state.entfernung;
         if (!e.an) return aus(t('s3.sumOff'));
-        return an(t('s3.sum', { von: zahl(e.von ?? 0),
-                                bis: e.bis === null ? '∞' : zahl(e.bis) }));
+        return an(t('s3.sum', { bis: e.bis === null ? '∞' : zahl(e.bis) }));
       }
       case 'preis': {
         const p = state.preis;
         if (!p.an) return aus(t('s4.sumOff'));
         const w = FF.WAEHRUNG_ZEICHEN[p.waehrung] || p.waehrung;
-        return an(t('s4.sum', { von: zahl(p.von ?? 0),
-                                bis: p.bis === null ? '∞' : zahl(p.bis), w }));
+        return an(t('s4.sum', { bis: p.bis === null ? '∞' : zahl(p.bis), w }));
       }
       case 'bands': {
         const n = state.bands.auswahl.size;

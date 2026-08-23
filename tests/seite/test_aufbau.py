@@ -83,12 +83,15 @@ class TestSortierung:
 
 
 class TestKarte:
-    def test_sie_kennt_den_bereich_statt_eines_umkreises(self):
-        """Ein einzelner Kreis würde eine untere Grenze verschweigen."""
+    def test_sie_zeigt_die_obergrenze(self):
+        """Ein Ring mit Loch in der Mitte gehörte zu einem Bereich „von–bis".
+        Es gibt nur noch eine Obergrenze — also ein Kreis, kein Ring."""
         karte = JS["js/karte.js"]
-        for handgriff in ("umkreisVon", "umkreisBis", "umkreisAktiv"):
+        for handgriff in ("umkreisBis", "umkreisAktiv"):
             assert f"cfg.{handgriff}()" in karte
             assert f"{handgriff}:" in JS["js/start.js"]
+        assert "umkreisVon" not in karte
+        assert "umkreisVon" not in JS["js/start.js"]
 
     def test_sie_zoomt_nicht_ueber_die_erde_hinaus(self):
         """Der kleinste Zoom reichte bis 105.000 km halber Höhe, das Fünffache

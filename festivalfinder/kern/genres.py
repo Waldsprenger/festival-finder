@@ -127,6 +127,30 @@ STICHWORTE: dict[str, str] = {
                 r"mash ?up|coveer|\buvm\b|querbeet|alles dabei",
 }
 
+# „Hardcore" allein ist zweideutig, und zwar nicht am Wort erkennbar: In der
+# elektronischen Musik meint es Gabber, in der Bandmusik Hardcore Punk. Die
+# Quellen schreiben beides einfach als „Hardcore". Deshalb entscheidet der
+# Rest der Angabe — die drei Muster unten sind die Anhaltspunkte dafuer.
+
+#: Unzweideutige Punk-Vokabeln. Wer eine nennt, meint Punk — auch neben Techno.
+ECHT_PUNK = re.compile(
+    r"punk|\boi!?\b|crust|\bemo\b|screamo|beatdown|powerviolence|riot|"
+    r"\bd beat\b|hardcore \(metal\)|metalcore|deathcore|grindcore|mathcore|"
+    r"post hardcore|melodic hardcore|fastcore|noisecore|postcore|skacore|"
+    r"ska core|blackened hardcore|straight edge")
+
+#: Die harte Tanzmusik. Steht sie daneben, ist „Hardcore" das Tempo.
+HARTE_TANZMUSIK = re.compile(
+    r"hardcore techno|hard techno|hardstyle|rawstyle|gabber|frenchcore|"
+    r"uptempo|terror|hardtekk?|tekstyle|raggatek|tribecore|early rave|"
+    r"jumpstyle|happy hardcore|industrial hardcore|uk hardcore|darkcore|"
+    r"crossbreed|hard dance|hands up|schranz")
+
+#: Oberbegriffe, die für Bandmusik stehen. Steht einer daneben, bleibt es bei
+#: Punk: Ein einzelnes „Deep House" in einer Metalaufzählung entscheidet nichts.
+BANDMUSIK = frozenset({"rock", "metal", "reggae", "folk", "jazzblues",
+                       "gothic", "mittelalter", "klassik", "schlager"})
+
 _SPEZIAL = [(re.compile(muster), keys) for muster, keys in SPEZIAL]
 _STICHWORTE = {k: re.compile(v) for k, v in STICHWORTE.items()}
 
@@ -160,6 +184,7 @@ def oberbegriffe(genre_text: str) -> list[str]:
     nicht mehr als Beschreibung, sie waere nur noch ein Ort zum Verlieren.
     """
     treffer: set[str] = set()
+    ganz = normalisiere(genre_text or "")
     for angabe in (genre_text or "").split(","):
         roh = normalisiere(angabe)
         if not roh:
@@ -170,4 +195,25 @@ def oberbegriffe(genre_text: str) -> list[str]:
                 treffer.update(_zuordnen(teil))
     if len(treffer) > 1:
         treffer.discard("gemischt")
+    if "punk" in treffer and _gabber(ganz, treffer):
+        treffer.discard("punk")
     return [k for k in OBERBEGRIFFE if k in treffer]
+
+
+def _gabber(ganz: str, treffer: set[str]) -> bool:
+    """Meint „Hardcore" hier das Tempo statt den Punk?
+
+    Wer „Punk", „Oi!" oder „Metalcore" nennt, meint den Punk — dann nicht.
+    Sonst zählt das Umfeld: Steht harte Tanzmusik daneben (Hardstyle, Gabber,
+    Frenchcore), oder ist außer Elektronischem überhaupt nichts genannt, dann
+    ja. 60 Festivals standen so unter „Punk & Hardcore", darunter Defqon.1,
+    Thunderdome und Masters of Hardcore — wer nach Punk suchte, bekam sie.
+
+    Ein einzelnes „Deep House" in einer Metalaufzählung entscheidet dagegen
+    nichts: Das StuStaCulum nennt achtzehn Stile, siebzehn davon mit Band.
+    """
+    if ECHT_PUNK.search(ganz):
+        return False
+    umfeld = treffer - {"punk"}
+    return bool(HARTE_TANZMUSIK.search(ganz)
+                or ("electronic" in umfeld and not umfeld & BANDMUSIK))

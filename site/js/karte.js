@@ -242,28 +242,22 @@ window.KARTE = (() => {
     const wohnort = cfg.wohnort();
     if (!wohnort || !cfg.umkreisAktiv()) return;
     const bis = cfg.umkreisBis();
-    const von = cfg.umkreisVon() || 0;
     const hx = v.xKurz(wohnort.lon), hy = v.y(wohnort.lat);
     const aussen = bis === null || bis === undefined ? null : v.kmZuPxY(bis);
-    const innen = von > 0 ? v.kmZuPxY(von) : 0;
     // Ein Kreis, der zwanzigmal so gross ist wie das Bild, kostet nur Zeit.
     const zuGross = (r) => r > 20 * (v.w + v.h);
 
     if (aussen !== null && !zuGross(aussen)) {
       ctx.beginPath();
       ctx.ellipse(hx, hy, aussen, aussen, 0, 0, Math.PI * 2);
-      if (innen > 0 && innen < aussen) {
-        ctx.moveTo(hx + innen, hy);
-        ctx.ellipse(hx, hy, innen, innen, 0, 0, Math.PI * 2);
-      }
       ctx.fillStyle = 'rgba(226,35,26,.16)';
-      ctx.fill('evenodd');
+      ctx.fill();
     }
 
     ctx.strokeStyle = '#ff3b30';
     ctx.lineWidth = 2.2;
     ctx.setLineDash([6, 5]);
-    for (const r of [innen, aussen]) {
+    for (const r of [aussen]) {
       if (!r || zuGross(r)) continue;
       ctx.beginPath();
       ctx.ellipse(hx, hy, r, r, 0, 0, Math.PI * 2);
@@ -316,15 +310,11 @@ window.KARTE = (() => {
     ctx.fillText(`${schritt} km`, 14, h - 22);
   }
 
-  /** „0–200 km", „ab 300 km", „bis 200 km" — der eingestellte Bereich. */
+  /** „bis 200 km" — die eingestellte Obergrenze. */
   function bereichText() {
-    const t = cfg.t;
-    const zahl = (n) => Number(n).toLocaleString(cfg.sprache());
-    const von = cfg.umkreisVon() || 0;
     const bis = cfg.umkreisBis();
-    if (bis === null || bis === undefined) return t('map.rangeFrom', { von: zahl(von) });
-    if (!von) return t('map.rangeTo', { bis: zahl(bis) });
-    return t('map.range', { von: zahl(von), bis: zahl(bis) });
+    return bis === null || bis === undefined ? ''
+      : cfg.t('map.rangeTo', { bis: Number(bis).toLocaleString(cfg.sprache()) });
   }
 
   /** Text unter der Karte: was gerade zu sehen ist. */
@@ -511,7 +501,7 @@ window.KARTE = (() => {
   }
 
   return {
-    /** einstellungen: {t, sprache, wohnort, umkreisAktiv, umkreisVon, umkreisBis,
+    /** einstellungen: {t, sprache, wohnort, umkreisAktiv, umkreisBis,
         datenRahmen, welt, weltFein, fineBox, aufPinKlick} */
     start(einstellungen) {
       cfg = einstellungen;

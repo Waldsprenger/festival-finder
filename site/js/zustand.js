@@ -23,8 +23,10 @@
 
     home: null,                  // {lat, lon, label, land}
     zeit: { von: '', bis: '', minDate: '', ohneTermin: false, abgesagte: false },
-    entfernung: { an: false, von: null, bis: null, ohneKoordinate: false },
-    preis: { an: false, von: null, bis: null, waehrung: 'EUR',
+    // Nur eine Obergrenze, kein Bereich: „ab 300 km“ sucht niemand, und
+    // „ab 50 €“ erst recht nicht.
+    entfernung: { an: false, bis: null, ohneKoordinate: false },
+    preis: { an: false, bis: null, waehrung: 'EUR',
              gewaehlt: false, ohnePreis: true },
     bands: { an: false, auswahl: new Map() },   // bandIndex -> Gewicht (1 oder 2)
     genre: { an: false, auswahl: new Set(), ohneGenre: false },
@@ -93,9 +95,7 @@
       if (!e.an || !s.home) return true;
       const d = entfernungVon(row, s.home);
       if (d === null) return e.ohneKoordinate;
-      if (e.von !== null && d < e.von) return false;
-      if (e.bis !== null && d > e.bis) return false;
-      return true;
+      return e.bis === null || d <= e.bis;
     },
 
     preis(s, row) {
@@ -103,9 +103,7 @@
       if (!p.an) return true;
       const wert = row[SPALTE.EUR];
       if (wert === null) return p.ohnePreis;
-      if (p.von !== null && wert < nachEuro(p.von, p.waehrung)) return false;
-      if (p.bis !== null && wert > nachEuro(p.bis, p.waehrung)) return false;
-      return true;
+      return p.bis === null || wert <= nachEuro(p.bis, p.waehrung);
     },
 
     // Eine ausgewählte Band genügt: Wer fünf nennt, sucht nicht das Festival,

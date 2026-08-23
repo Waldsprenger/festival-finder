@@ -25,6 +25,35 @@
 
   const genreName = (i) => t('genre.' + GENRES[i]);
 
+  /* ---------------- Beispiele im Suchfeld ----------------
+     Drei Namen als Platzhalter, bei jedem Besuch andere. Ein fester Vorschlag
+     liest sich schnell wie eine Empfehlung; drei wechselnde zeigen, wonach das
+     Feld überhaupt fragt. Genommen wird nur, was auch im Bestand steht —
+     sonst stünde dort ein Name, den die Suche selbst nicht findet. */
+
+  const VORSCHLAEGE = ['Alexander Marcus', 'HGich.T', 'SSIO', 'Lorna Shore',
+                       'Heaven Shall Burn', 'Rise Against', 'Iron Maiden',
+                       'Bring Me The Horizon', 'Pendulum', 'Skrillex'];
+
+  const beispiele = (() => {
+    const vorhanden = new Map(BANDS.map((n, i) => [bandsGefaltet[i], n]));
+    // Die verbindliche Schreibweise aus den Daten, nicht die von oben:
+    // dort steht „Bring Me the Horizon", klein geschrieben.
+    const da = VORSCHLAEGE.map((n) => vorhanden.get(fold(n))).filter(Boolean);
+    for (let i = da.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [da[i], da[j]] = [da[j], da[i]];
+    }
+    return da.slice(0, 3);
+  })();
+
+  function platzhalterSetzen() {
+    const feld = $('band-search');
+    if (feld && beispiele.length) {
+      feld.placeholder = t('bands.placeholder', { bands: beispiele.join(', ') });
+    }
+  }
+
   /* ---------------- Bandsuche ---------------- */
 
   function treffer(term) {
@@ -50,6 +79,7 @@
   }
 
   function bandtrefferZeichnen() {
+    platzhalterSetzen();          // auch nach einem Sprachwechsel
     const term = fold($('band-search').value.trim());
     const liste = $('band-results');
     const hinweis = $('band-hint');
@@ -205,5 +235,5 @@
   }
 
   Object.assign(FF, { bandtrefferZeichnen, bandauswahlZeichnen, genresZeichnen,
-                      genreName, aliasVonBand });
+                      genreName, aliasVonBand, beispiele });
 })();

@@ -82,15 +82,15 @@
   function preisHinweis() {
     const el = $('preis-hint');
     const p = state.preis;
-    if (p.waehrung === 'EUR' || (p.von === null && p.bis === null)) {
+    if (p.waehrung === 'EUR' || p.bis === null) {
       el.className = 'hint';
       el.textContent = '';
       return;
     }
-    const inEuro = (v) => v === null ? '∞'
-      : FF.nachEuro(v).toLocaleString(FF.sprache(), { maximumFractionDigits: 0 }) + ' €';
     el.className = 'hint';
-    el.textContent = t('s4.inEuro', { von: inEuro(p.von ?? 0), bis: inEuro(p.bis) });
+    el.textContent = t('s4.inEuro', {
+      bis: FF.nachEuro(p.bis).toLocaleString(FF.sprache(),
+                                             { maximumFractionDigits: 0 }) + ' €' });
   }
 
   /* ---------------- Karte ----------------
@@ -121,7 +121,6 @@
       sprache: FF.sprache,
       wohnort: () => state.home,
       umkreisAktiv: () => state.entfernung.an && !!state.home,
-      umkreisVon: () => state.entfernung.von ?? 0,
       umkreisBis: () => state.entfernung.bis,
       datenRahmen: () => FF.D.dataBox || null,
       welt: FF.D.world,
@@ -241,20 +240,12 @@
 
     // --- Schritt 3: Entfernung
     const kmLesen = () => {
-      state.entfernung.von = feldZahl($('km-von'));
       state.entfernung.bis = feldZahl($('km-bis'));
-      const e = state.entfernung;
       const el = $('km-hint');
-      if (e.von !== null && e.bis !== null && e.von > e.bis) {
-        el.className = 'hint err';
-        el.textContent = t('s.rangeSwapped');
-      } else {
-        el.className = 'hint';
-        el.textContent = state.home ? '' : t('s3.needHome');
-      }
+      el.className = 'hint';
+      el.textContent = state.home ? '' : t('s3.needHome');
       FF.zeichnen();
     };
-    $('km-von').addEventListener('input', kmLesen);
     $('km-bis').addEventListener('input', kmLesen);
     $('geo-unknown').addEventListener('change', (e) => {
       state.entfernung.ohneKoordinate = e.target.checked; FF.zeichnen();
@@ -262,12 +253,10 @@
 
     // --- Schritt 4: Preis
     const preisLesen = () => {
-      state.preis.von = feldZahl($('preis-von'));
       state.preis.bis = feldZahl($('preis-bis'));
       preisHinweis();
       FF.zeichnen();
     };
-    $('preis-von').addEventListener('input', preisLesen);
     $('preis-bis').addEventListener('input', preisLesen);
     $('preis-waehrung').addEventListener('change', (e) => {
       state.preis.waehrung = e.target.value;

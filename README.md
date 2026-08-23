@@ -416,6 +416,20 @@ Absicht: „Ska Punk" gehört zu Punk und zu Reggae/Ska. Bleibt nichts übrig, g
 „Genreübergreifend" — sobald aber eine Richtung erkennbar ist, fällt die
 Sammelkategorie weg.
 
+**„Hardcore" ist zweideutig, und zwar nicht am Wort erkennbar.** In der
+Bandmusik heißt es Hardcore Punk, in der Tanzmusik Gabber; die Quellen
+schreiben beides gleich. Ein Stichwort reicht dafür nicht — es entscheidet
+der Rest der Angabe. Nennt jemand ausdrücklich Punk, Oi! oder Metalcore, gilt
+der Punk. Steht daneben harte Tanzmusik (Hardstyle, Frenchcore, Uptempo), oder
+ist außer Elektronischem nichts genannt, gilt das Tempo. Ohne diese
+Unterscheidung standen **60 reine Elektro-Festivals** unter „Punk & Hardcore",
+darunter Defqon.1, Thunderdome, Tomorrowland Brasil und Masters of Hardcore:
+Wer nach Punk suchte, bekam sie mitgeliefert.
+
+Ein einzelnes elektronisches Wort kippt dabei nichts: Das StuStaCulum nennt
+achtzehn Stile, siebzehn davon mit Band und eines „Deep House" — dort bleibt
+der Hardcore der Punk.
+
 ## Koordinaten und Preise
 
 Das Ortsverzeichnis ist zweimal fein aufgelöst, weil die beiden Zwecke
