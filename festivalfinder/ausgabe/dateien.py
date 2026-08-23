@@ -3,6 +3,12 @@
 Die Feldnamen im JSON sind englisch und bleiben es — `data/festivals.json`
 wird mitveröffentlicht, und wer sie auswertet, soll das nach einem Umbau
 weiter tun können. Die Zuordnung steht an einer Stelle: `Festival.als_json`.
+
+Zwei Funktionen, weil zwei Schritte: **`bestand()` gehört zum Sammeln** und
+schreibt das einzige Ergebnis, das ein Lauf hinterlässt. **`tabellen()` gehört
+zum Bauen** und leitet daraus ab. Ein Bauschritt, der nur den Code betrifft,
+kommt damit ohne einen neuen Abruf bei zwölf Quellen aus: Er liest den Bestand
+von heute Nacht und erzeugt alles Übrige neu.
 """
 
 import csv
@@ -12,9 +18,13 @@ from ..kern.zeit import deutsch
 from ..pfade import DATA, schreib_json
 
 
-def schreiben(festivals: list[Festival]) -> None:
-    """JSON für die Webseite, drei CSV-Tabellen für alles andere."""
+def bestand(festivals: list[Festival]) -> None:
+    """Was ein Sammellauf hinterlässt: der Bestand als JSON."""
     schreib_json(DATA / "festivals.json", [f.als_json() for f in festivals])
+
+
+def tabellen(festivals: list[Festival]) -> None:
+    """Was sich daraus ableiten lässt: drei CSV-Tabellen."""
     _festivals_csv(festivals)
     _lineups_csv(festivals)
     _bands_csv(festivals)

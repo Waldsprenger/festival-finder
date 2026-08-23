@@ -88,7 +88,7 @@ def befehl_sammeln(args) -> int:
     for widerspruch in pruefung.stimmigkeit(festivals):
         print(f"  ! Widerspruch in den Daten: {widerspruch}", file=sys.stderr)
 
-    ausgabe.dateien.schreiben(festivals)
+    ausgabe.dateien.bestand(festivals)
     schreib_json(DATA / "band_normalisierung.json", bandstatistik)
 
     # Nur bei einem vollständigen Lauf vergleichen — ein Testlauf mit --limit
@@ -181,6 +181,7 @@ def befehl_bauen(args) -> int:
         print("data/festivals.json ist leer - erst sammeln.", file=sys.stderr)
         return 1
 
+    ausgabe.dateien.tabellen(festivals)
     z = ausgabe.uebersicht.bauen(festivals)
     print(f"uebersicht.html  ({z['mb']:.1f} MB, {z['festivals']} Festivals)")
 

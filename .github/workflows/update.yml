@@ -7,6 +7,10 @@ name: Tägliche Aktualisierung
 # also jede Seite neu und löscht anschließend, was der Lauf nicht angefasst hat.
 # Ohne das blieben stille Korrekturen der Quellen unbemerkt und der Speicher
 # würde mit jedem verschwundenen Festival weiterwachsen.
+#
+# Ein Push ist die dritte Laufart und die kürzeste: Er ändert Code, keine
+# Termine. Gebaut und veröffentlicht wird aus dem Bestand der letzten Nacht,
+# gesammelt wird nicht — das erspart den zwölf Quellen einen Abruf je Commit.
 on:
   schedule:
     - cron: "17 3 * * 1-6"      # Mo-Sa 03:17 UTC (04:17 bzw. 05:17 deutscher Zeit)
@@ -53,11 +57,17 @@ jobs:
 
       # Der Seiten-Cache spart Abrufe bei den Quellen, der Geo-Cache spart
       # Nominatim-Anfragen. Ohne ihn liefe jeder Tag von vorn.
-      - name: Cache wiederherstellen
-        uses: actions/cache@v4
+      # Getrennt zurueckholen und ablegen: Ein Push-Lauf holt nichts Neues,
+      # also gibt es auch nichts abzulegen. Sonst wuechse mit jedem Commit ein
+      # weiterer Speicherstand von einem halben Gigabyte heran.
+      - name: Zwischenspeicher zurückholen
+        id: speicher
+        uses: actions/cache/restore@v4
         with:
           path: |
             cache
+            data/festivals.json
+            data/lauf.json
             data/geo.json
             data/gazetteer.json
             data/plz.json
@@ -70,34 +80,62 @@ jobs:
           key: festival-cache-${{ github.run_id }}
           restore-keys: festival-cache-
 
-      # Sonntags (oder auf Wunsch beim Handstart) jede Seite neu holen
+      # Drei Laufarten. Ein Push baut nur — es sei denn, der Bestand der letzten
+      # Nacht fehlt (Zwischenspeicher abgelaufen): Dann gaebe es nichts zu
+      # bauen, und der volle Lauf ist der einzige Weg.
       - name: Laufart bestimmen
         id: art
         run: |
           if [ "${{ github.event.schedule }}" = "17 2 * * 0" ] \
              || [ "${{ inputs.frisch }}" = "true" ]; then
-            echo "frisch=--frisch" >> "$GITHUB_OUTPUT"
+            echo "befehl=alles --frisch" >> "$GITHUB_OUTPUT"
             echo "Kompletter Neuabruf"
+          elif [ "${{ github.event_name }}" = "push" ] && [ -s data/festivals.json ]; then
+            echo "befehl=bauen" >> "$GITHUB_OUTPUT"
+            echo "Nur bauen - es gilt der Bestand der letzten Nacht"
           else
-            echo "frisch=" >> "$GITHUB_OUTPUT"
-            echo "Nur Veraltetes nachladen"
+            echo "befehl=alles" >> "$GITHUB_OUTPUT"
+            echo "Voller Lauf, nur Veraltetes nachladen"
           fi
 
       # Die Reihenfolge der Schritte steht in festivalfinder/cli.py - damit
       # ein Lauf hier und ein Lauf am eigenen Rechner dasselbe tun.
       - name: Datenlauf
-        run: python -m festivalfinder alles ${{ steps.art.outputs.frisch }}
+        run: python -m festivalfinder ${{ steps.art.outputs.befehl }}
+
+      # Nur nach einem Sammellauf: Ein Bauschritt hat nichts geholt.
+      - name: Zwischenspeicher ablegen
+        if: steps.art.outputs.befehl != 'bauen'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            cache
+            data/festivals.json
+            data/lauf.json
+            data/geo.json
+            data/gazetteer.json
+            data/plz.json
+            data/verortung.json
+            data/quellen_stand.json
+            data/preis_verlauf.json
+            data/bestand_verlauf.json
+            data/welt_grob.json
+            data/welt_fein.json
+          key: festival-cache-${{ github.run_id }}
 
       # Warnungen sollen sichtbar sein, ohne dass jemand ins Protokoll steigt.
       - name: Protokoll in die Zusammenfassung
         if: always()
         run: |
           {
-            echo "### Datenlauf"
+            echo "### ${{ steps.art.outputs.befehl }}"
             echo '```'
             python - <<'EOF'
           import json, pathlib
-          d = json.loads(pathlib.Path("data/lauf.json").read_text(encoding="utf-8"))
+          p = pathlib.Path("data/lauf.json")
+          if not p.exists():
+              print("Kein Datenlauf und kein alter Bericht."); raise SystemExit
+          d = json.loads(p.read_text(encoding="utf-8"))
           print(f"Stand {d['stand']} - {d['festivals']} Festivals")
           for name, n in d["quellen"].items():
               print(f"  {name:<18} {n:>6}")

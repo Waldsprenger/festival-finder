@@ -658,8 +658,18 @@ unter **Settings → Pages → Source** *GitHub Actions* wählen.
 
 | Wann | Was |
 |---|---|
-| Mo–Sa 03:17 UTC | nur Seiten neu holen, deren Zwischenspeicher älter als 24 Stunden ist |
-| So 02:17 UTC | `--frisch`: **jede** Seite neu abrufen, danach verwaisten Cache löschen |
+| Mo–Sa 03:17 UTC | `alles`: nur Seiten neu holen, deren Zwischenspeicher älter als 24 Stunden ist |
+| So 02:17 UTC | `alles --frisch`: **jede** Seite neu abrufen, danach verwaisten Cache löschen |
+| bei jedem Push auf `main` | `bauen`: aus dem Bestand der letzten Nacht neu erzeugen und veröffentlichen |
+
+Ein Push ändert Code, keine Termine — deshalb wird dabei nicht gesammelt. Das
+erspart den zwölf Quellen einen Abruf je Commit und dem Lauf zehn Minuten; die
+Seite ist trotzdem gleich nach dem Push auf dem neuen Stand. Möglich ist das,
+weil ein Sammellauf genau ein Ergebnis hinterlässt — `data/festivals.json` —
+und alles Weitere daraus abgeleitet wird: die drei CSV-Tabellen, die
+Kontrolltabelle, `data.js`, `orte.js`, die Einzelseite. Fehlt der Bestand, weil
+der Zwischenspeicher abgelaufen ist, läuft stattdessen der volle Lauf; ohne ihn
+gäbe es nichts zu bauen.
 
 Der wöchentliche Komplettabruf ist nötig, weil die Quellen still korrigieren:
 Ein verschobener Termin käme sonst erst an, wenn die Seite ohnehin wieder
