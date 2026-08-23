@@ -312,6 +312,8 @@ class TestDieselbeVeranstaltung:
         ("Fränkische Musiktage Alzenau", "37. Fränkische Musiktage", "Alzenau"),
         ("Lollapalooza", "Lollapalooza Festival Berlin", "Berlin"),
         ("Riot Fest", "Riot Fest Chicago", "Chicago"),
+        # Der Ort auch davor, mit Doppelpunkt
+        ("Jazz & Joy", "Worms: Jazz and Joy", "Worms"),
         # Land im Namen
         ("Time Warp Festival", "Time Warp Germany", "Mannheim"),
     ])
@@ -330,6 +332,16 @@ class TestDieselbeVeranstaltung:
     ])
     def test_nicht_dasselbe(self, a, b, ort):
         assert not dieselbe_veranstaltung(a, b, ort)
+
+    def test_ohne_ort_traegt_der_name_allein_nicht(self):
+        """Nachgemessen: Der Namensvergleich ohne Ortsanker faende 91 weitere
+        Partner, und die meisten waeren falsch — „Bracknell Jazz Festival"
+        gegen „Brick Lane Jazz Festival", „Chicago Open Air" gegen „Chicago
+        Blues Festival". Deshalb bleibt es dort beim genauen Schluessel."""
+        assert not dieselbe_veranstaltung("Bracknell Jazz Festival",
+                                          "Brick Lane Jazz Festival", "")
+        assert not dieselbe_veranstaltung("Chicago Open Air",
+                                          "Chicago Blues Festival", "Chicago")
 
     def test_der_ort_faellt_nur_als_ort_weg(self):
         """„Rock am Ring" verlöre sonst seinen Ring."""
