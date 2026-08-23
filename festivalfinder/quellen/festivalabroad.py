@@ -47,7 +47,6 @@ class FestivalAbroad(Quelle):
             platz = erstes_objekt(d.get("location"))
             anschrift = erstes_objekt(platz.get("address"))
             geo = erstes_objekt(platz.get("geo"))
-            angebot = erstes_objekt(d.get("offers"))
             return fund(
                 self.name, url, name,
                 von=zeit.aus_iso(d.get("startDate")),

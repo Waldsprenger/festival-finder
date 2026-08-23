@@ -7,12 +7,11 @@ guten Stand.
 """
 
 import json
-from datetime import date
 
 import pytest
 
 from festivalfinder.ausgabe import daten_js
-from festivalfinder.ausgabe.daten_js import (LINEUP, aufrunden, als_javascript,
+from festivalfinder.ausgabe.daten_js import (aufrunden, als_javascript,
                                              datenrahmen,
                                              frueheste_monatsgrenze, pruefe)
 from festivalfinder.kern.festival import Festival

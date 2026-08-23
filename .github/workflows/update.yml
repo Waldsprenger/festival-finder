@@ -48,7 +48,7 @@ jobs:
           python-version: "3.12"
 
       - name: Abhängigkeiten
-        run: pip install requests beautifulsoup4 pillow pytest
+        run: pip install requests beautifulsoup4 pillow pytest pyflakes
 
       # Erst prüfen, dann sammeln: Ein Fehler in der Logik soll auffallen,
       # bevor er sich in die veröffentlichten Daten schreibt.

@@ -10,7 +10,7 @@ from ..kern import zeit
 from ..kern.fund import Fund, fund
 from ..kern.geld import betrag
 from ..kern.orte import ist_land, land_code
-from ..kern.text import clean, feld, valid_band
+from ..kern.text import feld, valid_band
 from ..netz import Abrufer, erstes_objekt, json_ld_events, sitemap_adressen
 from .basis import Quelle
 

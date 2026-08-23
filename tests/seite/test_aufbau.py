@@ -161,7 +161,6 @@ class TestFaltung:
         assert "'ß', 'ss'" not in text_js and '"ß"' not in text_js
 
     def test_die_regeln_reisen_mit(self):
-        from festivalfinder.ausgabe import daten_js
         quelle = (SITE.parent / "festivalfinder" / "ausgabe" / "daten_js.py") \
             .read_text(encoding="utf-8")
         assert '"faltung": REGELN' in quelle

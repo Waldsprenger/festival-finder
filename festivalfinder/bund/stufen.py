@@ -14,7 +14,7 @@ Ortsschlüssel).
 from ..kern import zeit
 from ..kern.festival import Festival
 from ..kern.fund import Fund
-from ..kern.text import city_key, clean, eng, festival_key, fold, genres_vereinen
+from ..kern.text import city_key, clean, festival_key, fold, genres_vereinen
 from .regeln import (adresse, dieselbe_veranstaltung, name_deckt_sich,
                      name_steckt_drin, namen_verwandt, ort_deckt_sich,
                      schreibweise_gleich)

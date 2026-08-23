@@ -15,7 +15,7 @@ import re
 
 import pytest
 
-from festivalfinder.pfade import BASE, DATA, SITE
+from festivalfinder.pfade import DATA, SITE
 
 DATENSCHUTZ = (SITE / "datenschutz.html").read_text(encoding="utf-8")
 

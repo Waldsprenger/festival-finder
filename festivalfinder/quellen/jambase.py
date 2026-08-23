@@ -13,7 +13,7 @@ import re
 from ..kern import zeit
 from ..kern.fund import Fund, fund
 from ..kern.orte import zahl_oder_nichts
-from ..kern.text import clean, feld, valid_band
+from ..kern.text import feld, valid_band
 from ..netz import Abrufer, erstes_objekt, json_ld_events, sitemap_adressen, soup
 from .basis import Quelle
 

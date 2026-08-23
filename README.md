@@ -773,7 +773,7 @@ das andere wäre unsere eigene Ungeduld.
 ## Tests
 
 ```bash
-pip install pytest && python -m pytest tests -q
+pip install pytest pyflakes && python -m pytest tests -q
 ```
 
 711 Tests in gut acht Sekunden, ohne Netz und ohne Datenbestand. Sie halten
@@ -806,6 +806,7 @@ einmal falsch in den Daten:
 | `tests/test_chronik.py` | genau eine Zeile je Monat, auch nach einer Pause |
 | `tests/test_werkzeug_netz.py` | Ausfall des Kartendienstes ist kein „Ort unbekannt" |
 | `tests/test_dateien.py` | JSON schreiben und lesen, auch bei Abbruch mittendrin |
+| `tests/test_statisch.py` | pyflakes über den Quelltext — Namen, die erst zur Laufzeit auffielen |
 | `tests/test_dokumentation.py` | das README gegen das Projekt, das es wirklich gibt |
 
 Der Workflow führt sie vor jedem Datenlauf aus: Ein Fehler in der Logik soll

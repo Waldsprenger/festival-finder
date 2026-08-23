@@ -10,7 +10,7 @@ gibt.
 import re
 
 from ..kern.fund import Fund, fund
-from ..kern.text import clean, feld
+from ..kern.text import feld
 from ..netz import Abrufer, erstes_objekt, json_ld_events, sitemap_adressen
 from .basis import Quelle
 

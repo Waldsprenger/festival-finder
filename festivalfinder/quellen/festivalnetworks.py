@@ -10,7 +10,7 @@ import json
 from ..kern import zeit
 from ..kern.fund import Fund, fund
 from ..kern.orte import zahl_oder_nichts
-from ..kern.text import clean, feld, genres_vereinen
+from ..kern.text import feld, genres_vereinen
 from ..netz import Abrufer
 from .basis import Quelle
 

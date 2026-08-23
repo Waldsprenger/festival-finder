@@ -105,7 +105,7 @@ def befehl_sammeln(args) -> int:
     # steht er im Protokoll — beim Lauf auf fremden Servern kommt niemand an
     # dessen Protokoll heran, und eine Quelle, die dort nichts liefert, fiele
     # sonst nur als kleinere Zahl auf.
-    lauf = {
+    bericht = {
         "stand": datetime.now().astimezone().strftime("%Y-%m-%dT%H:%M%z"),
         "quellen": ergebnis.funde,
         "mitgebrachter_stand": ergebnis.mitgebracht,
@@ -116,13 +116,13 @@ def befehl_sammeln(args) -> int:
         "nicht_ladbar_grund": _gruende(netz.fehlgeschlagen),
         "meldungen": netz.meldungen[:40],
     }
-    schreib_json(DATA / "lauf.json", lauf)
+    schreib_json(DATA / "lauf.json", bericht)
 
     acts = len({b for f in festivals for b in f.lineup})
     # Ein Strich je Monat, mitversioniert: die einzige Stelle zum Zurückschauen
     # — und der Schreibvorgang, der den zeitgesteuerten Lauf am Leben hält.
-    if chronik.nachtragen(lauf, acts):
-        print(f"Chronik                  : Zeile für {lauf['stand'][:7]} angelegt")
+    if chronik.nachtragen(bericht, acts):
+        print(f"Chronik                  : Zeile für {bericht['stand'][:7]} angelegt")
     print(f"Preise beobachtet        : {preise['beobachtet']}, "
           f"seit dem ersten Mal geändert: {preise['geändert']}")
     print(f"Seit gestern dazu        : {neues['festivals']} Festivals, "

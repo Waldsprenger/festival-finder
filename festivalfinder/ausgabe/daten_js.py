@@ -20,7 +20,7 @@ from ..kern.genres import OBERBEGRIFFE, oberbegriffe
 from ..kern.geld import KURSE, WAEHRUNG_LAND, in_euro
 from ..kern.orte import FEINRAHMEN, ISO_CODES, KONTINENT
 from ..kern.text import REGELN
-from ..pfade import DATA, SITE, lies_json, schreib_json, schreib_text
+from ..pfade import DATA, SITE, lies_json, schreib_text
 from ..werkzeug import neuheiten
 from .verorten import Verorter
 

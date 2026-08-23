@@ -12,7 +12,6 @@ In `tests/seiten/` liegen je Quelle zwei eingefrorene Seiten (gepackt, zusammen
 import gzip
 import json
 import re
-from pathlib import Path
 
 import pytest
 
