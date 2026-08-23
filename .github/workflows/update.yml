@@ -21,7 +21,11 @@ on:
     branches: [main]
 
 permissions:
-  contents: read
+  # Schreiben, weil der Lauf die Chronik fortschreibt - eine Zeile je Monat.
+  # Ein Push mit dem GITHUB_TOKEN loest keinen Workflow aus (GitHub verhindert
+  # die Rekursion); der "push"-Ausloeser oben greift dabei also nicht. Wer das
+  # spaeter auf einen persoenlichen Token umstellt, baut sich eine Schleife.
+  contents: write
   pages: write
   id-token: write
 
@@ -104,6 +108,36 @@ jobs:
           EOF
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+
+      # Ein Strich je Monat, mitversioniert. Er ist fuer sich nuetzlich - die
+      # einzige Stelle, an der sich der Bestand ueber Jahre zurueckverfolgen
+      # laesst - und haelt nebenbei den Zeitplan am Leben: GitHub schaltet
+      # zeitgesteuerte Laeufe in oeffentlichen Projekten ab, wenn 60 Tage lang
+      # niemand ins Projekt geschrieben hat. Die Laeufe selbst zaehlen nicht.
+      - name: Chronik veröffentlichen
+        run: |
+          if [ -z "$(git status --porcelain -- data/chronik.jsonl)" ]; then
+            echo "Chronik unverändert - dieser Monat steht schon drin"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/chronik.jsonl
+          git commit -m "Chronik: Stand $(date -u +%Y-%m)"
+          git push
+
+      # Wenn die Chronik den Zeitplan doch nicht am Leben haelt, soll das
+      # auffallen, bevor der Lauf abgeschaltet wird - und nicht erst dadurch,
+      # dass er wochenlang nicht mehr laeuft. GitHub kuendigt die Abschaltung
+      # zwar per E-Mail an, aber die liest man leicht weg.
+      - name: Steht das Projekt still?
+        if: always()
+        run: |
+          TAGE=$(( ( $(date -u +%s) - $(git log -1 --format=%ct) ) / 86400 ))
+          echo "Letzter Schreibvorgang vor $TAGE Tagen." >> "$GITHUB_STEP_SUMMARY"
+          if [ "$TAGE" -gt 40 ]; then
+            echo "::warning::Seit $TAGE Tagen wurde nichts ins Projekt geschrieben. GitHub schaltet den Zeitplan nach 60 Tagen ab - die Chronik scheint ihn nicht am Leben zu halten."
+          fi
 
       - name: CSV- und JSON-Ausgaben mitveröffentlichen
         run: |

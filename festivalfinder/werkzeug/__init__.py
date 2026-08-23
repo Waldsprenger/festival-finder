@@ -5,8 +5,8 @@ aus dem Zwischenspeicher; die Preisgeschichte, das Tagebuch der Neuzugänge und 
 mitgebrachte Stand gehören zu jedem Lauf.
 """
 
-from . import (gazetteer, geokodieren, neuheiten, preisverlauf, schnappschuss,
-               schriften, weltkarte)
+from . import (chronik, gazetteer, geokodieren, neuheiten, preisverlauf,
+               schnappschuss, schriften, weltkarte)
 
 __all__ = ["gazetteer", "weltkarte", "geokodieren", "schriften",
-           "preisverlauf", "schnappschuss", "neuheiten"]
+           "preisverlauf", "schnappschuss", "neuheiten", "chronik"]

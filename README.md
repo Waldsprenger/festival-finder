@@ -76,6 +76,7 @@ nichts voneinander.
 | `festivalfinder/werkzeug/schriften.py` | Display-Schrift als data-URI |
 | `festivalfinder/werkzeug/preisverlauf.py` | was ein Ticket zuerst und was es heute kostet |
 | `festivalfinder/werkzeug/neuheiten.py` | seit wann wir welches Festival und welche Band kennen |
+| `festivalfinder/werkzeug/chronik.py` | ein Strich je Monat: Bestand und Quellenausbeute |
 | `festivalfinder/werkzeug/schnappschuss.py` | der Stand einer Quelle, die nicht jeder Lauf erreicht |
 | **oben** | |
 | `festivalfinder/sammeln.py` | der Sammellauf über alle Quellen |
@@ -667,6 +668,43 @@ niemand angefasst hat — sie gehören zu Festivals, die es in den Quellen nicht
 mehr gibt. Die Wochenfrist ist Absicht: Eine Seite, die an diesem Tag nicht
 antwortet, behält ihren Stand und fällt nicht gleich heraus.
 
+### Was den Zeitplan am Leben hält
+
+GitHub schaltet zeitgesteuerte Läufe in öffentlichen Projekten ab, sobald 60
+Tage lang **niemand ins Projekt geschrieben hat**. Die Läufe selbst zählen
+dabei nicht: Ein Projekt kann täglich bauen und trotzdem als verlassen gelten.
+Für diese Seite ist das keine graue Theorie — an ihr wird über den Herbst
+gearbeitet, wenn die Lineups kommen, und im Frühjahr oft monatelang nicht.
+
+Dagegen steht die **Chronik**: Der Lauf trägt einmal im Monat eine Zeile in
+[data/chronik.jsonl](data/chronik.jsonl) nach und schiebt sie ins Projekt.
+Bestand, Acts, Funde je Quelle, die Warnungen des Tages. Sie ist für sich
+nützlich — `lauf.json` beschreibt nur den letzten Lauf und wird jedes Mal
+überschrieben, die Chronik ist die einzige Stelle zum Zurückschauen: Wie ist
+der Bestand über die Jahre gewachsen, kam festivalticker je wieder? Dass ihr
+Commit nebenbei den Zeitplan am Leben hält, ist die Folge davon und kein
+Kunstgriff. Ein leerer Commit täte es technisch auch und wäre genau das: leer.
+
+Zwei Dinge, die dabei zu beachten sind:
+
+* **Keine Schleife.** Der Workflow hört auch auf `push`. Ein Push mit dem
+  `GITHUB_TOKEN` löst aber keinen Workflow aus — das verhindert GitHub, um
+  genau diese Rekursion zu unterbinden. Wer das später auf einen persönlichen
+  Token umstellt, baut sich eine.
+* **Der Lauf prüft sich selbst.** Ob ein Commit der Actions-Kennung wirklich
+  als „Aktivität" zählt, sagt GitHub nirgends verbindlich zu. Deshalb rechnet
+  jeder Lauf aus, wie lange der letzte Schreibvorgang her ist, und meldet es in
+  der Zusammenfassung; über 40 Tagen wird daraus eine Warnung. GitHub kündigt
+  die Abschaltung zwar auch per E-Mail an, aber die liest man leicht weg.
+
+Was daran hängt, ist mehr als der tägliche Bestand: Der Actions-Cache verfällt,
+wenn sieben Tage lang niemand darauf zugreift. Steht der Zeitplan, verschwinden
+mit ihm `geo.json`, `preis_verlauf.json`, `quellen_stand.json` und
+`bestand_verlauf.json` — und damit die Aufzeichnung, seit wann wir welches
+Festival kennen. Sie beginnt danach von vorn: `beginn` steht auf dem Tag der
+Wiederaufnahme, es wird also nichts fälschlich als neu gemeldet, aber die Zeit
+davor ist als Vergleichsmaßstab verloren.
+
 Von Hand startbar ist beides unter *Actions*; das Feld *Alles neu abrufen*
 schaltet den frischen Lauf ein. Mitveröffentlicht werden die Ausgaben unter
 `/daten/`: `festivals.json`, `festivals.csv`, `lineups.csv`, `bands.csv`, die
@@ -721,6 +759,7 @@ einmal falsch in den Daten:
 | `tests/test_pruefung.py` | Selbstprüfung und Einbruchsmeldung |
 | `tests/test_werkzeug.py` | Preisgeschichte und mitgebrachter Stand |
 | `tests/test_neuheiten.py` | seit wann wir was kennen — und wann das schweigt |
+| `tests/test_chronik.py` | genau eine Zeile je Monat, auch nach einer Pause |
 | `tests/test_werkzeug_netz.py` | Ausfall des Kartendienstes ist kein „Ort unbekannt" |
 | `tests/test_dateien.py` | JSON schreiben und lesen, auch bei Abbruch mittendrin |
 | `tests/test_dokumentation.py` | das README gegen das Projekt, das es wirklich gibt |
