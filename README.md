@@ -885,6 +885,22 @@ es als Hinweis, sonst stünden vergangene Termine als kommende in der Liste. Und
 die 129 unterdrückten Spielstätten tragen im Datenblatt nur den Festivalnamen,
 sagen als Ortsangabe also nichts.
 
+**Auch festivalabroads Ticketangaben helfen nicht.** Das Datenblatt führt ein
+Feld `offers`, und der Leser holte es sich jahrelang ab, ohne es je zu
+verwenden. Nachgezählt über alle 3.261 Seiten: 853 Angebote, und **kein
+einziges** mit einem Preis — dort stehen nur Ticketshop, Verfügbarkeit und
+Währung. Die tote Zeile ist raus.
+
+Im Fließtext derselben Seiten stehen dagegen Preise, bei 228 von 3.261 Seiten.
+Sie kommen aber zu 97 % von **Vivid Seats**, einem Wiederverkaufsmarkt: „Buy
+General Admission Vivid Seats · from US$267" ist ein Angebot auf dem Zweitmarkt,
+nicht die Kasse des Veranstalters. Das Preisfeld meint überall sonst den
+günstigsten Einstiegspreis; eine Zweitmarktzahl darin würde den Preisfilter
+ausschließen lassen, was an der Kasse viel weniger kostet, die Sortierung
+verschieben und die Preisbeobachtung mit Marktschwankungen füllen. 159
+Festivals bekämen dafür überhaupt erst einen Preis — gut ein Prozent. Der Preis
+dafür ist zu hoch, also bleibt es bei „kein Preis".
+
 **Die offiziellen Festivalseiten helfen nicht weiter.** Eine Stichprobe über
 180 Festivals: Neun von zehn Veranstalterseiten bieten nichts Maschinenlesbares
 an, und wo ein Datenblatt steht, widersprach es kein einziges Mal. Die
