@@ -107,3 +107,20 @@ def test_die_quellen_der_fussnote_stimmen_mit_dem_scraper_ueberein():
     ohne_striche = fuss.replace("-", "")
     fehlen = [n for n in namen if n not in ohne_striche]
     assert not fehlen, f"in der Fussnote fehlen: {fehlen}"
+
+
+def test_der_lokale_speicher_steht_im_text():
+    """Die Seite schreibt zweierlei in den Gerätespeicher: die Spracheinstellung
+    und die gemerkten Suchen. Beides gehört genannt — der Text sagte lange, mit
+    dem Schließen des Tabs sei alles verworfen, und das stimmte dann nicht mehr.
+    """
+    for schluessel in re.findall(r"localStorage\.setItem\('([\w.]+)'",
+                                 (SITE / "js" / "wunsch.js").read_text(encoding="utf-8")):
+        if schluessel.endswith(".probe"):
+            continue
+        assert "Gemerkte Suchen" in DATENSCHUTZ, \
+            f"{schluessel} wird gespeichert, steht aber nicht im Datenschutztext"
+
+    dauer = DATENSCHUTZ.split("<h2>Speicherdauer</h2>", 1)[1].split("<h2>", 1)[0]
+    assert "gemerkten Suchen" in dauer, \
+        "die Speicherdauer verschweigt, dass gemerkte Suchen den Tab überleben"

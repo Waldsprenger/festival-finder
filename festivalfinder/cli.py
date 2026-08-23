@@ -22,7 +22,8 @@ from . import ausgabe, pruefung, sammeln
 from .bund import lauf
 from .netz import Abrufer
 from .pfade import DATA, schreib_json, schreib_text
-from .werkzeug import gazetteer, geokodieren, preisverlauf, schriften, weltkarte
+from .werkzeug import (gazetteer, geokodieren, neuheiten, preisverlauf, schriften,
+                       weltkarte)
 
 
 # --------------------------------------------------------------------------
@@ -81,6 +82,8 @@ def befehl_sammeln(args) -> int:
 
     # Preise vergleichen, bevor geprüft und geschrieben wird
     preise = preisverlauf.verfolgen(festivals)
+    # ... und was seit gestern dazugekommen ist, fürs Tagebuch
+    neues = neuheiten.verfolgen(festivals)
 
     for widerspruch in pruefung.stimmigkeit(festivals):
         print(f"  ! Widerspruch in den Daten: {widerspruch}", file=sys.stderr)
@@ -117,6 +120,9 @@ def befehl_sammeln(args) -> int:
     acts = len({b for f in festivals for b in f.lineup})
     print(f"Preise beobachtet        : {preise['beobachtet']}, "
           f"seit dem ersten Mal geändert: {preise['geändert']}")
+    print(f"Seit gestern dazu        : {neues['festivals']} Festivals, "
+          f"{neues['bands']} bestätigte Bands "
+          f"({neues['tagebuch']} Einträge im Tagebuch)")
     print(f"\nFestivals gesamt        : {len(festivals)}")
     print(f"  aus mehreren Quellen  : {sum(1 for f in festivals if len(f.quellen) > 1)}")
     print(f"  mit Lineup            : {sum(1 for f in festivals if f.lineup)}")

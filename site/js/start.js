@@ -314,6 +314,7 @@
       datenstandZeigen();
       datumsHinweis(false);
       FF.zeichnen();
+      FF.wunsch.zeichnen();
     });
 
     datenstandZeigen();
@@ -327,6 +328,7 @@
     FF.bandauswahlZeichnen();
     FF.genresZeichnen();
     FF.zeichnen();
+    FF.wunsch.start();
   }
 
   document.addEventListener('DOMContentLoaded', init);

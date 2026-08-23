@@ -42,7 +42,8 @@
   const ZEICHEN = { EUR: '€', CHF: 'CHF', GBP: '£', USD: '$', DKK: 'kr.',
                     SEK: 'kr', NOK: 'kr', PLN: 'zł', CZK: 'Kč', HUF: 'Ft' };
 
-  const nachEuro = (betrag) => betrag * (KURSE[state.preis.waehrung] || 1);
+  const nachEuro = (betrag, waehrung) =>
+    betrag * (KURSE[waehrung || state.preis.waehrung] || 1);
 
   /** Welche Währung gilt an diesem Ort? Ohne bekanntes Land: Euro. */
   function waehrungFuerLand(land) {
@@ -60,59 +61,67 @@
     return Math.round(2 * R * Math.asin(Math.sqrt(s)));
   }
 
-  function entfernungVon(row) {
-    if (!state.home || row[SPALTE.LAT] == null) return null;
-    return luftlinie(state.home.lat, state.home.lon, row[SPALTE.LAT], row[SPALTE.LON]);
+  function entfernungVon(row, heim) {
+    const h = heim === undefined ? state.home : heim;
+    if (!h || row[SPALTE.LAT] == null) return null;
+    return luftlinie(h.lat, h.lon, row[SPALTE.LAT], row[SPALTE.LON]);
   }
 
-  /* ---------------- Prüfungen je Schritt ---------------- */
+  /* ---------------- Prüfungen je Schritt ----------------
+     Jede Prüfung bekommt den Filter als erstes Argument, statt ihn sich aus
+     `state` zu holen. Das kostet ein Zeichen und spart eine zweite Fassung:
+     Eine gemerkte Wunschliste ist derselbe Filter, nur nicht der gerade
+     eingestellte — und wird mit denselben Regeln geprüft. */
 
   const PRUEFUNG = {
     // Der Wohnort filtert nicht, er misst nur.
     ort: () => true,
 
-    zeit(row) {
-      if (row[SPALTE.ABGESAGT] && !state.zeit.abgesagte) return false;
-      if (!row[SPALTE.VON]) return state.zeit.ohneTermin;
+    zeit(s, row) {
+      if (row[SPALTE.ABGESAGT] && !s.zeit.abgesagte) return false;
+      if (!row[SPALTE.VON]) return s.zeit.ohneTermin;
       // Der Zeitraum zählt, nicht der Beginn: Ein Festival, das gestern
       // angefangen hat und bis Sonntag läuft, ist heute noch zu erreichen.
       const ende = row[SPALTE.BIS] || row[SPALTE.VON];
-      if (state.zeit.von && ende < state.zeit.von) return false;
-      if (state.zeit.bis && row[SPALTE.VON] > state.zeit.bis) return false;
+      if (s.zeit.von && ende < s.zeit.von) return false;
+      if (s.zeit.bis && row[SPALTE.VON] > s.zeit.bis) return false;
       return true;
     },
 
-    entfernung(row) {
-      const e = state.entfernung;
-      if (!e.an || !state.home) return true;
-      const d = entfernungVon(row);
+    entfernung(s, row) {
+      const e = s.entfernung;
+      if (!e.an || !s.home) return true;
+      const d = entfernungVon(row, s.home);
       if (d === null) return e.ohneKoordinate;
       if (e.von !== null && d < e.von) return false;
       if (e.bis !== null && d > e.bis) return false;
       return true;
     },
 
-    preis(row) {
-      const p = state.preis;
+    preis(s, row) {
+      const p = s.preis;
       if (!p.an) return true;
       const wert = row[SPALTE.EUR];
       if (wert === null) return p.ohnePreis;
-      if (p.von !== null && wert < nachEuro(p.von)) return false;
-      if (p.bis !== null && wert > nachEuro(p.bis)) return false;
+      if (p.von !== null && wert < nachEuro(p.von, p.waehrung)) return false;
+      if (p.bis !== null && wert > nachEuro(p.bis, p.waehrung)) return false;
       return true;
     },
 
-    bands(row, i) {
-      if (!state.bands.an || !state.bands.auswahl.size) return true;
-      for (const b of state.bands.auswahl.keys()) if (sets[i].has(b)) return true;
+    // Eine ausgewählte Band genügt: Wer fünf nennt, sucht nicht das Festival,
+    // auf dem alle fünf spielen, sondern jedes, auf dem eine davon spielt.
+    bands(s, row, i) {
+      if (!s.bands.an || !s.bands.auswahl.size) return true;
+      const drin = i == null ? new Set(row[SPALTE.LINEUP] || []) : sets[i];
+      for (const b of s.bands.auswahl.keys()) if (drin.has(b)) return true;
       return false;
     },
 
-    genre(row) {
-      if (!state.genre.an || !state.genre.auswahl.size) return true;
+    genre(s, row) {
+      if (!s.genre.an || !s.genre.auswahl.size) return true;
       const eigene = row[SPALTE.GENRES] || [];
-      if (!eigene.length) return state.genre.ohneGenre;
-      return eigene.some((g) => state.genre.auswahl.has(g));
+      if (!eigene.length) return s.genre.ohneGenre;
+      return eigene.some((g) => s.genre.auswahl.has(g));
     },
   };
 
@@ -122,7 +131,7 @@
     const pruefungen = KETTE.slice(0, bis + 1).map((n) => PRUEFUNG[n]);
     let n = 0;
     for (let i = 0; i < F.length; i++) {
-      if (pruefungen.every((p) => p(F[i], i))) n++;
+      if (pruefungen.every((p) => p(state, F[i], i))) n++;
     }
     return n;
   }
@@ -131,7 +140,7 @@
   function gefiltert() {
     const raus = [];
     for (let i = 0; i < F.length; i++) {
-      if (KETTE.every((n) => PRUEFUNG[n](F[i], i))) raus.push(i);
+      if (KETTE.every((n) => PRUEFUNG[n](state, F[i], i))) raus.push(i);
     }
     return raus;
   }

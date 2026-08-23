@@ -59,10 +59,19 @@ def sprachen() -> set[str]:
     return {s for s, _ in EINTRAG.findall(block)}
 
 
-def quelltexte() -> dict[str, str]:
-    """Alle Skripte der Seite plus index.html, nach Namen."""
+def quelltexte(mit_tabelle: bool = True) -> dict[str, str]:
+    """Alle Skripte der Seite plus index.html, nach Namen.
+
+    `mit_tabelle=False` lässt i18n.js weg. Für die Frage „ruft das jemand?"
+    muss sie draußen bleiben: Dort steht jeder Schlüssel schon als Definition,
+    und die Suche fände ihn immer — die Prüfung auf verwaiste Texte konnte
+    deshalb nie anschlagen. Sie tat es auch nicht: Zwei Texte in zehn Sprachen
+    standen darin, die niemand mehr rief.
+    """
     dateien = {"index.html": SEITE}
     for pfad in SKRIPTE:
+        if not mit_tabelle and pfad.endswith("i18n.js"):
+            continue
         datei = SITE / pfad
         if datei.exists():
             dateien[pfad] = datei.read_text(encoding="utf-8")
@@ -128,10 +137,15 @@ def test_auch_die_umwegigen_schluessel_gibt_es():
 
 
 def test_keine_verwaisten_texte():
-    """Ein Text, den niemand ruft, ist Ballast — und beim Übersetzen Arbeit."""
-    alles = "\n".join(quelltexte().values())
+    """Ein Text, den niemand ruft, ist Ballast — und beim Übersetzen Arbeit.
+
+    Ohne die Tabelle selbst gesucht: In ihr steht jeder Schlüssel schon als
+    Definition. Gerufen wird er als `t('x.y')` im Skript oder als
+    `data-i18n="x.y"` in der Seite — beide Schreibweisen zählen.
+    """
+    alles = "\n".join(quelltexte(mit_tabelle=False).values())
     verwaist = sorted(k for k in texte()
-                      if f"'{k}'" not in alles
+                      if f"'{k}'" not in alles and f'"{k}"' not in alles
                       # t('genre.' + key) und t('sort.' + key) sind Familien
                       and not re.match(r"^(genre|sort)\.", k))
     assert not verwaist, f"nirgends verwendet: {verwaist}"

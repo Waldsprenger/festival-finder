@@ -28,13 +28,15 @@ def stile() -> list[str]:
 def vorrat() -> list[str]:
     """Was der Service Worker beim ersten Besuch ablegen soll.
 
-    Die Seite selbst, ihre Stile, ihre Skripte, die Rechtstexte und das
-    Manifest. Nicht dabei: `orte.js` — das große Verzeichnis wird nur
-    nachgeladen, wenn jemand einen Ort sucht, den die kleine Liste nicht kennt.
+    Die Seite selbst, ihre Stile, ihre Skripte, die Rechtstexte, das Manifest
+    und die Neuigkeiten. Nicht dabei: `orte.js` — das große Verzeichnis wird
+    nur nachgeladen, wenn jemand einen Ort sucht, den die kleine Liste nicht
+    kennt.
     """
     dateien = ["./", "./index.html"]
     dateien += [f"./{d}" for d in stile()]
     dateien += [f"./{d}" for d in skripte() if d != "orte.js"]
-    dateien += ["./impressum.html", "./datenschutz.html", "./manifest.webmanifest"]
+    dateien += ["./impressum.html", "./datenschutz.html", "./manifest.webmanifest",
+                "./neu.json"]
     # Reihenfolge behalten, Doppelte entfernen
     return list(dict.fromkeys(dateien))

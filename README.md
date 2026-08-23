@@ -75,6 +75,7 @@ nichts voneinander.
 | `festivalfinder/werkzeug/geokodieren.py` | Ortskoordinaten von Nominatim → `data/geo.json` |
 | `festivalfinder/werkzeug/schriften.py` | Display-Schrift als data-URI |
 | `festivalfinder/werkzeug/preisverlauf.py` | was ein Ticket zuerst und was es heute kostet |
+| `festivalfinder/werkzeug/neuheiten.py` | was seit gestern dazukam: Festivals und bestätigte Bands |
 | `festivalfinder/werkzeug/schnappschuss.py` | der Stand einer Quelle, die nicht jeder Lauf erreicht |
 | **oben** | |
 | `festivalfinder/sammeln.py` | der Sammellauf über alle Quellen |
@@ -101,6 +102,7 @@ Der Service Worker und die gebündelte Einzelseite lesen genau diese Liste.
 | `site/js/kette.js` | die sechs Schritte: aufklappen, zusammenklappen, weiterreichen |
 | `site/js/auswahl.js` | Bandsuche und Genreauswahl |
 | `site/js/liste.js` | Treffer: Satz, Sortierung, Karten |
+| `site/js/wunsch.js` | gemerkte Suchen und was seit dem letzten Besuch dazukam |
 | `site/js/oberflaeche.js` | Hilfetexte, Installation, Zählung, Rückmeldung, Rechtstexte |
 | `site/js/start.js` | die Verdrahtung |
 | `site/data.js` | die Daten, von `ausgabe/daten_js.py` erzeugt |
@@ -501,9 +503,9 @@ Alle Daten stehen in `site/data.js` als Zahlenreihen: Bands und Genres nur als
 Index, das drückt 5.524 Festivals mit 40.547 Acts auf 6,1 MB (2,1 MB über die
 Leitung, weil GitHub Pages komprimiert).
 
-Der Code liegt in elf Teilen: `karte.js` zeichnet die Landkarte und kennt vom
-Rest nur vier Handgriffe (`start`, `zeichnen`, `setzePins`, `zentrieren`);
-`app.js` kümmert sich um alles andere. Deutsche Texte stehen ausschließlich in
+Der Code liegt in zwölf Teilen: `karte.js` zeichnet die Landkarte und kennt vom
+Rest nur vier Handgriffe (`start`, `zeichnen`, `setzePins`, `zentrieren`), die
+übrigen teilen sich `FF` als einzigen Namensraum. Deutsche Texte stehen ausschließlich in
 `i18n.js` — auch die Hilfetexte hinter den Fragezeichen, die früher zusätzlich
 im HTML standen und dort auseinanderliefen. Zahlen in diesen Texten kommen aus
 den Daten (`Für {ohnePreis} Festivals nennt die Quelle keinen Preis`), damit
@@ -566,6 +568,57 @@ jedem Regler, Installation als App mit Offline-Betrieb, Rückmeldung per
 [js/config.js](site/js/config.js) eine GoatCounter-Kennung steht **und** die Seite
 eigenständig über HTTPS läuft. Der Stand bleibt im GoatCounter-Konto; die Seite
 zeigt ihn nirgends.
+
+**Gemerkte Suchen.** Ein Filter lässt sich unter einem Namen ablegen; beim
+nächsten Besuch steht darüber, was seither dazugekommen ist. Zwei Arten von
+Neuigkeit zählen, und die zweite ist die interessantere: ein Festival, das es
+gestern nicht gab — und eine Band, die bei einem längst bekannten Festival neu
+bestätigt wurde. Wacken kennt jeder; interessant wird es, wenn dort Powerwolf
+dazukommt. Sind mehrere Bands ausgewählt, genügt eine davon.
+
+Alles bleibt auf dem Gerät. Gespeichert wird im lokalen Speicher des Browsers,
+verglichen wird im Browser; es gibt kein Konto, keinen Server und keine
+Anmeldung. Wer eine Suche auf ein zweites Gerät bringen will, nimmt den Link:
+Der Filter steht darin, base64-verpackt hinter `#l=`.
+
+Drei Entscheidungen, die dahinterstehen:
+
+* **Bands als Namen, nicht als Nummern.** `band_nr()` vergibt die Indizes bei
+  jedem Bau neu, in der Reihenfolge des Auftretens — eine gemerkte 4711 meinte
+  morgen eine andere Band. Namen, die aus allen Quellen verschwinden, fallen
+  beim Auspacken weg, statt als `undefined` stehen zu bleiben und die Suche
+  stumm zu machen.
+* **Nur eine Prüfregel.** `FF.PRUEFUNG` bekommt den Filter als Argument, statt
+  ihn sich aus `state` zu holen. Eine gemerkte Suche ist derselbe Filter, nur
+  nicht der gerade eingestellte, und wird mit denselben Regeln geprüft — nicht
+  mit einer zweiten Fassung, die irgendwann davonläuft.
+* **Ein Zeitstempel als Sicherung.** `neu.json` trägt den Stand des Laufs, aus
+  dem sie stammt. Liefert der Anwendungsspeicher eine Fassung aus einem anderen
+  Lauf, gälten ihre Genre-Nummern für eine andere `data.js` — dann gilt die
+  Datei als ungültig, statt falsch zu melden.
+
+Was dazugekommen ist, rechnet der Lauf aus, nicht der Browser:
+[werkzeug/neuheiten.py](festivalfinder/werkzeug/neuheiten.py) hält in
+`data/bestand_verlauf.json` fest, welche Festivals es gibt und wer bei ihnen
+spielt, und schreibt die Unterschiede als Tagebuch nach `data/neuheiten.json`,
+dreißig Tage weit zurück — so lange darf ein Gerät auch aus sein. Beim Bauen
+wird daraus `site/neu.json`, mit denselben Zeilen wie `data.js`, damit die
+Seite nicht zweierlei Zeilenformen kennen muss.
+
+Zwei Regeln halten das Tagebuch ruhig: Der erste Lauf meldet nichts — ohne
+Vergleichsstand wären alle 13.338 Festivals neu. Und ein Festival, das einen
+Lauf lang fehlt, ist nicht verschwunden: An dem Tag, an dem festivalticker den
+Serverlauf abwies, fehlten 1.900 auf einmal; ohne Geduld wären sie am Tag
+darauf allesamt „neu" gewesen.
+
+**Was es (noch) nicht gibt: Push und E-Mail.** Beides ginge, kostet aber sehr
+Verschiedenes. Eine Push-Meldung darf inhaltsleer sein — der Service Worker
+holt sich die Änderungen und gleicht sie hier ab, der Absender erfährt nie,
+wonach jemand sucht. Dafür fehlt nur eine Stelle, die Abo-Endpunkte
+entgegennimmt; GitHub kann das nicht, ein kleiner Worker anderswo schon. Eine
+E-Mail dagegen muss fertig getextet verschickt werden: Der Abgleich müsste auf
+einem Server passieren, und damit lägen Adresse und Bandauswahl dort. Das ist
+kein technisches, sondern ein datenschutzrechtliches Vorhaben.
 
 ## Veröffentlichen
 
@@ -638,6 +691,7 @@ einmal falsch in den Daten:
 | `tests/test_sammeln.py` | der Ablauf des Laufs: Parsefehler, Schweigen, Zwischenspeicher |
 | `tests/test_pruefung.py` | Selbstprüfung und Einbruchsmeldung |
 | `tests/test_werkzeug.py` | Preisgeschichte und mitgebrachter Stand |
+| `tests/test_neuheiten.py` | das Tagebuch der Neuzugänge — und wann es schweigt |
 | `tests/test_werkzeug_netz.py` | Ausfall des Kartendienstes ist kein „Ort unbekannt" |
 | `tests/test_dateien.py` | JSON schreiben und lesen, auch bei Abbruch mittendrin |
 | `tests/test_dokumentation.py` | das README gegen das Projekt, das es wirklich gibt |

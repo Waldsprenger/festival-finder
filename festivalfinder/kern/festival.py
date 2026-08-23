@@ -15,6 +15,7 @@ from datetime import date
 
 from . import zeit
 from .fund import Fund
+from .text import city_key, festival_key
 
 
 @dataclass(slots=True)
@@ -56,6 +57,17 @@ class Festival:
             genre=f.genre, besucher=f.besucher, hinweis=f.hinweis,
             abgesagt=f.abgesagt, rang=rang,
         )
+
+    @property
+    def kennung(self) -> str:
+        """Dasselbe Festival über Läufe hinweg wiedererkennen.
+
+        Nicht die Zeilennummer und nicht der Name: Die Nummer verschiebt sich
+        bei jedem Lauf, und der Name schwankt zwischen den Quellen. Der
+        Schlüssel aus Name, Jahrgang und Ort überlebt beides — die
+        Preisgeschichte und das Tagebuch der Neuzugänge hängen daran.
+        """
+        return f"{festival_key(self.name)}|{self.jahr}|{city_key(self.stadt)}"
 
     @property
     def lineup(self) -> list[str]:

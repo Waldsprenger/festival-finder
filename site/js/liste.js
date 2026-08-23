@@ -296,5 +296,5 @@
     return det;
   }
 
-  Object.assign(FF, { zeichnen, eintragZeigen, sortierungZeichnen });
+  Object.assign(FF, { zeichnen, eintragZeigen, sortierungZeichnen, termin });
 })();

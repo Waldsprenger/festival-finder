@@ -39,6 +39,19 @@
 
 <main>
 
+  <!-- ============ Gemerkte Suchen ============
+       Steht vor der Kette, weil man sie öffnen will, bevor man sechs Fragen
+       neu beantwortet. Ohne gemerkte Suche ist der Abschnitt nicht da. -->
+  <section class="panel" id="s-wunsch" hidden>
+    <h2><span class="num">♥</span> <span data-i18n="lists.title">Gemerkte Suchen</span>
+      <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="lists.help">?</button>
+    </h2>
+    <div class="koerper">
+      <p class="stat" id="wunsch-stat"></p>
+      <ul class="wunschliste" id="wunsch-liste"></ul>
+    </div>
+  </section>
+
   <!-- ============ Schritt 1: Wohnort ============
        Die Kette baut sich Frage für Frage auf. Jede beantwortete Frage klappt
        zu einer Zeile zusammen; erst danach erscheint die nächste. -->
@@ -278,6 +291,17 @@
 
     <p class="stat" id="result-stat" data-i18n="res.none">Keine Treffer.</p>
     <ol class="festivals" id="festival-list"></ol>
+
+    <!-- Diese Suche merken. Bleibt auf dem Gerät; der Link trägt sie weiter. -->
+    <div class="merken" id="merken">
+      <div class="row">
+        <input type="text" id="merk-name" maxlength="60"
+               data-i18n-ph="lists.namePh" placeholder="Name, z. B. Metal-Sommer">
+        <button type="button" id="merk-speichern" data-i18n="lists.save"
+                data-i18n-title="lists.saveTitle">Diese Suche merken</button>
+      </div>
+      <p class="hint" id="merk-hint"></p>
+    </div>
   </section>
 
   <!-- ============ Rückmeldung ============ -->
@@ -383,6 +407,7 @@
 <script src="js/kette.js"></script>
 <script src="js/auswahl.js"></script>
 <script src="js/liste.js"></script>
+<script src="js/wunsch.js"></script>
 <script src="js/oberflaeche.js"></script>
 <script src="js/start.js"></script>
 </body>

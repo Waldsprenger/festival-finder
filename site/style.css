@@ -400,6 +400,59 @@ button.help.on { border-color: var(--amber); background: var(--amber); color: #1
 }
 .stat b { color: var(--amber); font-variant-numeric: tabular-nums; }
 
+/* ---------- Gemerkte Suchen ---------- */
+
+.merken {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--line);
+}
+
+.wunschliste { list-style: none; margin: 0; padding: 0; }
+
+.wunschliste > li {
+  padding: .75rem 0;
+  border-top: 1px solid var(--line);
+}
+.wunschliste > li:first-child { border-top: 0; }
+
+.wunsch-kopf {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  flex-wrap: wrap;
+}
+
+.wunsch-knoepfe { display: flex; gap: .4rem; margin-left: auto; flex-wrap: wrap; }
+
+/* Die Zahl der Neuzugänge — der einzige Grund, hier hinzusehen */
+.marke {
+  padding: .1rem .5rem;
+  border-radius: 999px;
+  background: var(--red);
+  color: #fff;
+  font-size: .78rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.wunsch-neu {
+  list-style: none;
+  margin: .6rem 0 .6rem;
+  padding: .6rem 0 0 .9rem;
+  border-left: 2px solid var(--line);
+}
+.wunsch-neu li { margin: 0 0 .55rem; font-size: .9rem; }
+.wunsch-neu li:last-child { margin-bottom: 0; }
+.wunsch-neu b { color: var(--fg); }
+.wunsch-neu span { color: var(--mut); }
+
+.stat.ok { color: var(--amber); }
+
+@media (max-width: 640px) {
+  .wunsch-knoepfe { margin-left: 0; width: 100%; }
+}
+
 /* ---------- Rückmeldung ---------- */
 
 select, textarea {

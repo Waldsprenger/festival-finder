@@ -20,7 +20,8 @@ from ..kern.genres import OBERBEGRIFFE, oberbegriffe
 from ..kern.geld import KURSE, WAEHRUNG_LAND, in_euro
 from ..kern.orte import FEINRAHMEN, ISO_CODES, KONTINENT
 from ..kern.text import REGELN
-from ..pfade import DATA, SITE, lies_json, schreib_text
+from ..pfade import DATA, SITE, lies_json, schreib_json, schreib_text
+from ..werkzeug import neuheiten
 from .verorten import Verorter
 
 #: Spalten einer Festivalzeile — dieselbe Reihenfolge steht in site/js/daten.js
@@ -130,6 +131,37 @@ def als_javascript(name: str, payload: dict) -> str:
     return f"window.{name} = JSON.parse('{text}');\n"
 
 
+def neuigkeiten(festivals: list[Festival], zeilen: list, stand: str) -> int:
+    """`site/neu.json`: was in den letzten dreißig Tagen dazugekommen ist.
+
+    Die Zeilen haben dieselbe Spaltenordnung wie in `data.js` — es soll nur
+    eine Zeilenform geben, sonst prüft die Seite zweierlei Zeilen mit
+    zweierlei Regeln. Was die Datei nicht mitnimmt, sind die Lineup-Nummern:
+    Sie werden bei jedem Bauen neu vergeben. Dazugekommene Bands stehen als
+    Namen daneben.
+
+    Der Zeitstempel ist eine Sicherung: Liefert der Anwendungsspeicher eine
+    Fassung aus einem anderen Lauf, passen die Genre-Nummern nicht mehr
+    zusammen — dann gilt die Datei als ungültig, statt falsch zu melden.
+    """
+    tagebuch = lies_json(neuheiten.TAGEBUCH, []) or []
+    # Nur, was es heute noch gibt: Ein Festival, das inzwischen wieder
+    # verschwunden ist, muss niemand mehr gemeldet bekommen.
+    nach_kennung = {f.kennung: n for n, f in enumerate(festivals)}
+    eintraege = []
+    for e in tagebuch:
+        n = nach_kennung.get(e.get("k"))
+        if n is None:
+            continue
+        zeile = list(zeilen[n])
+        zeile[LINEUP] = []
+        eintraege.append({"g": e["grund"], "seit": e["seit"],
+                          "b": e.get("bands") or [], "z": zeile})
+    schreib_json(SITE / "neu.json", {"stand": stand, "eintraege": eintraege},
+                 kompakt=True)
+    return len(eintraege)
+
+
 def bauen(festivals: list[Festival]) -> dict:
     """site/data.js und site/orte.js schreiben; gibt die Kennzahlen zurück."""
     geo = lies_json(DATA / "geo.json", {})
@@ -231,6 +263,7 @@ def bauen(festivals: list[Festival]) -> dict:
 
     return {
         "festivals": len(zeilen),
+        "neuigkeiten": neuigkeiten(festivals, zeilen, payload["generated"]),
         "mit_koordinaten": verorten.gefunden,
         "aus_plz": verorten.aus_plz,
         "aus_cache": verorten.aus_cache,

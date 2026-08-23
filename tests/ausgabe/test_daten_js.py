@@ -11,9 +11,12 @@ from datetime import date
 
 import pytest
 
-from festivalfinder.ausgabe.daten_js import (aufrunden, als_javascript,
+from festivalfinder.ausgabe import daten_js
+from festivalfinder.ausgabe.daten_js import (LINEUP, aufrunden, als_javascript,
                                              datenrahmen,
                                              frueheste_monatsgrenze, pruefe)
+from festivalfinder.kern.festival import Festival
+from festivalfinder.werkzeug import neuheiten
 
 
 def zeile(**rest):
@@ -119,3 +122,62 @@ class TestGrenzen:
 
     def test_ohne_termine_keine_untergrenze(self):
         assert frueheste_monatsgrenze([zeile(von="")]) == ""
+
+
+class TestNeuigkeiten:
+    """`site/neu.json` — was die Seite gegen ihre gemerkten Wunschlisten hält."""
+
+    @pytest.fixture(autouse=True)
+    def eigene_dateien(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(neuheiten, "TAGEBUCH", tmp_path / "neuheiten.json")
+        monkeypatch.setattr(daten_js, "SITE", tmp_path)
+        return tmp_path
+
+    def eintraege(self, tmp_path):
+        return json.loads((tmp_path / "neu.json").read_text(encoding="utf-8"))
+
+    def test_ein_neuzugang_kommt_mit(self, tmp_path):
+        f = Festival(name="Neufest", jahr="2026", stadt="Kiel")
+        neuheiten.TAGEBUCH.write_text(json.dumps(
+            [{"k": f.kennung, "seit": "2026-08-25", "grund": "neu",
+              "bands": ["Powerwolf"]}]), encoding="utf-8")
+
+        anzahl = daten_js.neuigkeiten([f], [zeile(name="Neufest")], "2026-08-25T05:00")
+        assert anzahl == 1
+        inhalt = self.eintraege(tmp_path)
+        assert inhalt["stand"] == "2026-08-25T05:00"
+        assert inhalt["eintraege"][0]["g"] == "neu"
+        assert inhalt["eintraege"][0]["b"] == ["Powerwolf"]
+        assert inhalt["eintraege"][0]["z"][0] == "Neufest"
+
+    def test_die_lineupnummern_bleiben_draussen(self, tmp_path):
+        """Sie werden bei jedem Bauen neu vergeben — eine gemerkte 4711 meinte
+        morgen eine andere Band. Was dazukam, steht als Name daneben."""
+        f = Festival(name="Neufest", jahr="2026", stadt="Kiel")
+        neuheiten.TAGEBUCH.write_text(json.dumps(
+            [{"k": f.kennung, "seit": "2026-08-25", "grund": "lineup",
+              "bands": ["Ghost"]}]), encoding="utf-8")
+        daten_js.neuigkeiten([f], [zeile(lineup=[3, 7])], "2026-08-25T05:00")
+        assert self.eintraege(tmp_path)["eintraege"][0]["z"][LINEUP] == []
+
+    def test_die_zeile_behaelt_ihre_spaltenordnung(self, tmp_path):
+        """Es soll nur eine Zeilenform geben — sonst prüft die Seite zweierlei
+        Zeilen mit zweierlei Regeln."""
+        f = Festival(name="Neufest", jahr="2026", stadt="Kiel")
+        neuheiten.TAGEBUCH.write_text(json.dumps(
+            [{"k": f.kennung, "seit": "2026-08-25", "grund": "neu", "bands": []}]),
+            encoding="utf-8")
+        daten_js.neuigkeiten([f], [zeile()], "2026-08-25T05:00")
+        assert len(self.eintraege(tmp_path)["eintraege"][0]["z"]) == len(zeile())
+
+    def test_was_es_nicht_mehr_gibt_kommt_nicht_mit(self, tmp_path):
+        """Ein Festival, das inzwischen wieder verschwunden ist, muss niemand
+        gemeldet bekommen."""
+        neuheiten.TAGEBUCH.write_text(json.dumps(
+            [{"k": "verschwunden|2026|kiel", "seit": "2026-08-25",
+              "grund": "neu", "bands": []}]), encoding="utf-8")
+        assert daten_js.neuigkeiten([], [], "2026-08-25T05:00") == 0
+
+    def test_ohne_tagebuch_bleibt_die_datei_leer(self, tmp_path):
+        assert daten_js.neuigkeiten([], [], "2026-08-25T05:00") == 0
+        assert self.eintraege(tmp_path)["eintraege"] == []

@@ -20,7 +20,6 @@ Festivals löschen.
 from datetime import date
 
 from ..kern.festival import Festival
-from ..kern.text import city_key, festival_key
 from ..pfade import DATA, lies_json, schreib_json
 
 DATEI = DATA / "preis_verlauf.json"
@@ -43,11 +42,6 @@ def _tage_her(stand: str, heute: str) -> int:
         return 10 ** 6
 
 
-def schluessel(f: Festival) -> str:
-    """Ein Festival über Läufe hinweg wiedererkennen."""
-    return f"{festival_key(f.name)}|{f.jahr}|{city_key(f.stadt)}"
-
-
 def verfolgen(festivals: list[Festival], heute: str | None = None) -> dict[str, int]:
     """Preise mit dem letzten Lauf vergleichen und die Historie fortschreiben.
 
@@ -62,7 +56,7 @@ def verfolgen(festivals: list[Festival], heute: str | None = None) -> dict[str, 
     for f in festivals:
         if not f.preis:
             continue
-        k = schluessel(f)
+        k = f.kennung
         alt = vorher.get(k)
         if alt is None:
             eintrag = {"erst": f.preis, "seit": heute,
