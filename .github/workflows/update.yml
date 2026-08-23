@@ -103,7 +103,25 @@ jobs:
       # Die Reihenfolge der Schritte steht in festivalfinder/cli.py - damit
       # ein Lauf hier und ein Lauf am eigenen Rechner dasselbe tun.
       - name: Datenlauf
-        run: python -m festivalfinder ${{ steps.art.outputs.befehl }}
+        run: |
+          set -o pipefail
+          python -m festivalfinder ${{ steps.art.outputs.befehl }} 2>&1 | tee /tmp/lauf.log
+
+      # Welcher der sechs Teilschritte gescheitert ist, stand bisher nur im
+      # Protokoll - und da sieht niemand nach, der nur die Fehlermeldung
+      # "exit code 1" vor sich hat. befehl_alles schreibt zu jedem Schritt eine
+      # Zeile; die gehoert in die Zusammenfassung.
+      - name: Woran es lag
+        if: failure()
+        run: |
+          {
+            echo "### Der Lauf ist gescheitert"
+            echo '```'
+            grep -E "^\[|FEHLER|Traceback|Error" /tmp/lauf.log | tail -40 || true
+            echo "--- die letzten Zeilen ---"
+            tail -25 /tmp/lauf.log || echo "kein Protokoll"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       # Nur nach einem Sammellauf: Ein Bauschritt hat nichts geholt.
       - name: Zwischenspeicher ablegen
