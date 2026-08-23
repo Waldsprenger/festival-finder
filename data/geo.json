@@ -5070,11 +5070,6 @@
     "lon": 11.1177362,
     "display": "Gadebusch, Nordwestmecklenburg, Mecklenburg-Vorpommern, 19205, Deutschland"
   },
-  "Builth Wells|Irland": {
-    "lat": 52.1493287,
-    "lon": -3.4058015,
-    "display": "Builth Wells, Powys, Wales, LD2 3AP, Vereinigtes Königreich"
-  },
   "Schierling|Deutschland": {
     "lat": 48.8374635,
     "lon": 12.1379497,
@@ -5480,11 +5475,6 @@
     "lon": 13.3951309,
     "display": "Berlin, Deutschland"
   },
-  "Dobr|Tschechien": {
-    "lat": 53.4377778,
-    "lon": 18.3766667,
-    "display": "Nowe Dobra, Gmeinde Schwetz, powiat świecki, Woiwodschaft Kujawien-Pommern, 86-100, Polen"
-  },
   "Verden|Deutschland": {
     "lat": 52.9219073,
     "lon": 9.2286737,
@@ -5764,11 +5754,6 @@
     "lat": 49.1966572,
     "lon": 9.6862506,
     "display": "Westernach, Kupferzell, GVV Hohenloher Ebene, Hohenlohekreis, Baden-Württemberg, Deutschland"
-  },
-  "Fuine|Kroatien": {
-    "lat": 46.5504384,
-    "lon": 12.7734428,
-    "display": "Creta della Fuina / Crete di Fuine, Prato Carnico / Prât di Cjargne, Udine, Friaul-Julisch Venetien, 33020, Italien"
   },
   "St. Pölten|AT": {
     "lat": 48.2043985,
@@ -9733,11 +9718,6 @@
     "lon": 8.6254937,
     "display": "Sankt Peter-Ording, Eiderstedt, Kreis Nordfriesland, Schleswig-Holstein, 25826, Deutschland"
   },
-  "Mumbai|IN": {
-    "lat": 40.4427341,
-    "lon": -3.6370906,
-    "display": "Mumbai, Travesía López de Aranda, Salvador, San Blas - Canillejas, Madrid, Autonome Gemeinschaft Madrid, 28027, Spanien"
-  },
   "Utrecht|NL": {
     "lat": 52.0907006,
     "lon": 5.1215634,
@@ -9747,11 +9727,6 @@
     "lat": 51.1981778,
     "lon": 6.6916476,
     "display": "Neuss, Rhein-Kreis Neuss, Nordrhein-Westfalen, Deutschland"
-  },
-  "Uvita|CR": {
-    "lat": 43.7245009,
-    "lon": 7.4110388,
-    "display": "Uvita, Avenue Marquet, Cap-d'Ail, Nizza, Alpes-Maritimes, Provence-Alpes-Côte d'Azur, Metropolitanes Frankreich, 06320, Frankreich"
   },
   "Freising|DE": {
     "lat": 48.4008273,
@@ -9778,16 +9753,6 @@
     "lon": 23.723913,
     "display": "104 45, 4η Κοινότητα Αθηνών, Athen, Δήμος Αθηναίων, Regionalbezirk Athen-Zentrum, Region Attika, Attika, Griechenland"
   },
-  "Buenos Aires|AR": {
-    "lat": 40.9537167,
-    "lon": -5.7051935,
-    "display": "Buenos Aires, Salamanca, Kastilien und León, Spanien"
-  },
-  "Santiago de Chile|CL": {
-    "lat": 50.5060917,
-    "lon": 30.5090828,
-    "display": "площа Сантьяго-де-Чилі, Оболонь, Rajon Obolon, Kiew, 04210, Ukraine"
-  },
   "Nordhorn|Deutschland": {
     "lat": 52.4359731,
     "lon": 7.0707659,
@@ -9804,20 +9769,10 @@
     "lon": 7.0148403,
     "display": "Leysin, District d'Aigle, Waadt, 1854, Schweiz"
   },
-  "Asunción|PY": {
-    "lat": 42.6165374,
-    "lon": -5.5684051,
-    "display": "Asunción, León, Kastilien und León, Spanien"
-  },
   "Adelboden|CH": {
     "lat": 46.4927213,
     "lon": 7.5587618,
     "display": "Adelboden, Verwaltungskreis Frutigen-Niedersimmental, Verwaltungsregion Oberland, Bern, 3715, Schweiz"
-  },
-  "Bogota|CO": {
-    "lat": 47.3269285,
-    "lon": 3.6626658,
-    "display": "bogota, Monceaux-le-Comte, Clamecy, Nièvre, Bourgogne-Franche-Comté, Metropolitanes Frankreich, 58190, Frankreich"
   },
   "Fröndenberg|Deutschland": {
     "lat": 51.4739253,
@@ -9904,11 +9859,6 @@
     "lon": 6.83536,
     "display": "Großrosseln, Regionalverband Saarbrücken, Saarland, 66352, Deutschland"
   },
-  "Johannesburg|ZA": {
-    "lat": 60.046509,
-    "lon": 18.5600281,
-    "display": "Johannesburg, Norrtälje kommun, Provinz Stockholm, 763 23, Schweden"
-  },
   "Calatafimi|IT": {
     "lat": 37.9041421,
     "lon": 12.8685834,
@@ -9928,11 +9878,6 @@
     "lat": 46.0615827,
     "lon": 4.4932835,
     "display": "Lamure-sur-Azergues, Villefranche-sur-Saône, Rhône, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 69870, Frankreich"
-  },
-  "Jakarta|ID": {
-    "lat": 52.534585,
-    "lon": 13.3653585,
-    "display": "Jakarta, Hedwig-Porschütz-Straße, Europacity, Moabit, Mitte, Berlin, 10557, Deutschland"
   },
   "Spielberg|Österreich": {
     "lat": 47.2122736,
@@ -10274,11 +10219,6 @@
     "lat": 53.954381,
     "lon": 9.7866367,
     "display": "Quarnstedt, Amt Kellinghusen, Kreis Steinburg, Schleswig-Holstein, Deutschland"
-  },
-  "Bischofmais|Deutschland": {
-    "lat": 48.1971895,
-    "lon": 16.2102929,
-    "display": "Große Bischofmais, Katastralgemeinde Auhof, Hietzing, Wien, 1130, Österreich"
   },
   "Niedergörsdorf|DE": {
     "lat": 51.9508295,
@@ -11732,11 +11672,6 @@
     "lon": 7.3602385,
     "display": "Oberwangen, Köniz, Verwaltungskreis Bern-Mittelland, Verwaltungsregion Bern-Mittelland, Bern, 3173, Schweiz"
   },
-  "Incheon|KR": {
-    "lat": 38.7421801,
-    "lon": -9.148602,
-    "display": "Incheon, 16, Avenida Júlio Dinis, Campo Pequeno, Avenidas Novas, Lissabon, 1069-199, Portugal"
-  },
   "Dorsten|": {
     "lat": 51.6604071,
     "lon": 6.9647431,
@@ -12044,11 +11979,6 @@
     "lat": 52.9649759,
     "lon": 10.5605453,
     "display": "Uelzen, Landkreis Uelzen, Niedersachsen, 29525, Deutschland"
-  },
-  "Almaty|KZ": {
-    "lat": 44.7724485,
-    "lon": -0.6140958,
-    "display": "Almaty, Allée Raymond Mirande, Laurenzane, Gradignan, Bordeaux, Gironde, Neu-Aquitanien, Metropolitanes Frankreich, 33170, Frankreich"
   },
   "Kautzen|Österreich": {
     "lat": 48.9302844,
@@ -12440,16 +12370,6 @@
     "lat": 54.2733206,
     "lon": 10.7663663,
     "display": "Wangels, Oldenburg-Land, Kreis Ostholstein, Schleswig-Holstein, Deutschland"
-  },
-  "Pattaya|TH": {
-    "lat": 49.4868756,
-    "lon": 0.1279136,
-    "display": "Pattaya, 64, Rue de Prony, Saint-Nicolas, Le Havre, Seine-Maritime, Normandie, Metropolitanes Frankreich, 76600, Frankreich"
-  },
-  "Hong Kong|CN": {
-    "lat": 48.876213,
-    "lon": 2.3456817,
-    "display": "Hong Kong, Rue La Fayette, Quartier du Faubourg-Montmartre, Paris 9e Arrondissement, Paris, Île-de-France, Metropolitanes Frankreich, 75009, Frankreich"
   },
   "Saalbach Hinterglemm|Österreich": {
     "lat": 47.3724977,
@@ -17345,11 +17265,6 @@
     "lon": 11.1177362,
     "display": "Gadebusch, Nordwestmecklenburg, Mecklenburg-Vorpommern, 19205, Deutschland"
   },
-  "Builth Wells|IE": {
-    "lat": 52.1493287,
-    "lon": -3.4058015,
-    "display": "Builth Wells, Powys, Wales, LD2 3AP, Vereinigtes Königreich"
-  },
   "Kreuzlingen|CH": {
     "lat": 47.6464362,
     "lon": 9.1725621,
@@ -17736,11 +17651,6 @@
     "lon": 14.0300689,
     "display": "Bad Freienwalde (Oder), Wölsickendorf-Wollenberg, Märkisch-Oderland, Brandenburg, 16259, Deutschland"
   },
-  "Dobr|CZ": {
-    "lat": 53.4377778,
-    "lon": 18.3766667,
-    "display": "Nowe Dobra, Gmeinde Schwetz, powiat świecki, Woiwodschaft Kujawien-Pommern, 86-100, Polen"
-  },
   "Verden|DE": {
     "lat": 52.9219073,
     "lon": 9.2286737,
@@ -17932,11 +17842,6 @@
     "lat": 41.1526668,
     "lon": 15.0885633,
     "display": "Ariano Irpino, Avellino, Kampanien, Italien"
-  },
-  "Fuine|HR": {
-    "lat": 46.5504384,
-    "lon": 12.7734428,
-    "display": "Creta della Fuina / Crete di Fuine, Prato Carnico / Prât di Cjargne, Udine, Friaul-Julisch Venetien, 33020, Italien"
   },
   "Glanusk|GB": {
     "lat": 51.8672773,
@@ -20143,11 +20048,6 @@
     "lon": -1.2839318,
     "display": "Mouzillon, Nantes, Loire-Atlantique, Pays de la Loire, Metropolitanes Frankreich, 44330, Frankreich"
   },
-  "Val Thorens|NL": {
-    "lat": 45.2979109,
-    "lon": 6.5822693,
-    "display": "Val Thorens, Les Belleville, Albertville, Savoyen, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 73440, Frankreich"
-  },
   "Writtle|GB": {
     "lat": 51.7284758,
     "lon": 0.4115666,
@@ -21956,11 +21856,6 @@
     "lon": 5.2203198,
     "display": "Bunnik, Utrecht, Niederlande"
   },
-  "Tarragona|NL": {
-    "lat": 41.1375471,
-    "lon": 1.0642158,
-    "display": "NL-Parking.nl, Avinguda del Prat, Riudoms, Baix Camp, Tarragona, Katalonien, 43330, Spanien"
-  },
   "Saint-Michel de Chaillol|FR": {
     "lat": 44.68172,
     "lon": 6.1669,
@@ -22221,11 +22116,6 @@
     "lat": 51.5962678,
     "lon": 13.7745344,
     "display": "Lichterfeld-Schacksdorf, Kleine Elster (Niederlausitz), Elbe-Elster, Brandenburg, Deutschland"
-  },
-  "Nigrán|NL": {
-    "lat": 42.1425187,
-    "lon": -8.7880115,
-    "display": "Nigrán, Vigo, Pontevedra, Galicien, Spanien"
   },
   "Someren|NL": {
     "lat": 51.3863224,
@@ -23094,11 +22984,6 @@
     "lat": 43.5190935,
     "lon": 13.6066218,
     "display": "Sirolo, Ancona, Marken, Italien"
-  },
-  "Offenbach am Main|NL": {
-    "lat": 50.0831579,
-    "lon": 8.7455148,
-    "display": "Deutsche Post NL Offenbach, 200, Sprendlinger Landstraße, Lauterborn, Offenbach am Main, Hessen, 63069, Deutschland"
   },
   "Sèvremont|FR": {
     "lat": 46.8404782,
@@ -24192,11 +24077,6 @@
     "lon": 23.8731966,
     "display": "Raganiškė, Seirijų seniūnija, Lazdijų rajono savivaldybė, Bezirk Alytus, 67252, Litauen"
   },
-  "Belfast BT ET|GB": {
-    "lat": 47.590251,
-    "lon": -52.7266334,
-    "display": "Belfast Street, Kent's Pond, St. John's, Neufundland, Neufundland und Labrador, A1A 2H4, Kanada"
-  },
   "Sicily|IT": {
     "lat": 37.587794,
     "lon": 14.155048,
@@ -24319,11 +24199,6 @@
     "lon": 10.1385595,
     "display": "Vester Alle, Assentoft, Randers Kommune, Region Mitteljütland, 8960, Dänemark"
   },
-  "Buckinham|GB": {
-    "lat": 28.2273755,
-    "lon": -81.3077959,
-    "display": "Buckinham Way, Saint Cloud, Osceola County, Florida, 34770, Vereinigte Staaten von Amerika"
-  },
   "Belfast BT HR|GB": {},
   "LV-|LV": {
     "lat": 56.9493977,
@@ -24435,11 +24310,6 @@
     "lon": 28.8761294,
     "display": "Ataköy Marina, Kennedy Caddesi, Sakızağacı Mahallesi, Bakırköy, İstanbul, Marmararegion, 34142, Türkei"
   },
-  "A FP|IE": {
-    "lat": 51.6521705,
-    "lon": 17.8302481,
-    "display": "FP Spomax S.A., Krępa, Ostrowo, powiat ostrowski, Woiwodschaft Großpolen, 63-400, Polen"
-  },
   "Mt Crested Butte|US": {
     "lat": 38.9076593,
     "lon": -106.9690519,
@@ -24500,11 +24370,6 @@
     "lon": 9.1896346,
     "display": "Mailand, Rodano, Mailand, Lombardei, Italien"
   },
-  "Varies|AU": {
-    "lat": 48.4068806,
-    "lon": -2.1707416,
-    "display": "Les Varies, Les varies, La Haute-Ville, Kerual, Trébédan, Dinan, Côtes-d'Armor, Bretagne, Metropolitanes Frankreich, 22980, Frankreich"
-  },
   "rue Jobin|FR": {
     "lat": 43.3103425,
     "lon": 5.3894801,
@@ -24519,11 +24384,6 @@
     "lat": 41.0256406,
     "lon": 28.9742134,
     "display": "Galataturm, Büyük Hendek Caddesi, Kuledibi, Bereketzade Mahallesi, Beyoğlu, İstanbul, Marmararegion, 34420, Türkei"
-  },
-  "Varies|US": {
-    "lat": 48.4068806,
-    "lon": -2.1707416,
-    "display": "Les Varies, Les varies, La Haute-Ville, Kerual, Trébédan, Dinan, Côtes-d'Armor, Bretagne, Metropolitanes Frankreich, 22980, Frankreich"
   },
   "Kalamitsi|GR": {
     "lat": 39.9911743,
@@ -24595,11 +24455,6 @@
     "lat": 51.7085664,
     "lon": 5.4162364,
     "display": "Zonnepark Graafsebaan, Rosmalen, Herzogenbusch, Nordbrabant, Niederlande"
-  },
-  "T DWP|IE": {
-    "lat": 51.5000171,
-    "lon": -0.1310128,
-    "display": "Department for Work and Pensions, Tothill Street, Westminster, Millbank, City of Westminster, Groß-London, England, SW1H 9NA, Vereinigtes Königreich"
   },
   "Peak Crossing|AU": {
     "lat": -27.785891,
@@ -24707,11 +24562,6 @@
     "lon": 14.4212535,
     "display": "Prag, Tschechien"
   },
-  "ATD|MT": {
-    "lat": 48.4540473,
-    "lon": -4.2433859,
-    "display": "Agence Technique Départementale, Voas Glaz, Landerneau, Brest, Finistère, Bretagne, Metropolitanes Frankreich, 29800, Frankreich"
-  },
   "Flemington Racecourse|AU": {
     "lat": -37.7892513,
     "lon": 144.9127713,
@@ -24797,11 +24647,6 @@
     "lon": -122.8448989,
     "display": "Deer Island, Columbia County, Oregon, 97018, Vereinigte Staaten von Amerika"
   },
-  "MC Breda|NL": {
-    "lat": 43.2855147,
-    "lon": 13.6748919,
-    "display": "Via Vincenzo Breda, Filippanto' - Vallon Faggiano, Civitanova Marche, Macerata, Marken, 62012, Italien"
-  },
   "Birdsville|AU": {
     "lat": -25.8980596,
     "lon": 139.3523124,
@@ -24817,52 +24662,12 @@
     "lon": -2.5650945,
     "display": "Lancashire, England, Vereinigtes Königreich"
   },
-  "None|AZ": {
-    "lat": 24.1881637,
-    "lon": 52.6182634,
-    "display": "مطار جبل الظنة, شارع جَبَل الظَّنَّة, Al Dhannah, مدينة الظنة, منطقة الظفرة, Emitrat Abu Dhabi, Vereinigte Arabische Emirate"
-  },
-  "None|PH": {
-    "lat": 13.4830962,
-    "lon": 123.6354565,
-    "display": "None, Lourdes, Albay, Bicol Region, 4513, Philippinen"
-  },
-  "None|BE": {
-    "lat": 50.5271905,
-    "lon": 5.8354965,
-    "display": "Fond del None, Chaufheid, Theux, Verviers, Lüttich, Wallonien, 4910, Belgien"
-  },
-  "None|US": {
-    "lat": 32.2527963,
-    "lon": -101.4752803,
-    "display": "Settles Hotel, 200, East 3rd Street, Original Town, Big Spring, Howard County, Texas, 79720, Vereinigte Staaten von Amerika"
-  },
-  "None|CA": {
-    "lat": 52.452143,
-    "lon": -112.9165058,
-    "display": "sunset Lane, Buffalo Sands, County of Stettler, Alberta, Kanada"
-  },
   "Attiki|GR": {
     "lat": 37.9960777,
     "lon": 23.7224191,
     "display": "Αττική, Κυψέλη, 6η Κοινότητα Αθηνών, Athen, Δήμος Αθηναίων, Regionalbezirk Athen-Zentrum, Region Attika, Attika, 104 40, Griechenland"
   },
-  "None|GB": {
-    "lat": 53.8733606,
-    "lon": -1.6359839,
-    "display": "None Go Bye Farm, Carlton, Yeadon, Leeds, West Yorkshire, England, Vereinigtes Königreich"
-  },
-  "None|FR": {
-    "lat": 45.1092975,
-    "lon": 0.9190356,
-    "display": "La None, Milhac-d'Auberoche, Bassillac et Auberoche, Périgueux, Dordogne, Neu-Aquitanien, Metropolitanes Frankreich, 24330, Frankreich"
-  },
   "Com. Sambata de Sus|RO": {},
-  "None|PL": {
-    "lat": 49.7953544,
-    "lon": 13.383345,
-    "display": "none, 27, Plzeň 1, Pilsen, Bezirk Pilsen-Stadt, Pilsner Region, Südwesten, 316 00, Tschechien"
-  },
   "La Habana|CU": {
     "lat": 23.135305,
     "lon": -82.3589631,
@@ -24873,51 +24678,21 @@
     "lon": 9.0813749,
     "display": "Alzenau, Landkreis Aschaffenburg, Bayern, 63755, Deutschland"
   },
-  "None|CZ": {
-    "lat": 50.1915183,
-    "lon": 14.2450579,
-    "display": "Raně středověké hradiště Budeč, Na Budeč, Kowar, Sakolan, Bezirk Kladen, Mittelböhmische Region, 273 28, Tschechien"
-  },
-  "None|DE": {
-    "lat": 51.307629,
-    "lon": 13.552836,
-    "display": "Verkehrslandeplatz Großenhain, 25, Zum Fliegerhorst, Naundorf, Großenhain, Meißen, Sachsen, 01558, Deutschland"
-  },
   "West Palm Beach|": {
     "lat": 26.715364,
     "lon": -80.0532942,
     "display": "West Palm Beach, Palm Beach County, Florida, Vereinigte Staaten von Amerika"
-  },
-  "IG DW|GB": {
-    "lat": 49.0457048,
-    "lon": 3.4032894,
-    "display": "Le Bill'ig Café, Rue du Château, Château-Thierry, Aisne, Nordfrankreich, Metropolitanes Frankreich, 02400, Frankreich"
   },
   "Haringey|GB": {
     "lat": 51.5879364,
     "lon": -0.1054376,
     "display": "London Borough of Haringey, Groß-London, England, Vereinigtes Königreich"
   },
-  "None|TH": {
-    "lat": 15.565178,
-    "lon": 103.9350367,
-    "display": "None, บ้านหญ้าหน่อง, จำปาขัน, อำเภอสุวรรณภูมิ, Roi Et, Thailand"
-  },
-  "None|MM": {
-    "lat": 21.8646761,
-    "lon": 96.0760219,
-    "display": "ဓနုံး, Amarapura, မန္တလေးမြို့, Mandalay-Region, 05062, Myanmar"
-  },
   "Is that All There Is Festival – Berlin|DE": {},
   "Japan|JP": {
     "lat": 34.6656393,
     "lon": 135.4324527,
     "display": "ユニバーサル・スタジオ・ジャパン, 此花区, Osaka, Präfektur Osaka, Japan"
-  },
-  "None|DK": {
-    "lat": 23.7088635,
-    "lon": 90.4187201,
-    "display": "None, 14/2, Baniyanagor Road, বানিয়া নগর, ধোলাইখাল, লক্ষ্মীবাজার, Dhaka, ঢাকা মহানগর, Dhaka, Division Dhaka, 1204, Bangladesch"
   },
   "Ciudad de México|MX": {
     "lat": 19.4326296,
@@ -24934,70 +24709,25 @@
     "lon": 10.0519916,
     "display": "Gemeinde Aalborg, Region Nordjütland, Dänemark"
   },
-  "None|ZA": {
-    "lat": -25.7586948,
-    "lon": 28.2539516,
-    "display": "none, The Link, Lynnwood, Tshwane Ward 82, Pretoria, City of Tshwane Metropolitan Municipality, Gauteng, 0113, Südafrika"
-  },
   "Thomas Koppels Gade|": {
     "lat": 56.1507773,
     "lon": 10.1858428,
     "display": "Thomas Koppels Gade, Langenæs, Frederiksbjerg, Aarhus, Aarhus Kommune, Region Mitteljütland, 8000, Dänemark"
-  },
-  "None|ES": {
-    "lat": 42.1135858,
-    "lon": 2.7716555,
-    "display": "None Sport, Avinguda Països Catalans, Banyoles, Pla de l'Estany, Girona, Katalonien, 17820, Spanien"
-  },
-  "None|SA": {
-    "lat": 25.0021563,
-    "lon": 46.571408,
-    "display": "طريق أبي بكر الصديق, Banban, محافظة الرياض, Provinz Riad, Saudi-Arabien"
   },
   "Gozo|MT": {
     "lat": 36.0467778,
     "lon": 14.2582565,
     "display": "Gozo, Malta"
   },
-  "None|IL": {
-    "lat": 48.8595242,
-    "lon": 2.3060867,
-    "display": "None, Rue Saint-Dominique, Quartier du Gros-Caillou, Paris 7e Arrondissement, Paris, Île-de-France, Metropolitanes Frankreich, 75007, Frankreich"
-  },
-  "None|MX": {
-    "lat": 17.0662649,
-    "lon": -96.7195382,
-    "display": "Las Mariposas, 517, Calle de José María Pino Suárez, Barrio Mágico de Jalatlaco, Oaxaca, Oaxaca de Juárez, Oaxaca, 68000, Mexiko"
-  },
   "Christchurch City|NZ": {
     "lat": -43.6410976,
     "lon": 172.7937209,
     "display": "Christchurch City, Canterbury, Neuseeland"
   },
-  "None|AU": {
-    "lat": -33.8947986,
-    "lon": 151.0898628,
-    "display": "Coronation Pde, Coronation Parade, Strathfield South, Inner West, Sydney, Neusüdwales, 2136, Australien"
-  },
   "Aegina Municipality|GR": {
     "lat": 37.7243694,
     "lon": 23.4938109,
     "display": "Δήμος Αίγινας, Regionalbezirk Inseln, Region Attika, Attika, 180 10, Griechenland"
-  },
-  "None|EE": {
-    "lat": 44.933143,
-    "lon": 7.540121,
-    "display": "None, Turin, Piemont, Italien"
-  },
-  "None|NG": {
-    "lat": 6.4025159,
-    "lon": 5.5615934,
-    "display": "none, Ovah, Ovia North-East, Edo, Nigeria"
-  },
-  "None|RO": {
-    "lat": 46.767253,
-    "lon": 23.7200132,
-    "display": "None, Dezmir, Apahida, Zona Metropolitană Cluj, Klausenburg, 407039, Rumänien"
   },
   "Milano|IT": {
     "lat": 45.4641943,
@@ -25014,45 +24744,15 @@
     "lon": 151.885128,
     "display": "Seventeen Seventy, Queensland, 4677, Australien"
   },
-  "None|JP": {
-    "lat": 33.5343657,
-    "lon": 134.2306566,
-    "display": "野根, 東洋町, 安芸郡, Präfektur Kōchi, Japan"
-  },
   "Aireys Inlet|": {
     "lat": -38.4620894,
     "lon": 144.1067555,
     "display": "Aireys Inlet, Victoria, 3231, Australien"
   },
-  "None|TR": {
-    "lat": 37.1322043,
-    "lon": 31.0925253,
-    "display": "None, Serik, Antalya, Mittelmeerregion, Türkei"
-  },
-  "None|RU": {
-    "lat": 53.3441657,
-    "lon": -1.5327905,
-    "display": "none, Broad Elms Lane, Parkhead, Bents Green, Sheffield, South Yorkshire, England, S11 9QZ, Vereinigtes Königreich"
-  },
-  "None|RS": {
-    "lat": 44.796479,
-    "lon": 20.4738632,
-    "display": "None Shop, 47, Стојана Протића, Чубура, Београд (Врачар), Stadtbezirk Vračar, Stadt Belgrad, Zentralserbien, 11000, Serbien"
-  },
-  "None|JO": {
-    "lat": 44.933143,
-    "lon": 7.540121,
-    "display": "None, Turin, Piemont, Italien"
-  },
   "Ísafjörður|": {
     "lat": 66.0726918,
     "lon": -23.1193541,
     "display": "Ísafjörður, Ísafjarðarbær, Vestfirðir, 400, Island"
-  },
-  "None|BG": {
-    "lat": 44.933143,
-    "lon": 7.540121,
-    "display": "None, Turin, Piemont, Italien"
   },
   "Ontario|CA": {
     "lat": 50.000678,
@@ -25085,30 +24785,10 @@
     "lon": 15.7632457,
     "display": "Niederösterreich, Österreich"
   },
-  "None|AT": {
-    "lat": 47.7565154,
-    "lon": 13.0003452,
-    "display": "none, 35, Glanstraße, Fürstenbrunn, Grödig, Bezirk Salzburg-Umgebung, Salzburg, 5082, Österreich"
-  },
-  "None|AL": {
-    "lat": 24.1881637,
-    "lon": 52.6182634,
-    "display": "مطار جبل الظنة, شارع جَبَل الظَّنَّة, Al Dhannah, مدينة الظنة, منطقة الظفرة, Emitrat Abu Dhabi, Vereinigte Arabische Emirate"
-  },
   "Warwickshire|GB": {
     "lat": 52.3213064,
     "lon": -1.5536906,
     "display": "Warwickshire, England, Vereinigtes Königreich"
-  },
-  "None|SE": {
-    "lat": 49.1834886,
-    "lon": 16.6028437,
-    "display": "none, Rullerovo nábřeží, Altbrünn, Brno-střed, Brünn, Bezirk Brünn-Stadt, Südmährische Region, 600 13, Tschechien"
-  },
-  "None|UA": {
-    "lat": 44.933143,
-    "lon": 7.540121,
-    "display": "None, Turin, Piemont, Italien"
   },
   "Isle of Anglesey|GB": {
     "lat": 53.2781603,
@@ -25135,11 +24815,6 @@
     "lon": -77.0363849,
     "display": "Washington, District of Columbia, Vereinigte Staaten von Amerika"
   },
-  "None|GR": {
-    "lat": 38.0121299,
-    "lon": 23.6300091,
-    "display": "None, Δαφνί, Σκαραμαγκάς, Δήμος Χαϊδαρίου, Regionalbezirk Athen-West, Region Attika, Attika, 124 62, Griechenland"
-  },
   "County Meath|IE": {
     "lat": 53.6497514,
     "lon": -6.5884245,
@@ -25155,20 +24830,10 @@
     "lon": -74.4041622,
     "display": "New Jersey, Vereinigte Staaten von Amerika"
   },
-  "None|FI": {
-    "lat": 63.4743,
-    "lon": 26.6052383,
-    "display": "None, Kiuruvesi, Ylä-Savon seutukunta, Nord-Savo, Festland-Finnland, 74680, Finnland"
-  },
   "New South Wales|AU": {
     "lat": -32.1629594,
     "lon": 147.0320469,
     "display": "Neusüdwales, Australien"
-  },
-  "None|LB": {
-    "lat": 44.933143,
-    "lon": 7.540121,
-    "display": "None, Turin, Piemont, Italien"
   },
   "Belgium|BE": {
     "lat": 51.2597912,
@@ -25180,20 +24845,10 @@
     "lon": -7.7553926,
     "display": "Rande, San Salvador de Couzadoiro, Ortigueira, Ortegal, A Coruña, Galicien, 15330, Spanien"
   },
-  "None|BY": {
-    "lat": 55.195419,
-    "lon": 30.2060108,
-    "display": "none, 36, Uliza Lenina (Lenin-Straße), парк Фрунзэ, Пескавацік, Кастрычніцкі раён, Wizebsk, Wizebskaja Woblasz, 210026, Belarus"
-  },
   "Soliera MO|IT": {
     "lat": 44.7383497,
     "lon": 10.9247932,
     "display": "Soliera, Unione delle Terre d'Argine, Modena, Emilia-Romagna, 41019, Italien"
-  },
-  "None|KR": {
-    "lat": 50.2130119,
-    "lon": 15.9091848,
-    "display": "none, Stříbrná, Svinary, Swinar, Königgrätz, Bezirk Königgrätz, Königgrätzer Region, 503 47, Tschechien"
   },
   "Colorado|US": {
     "lat": 38.7251776,
@@ -25256,45 +24911,20 @@
     "display": "Écaussinnes, Soignies, Hennegau, Wallonien, Belgien"
   },
   "Titanic Slipways|GB": {},
-  "None|PT": {
-    "lat": 40.7573307,
-    "lon": -8.4848879,
-    "display": "Lavagem - João de Almeida Oliveira, Lda., 268, IC 2;EN 1, Mundo Novo, Branca, Albergaria-a-Velha, Aveiro, 3850-576, Portugal"
-  },
   "Al Hebiah 4|AE": {
     "lat": 25.0334367,
     "lon": 55.2205444,
     "display": "الحبية 4, Dubai, Vereinigte Arabische Emirate"
-  },
-  "None|IN": {
-    "lat": 31.5225078,
-    "lon": 74.9822688,
-    "display": "None, Tarn Taran Tahsil, Distrikt Tarn Taran, Punjab, 143402, Indien"
   },
   "Kingston upon Thames|": {
     "lat": 51.4096275,
     "lon": -0.3062621,
     "display": "Kingston upon Thames, Groß-London, England, KT1 1JS, Vereinigtes Königreich"
   },
-  "None|CH": {
-    "lat": 47.3736617,
-    "lon": 8.5291725,
-    "display": "St. Jakob, 슈타우파하, Langstrasse, Kreis 4, Zürich, Bezirk Zürich, Zürich, 8004, Schweiz"
-  },
-  "None|BH": {
-    "lat": 44.068719,
-    "lon": 18.4227277,
-    "display": "None, R 460, Odžak, Kamenica, Općina Vareš, Zeničko-dobojski kanton, Föderation Bosnien und Herzegowina, Bosnien und Herzegowina"
-  },
   "Rosarito Beach|MX": {
     "lat": 32.3286817,
     "lon": -117.0537951,
     "display": "Rosarito Tripizdon Beach, Rosarito, Municipio de Playas de Rosarito, Niederkalifornien, Mexiko"
-  },
-  "None|HU": {
-    "lat": 47.5436118,
-    "lon": 19.3979567,
-    "display": "J & J Autosport-Service Kft., 38, Szent István utca, Isaszeg, Gödöllői járás, Komitat Pest, Mittelungarn, 2117, Ungarn"
   },
   "BS TN|GB": {
     "lat": 53.6588979,
@@ -25316,11 +24946,6 @@
     "lon": -0.0496958,
     "display": "Jamaica Street, Ratcliffe, Stepney, London Borough of Tower Hamlets, Groß-London, England, E1 3HR, Vereinigtes Königreich"
   },
-  "None|BB": {
-    "lat": 51.9469967,
-    "lon": 13.8886533,
-    "display": "None, Deichsiedlung, Lübben (Spreewald), Dahme-Spreewald, Brandenburg, 15907, Deutschland"
-  },
   "Annandale-on-Hudson|US": {
     "lat": 42.0128695,
     "lon": -73.9081901,
@@ -25330,11 +24955,6 @@
     "lat": 53.2668455,
     "lon": 22.8525787,
     "display": "Woiwodschaft Podlachien, Polen"
-  },
-  "None|LV": {
-    "lat": 44.933143,
-    "lon": 7.540121,
-    "display": "None, Turin, Piemont, Italien"
   },
   "Barunga|AU": {
     "lat": -14.5250033,
@@ -25361,25 +24981,10 @@
     "lon": 30.316229,
     "display": "Sankt Petersburg, Föderationskreis Nordwest, Russland"
   },
-  "None|BR": {
-    "lat": 11.7972212,
-    "lon": 51.266232,
-    "display": "none, Buuro-Xamur, Caluula علولة, Bari, Puntland أرض البنط, Somalia"
-  },
   "Baton Rogue|US": {
     "lat": 30.4798097,
     "lon": -91.2033652,
     "display": "Enterprise Baton Rogue NGL Fractionator, Sunrise, West Baton Rouge Parish, Louisiana, Vereinigte Staaten von Amerika"
-  },
-  "None|NZ": {
-    "lat": 44.933143,
-    "lon": 7.540121,
-    "display": "None, Turin, Piemont, Italien"
-  },
-  "None|SG": {
-    "lat": 37.6843111,
-    "lon": -97.3851289,
-    "display": "Second II None Motorcycle Club, North Kessler Street, Wichita, Sedgwick County, Kansas, 67203, Vereinigte Staaten von Amerika"
   },
   "Fo u|HU": {
     "lat": 47.5026694,
@@ -25411,11 +25016,6 @@
     "lon": 120.302393,
     "display": "Beigang, Landkreis Yunlin, Taiwan"
   },
-  "None|CN": {
-    "lat": 32.6921772,
-    "lon": 109.0239688,
-    "display": "四季酒店, 金州路, 双堤社区, 新城街道, 汉滨区, Ankang, Shaanxi, China"
-  },
   "Wisconsin|US": {
     "lat": 44.4308975,
     "lon": -89.6884637,
@@ -25426,32 +25026,12 @@
     "lon": -0.7254008,
     "display": "BT, Denbigh East, Bletchley and Fenny Stratford, Bletchley, Milton Keynes, City of Milton Keynes, England, MK2 2AP, Vereinigtes Königreich"
   },
-  "None|CY": {
-    "lat": 44.933143,
-    "lon": 7.540121,
-    "display": "None, Turin, Piemont, Italien"
-  },
-  "Luster Municipality|NO": {
-    "lat": 43.4651517,
-    "lon": -80.5218689,
-    "display": "Luster & Oak, Erb Street East, Uptown, Waterloo, Region of Waterloo, Southwestern Ontario, Ontario, N2J 2Z7, Kanada"
-  },
-  "Glendalough Estate|IE": {
-    "lat": -31.915753,
-    "lon": 115.8310583,
-    "display": "Holdsworth Real Estate, Scarborough Beach Road, Glendalough, Mount Hawthorn, Perth, Westaustralien, 6016, Australien"
-  },
   "Tennessee|US": {
     "lat": 40.4124541,
     "lon": -90.8368406,
     "display": "Tennessee, McDonough County, Illinois, Vereinigte Staaten von Amerika"
   },
   "Monmouthsire|GB": {},
-  "None|MT": {
-    "lat": 47.8584774,
-    "lon": -108.0332769,
-    "display": "None Dam, Phillips County, Montana, Vereinigte Staaten von Amerika"
-  },
   "Tallinn City|EE": {
     "lat": 59.429099,
     "lon": 24.7263921,
@@ -25461,11 +25041,6 @@
     "lat": 41.7712085,
     "lon": -73.05983,
     "display": "Harwinton, Northwest Hills Planning Region, Connecticut, 06791, Vereinigte Staaten von Amerika"
-  },
-  "None|GE": {
-    "lat": 48.8595242,
-    "lon": 2.3060867,
-    "display": "None, Rue Saint-Dominique, Quartier du Gros-Caillou, Paris 7e Arrondissement, Paris, Île-de-France, Metropolitanes Frankreich, 75007, Frankreich"
   },
   "Ruhr area|DE": {
     "lat": 51.5173864,
@@ -25502,50 +25077,20 @@
     "lon": 10.4541838,
     "display": "Frederikshavn Kommune, Region Nordjütland, Dänemark"
   },
-  "None|NO": {
-    "lat": 49.1798472,
-    "lon": 16.5488002,
-    "display": "none, Plachty, Neu Leskau, Brno-Nový Lískovec, Brünn, Bezirk Brünn-Stadt, Südmährische Region, 634 00, Tschechien"
-  },
-  "None|LT": {
-    "lat": 40.8910651,
-    "lon": 12.961391,
-    "display": "None, Salita Croce, Ponza, Latina, Latium, 04027, Italien"
-  },
   "Ostholstein|DE": {
     "lat": 54.1766629,
     "lon": 10.84762,
     "display": "Kreis Ostholstein, Schleswig-Holstein, Deutschland"
-  },
-  "None|FJ": {
-    "lat": 44.933143,
-    "lon": 7.540121,
-    "display": "None, Turin, Piemont, Italien"
-  },
-  "TR AN|GB": {
-    "lat": 38.342229,
-    "lon": 38.3683318,
-    "display": "GB-9, Fide Sokak, Çamurlu Mahallesi, Malatya, Battalgazi, Malatya, Ostanatolien, 44050, Türkei"
   },
   "Plzen|CZ": {
     "lat": 49.7477415,
     "lon": 13.3775249,
     "display": "Pilsen, Bezirk Pilsen-Stadt, Pilsner Region, Südwesten, Tschechien"
   },
-  "Q226941|BE": {
-    "lat": 52.5173885,
-    "lon": 13.3951309,
-    "display": "Berlin, Deutschland"
-  },
   "Oro-Medonte|CA": {
     "lat": 44.5445701,
     "lon": -79.5489109,
     "display": "Oro-Medonte, Simcoe County, Central Ontario, Ontario, Kanada"
-  },
-  "None|MY": {
-    "lat": 32.2527963,
-    "lon": -101.4752803,
-    "display": "Settles Hotel, 200, East 3rd Street, Original Town, Big Spring, Howard County, Texas, 79720, Vereinigte Staaten von Amerika"
   },
   "Kirkehojvej D|DK": {
     "lat": 55.841531,
@@ -25556,11 +25101,6 @@
     "lat": 42.6162722,
     "lon": 1.1399146,
     "display": "Escalarre, la Guingueta d'Àneu, Pallars Sobirà, Lleida, Katalonien, 25588, Spanien"
-  },
-  "None|MA": {
-    "lat": 42.3764068,
-    "lon": -71.1022769,
-    "display": "none, Dimick Street, Union Square, Somerville, Middlesex County, Massachusetts, 02143, Vereinigte Staaten von Amerika"
   },
   "Ubobo|AU": {
     "lat": -24.4057012,
@@ -25573,20 +25113,10 @@
     "display": "Boyup Brook, Westaustralien, 6244, Australien"
   },
   "Bozcaada district|TR": {},
-  "None|SK": {
-    "lat": 49.4783381,
-    "lon": 18.541683,
-    "display": "Vjadačka, 484, Kornica, Klokočov, Bezirk Tschadsa, Silleiner Landschaftsverband, 023 21, Slowakei"
-  },
   "Vermont|US": {
     "lat": 40.2942106,
     "lon": -90.4279033,
     "display": "Vermont, Fulton County, Illinois, 61484, Vereinigte Staaten von Amerika"
-  },
-  "None|IE": {
-    "lat": 53.2629481,
-    "lon": -9.0565049,
-    "display": "None, Martin Connolly Causeway, Claddagh, Galway, County Galway, Connacht, Irland"
   },
   "St. Paul|US": {
     "lat": 44.9497487,
@@ -25594,11 +25124,6 @@
     "display": "Saint Paul, Ramsey County, Minnesota, Vereinigte Staaten von Amerika"
   },
   "DG Breda|NL": {},
-  "None|UY": {
-    "lat": -31.4468246,
-    "lon": -57.9145589,
-    "display": "Armonía, s/n, Los Sauces, Barrio Jardines de Termas del Daymán, Termas del Daymán, Salto, 50000, Uruguay"
-  },
   "Cleveland|": {
     "lat": 41.4996574,
     "lon": -81.6936772,
@@ -25624,30 +25149,10 @@
     "lon": 14.5118734,
     "display": "Am Helenesee, Malchow, Beresinchen, Lossow, Frankfurt (Oder), Brandenburg, 15236, Deutschland"
   },
-  "New South Wales|GB": {
-    "lat": -33.7006657,
-    "lon": 151.1010088,
-    "display": "GB Carcare, Hunter Street, Sydney, Neusüdwales, 2077, Australien"
-  },
-  "None|AR": {
-    "lat": -30.2406248,
-    "lon": -57.8452972,
-    "display": "Aeródromo de Timboy, Ruta Provincial 129, Municipio de Monte Caseros, Departamento Monte Caseros, Corrientes, Argentinien"
-  },
-  "None|EG": {
-    "lat": 30.0961988,
-    "lon": 31.315038,
-    "display": "شارع الفتح, قسم مصر الجديدة, الزيتون, Kairo, 11321, Ägypten"
-  },
   "Alberta|CA": {
     "lat": 55.001251,
     "lon": -115.002136,
     "display": "Alberta, Kanada"
-  },
-  "None|CO": {
-    "lat": 2.8002584,
-    "lon": -72.6057779,
-    "display": "none, Puerto Concordia, Subregión Ariari, Meta, RAP (Especial) Central, Kolumbien"
   },
   "Auvergne-Rhône-Alpes|FR": {
     "lat": 45.2968119,
@@ -25735,11 +25240,6 @@
     "lon": 106.7166008,
     "display": "Ho-Chi-Minh-Stadt, Vietnam"
   },
-  "None|VE": {
-    "lat": 50.3921762,
-    "lon": 16.175256,
-    "display": "none, 28526, Ve Zdolině, Lip, Nachod, Bezirk Nachod, Königgrätzer Region, 547 01, Tschechien"
-  },
   "Napoli NA|IT": {
     "lat": 40.8358846,
     "lon": 14.2487679,
@@ -25784,11 +25284,6 @@
     "lat": 39.0636648,
     "lon": -85.459409,
     "display": "Nebraska, Jennings County, Indiana, 47223, Vereinigte Staaten von Amerika"
-  },
-  "None|DO": {
-    "lat": 51.3640279,
-    "lon": 7.4082112,
-    "display": "none, Vorhalle, Westerbauer, Hagen-Nord, Hagen, Nordrhein-Westfalen, Deutschland"
   },
   "Vollore-Ville|FR": {
     "lat": 45.7846416,
@@ -25850,21 +25345,6 @@
     "lon": 55.1000058,
     "display": "Emitrat Abu Dhabi, Vereinigte Arabische Emirate"
   },
-  "None|CL": {
-    "lat": -43.6939016,
-    "lon": -72.6754629,
-    "display": "None, Chaitén, Provincia de Palena, Región de Los Lagos, Chile"
-  },
-  "None|TW": {
-    "lat": 44.933143,
-    "lon": 7.540121,
-    "display": "None, Turin, Piemont, Italien"
-  },
-  "None|VN": {
-    "lat": 20.8944305,
-    "lon": 106.7056206,
-    "display": "khu dân cư, đường đổ bê tông, Sáu Phiên, Phường Thủy Nguyên, Hải Phòng, 04340, Vietnam"
-  },
   "Pennsylvania|US": {
     "lat": 40.9699889,
     "lon": -77.7278831,
@@ -25874,11 +25354,6 @@
     "lat": 44.7295348,
     "lon": 5.2046372,
     "display": "Drôme, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, Frankreich"
-  },
-  "None|HR": {
-    "lat": 28.4812256,
-    "lon": 77.0133788,
-    "display": "none, Sector 3A, Gurgaon, Gurugram, Haryana, Indien"
   },
   "London SE BJ|GB": {
     "lat": 51.5048337,
@@ -25924,11 +25399,6 @@
     "lat": 46.5786721,
     "lon": 18.3904744,
     "display": "Regöly, Tamási járás, Komitat Tolnau, Südtransdanubien, Transdanubien, 7193, Ungarn"
-  },
-  "None|NL": {
-    "lat": 52.4677052,
-    "lon": 6.0648985,
-    "display": "none, Stadslaan, Hattem, Geldern, Niederlande, 8051 NH, Niederlande"
   },
   "PG|IT": {
     "lat": 43.1070321,
@@ -25986,20 +25456,10 @@
     "lon": 144.6780052,
     "display": "Victoria, Australien"
   },
-  "W FK|IE": {
-    "lat": 43.6812434,
-    "lon": -79.4287602,
-    "display": "FK, 770, St. Clair Avenue West, Wychwood, Toronto—St. Paul's, Toronto, Golden Horseshoe, Ontario, M6C 2X5, Kanada"
-  },
   "British Columbia|CA": {
     "lat": 55.001251,
     "lon": -125.002441,
     "display": "Britisch-Kolumbien, Kanada"
-  },
-  "None|ID": {
-    "lat": -9.8334179,
-    "lon": 124.4129333,
-    "display": "None, Oof, Timor Tengah Selatan, Ost-Nusa Tenggara, Indonesien"
   },
   "Boone|": {
     "lat": 36.2187873,
@@ -26033,11 +25493,6 @@
     "display": "Vélez de Benaudalla, Comarca de la Costa Granadina, Granada, Andalusien, Spanien"
   },
   "The Central Co-op Country Ground|AU": {},
-  "None|LU": {
-    "lat": 11.7972212,
-    "lon": 51.266232,
-    "display": "none, Buuro-Xamur, Caluula علولة, Bari, Puntland أرض البنط, Somalia"
-  },
   "Chiba Prefecture|JP": {
     "lat": 35.549399,
     "lon": 140.2647303,
@@ -26083,11 +25538,6 @@
     "lat": 44.6692449,
     "lon": 10.6284098,
     "display": "Via Ada Negri, Due Maestà, Buco del Signore, Canali, Reggio Emilia, Reggio nell'Emilia, Emilia-Romagna, 42123, Italien"
-  },
-  "None|SI": {
-    "lat": 32.2527963,
-    "lon": -101.4752803,
-    "display": "Settles Hotel, 200, East 3rd Street, Original Town, Big Spring, Howard County, Texas, 79720, Vereinigte Staaten von Amerika"
   },
   "Tartu City|EE": {
     "lat": 58.3733603,
@@ -26175,11 +25625,6 @@
     "lon": -1.3280951,
     "display": "Cropredy, Cherwell District, Oxfordshire, England, Vereinigtes Königreich"
   },
-  "None|IR": {
-    "lat": 36.4218004,
-    "lon": 54.9688455,
-    "display": "مجتمع غير دولتي فرشته, بن بست ۳, چنارسوخته, چمران و رزمندگان, Schahrud, بخش مرکزی, شهرستان شاهرود, Semnan, 36137-58566, Iran"
-  },
   "Ratlinghope|GB": {
     "lat": 52.5660419,
     "lon": -2.8821782,
@@ -26202,11 +25647,6 @@
     "lon": 11.1349793,
     "display": "Rispescia, Grosseto, Toskana, Italien"
   },
-  "None|BO": {
-    "lat": 12.0378434,
-    "lon": 13.075267,
-    "display": "none, Tungushe, Tuba, Jere, Borno, Nigeria"
-  },
   "Community of Madrid|ES": {
     "lat": 40.5248319,
     "lon": -3.7715628,
@@ -26222,11 +25662,6 @@
     "lon": 18.563315,
     "display": "Jahorina, Јахорина, Општина Пале (РС) / Opština Pale (RS), Град Источно Сарајево / Grad Istočno Sarajevo, Republika Srpska, 71423, Bosnien und Herzegowina"
   },
-  "None|PE": {
-    "lat": 47.5436118,
-    "lon": 19.3979567,
-    "display": "J & J Autosport-Service Kft., 38, Szent István utca, Isaszeg, Gödöllői járás, Komitat Pest, Mittelungarn, 2117, Ungarn"
-  },
   "Idaho|US": {
     "lat": 40.6536764,
     "lon": -79.3469844,
@@ -26236,11 +25671,6 @@
     "lat": 46.2887866,
     "lon": 7.5427851,
     "display": "Lac de Geronde, Siders, Mittelwallis, Wallis, Schweiz"
-  },
-  "None|ML": {
-    "lat": -9.8334179,
-    "lon": 124.4129333,
-    "display": "None, Oof, Timor Tengah Selatan, Ost-Nusa Tenggara, Indonesien"
   },
   "Pontaumur|FR": {
     "lat": 45.8680597,
@@ -26272,11 +25702,6 @@
     "lon": 2.4232301,
     "display": "Place de Völklingen, Cité des Sentes, Les Lilas, Bobigny, Seine-Saint-Denis, Île-de-France, Metropolitanes Frankreich, 93260, Frankreich"
   },
-  "None|CV": {
-    "lat": 44.933143,
-    "lon": 7.540121,
-    "display": "None, Turin, Piemont, Italien"
-  },
   "Bobital|FR": {
     "lat": 48.413601,
     "lon": -2.102638,
@@ -26301,11 +25726,6 @@
     "lat": 48.619553,
     "lon": -3.537898,
     "display": "Lanvellec, Lannion, Côtes-d'Armor, Bretagne, Metropolitanes Frankreich, 22420, Frankreich"
-  },
-  "None|BF": {
-    "lat": 44.933143,
-    "lon": 7.540121,
-    "display": "None, Turin, Piemont, Italien"
   },
   "La Chaise-Dieu|FR": {
     "lat": 45.321114,
@@ -26347,11 +25767,6 @@
     "lon": -8.2738274,
     "display": "Guísamo, Bergondo, A Coruña, Galicien, 15640, Spanien"
   },
-  "None|CR": {
-    "lat": 39.96197,
-    "lon": -105.43997,
-    "display": "None, Magnolia Drive, Aspen Meadows, Boulder County, Colorado, 80471, Vereinigte Staaten von Amerika"
-  },
   "Escaldes-Engordany|AD": {
     "lat": 42.486196,
     "lon": 1.6037711,
@@ -26376,16 +25791,6 @@
     "lat": 43.0269283,
     "lon": 0.5709114,
     "display": "Saint-Bertrand-de-Comminges, Saint-Gaudens, Haute-Garonne, Okzitanien, Metropolitanes Frankreich, 31510, Frankreich"
-  },
-  "None|DZ": {
-    "lat": 36.7209797,
-    "lon": 3.1419872,
-    "display": "none, Avenue Ghiboub Boualem, Hassan Badi, حي سيدي مبارك, El-Harrach, Kreis al-Harrasch, Provinz Algier, 16000, Algerien"
-  },
-  "None|TN": {
-    "lat": 31.5225078,
-    "lon": 74.9822688,
-    "display": "None, Tarn Taran Tahsil, Distrikt Tarn Taran, Punjab, 143402, Indien"
   },
   "Saint-Donat-sur-l'Herbasse|FR": {
     "lat": 45.1212493,
@@ -26442,11 +25847,6 @@
     "lon": 144.5094444,
     "display": "Caldwell, Neusüdwales, 2710, Australien"
   },
-  "None|MU": {
-    "lat": 49.5891284,
-    "lon": 17.250268,
-    "display": "none, Vídeňská, Olomouc-střed, Powel, Olmütz, Bezirk Olmütz, Olmützer Region, 799 00, Tschechien"
-  },
   "Saou|FR": {
     "lat": 44.6459054,
     "lon": 5.0626491,
@@ -26483,16 +25883,6 @@
     "lon": 11.5847938,
     "display": "Neustadt-Glewe, Ludwigslust-Parchim, Mecklenburg-Vorpommern, 19306, Deutschland"
   },
-  "Quai Albert er|MC": {
-    "lat": 46.4014456,
-    "lon": 6.5924315,
-    "display": "Quai Charles-Albert Besson, Évian-les-Bains, Thonon-les-Bains, Hochsavoyen, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 74500, Frankreich"
-  },
-  "None|CG": {
-    "lat": 44.933143,
-    "lon": 7.540121,
-    "display": "None, Turin, Piemont, Italien"
-  },
   "Alentejo|PT": {
     "lat": 41.1640525,
     "lon": -8.1114507,
@@ -26508,20 +25898,10 @@
     "lon": -82.7589877,
     "display": "White Springs, Hamilton County, Florida, Vereinigte Staaten von Amerika"
   },
-  "Le Tampon|FR": {
-    "lat": -21.2774285,
-    "lon": 55.5164178,
-    "display": "Le Tampon, Saint-Pierre, Réunion, Frankreich"
-  },
   "Rixeyville|US": {
     "lat": 38.5797188,
     "lon": -77.9788747,
     "display": "Rixeyville, Culpeper County, Virginia, 22737, Vereinigte Staaten von Amerika"
-  },
-  "None|IS": {
-    "lat": 48.8595242,
-    "lon": 2.3060867,
-    "display": "None, Rue Saint-Dominique, Quartier du Gros-Caillou, Paris 7e Arrondissement, Paris, Île-de-France, Metropolitanes Frankreich, 75007, Frankreich"
   },
   "Mecklenburg-Vorpommern|DE": {
     "lat": 53.7735064,
@@ -26603,11 +25983,6 @@
     "display": "Stadt Sarajevo, Kanton Sarajevo, Föderation Bosnien und Herzegowina, Bosnien und Herzegowina"
   },
   "Gulkula ceremonial site|AU": {},
-  "None|GT": {
-    "lat": -25.7586948,
-    "lon": 28.2539516,
-    "display": "none, The Link, Lynnwood, Tshwane Ward 82, Pretoria, City of Tshwane Metropolitan Municipality, Gauteng, 0113, Südafrika"
-  },
   "Basque Country|FR": {
     "lat": 43.384528,
     "lon": -1.6673184,
@@ -26634,11 +26009,6 @@
     "lat": 47.2950408,
     "lon": 4.9403957,
     "display": "Corcelles-les-Monts, Dijon, Côte-d'Or, Bourgogne-Franche-Comté, Metropolitanes Frankreich, 21160, Frankreich"
-  },
-  "None|PG": {
-    "lat": 44.933143,
-    "lon": 7.540121,
-    "display": "None, Turin, Piemont, Italien"
   },
   "Mexico|MX": {
     "lat": 19.4326296,
@@ -26745,21 +26115,11 @@
     "lon": 149.7818421,
     "display": "Bomera, Tambar Springs, Neusüdwales, 2381, Australien"
   },
-  "None|CU": {
-    "lat": 44.933143,
-    "lon": 7.540121,
-    "display": "None, Turin, Piemont, Italien"
-  },
   "United Day 9 – Bandung|ID": {},
   "Herrang|SE": {
     "lat": 60.1294737,
     "lon": 18.647286,
     "display": "Herräng, Norrtälje kommun, Provinz Stockholm, 760 49, Schweden"
-  },
-  "Hetta|FI": {
-    "lat": 68.3856532,
-    "lon": 23.6150148,
-    "display": "Hetta, Enontekiö, Tunturi-Lapin seutukunta, Lappland, Festland-Finnland, 99400, Finnland"
   },
   "Michigan|US": {
     "lat": 43.6211955,
@@ -26787,20 +26147,10 @@
     "lon": -93.3122705,
     "display": "Iowa, Vereinigte Staaten von Amerika"
   },
-  "None|BJ": {
-    "lat": 44.933143,
-    "lon": 7.540121,
-    "display": "None, Turin, Piemont, Italien"
-  },
   "Cesta na Senec|SK": {
     "lat": 48.1893764,
     "lon": 17.1871336,
     "display": "Cesta na Senec, Bratislava, Okres Bratislava II, Bratislava, Borinka, Bratislavský kraj, 900 32, Slowakei"
-  },
-  "None|TZ": {
-    "lat": -6.1944538,
-    "lon": 35.7853621,
-    "display": "Osterbay filling station, Kikuyu Road, Medeli, Dodoma, Dodoma City, Dodoma, Zentralzone, 41110, Tansania"
   },
   "Centre de Cultura Contemporània de Barcelona|ES": {
     "lat": 41.383693,
@@ -26817,25 +26167,10 @@
     "lon": -59.625192,
     "display": "Saint James, Barbados"
   },
-  "None|NP": {
-    "lat": 28.222557,
-    "lon": 83.9716735,
-    "display": "None, Machhapuchre Marga, धारापानी, ढुङ्गे खोला, Pokhara-05, Pokhara, कास्की, Provinz Gandaki, 33700, Nepal"
-  },
   "Frontenac County|CA": {
     "lat": 44.6102902,
     "lon": -76.6330415,
     "display": "Frontenac County, Eastern Ontario, Ontario, Kanada"
-  },
-  "Horten Municipality|NO": {
-    "lat": 56.1487443,
-    "lon": 10.2091923,
-    "display": "Horten, Frederiks Plads, Midtbyen, Frederiksbjerg, Aarhus, Aarhus Kommune, Region Mitteljütland, 8000, Dänemark"
-  },
-  "PE TY|GB": {
-    "lat": 54.9199729,
-    "lon": 69.1186155,
-    "display": "Күн шуақты жағажай, Заречный, Petropawl, Stadtverwaltung Petropawl, Gebiet Nordkasachstan, 150000, Kasachstan"
   },
   "Nagy Piknik – Budapest|HU": {},
   "Hay-on-Wye|GB": {
@@ -26847,16 +26182,6 @@
     "lat": 48.3637887,
     "lon": 17.6056433,
     "display": "Trnavská NAD, Modersdorf, Trnava, Bezirk Tyrnau, Tyrnauer Landschaftsverband, Slowakei"
-  },
-  "None|MO": {
-    "lat": 39.0041526,
-    "lon": -94.4331255,
-    "display": "None, Kansas City, Jackson County, Missouri, 64133, Vereinigte Staaten von Amerika"
-  },
-  "Saare maakond|EE": {
-    "lat": 58.2057461,
-    "lon": 22.4848673,
-    "display": "Saare maakond, Estland"
   },
   "Playa d'en Bossa & San Antonio|ES": {},
   "Avinguda Doctor Fleming|ES": {
@@ -26889,11 +26214,6 @@
     "lon": -0.0102184,
     "display": "Roundhouse Lane, Stratford, London Borough of Newham, Groß-London, England, E20 1GJ, Vereinigtes Königreich"
   },
-  "D W|IE": {
-    "lat": 53.3300465,
-    "lon": 6.1040719,
-    "display": "Ie, Noardeast-Fryslân, Friesland, Niederlande"
-  },
   "Patti (ME)|IT": {
     "lat": 38.1520551,
     "lon": 14.9690107,
@@ -26903,11 +26223,6 @@
     "lat": 43.7639185,
     "lon": -93.3289552,
     "display": "Clarks Grove, Freeborn County, Minnesota, Vereinigte Staaten von Amerika"
-  },
-  "Sulzbach-Rosenberg|IT": {
-    "lat": 49.5036872,
-    "lon": 11.7495511,
-    "display": "IT-Support Hager, 5, Schwemmerberg, Sulzbach, Sulzbach-Rosenberg, Landkreis Amberg-Sulzbach, Bayern, 92237, Deutschland"
   },
   "El Djem|TN": {
     "lat": 35.321945,
@@ -26939,11 +26254,6 @@
     "lon": 103.8519072,
     "display": "Singapur"
   },
-  "None|JM": {
-    "lat": 49.221223,
-    "lon": 16.5347529,
-    "display": "none, Údolí oddechu, Bisterz, Brünn, Bezirk Brünn-Stadt, Südmährische Region, 624 00, Tschechien"
-  },
   "Aichi|JP": {
     "lat": 34.9991645,
     "lon": 137.254574,
@@ -26953,11 +26263,6 @@
     "lat": 48.7651713,
     "lon": 0.6278039,
     "display": "L'Aigle, Mortagne-au-Perche, Orne, Normandie, Metropolitanes Frankreich, 61300, Frankreich"
-  },
-  "None|BA": {
-    "lat": 44.068719,
-    "lon": 18.4227277,
-    "display": "None, R 460, Odžak, Kamenica, Općina Vareš, Zeničko-dobojski kanton, Föderation Bosnien und Herzegowina, Bosnien und Herzegowina"
   },
   "Jølster|NO": {
     "lat": 61.5714843,
@@ -26974,11 +26279,6 @@
     "lon": 6.2664637,
     "display": "Var, Provence-Alpes-Côte d'Azur, Metropolitanes Frankreich, Frankreich"
   },
-  "None|LC": {
-    "lat": 49.3622774,
-    "lon": 14.1519172,
-    "display": "none, LC Ke Smetiprachu, Borečnice, Čížová, Bezirk Pisek, Südböhmische Region, Südwesten, 398 32, Tschechien"
-  },
   "Grad Zagreb|HR": {
     "lat": 45.8130967,
     "lon": 15.9772795,
@@ -26994,22 +26294,12 @@
     "lon": 23.8172374,
     "display": "Pakkainpolku, Jukukalla, Hiekkasärkät, Kalajoki, Ylivieskan seutukunta, Nordösterbotten, Festland-Finnland, 85180, Finnland"
   },
-  "None|PK": {
-    "lat": 24.8371691,
-    "lon": 67.0683105,
-    "display": "None Shoes Shop, Korangi Service Road, 1 ڈی ایچ اے فیز, صدر ٹاؤن, ضلع کراچی, Karatschi, Sindh, 75220, Pakistan"
-  },
   "Karlsøy Municipality|NO": {},
   "Karmøy Municipality|NO": {},
   "Uppsala Municipality|SE": {
     "lat": 62.4109813,
     "lon": 17.2881792,
     "display": "Uppsalavägen, Östra Granloholm, Granloholm, Selångers distrikt, Sundsvalls kommun, Provinz Västernorrland, 857 31, Schweden"
-  },
-  "Cayenne|FR": {
-    "lat": 4.9371544,
-    "lon": -52.3258736,
-    "display": "Cayenne, Französisch-Guayana, 97300, Frankreich"
   },
   "Georgia (country)|US": {
     "lat": 32.8081222,
@@ -27021,11 +26311,6 @@
     "lat": 54.6143136,
     "lon": -2.9420899,
     "display": "Cumbria, England, Vereinigtes Königreich"
-  },
-  "None|BD": {
-    "lat": 23.7088635,
-    "lon": 90.4187201,
-    "display": "None, 14/2, Baniyanagor Road, বানিয়া নগর, ধোলাইখাল, লক্ষ্মীবাজার, Dhaka, ঢাকা মহানগর, Dhaka, Division Dhaka, 1204, Bangladesch"
   },
   "Kichijōji|JP": {
     "lat": 35.7043267,
@@ -27052,11 +26337,6 @@
     "lat": 44.413027,
     "lon": -68.5880555,
     "display": "Blue Hill, Hancock County, Maine, Vereinigte Staaten von Amerika"
-  },
-  "None|HT": {
-    "lat": 37.797663,
-    "lon": -122.4319104,
-    "display": "Bar None, 1980, Union Street, Cow Hollow, Pacific Heights, San Francisco, Kalifornien, 94123, Vereinigte Staaten von Amerika"
   },
   "Møre og Romsdal|NO": {
     "lat": 62.8452777,
@@ -27093,11 +26373,6 @@
     "lon": 6.2727742,
     "display": "Landweerswal, Braamt, Montferland, Geldern, Niederlande, 7048 AK, Niederlande"
   },
-  "None|MW": {
-    "lat": 44.933143,
-    "lon": 7.540121,
-    "display": "None, Turin, Piemont, Italien"
-  },
   "ExpoPark|CH": {
     "lat": 47.1281269,
     "lon": 7.2371639,
@@ -27127,11 +26402,6 @@
     "lat": -37.80498,
     "lon": 144.9865532,
     "display": "City of Yarra, Victoria, Australien"
-  },
-  "Q250984|AT": {
-    "lat": 44.8260126,
-    "lon": 8.2026863,
-    "display": "Asti, Piemont, Italien"
   },
   "Catalonia|ES": {
     "lat": 41.8523094,
@@ -27184,20 +26454,10 @@
     "lon": -1.7368098,
     "display": "Longborough, Cotswold District, Gloucestershire, England, Vereinigtes Königreich"
   },
-  "D YC|IE": {
-    "lat": 53.3300465,
-    "lon": 6.1040719,
-    "display": "Ie, Noardeast-Fryslân, Friesland, Niederlande"
-  },
   "Fontanellato PR|IT": {
     "lat": 44.8822638,
     "lon": 10.1729422,
     "display": "Fontanellato, Parma, Emilia-Romagna, 43012, Italien"
-  },
-  "None|AO": {
-    "lat": 47.7565154,
-    "lon": 13.0003452,
-    "display": "none, 35, Glanstraße, Fürstenbrunn, Grödig, Bezirk Salzburg-Umgebung, Salzburg, 5082, Österreich"
   },
   "Lucerne|CH": {
     "lat": 47.052144,
@@ -27244,11 +26504,6 @@
     "lat": 49.8955367,
     "lon": -97.1384584,
     "display": "Winnipeg, Manitoba, Kanada"
-  },
-  "Manatí|US": {
-    "lat": 18.4271372,
-    "lon": -66.4929477,
-    "display": "Manatí, Puerto Rico, 00701, Vereinigte Staaten von Amerika"
   },
   "Praia do Cabedelo|PT": {
     "lat": 41.1400056,
@@ -27315,11 +26570,6 @@
     "lon": 10.4280905,
     "display": "Faaborg-Midtfyn Kommune, Region Süddänemark, Dänemark"
   },
-  "None|UG": {
-    "lat": 1.071405,
-    "lon": 34.1816854,
-    "display": "Grace Resource, None, Republic Street, Naboa, Mbale City, Bugisa sub-region, Ost-Region, Uganda"
-  },
   "Montecosaro Scalo MC|IT": {
     "lat": 43.2868994,
     "lon": 13.64574,
@@ -27359,11 +26609,6 @@
     "lat": 60.0422735,
     "lon": 9.1546845,
     "display": "Veggli, Rollag, Buskerud, 3628, Norwegen"
-  },
-  "SK HH|GB": {
-    "lat": 27.3640518,
-    "lon": 88.5690974,
-    "display": "GB Pant Institute, Golitar, Gangtok, Gangtok subdivision, Gangtok, Sikkim, 737101, Indien"
   },
   "Skanderborg Municipality|DK": {
     "lat": 56.0851403,
@@ -27532,20 +26777,10 @@
     "lon": -2.3716598,
     "display": "North Nibley, Stroud, Gloucestershire, England, Vereinigtes Königreich"
   },
-  "F PY|IE": {
-    "lat": 45.7089394,
-    "lon": 3.2251788,
-    "display": "LA ROCHE NOIRE, Rue de la Croix des Pères, La Roche-Noire, Clermont-Ferrand, Puy-de-Dôme, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 63800, Frankreich"
-  },
   "KE Amsterdam|NL": {
     "lat": 52.3730796,
     "lon": 4.8924534,
     "display": "Amsterdam, Nordholland, Niederlande"
-  },
-  "Pedreira do Monte Castro|PT": {
-    "lat": 43.2422416,
-    "lon": -7.5689698,
-    "display": "A Veiga do Castro, San Paio, Sistallo, Cospeito, Terra Chá, Lugo, Galicien, 27377, Spanien"
   },
   "Sønderborg Municipality|DK": {
     "lat": 54.9680815,
@@ -27603,16 +26838,6 @@
     "lon": 12.5686548,
     "display": "København K, Teglgårdstræde, Pisserenden, Nørrevold, Kødbyen, Kopenhagen, Hauptstadtregion, 1452, Dänemark"
   },
-  "None|MD": {
-    "lat": 44.933143,
-    "lon": 7.540121,
-    "display": "None, Turin, Piemont, Italien"
-  },
-  "None|MK": {
-    "lat": 44.933143,
-    "lon": 7.540121,
-    "display": "None, Turin, Piemont, Italien"
-  },
   "Ohrid Municipality|MK": {
     "lat": 41.0812835,
     "lon": 20.7845138,
@@ -27622,16 +26847,6 @@
     "lat": 40.5814403,
     "lon": -79.5740244,
     "display": "Oklahoma, Westmoreland County, Pennsylvania, Vereinigte Staaten von Amerika"
-  },
-  "Sandbergen|SE": {
-    "lat": 48.4386609,
-    "lon": 16.8044794,
-    "display": "Sandbergen, Katastralgemeinde Ebenthal, Ebenthal, Bezirk Gänserndorf, Niederösterreich, 2251, Österreich"
-  },
-  "Trondheim municipality|NO": {
-    "lat": 43.5944193,
-    "lon": -79.7569598,
-    "display": "Trondheim Crescent, Meadowvale, Mississauga, Peel Region, Golden Horseshoe, Ontario, L5N 6C1, Kanada"
   },
   "Driftwood|US": {
     "lat": 30.1229876,
@@ -27665,11 +26880,6 @@
     "display": "County Cork, Munster, Irland"
   },
   "Via Igliut|CH": {},
-  "Saint-Jean-Cap-Ferrat|GB": {
-    "lat": 43.6899651,
-    "lon": 7.3327399,
-    "display": "Saint-Jean-Cap-Ferrat, Nizza, Alpes-Maritimes, Provence-Alpes-Côte d'Azur, Metropolitanes Frankreich, 06230, Frankreich"
-  },
   "Olympisch Stadion|NL": {
     "lat": 52.3434439,
     "lon": 4.8540543,
@@ -27755,11 +26965,6 @@
     "lon": 15.3936506,
     "display": "Paseky nad Jizerou, Bezirk Semil, Reichenberger Region, 512 47, Tschechien"
   },
-  "Ayr KA ES|GB": {
-    "lat": 41.1116859,
-    "lon": 1.2309145,
-    "display": "Ayr, Carretera Tortosa Pujada, Polígon industrial del Francolí, Tarragona, Tarragonès, Tarragona, Katalonien, 43005, Spanien"
-  },
   "Perisher Valley|AU": {
     "lat": -36.4056476,
     "lon": 148.4106631,
@@ -27774,11 +26979,6 @@
     "lat": 44.3158574,
     "lon": 2.5065697,
     "display": "Aveyron, Okzitanien, Metropolitanes Frankreich, Frankreich"
-  },
-  "Province of Trieste|IT": {
-    "lat": -11.9635546,
-    "lon": -76.9948998,
-    "display": "Trieste, Horacio Zeballos Gámez, Bayóvar, San Juan de Lurigancho, Lima, Lima Metropolitana, Lima, 15423, Peru"
   },
   "Upper Salford|US": {
     "lat": 40.2939898,
@@ -27799,11 +26999,6 @@
     "lat": 53.0561536,
     "lon": -113.997448,
     "display": "Hamlet of Mulhurst, County of Wetaskiwin, Alberta, Kanada"
-  },
-  "None|PY": {
-    "lat": 45.3938337,
-    "lon": 3.7382643,
-    "display": "Champ de None, La Trébèche, Dore-l'Église, Ambert, Puy-de-Dôme, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 63220, Frankreich"
   },
   "Cottesloe Beach|AU": {
     "lat": -31.9953964,
@@ -27826,11 +27021,6 @@
     "display": "Ulaanbaatar, Mongolei"
   },
   "Blekinge archipelago|SE": {},
-  "Longyearbyen|NO": {
-    "lat": 78.2231558,
-    "lon": 15.6463656,
-    "display": "Longyearbyen, Spitzbergen, 9170, Norwegen"
-  },
   "Valle D'Itria|IT": {
     "lat": 40.7529563,
     "lon": 17.3288229,
@@ -27881,11 +27071,6 @@
     "lat": 51.577252,
     "lon": -0.3714965,
     "display": "GB Motors, Village Way, Rayners Lane, London Borough of Harrow, Groß-London, England, HA5 5AB, Vereinigtes Königreich"
-  },
-  "None|EC": {
-    "lat": -32.9358004,
-    "lon": 27.9532381,
-    "display": "Meisie's Halt, R102, Buffalo City Ward 29, Gonubie, Buffalo City Metropolitan Municipality, Ostkap, 5205, Südafrika"
   },
   "Municipality of Radovljica|SI": {},
   "The Lake – Richterswil|CH": {},
@@ -27954,11 +27139,6 @@
     "lon": -123.796139,
     "display": "Garberville, Humboldt County, Kalifornien, 95542, Vereinigte Staaten von Amerika"
   },
-  "None|XK": {
-    "lat": 44.933143,
-    "lon": 7.540121,
-    "display": "None, Turin, Piemont, Italien"
-  },
   "Westminster|GB": {
     "lat": 51.5004439,
     "lon": -0.1265398,
@@ -28000,20 +27180,10 @@
     "lon": 11.7997267,
     "display": "Tværalle, Benløse Fælled, Ringsted, Ringsted Kommune, Region Seeland, 4100, Dänemark"
   },
-  "Risør Municipality|NO": {
-    "lat": 55.6413669,
-    "lon": 12.2611172,
-    "display": "Lind & Risør, Skåne Boulevard, Høje Taastrup, Taastrup, Høje-Taastrup Kommune, Hauptstadtregion, 2630, Dänemark"
-  },
   "Gauteng|ZA": {
     "lat": -25.9363439,
     "lon": 28.0813105,
     "display": "Gauteng, Südafrika"
-  },
-  "None|NA": {
-    "lat": 50.1915183,
-    "lon": 14.2450579,
-    "display": "Raně středověké hradiště Budeč, Na Budeč, Kowar, Sakolan, Bezirk Kladen, Mittelböhmische Region, 273 28, Tschechien"
   },
   "Freguesia de Briteiros (Salvador)|PT": {
     "lat": 41.5229511,
@@ -28040,11 +27210,6 @@
     "lon": 7.8853621,
     "display": "Helgoland, Kreis Pinneberg, Schleswig-Holstein, Deutschland"
   },
-  "Åland|FI": {
-    "lat": 60.1515942,
-    "lon": 20.0880306,
-    "display": "Ålandinseln, Finnland"
-  },
   "Sydney/Melbourne|AU": {
     "lat": -37.769829,
     "lon": 144.9621571,
@@ -28054,11 +27219,6 @@
     "lat": 36.8559395,
     "lon": 10.2858127,
     "display": "نهج نفطة, عين زغوان, البحيرة, الكرم, Tunis, 1090, Tunesien"
-  },
-  "Quezon City|ID": {
-    "lat": 14.6510546,
-    "lon": 121.0486254,
-    "display": "Quezon City, Eastern Manila District, Metro Manila, Philippinen"
   },
   "Round Top|US": {
     "lat": 30.0651011,
@@ -28270,11 +27430,6 @@
     "lon": 16.5540204,
     "display": "never come by bicycle when it's wet/damp, Montalbano Jonico, Matera, Basilikata, 75023, Italien"
   },
-  "None|ME": {
-    "lat": 17.0662649,
-    "lon": -96.7195382,
-    "display": "Las Mariposas, 517, Calle de José María Pino Suárez, Barrio Mágico de Jalatlaco, Oaxaca, Oaxaca de Juárez, Oaxaca, 68000, Mexiko"
-  },
   "Municipality of Tolmin|SI": {},
   "South Ostrobothnia|FI": {
     "lat": 62.7389391,
@@ -28411,11 +27566,6 @@
     "lon": 7.4373903,
     "display": "Avenue Princesse Grace, Larvotto, Monaco, 98000, Monaco"
   },
-  "None|SR": {
-    "lat": 50.0828826,
-    "lon": 14.4221684,
-    "display": "none, Jungmannplatz, Neustadt, Stadtbezirk Prag 1, Prag, 110 00, Tschechien"
-  },
   "Næstved Municipality|DK": {
     "lat": 55.2621065,
     "lon": 11.7085373,
@@ -28509,11 +27659,6 @@
     "lon": -3.0753867,
     "display": "Somerset, England, Vereinigtes Königreich"
   },
-  "None|KZ": {
-    "lat": 48.8530318,
-    "lon": 13.863348,
-    "display": "none, Rudolfova cesta, Schwarzes Kreuz, Tusset, Bezirk Prachatitz, Südböhmische Region, Südwesten, 384 44, Tschechien"
-  },
   "Browns Valley|US": {
     "lat": 45.595239,
     "lon": -96.833407,
@@ -28539,11 +27684,6 @@
     "lon": 148.3057091,
     "display": "Thredbo, Neusüdwales, 2625, Australien"
   },
-  "BW Amsterdam|NL": {
-    "lat": 47.6023802,
-    "lon": 7.658729,
-    "display": "Fresh Amsterdam, Weiler Straße, Stetten, Lörrach (Kernstadt), Untertüllingen, Lörrach, VVG der Stadt Lörrach, Landkreis Lörrach, Baden-Württemberg, 79540, Deutschland"
-  },
   "Tilford|GB": {
     "lat": 51.1871516,
     "lon": -0.7547391,
@@ -28558,11 +27698,6 @@
     "lat": 56.5820552,
     "lon": -6.6799861,
     "display": "Crossapol, Argyll and Bute, Schottland, Vereinigtes Königreich"
-  },
-  "None|TT": {
-    "lat": 44.933143,
-    "lon": 7.540121,
-    "display": "None, Turin, Piemont, Italien"
   },
   "Ross River|AU": {
     "lat": -19.477803,
@@ -28660,11 +27795,6 @@
     "display": "1A, Rue du Centenaire, Petingen, Kanton Esch an der Alzette, 4717, Luxemburg"
   },
   "Vamlingbo District|SE": {},
-  "A PDR|IE": {
-    "lat": 41.1473522,
-    "lon": -8.6029347,
-    "display": "Largo do Padrão, Rua Formosa, Baixa do Porto, Conjunto Urbano da Ribeira, Centro Histórico do Porto, Cedofeita, Santo Ildefonso, Sé, Miragaia, São Nicolau e Vitória, Porto, 4000-073, Portugal"
-  },
   "Ravnsbjergvej|DK": {
     "lat": 56.1208648,
     "lon": 10.1463328,
@@ -28706,11 +27836,6 @@
     "lat": 36.5895679,
     "lon": -81.3364889,
     "display": "Mouth of Wilson, Grayson County, Virginia, 28663, Vereinigte Staaten von Amerika"
-  },
-  "Province of Ciudad Real|ES": {
-    "lat": -12.1236804,
-    "lon": -76.993742,
-    "display": "Jirón Ciudad Real, Urb. Chama, Higuereta, Santiago de Surco, Lima, Lima Metropolitana, Lima, 15038, Peru"
   },
   "Weethalle|AU": {
     "lat": -33.878009,
@@ -28776,11 +27901,6 @@
     "lat": 47.3941347,
     "lon": 8.5180701,
     "display": "Breitensteinstrasse, Wipkingen, Kreis 10, Zürich, Bezirk Zürich, Zürich, 8037, Schweiz"
-  },
-  "Allinge-Sandvig|DK": {
-    "lat": 55.2830077,
-    "lon": 14.7915354,
-    "display": "Allinge-Sandvig, Bornholms Regionskommune, Hauptstadtregion, 3770, Dänemark"
   },
   "Newstead Village|GB": {
     "lat": 55.5998126,
@@ -28914,5 +28034,124 @@
     "lat": 53.0561536,
     "lon": -113.997448,
     "display": "Hamlet of Mulhurst, County of Wetaskiwin, Alberta, Kanada"
+  },
+  "Santiago de Chile|CL": {
+    "lat": -33.4376995,
+    "lon": -70.6510671,
+    "display": "Santiago, Provincia de Santiago, Región Metropolitana de Santiago, 8320000, Chile"
+  },
+  "Val Thorens|NL": {},
+  "Tarragona|NL": {},
+  "Nigrán|NL": {},
+  "Builth Wells|IE": {},
+  "Belfast BT ET|GB": {},
+  "Fuine|HR": {},
+  "Buckinham|GB": {},
+  "Offenbach am Main|NL": {},
+  "A FP|IE": {},
+  "Varies|AU": {},
+  "T DWP|IE": {},
+  "Hong Kong|CN": {
+    "lat": 22.2818333,
+    "lon": 114.1582831,
+    "display": "Hongkong, China"
+  },
+  "ATD|MT": {},
+  "MC Breda|NL": {},
+  "IG DW|GB": {},
+  "Luster Municipality|NO": {},
+  "Glendalough Estate|IE": {},
+  "TR AN|GB": {
+    "lat": 55.476908,
+    "lon": -4.3622561,
+    "display": "Track (disused), Ochiltree, East Ayrshire, Schottland, KA18 2LR, Vereinigtes Königreich"
+  },
+  "Q226941|BE": {},
+  "New South Wales|GB": {
+    "lat": 51.5743541,
+    "lon": -2.7003399,
+    "display": "Prince of Wales-Brücke, New Passage, Pilning and Severn Beach, Severn Beach, South Gloucestershire, West of England, England, Vereinigtes Königreich"
+  },
+  "W FK|IE": {},
+  "Quai Albert er|MC": {},
+  "Le Tampon|FR": {
+    "lat": -21.2774285,
+    "lon": 55.5164178,
+    "display": "Le Tampon, Saint-Pierre, Réunion, Frankreich"
+  },
+  "Hetta|FI": {
+    "lat": 68.3856532,
+    "lon": 23.6150148,
+    "display": "Hetta, Enontekiö, Tunturi-Lapin seutukunta, Lappland, Festland-Finnland, 99400, Finnland"
+  },
+  "Horten Municipality|NO": {},
+  "PE TY|GB": {},
+  "Saare maakond|EE": {
+    "lat": 58.2057461,
+    "lon": 22.4848673,
+    "display": "Saare maakond, Estland"
+  },
+  "D W|IE": {
+    "lat": 51.6787913,
+    "lon": -9.4510211,
+    "display": "West, 2, High Street, Bantry, West Cork, County Cork, Munster, P75 AE30, Irland"
+  },
+  "Sulzbach-Rosenberg|IT": {},
+  "Cayenne|FR": {
+    "lat": 4.9371544,
+    "lon": -52.3258736,
+    "display": "Cayenne, Französisch-Guayana, 97300, Frankreich"
+  },
+  "Varies|US": {},
+  "Q250984|AT": {},
+  "D YC|IE": {
+    "lat": 53.4553594,
+    "lon": -6.1528847,
+    "display": "D, Malahide, Irland"
+  },
+  "Manatí|US": {
+    "lat": 18.4271372,
+    "lon": -66.4929477,
+    "display": "Manatí, Puerto Rico, 00701, Vereinigte Staaten von Amerika"
+  },
+  "SK HH|GB": {},
+  "F PY|IE": {},
+  "Pedreira do Monte Castro|PT": {
+    "lat": 41.1400217,
+    "lon": -8.5401887,
+    "display": "Rua Cosme Ferreira de Castro, Cónega, Pevidal, Gondomar (São Cosme), Valbom e Jovim, Gondomar, Porto, 4420-264, Portugal"
+  },
+  "Sandbergen|SE": {},
+  "Trondheim municipality|NO": {},
+  "Saint-Jean-Cap-Ferrat|GB": {},
+  "Ayr KA ES|GB": {},
+  "Province of Trieste|IT": {
+    "lat": 45.5057939,
+    "lon": 11.8257271,
+    "display": "Parco di Via Trieste, Vaccarino, Piazzola sul Brenta, Padova, Venetien, 35016, Italien"
+  },
+  "Longyearbyen|NO": {
+    "lat": 78.2231558,
+    "lon": 15.6463656,
+    "display": "Longyearbyen, Spitzbergen, 9170, Norwegen"
+  },
+  "Risør Municipality|NO": {},
+  "Åland|FI": {
+    "lat": 60.1515942,
+    "lon": 20.0880306,
+    "display": "Ålandinseln, Finnland"
+  },
+  "Quezon City|ID": {},
+  "BW Amsterdam|NL": {},
+  "A PDR|IE": {},
+  "Province of Ciudad Real|ES": {
+    "lat": 38.3513193,
+    "lon": -0.5006613,
+    "display": "Carrer de Ciudad Real, Polígon de Sant Blai, Alicante, l'Alacantí, Alicante, Valencianische Gemeinschaft, 03005, Spanien"
+  },
+  "Allinge-Sandvig|DK": {
+    "lat": 55.2830077,
+    "lon": 14.7915354,
+    "display": "Allinge-Sandvig, Bornholms Regionskommune, Hauptstadtregion, 3770, Dänemark"
   }
 }

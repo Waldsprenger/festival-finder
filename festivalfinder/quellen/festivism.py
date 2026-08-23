@@ -10,7 +10,7 @@ gibt.
 import re
 
 from ..kern.fund import Fund, fund
-from ..kern.text import clean
+from ..kern.text import clean, feld
 from ..netz import Abrufer, erstes_objekt, json_ld_events, sitemap_adressen
 from .basis import Quelle
 
@@ -31,17 +31,17 @@ class Festivism(Quelle):
 
     def lesen(self, netz: Abrufer, url: str, html: str) -> Fund | None:
         for d in json_ld_events(html):
-            name = clean(str(d.get("name", "")))
+            name = feld(d.get("name"))
             if not name:
                 continue
             anschrift = erstes_objekt(erstes_objekt(d.get("location")).get("address"))
-            land = str(anschrift.get("addressCountry", ""))
+            land = feld(anschrift.get("addressCountry"))
             # „XW" steht bei dieser Quelle für die Spielwelt: Konzerte in
             # Minecraft und Roblox. Die gibt es wirklich — hinfahren kann man
             # nicht.
             if land.upper() == "XW" or "online" in str(
                     d.get("eventAttendanceMode", "")).lower():
                 return None
-            stadt = clean(str(anschrift.get("addressLocality", ""))).split(",")[0]
+            stadt = feld(anschrift.get("addressLocality")).split(",")[0]
             return fund(self.name, url, name, stadt=stadt, land=land)
         return None

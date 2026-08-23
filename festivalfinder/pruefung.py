@@ -23,6 +23,13 @@ from .werkzeug import schnappschuss
 #: Ein Jahr im Festivalnamen („Big Day Out 2000 Auckland")
 JAHR_IM_NAMEN = re.compile(r"\b(19\d\d|20\d\d)\b")
 
+#: Was ein leeres Datenblattfeld hinterlässt, wenn es durch `str()` gegangen ist
+NULLWORT = {"none", "null", "nil", "undefined", "nan", "n/a"}
+
+#: Felder, in denen ein solches Wort nie ein echter Wert wäre
+TEXTFELDER = ("stadt", "land", "ort", "plz", "preis", "webseite", "genre",
+              "besucher", "hinweis")
+
 
 def gewesene_ausgabe(f: Festival, seit: int) -> bool:
     """Terminlos, aber mit vergangenem Jahr im Namen — das war einmal.
@@ -63,6 +70,16 @@ def stimmigkeit(festivals: list[Festival]) -> list[str]:
               or bool(KOSTENLOS.search(f.preis)), "Preis ohne Preis")
         merke(not f.ort or not KNOPFBESCHRIFTUNG.match(f.ort),
               "Spielstätte ist eine Knopfbeschriftung")
+        # `str(blatt.get("city", ""))` sieht sicher aus und ist es nicht: Steht
+        # der Schlüssel im Datenblatt und trägt den Wert null, greift der
+        # Standardwert nicht, und heraus kommt die Zeichenkette „None". Genau
+        # das stand bei 2.490 Festivals als Ortsname — auf der Karte, in der
+        # Suche, und der Geokodierer fragte in 111 Ländern nach einem Ort
+        # namens „None".
+        merke(not any(getattr(f, feld).strip().lower() in NULLWORT
+                      for feld in TEXTFELDER), "Nullwert als Text im Feld")
+        merke(not f.webseite or f.webseite.lower().startswith("http"),
+              "Webseite ist keine Adresse")
 
     # Dubletten: gleicher Name, gleicher Ort, sich überschneidender Termin.
     # Zwei Ausgaben desselben Festivals im selben Jahr gibt es wirklich
@@ -91,18 +108,21 @@ def ausbeute(funde: dict[str, int], festivals: int,
     Festivals kommen und gehen.
     """
     vorher = lies_json(STAND, {}) or {}
-    warnungen: list[str] = []
     mitgebracht = mitgebracht or {}
+    #: Hinweise auf das Alter eines mitgebrachten Standes
+    alterung: list[str] = []
+    #: Einbrüche gegenüber dem letzten Lauf
+    einbrueche: list[str] = []
 
     for name, datum in mitgebracht.items():
         # Die Quelle bedient diesen Lauf nicht, ihr Stand liegt aber bei. Zu
         # melden ist deshalb nicht ihr Schweigen, sondern sein Alter.
         tage = schnappschuss.alter_in_tagen(datum)
         if tage is None:
-            warnungen.append(f"{name}: mitgebrachter Stand ohne lesbares Datum")
+            alterung.append(f"{name}: mitgebrachter Stand ohne lesbares Datum")
         elif tage > schnappschuss.ALTERSGRENZE_TAGE:
-            warnungen.append(f"{name}: mitgebrachter Stand vom {datum} "
-                             f"ist {tage} Tage alt")
+            alterung.append(f"{name}: mitgebrachter Stand vom {datum} "
+                            f"ist {tage} Tage alt")
 
     for name, jetzt in funde.items():
         if name in mitgebracht:
@@ -113,21 +133,27 @@ def ausbeute(funde: dict[str, int], festivals: int,
             # ist als Maßstab unbrauchbar (`0 < 0 * 0.8` ist falsch), also
             # meldete der Vergleich nichts — und beim Lauf auf fremden Servern
             # lieferte festivalticker über Monate nichts, ohne dass es auffiel.
-            warnungen.append(f"{name}: kein einziger Fund")
+            einbrueche.append(f"{name}: kein einziger Fund")
         elif frueher and jetzt < frueher * 0.8:
-            warnungen.append(f"{name}: {jetzt} statt {frueher} Funde")
+            einbrueche.append(f"{name}: {jetzt} statt {frueher} Funde")
 
     frueher_gesamt = vorher.get("festivals")
     if frueher_gesamt and festivals < frueher_gesamt * 0.8:
-        warnungen.append(f"Festivals gesamt: {festivals} statt {frueher_gesamt}")
+        einbrueche.append(f"Festivals gesamt: {festivals} statt {frueher_gesamt}")
 
     # Bei einem Einbruch bleibt der alte Maßstab stehen: Sonst gilt der
     # schlechte Wert ab morgen als normal und die Warnung verstummt, obwohl
     # nichts repariert ist.
+    #
+    # Nur bei einem Einbruch. Die Alterswarnung zählt hier nicht: Der Stand von
+    # festivalticker lässt sich nicht mehr auffrischen, sie steht also ab dem
+    # 11. September 2026 in jedem Lauf. Zählte sie mit, fröre der Maßstab für
+    # immer auf dem höchsten je erreichten Wert ein — und meldete Jahre später
+    # einen Einbruch, den es nie gab.
     gemerkt = {name: (vorher.get("quellen", {}).get(name, jetzt)
-                      if any(name in w for w in warnungen) else jetzt)
+                      if any(name in w for w in einbrueche) else jetzt)
                for name, jetzt in funde.items()}
     schreib_json(STAND, {"quellen": gemerkt,
                          "festivals": max(festivals, frueher_gesamt or 0)
-                         if warnungen else festivals})
-    return warnungen
+                         if einbrueche else festivals})
+    return alterung + einbrueche

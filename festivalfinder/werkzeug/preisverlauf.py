@@ -27,6 +27,13 @@ DATEI = DATA / "preis_verlauf.json"
 #: So lange bleibt ein Festival in der Beobachtung, auch wenn es gerade fehlt
 GEDULD_TAGE = 60
 
+# Ein Eintrag führt vier Angaben:
+#   erst    der zuerst beobachtete Preis
+#   seit    wann er zuerst beobachtet wurde
+#   aktuell der jetzt geltende Preis
+#   stand   wann das Festival zuletzt gesehen wurde - daran misst sich die
+#           Geduld weiter unten, nicht an der letzten Preisänderung
+
 
 def _tage_her(stand: str, heute: str) -> int:
     """Tage zwischen zwei ISO-Daten; ohne lesbares Datum: unendlich lange her."""
@@ -64,7 +71,12 @@ def verfolgen(festivals: list[Festival], heute: str | None = None) -> dict[str, 
             eintrag = {"erst": alt["erst"], "seit": alt["seit"],
                        "aktuell": f.preis, "stand": heute}
         else:
-            eintrag = alt
+            # `stand` heißt „zuletzt gesehen", nicht „zuletzt geändert". Stand
+            # das Datum der letzten Änderung darin, wäre die Geduld unten für
+            # jeden Preis aufgebraucht, der zwei Monate lang gleich blieb — und
+            # das ist der Normalfall. Genau die Einträge, die sie schützen
+            # soll, fielen als Erste heraus.
+            eintrag = {**alt, "stand": heute}
         verlauf[k] = eintrag
 
         if eintrag["erst"] != f.preis:

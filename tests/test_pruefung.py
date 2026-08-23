@@ -31,10 +31,19 @@ class TestStimmigkeit:
         ({"stadt": "104 45 Athen"}, "Postleitzahl im Ortsfeld"),
         ({"preis": "Pop Punk"}, "Preis ohne Preis"),
         ({"ort": "Tickets Ticket"}, "Spielstätte ist eine Knopfbeschriftung"),
+        ({"stadt": "None"}, "Nullwert als Text im Feld"),
+        ({"plz": "None"}, "Nullwert als Text im Feld"),
+        ({"webseite": "None"}, "Nullwert als Text im Feld"),
+        ({"genre": "undefined"}, "Nullwert als Text im Feld"),
+        ({"webseite": "www.beispiel.de"}, "Webseite ist keine Adresse"),
     ])
     def test_jeder_widerspruch_wird_gemeldet(self, kaputt, meldung):
         gefunden = pruefung.stimmigkeit([festival(**kaputt)])
         assert any(meldung in z for z in gefunden), gefunden
+
+    def test_ein_ortsname_der_zufaellig_so_heisst_bleibt_unbeanstandet(self):
+        """Gemeint ist das Wort allein — „Nonesuch" ist ein Ortsname."""
+        assert pruefung.stimmigkeit([festival(stadt="Nonesuch")]) == []
 
     def test_dublette_faellt_auf(self):
         doppelt = [festival(), festival(quellen={"festivalsunited": "https://a/b"})]
@@ -96,6 +105,20 @@ class TestAusbeute:
         """Nicht das Schweigen der Quelle zählt, sondern das Datum."""
         warnungen = pruefung.ausbeute({"festivalticker": 1900}, 900,
                                       {"festivalticker": "2020-01-01"})
+        assert any("Tage alt" in w for w in warnungen)
+
+    def test_ein_alter_stand_friert_den_massstab_nicht_ein(self):
+        """Der Stand von festivalticker lässt sich nicht mehr auffrischen, die
+        Alterswarnung steht also in jedem Lauf. Zählte sie als Einbruch, bliebe
+        der Maßstab für immer auf dem höchsten je erreichten Wert stehen — und
+        meldete Jahre später einen Einbruch, den es nie gab."""
+        alt = {"festivalticker": "2020-01-01"}
+        pruefung.ausbeute({"festivalticker": 1900, "jambase": 2000}, 13000, alt)
+        # Der Bestand schrumpft langsam, wie er es normalerweise tut
+        for gesamt in (12000, 11000, 10000, 9000):
+            warnungen = pruefung.ausbeute(
+                {"festivalticker": 1900, "jambase": 2000}, gesamt, alt)
+            assert not any("Festivals gesamt" in w for w in warnungen), warnungen
         assert any("Tage alt" in w for w in warnungen)
 
     def test_ein_frischer_mitgebrachter_stand_ist_in_ordnung(self):

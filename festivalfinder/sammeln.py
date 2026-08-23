@@ -95,9 +95,16 @@ def _eine_quelle(netz: Abrufer, quelle: Quelle, adressen: dict, seit: int,
     if gefunden:
         # Was dieser Lauf erreicht hat, bekommt der nächste mit, der es nicht
         # erreicht. Ein Teillauf (--limit) taugt dafür nicht.
-        if not limit and schnappschuss.schreiben(quelle.name, gefunden):
+        # Ob die Quelle wirklich geantwortet hat, entscheidet über das Datum:
+        # Kam jede Seite aus dem Zwischenspeicher, bleibt der alte Stand
+        # stehen. Sonst hieße der Stand jeden Tag „heute".
+        frisch = netz.hat_geholt(f.url for f in gefunden)
+        if not limit and schnappschuss.schreiben(quelle.name, gefunden,
+                                                 frisch=frisch):
             groesse = schnappschuss.datei(quelle.name).stat().st_size / 1e6
-            print(f"  Stand von {quelle.name} abgelegt ({groesse:.2f} MB)")
+            stand = schnappschuss.stand_von(quelle.name)
+            print(f"  Stand von {quelle.name} abgelegt ({groesse:.2f} MB, "
+                  f"vom {stand})")
         return gefunden
 
     mitgebracht, stand = schnappschuss.lesen(quelle.name)

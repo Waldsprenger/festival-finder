@@ -26,16 +26,24 @@ class Dienst:
     def __init__(self, *antworten):
         self.antworten = list(antworten)
         self.gefragt = 0
+        #: die Parameter jeder Anfrage, in der Reihenfolge des Fragens
+        self.fragen = []
 
-    def get(self, _url, **_kwargs):
+    def get(self, _url, params=None, **_kwargs):
         self.gefragt += 1
+        self.fragen.append(params or {})
         wert = self.antworten.pop(0) if self.antworten else Antwort()
         if isinstance(wert, Exception):
             raise wert
         return wert
 
 
-TREFFER = [{"lat": "54.3", "lon": "10.1", "display_name": "Kiel, Deutschland"}]
+def treffer(lat="54.3", lon="10.1", anzeige="Kiel, Deutschland", land="de"):
+    return [{"lat": lat, "lon": lon, "display_name": anzeige,
+             "address": {"country_code": land}}]
+
+
+TREFFER = treffer()
 
 
 @pytest.fixture(autouse=True)
@@ -73,6 +81,29 @@ class TestGeokodieren:
         ort, geantwortet = geokodieren.nachschlagen(dienst, "Kiel", "DE")
         assert ort and geantwortet
         assert dienst.gefragt == 2
+
+    def test_das_land_bleibt_bei_jedem_versuch_bedingung(self):
+        """Es stand einmal nur im ersten Versuch. Scheiterte der, suchte der
+        zweite weltweit — und Nominatim antwortete willig: Buenos Aires lag
+        danach in Spanien, Jakarta in Berlin, Hongkong in Paris."""
+        dienst = Dienst(Antwort(200, []), Antwort(200, []))
+        geokodieren.nachschlagen(dienst, "Buenos Aires", "AR")
+        assert dienst.gefragt == 2
+        assert all(f.get("countrycodes") == "ar" for f in dienst.fragen),             dienst.fragen
+
+    def test_ein_treffer_im_falschen_land_gilt_nicht(self):
+        """Lieber kein Punkt als ein falscher."""
+        spanien = treffer("40.95", "-5.70", "Buenos Aires, Salamanca", "es")
+        ort, geantwortet = geokodieren.nachschlagen(
+            Dienst(Antwort(200, spanien), Antwort(200, spanien)),
+            "Buenos Aires", "AR")
+        assert ort is None
+        assert geantwortet is True
+
+    def test_ohne_landesangabe_wird_weltweit_gesucht(self):
+        dienst = Dienst(Antwort(200, []), Antwort(200, TREFFER))
+        ort, _ = geokodieren.nachschlagen(dienst, "Kiel", "")
+        assert ort and all("countrycodes" not in f for f in dienst.fragen)
 
     def test_das_land_geht_mit(self):
         """Bei mehrdeutigen Namen liefert Nominatim den weltweit bekanntesten

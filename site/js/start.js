@@ -8,7 +8,7 @@
   if (FF.keineDaten) return;
 
   const { $, t, zahl, state } = FF;
-  const heute = new Date().toISOString().slice(0, 10);
+  const heute = FF.heute();
 
   /* ---------------- Schritt 1: Ort ---------------- */
 

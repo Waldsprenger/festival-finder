@@ -180,6 +180,9 @@ def befehl_bauen(args) -> int:
     print(f"  Koordinaten aus Postleitzahl: {z['aus_plz']}, aus dem Geo-Cache: "
           f"{z['aus_cache']}, aus dem Ortsverzeichnis: {z['aus_ortsverzeichnis']}, "
           f"aus der Quellseite: {z['aus_quelle']}")
+    if z["cache_verworfen"]:
+        print(f"  ! {z['cache_verworfen']} Geo-Cache-Eintraege lagen im falschen "
+              f"Land und blieben unbenutzt", file=sys.stderr)
     print(f"  Festivals {z['festivals']} | mit Koordinaten {z['mit_koordinaten']} | "
           f"mit Preis in EUR {z['mit_preis']} | Acts {z['acts']} | "
           f"Orte {z['orte']} | PLZ {z['plz']}")

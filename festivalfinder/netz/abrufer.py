@@ -69,6 +69,8 @@ class Abrufer:
         self.meldungen: list[str] = []
         #: Rechner, die den Lauf mit 403 abweisen, und wie oft
         self.abgewiesen: dict[str, int] = {}
+        #: Rechner → Seiten, die dieser Lauf wirklich über das Netz bekam
+        self.geholt: dict[str, int] = {}
         #: Wartezeit je Rechner in Sekunden — wächst, wenn er „zu schnell" meldet
         self.verzoegerung: dict[str, float] = {}
 
@@ -112,6 +114,15 @@ class Abrufer:
     def weist_ab(self, url: str) -> bool:
         """Hat dieser Rechner den Lauf schon oft genug abgewiesen?"""
         return self.abgewiesen.get(urlparse(url).netloc, 0) >= SPERRE_AB
+
+    def hat_geholt(self, urls) -> bool:
+        """Kam für diese Adressen in diesem Lauf wirklich etwas über das Netz?
+
+        Ein Lauf aus dem Zwischenspeicher sieht von außen aus wie ein
+        erfolgreicher — er liefert dieselben Seiten. Wer daraus einen
+        „Stand von heute" macht, datiert alte Daten neu.
+        """
+        return any(self.geholt.get(urlparse(u).netloc) for u in set(urls))
 
     def _wartezeit(self, url: str) -> float:
         return self.verzoegerung.get(urlparse(url).netloc, 0.0)
@@ -203,6 +214,8 @@ class Abrufer:
                 r.raise_for_status()
                 r.encoding = r.apparent_encoding or "utf-8"
                 self._schreib(pfad, r.text)
+                haus = urlparse(url).netloc
+                self.geholt[haus] = self.geholt.get(haus, 0) + 1
                 return r.text
             except Exception as exc:
                 # Mit dem Statuscode: 403 ist eine Entscheidung des Betreibers,

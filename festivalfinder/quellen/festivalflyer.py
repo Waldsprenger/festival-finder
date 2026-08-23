@@ -11,7 +11,7 @@ import re
 from ..kern import zeit
 from ..kern.fund import Fund, fund
 from ..kern.orte import ist_land, land_code
-from ..kern.text import clean, valid_band
+from ..kern.text import clean, feld, valid_band
 from ..netz import Abrufer, erstes_objekt, json_ld_events
 from .basis import Quelle
 
@@ -36,14 +36,14 @@ class FestivalFlyer(Quelle):
         if not ereignisse:
             return None
         d = ereignisse[0]
-        roh = clean(str(d.get("name", "")))
+        roh = feld(d.get("name"))
         if not roh:
             return None
         jm = re.search(r"\b(20\d{2})\b", roh)
 
         # „Fernhill Farm, Cheddar Road, BS40 6LD Compton Martin, United Kingdom"
         platz = erstes_objekt(d.get("location"))
-        anschrift = clean(str(platz.get("name", "")))
+        anschrift = feld(platz.get("name"))
         teile = [t.strip() for t in anschrift.split(",") if t.strip()]
         land = land_code(teile[-1]) if len(teile) > 1 else ""
         if not ist_land(land):
@@ -61,13 +61,13 @@ class FestivalFlyer(Quelle):
                                stadt_roh)),
             land=land,
             ort=spielstaette if len(spielstaette) <= 60 else "",
-            abgesagt=str(d.get("eventStatus", "")).endswith("EventCancelled"),
+            abgesagt=feld(d.get("eventStatus")).endswith("EventCancelled"),
             lineup=self._lineup(d),
         )
 
     def _lineup(self, d: dict) -> list[str]:
         """Die Beschreibung führt das Lineup, mit Schrägstrich getrennt."""
-        beschreibung = re.sub(r"<[^>]+>", " ", str(d.get("description", "")))
+        beschreibung = re.sub(r"<[^>]+>", " ", feld(d.get("description")))
         if "/" not in beschreibung:
             return []
         namen = []

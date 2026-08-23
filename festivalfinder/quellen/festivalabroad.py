@@ -9,7 +9,7 @@ import re
 from ..kern import zeit
 from ..kern.fund import Fund, fund
 from ..kern.orte import ist_land, zahl_oder_nichts
-from ..kern.text import clean
+from ..kern.text import clean, feld
 from ..netz import Abrufer, erstes_objekt, json_ld_events, sitemap_adressen, soup
 from .basis import Quelle
 
@@ -41,7 +41,7 @@ class FestivalAbroad(Quelle):
 
     def lesen(self, netz: Abrufer, url: str, html: str) -> Fund | None:
         for d in json_ld_events(html):
-            name = clean(str(d.get("name", "")))
+            name = feld(d.get("name"))
             if not name:
                 continue
             platz = erstes_objekt(d.get("location"))
@@ -53,16 +53,16 @@ class FestivalAbroad(Quelle):
                 von=zeit.aus_iso(d.get("startDate")),
                 bis=zeit.aus_iso(d.get("endDate")),
                 # „Dresden, Germany" — der Ort steht vorn, das Land dahinter
-                stadt=clean(str(anschrift.get("addressLocality", ""))).split(",")[0],
-                land=str(anschrift.get("addressCountry", "")),
-                ort=clean(str(platz.get("name", ""))),
+                stadt=feld(anschrift.get("addressLocality")).split(",")[0],
+                land=feld(anschrift.get("addressCountry")),
+                ort=feld(platz.get("name")),
                 lat=zahl_oder_nichts(geo.get("latitude")),
                 lon=zahl_oder_nichts(geo.get("longitude")),
-                webseite=str(d.get("url", "")),
-                genre=clean(str(d.get("keywords", ""))),
-                besucher=str(d.get("maximumAttendeeCapacity", "") or ""),
+                webseite=feld(d.get("url")),
+                genre=feld(d.get("keywords")),
+                besucher=feld(d.get("maximumAttendeeCapacity")),
                 preis="Eintritt frei" if d.get("isAccessibleForFree") is True else "",
-                abgesagt="cancel" in str(d.get("eventStatus", "")).lower(),
+                abgesagt="cancel" in feld(d.get("eventStatus")).lower(),
             )
         return self._ohne_datenblatt(url, html)
 

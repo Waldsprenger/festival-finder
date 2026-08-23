@@ -50,28 +50,41 @@ def nachschlagen(sitzung: requests.Session, stadt: str,
     Beides auseinanderzuhalten ist wichtig: „kennt den Ort nicht" darf in den
     Cache, „war gerade nicht erreichbar" nicht. Sonst schreibt ein einziger
     Ausfall hunderte Orte auf Dauer als unauffindbar fest.
+
+    Das Land ist Bedingung, nicht Wunsch. Es stand einmal nur im ersten
+    Versuch; scheiterte der, suchte der zweite weltweit — und Nominatim
+    antwortete willig: Buenos Aires lag danach in Spanien, Mumbai in Madrid,
+    Jakarta in Berlin und Santiago de Chile in Kiew. 145 Orte und 179
+    Festivals standen so im falschen Land.
     """
     code = cc(land)
-    versuche = []
     if code:
-        versuche.append({"city": stadt, "countrycodes": code})
-        versuche.append({"q": f"{stadt}, {code.upper()}"})
-    versuche.append({"city": stadt})
-    versuche.append({"q": stadt})
+        versuche = [{"city": stadt, "countrycodes": code},
+                    {"q": stadt, "countrycodes": code}]
+    else:
+        versuche = [{"city": stadt}, {"q": stadt}]
 
     geantwortet = False
     for params in versuche:
-        params |= {"format": "jsonv2", "limit": 1, "accept-language": "de"}
+        params |= {"format": "jsonv2", "limit": 1, "accept-language": "de",
+                   "addressdetails": 1}
         try:
             r = sitzung.get(ENDPUNKT, params=params, timeout=30)
             time.sleep(1.1)
             if r.status_code != 200:
                 continue
             geantwortet = True
-            if (hits := r.json()):
-                h = hits[0]
-                return {"lat": float(h["lat"]), "lon": float(h["lon"]),
-                        "display": h.get("display_name", "")}, True
+            if not (hits := r.json()):
+                continue
+            h = hits[0]
+            # Auch mit `countrycodes` gegengeprüft: Ein Treffer, der die
+            # Bedingung nicht erfüllt, ist keiner — lieber kein Punkt als ein
+            # falscher.
+            gefunden = (h.get("address") or {}).get("country_code", "")
+            if code and gefunden and gefunden.lower() != code:
+                continue
+            return {"lat": float(h["lat"]), "lon": float(h["lon"]),
+                    "display": h.get("display_name", "")}, True
         except Exception:
             time.sleep(2.0)
     return None, geantwortet

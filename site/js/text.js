@@ -39,6 +39,19 @@
 
   /* ---------------- Darstellung ---------------- */
 
+  /** Das heutige Datum als „2026-08-19" — nach der Uhr des Betrachters.
+
+      `new Date().toISOString()` rechnet nach UTC um und liefert oestlich
+      davon den halben Tag lang das Datum von gestern: In Neuseeland (UTC+12)
+      zwoelf Stunden lang, in Deutschland zwischen Mitternacht und zwei. Die
+      Voreinstellung „ab heute" zeigte dann Festivals, die gestern zu Ende
+      gegangen sind. */
+  function heute() {
+    const d = new Date();
+    const zwei = (n) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${zwei(d.getMonth() + 1)}-${zwei(d.getDate())}`;
+  }
+
   /** „2026-08-19" → „19.08.2026" */
   const datum = (iso) => {
     if (!iso) return '';
@@ -82,5 +95,6 @@
   //: Währungen, die erst umgerechnet vergleichbar sind
   const FREMDWAEHRUNG = /\b(CHF|GBP|USD|DKK|SEK|NOK|PLN|CZK|HUF)\b|£|\$/i;
 
-  Object.assign(FF, { fold, datum, stand, preisZusatz, aufzaehlen, FREMDWAEHRUNG });
+  Object.assign(FF, { fold, heute, datum, stand, preisZusatz, aufzaehlen,
+                    FREMDWAEHRUNG });
 })();

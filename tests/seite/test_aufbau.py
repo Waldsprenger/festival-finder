@@ -107,6 +107,21 @@ class TestKarte:
         assert "xKurz" in karte, "die Pins brauchen weiter den kurzen Weg"
 
 
+class TestZeit:
+    def test_das_heutige_datum_kommt_nicht_aus_UTC(self):
+        """`toISOString()` rechnet nach UTC um und liefert östlich davon den
+        halben Tag lang das Datum von gestern: in Neuseeland zwölf Stunden
+        lang, in Deutschland zwischen Mitternacht und zwei. Die Voreinstellung
+        „ab heute" zeigte dort Festivals, die gestern zu Ende gegangen sind."""
+        ohne_kommentar = re.compile(r"/\*.*?\*/|//.*", re.S)
+        for name, inhalt in JS.items():
+            code = ohne_kommentar.sub("", inhalt)
+            assert "toISOString" not in code, \
+                f"{name}: rechnet ein Datum über UTC"
+        assert "function heute()" in JS["js/text.js"]
+        assert "FF.heute()" in JS["js/start.js"]
+
+
 class TestModule:
     def test_jedes_modul_wird_eingebunden(self):
         vorhanden = {f"js/{p.name}" for p in (SITE / "js").glob("*.js")}

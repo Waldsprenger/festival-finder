@@ -100,6 +100,15 @@ class TestGrenzen:
         assert lat0 == 48.1 and lat1 == 54.3
         assert lon0 == 10.1 and lon1 == 11.6
 
+    def test_der_rahmen_schliesst_auch_die_raender_ein(self):
+        """Gerundet wird nach aussen: round(-46.4137, 2) laege noerdlich des
+        suedlichsten Punktes, und die Karte schnitte ihn ab."""
+        zeilen = [zeile(lat=-46.4137, lon=-73.5561),
+                  zeile(lat=64.1466, lon=178.0042)]
+        lat0, lat1, lon0, lon1 = datenrahmen(zeilen)
+        for z in zeilen:
+            assert lat0 <= z[9] <= lat1 and lon0 <= z[10] <= lon1
+
     def test_ohne_punkte_der_feine_ausschnitt(self):
         from festivalfinder.kern.orte import FEINRAHMEN
         assert datenrahmen([zeile(lat=None, lon=None)]) == list(FEINRAHMEN)

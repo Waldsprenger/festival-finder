@@ -34,6 +34,18 @@ def clean(text: str | None) -> str:
     return re.sub(r"\s+", " ", UNSICHTBAR.sub(" ", unescape(text))).strip()
 
 
+
+def feld(wert) -> str:
+    """Ein Textfeld aus einem Datenblatt — null heißt leer, nicht „None".
+
+    `str(d.get("k", ""))` sieht sicher aus und ist es nicht: Steht der
+    Schlüssel im Datenblatt und trägt den Wert null, greift der Standardwert
+    nicht, und `str(None)` ergibt die Zeichenkette „None". Genau das stand bei
+    2.490 Festivals als Ortsname — auf der Karte, in der Suche, und der
+    Geokodierer fragte Nominatim in 111 Ländern nach einem Ort namens „None".
+    """
+    return clean("" if wert is None else str(wert))
+
 # --------------------------------------------------------------------------
 # Faltung
 # --------------------------------------------------------------------------

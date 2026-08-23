@@ -85,6 +85,28 @@ NAMEN_HAND = {
     "myanmar": "MM", "costa rica": "CR", "panama": "PA", "guatemala": "GT",
     "honduras": "HN", "nicaragua": "NI", "el salvador": "SV", "belize": "BZ",
     "fidschi": "FJ", "papua-neuguinea": "PG",
+    # Deutsche Namen, die von der englischen Länderliste zu weit abweichen.
+    # Nominatim antwortet auf Deutsch, und wo der Name nicht auflösbar war,
+    # ließ sich der Treffer nicht gegen das gesuchte Land prüfen.
+    "russland": "RU", "moldau": "MD", "republik moldau": "MD",
+    "surinam": "SR", "madagaskar": "MG", "gazastreifen": "PS",
+    "palaestina": "PS", "palästina": "PS", "westjordanland": "PS",
+    "saint vincent und die grenadinen": "VC",
+}
+
+
+#: Gebiete mit eigenem Kürzel, deren Postanschrift auf den Mutterstaat lautet.
+#: Nominatim schreibt bei Chek Lap Kok „Hongkong, China" und bei Saint-Martin
+#: „Frankreich"; ohne diese Zuordnung sähe das nach einem Widerspruch aus.
+GEHOERT_ZU = {
+    "HK": "CN", "MO": "CN",
+    "MF": "FR", "GP": "FR", "MQ": "FR", "RE": "FR", "YT": "FR", "GF": "FR",
+    "PM": "FR", "BL": "FR", "NC": "FR", "PF": "FR", "WF": "FR", "TF": "FR",
+    "AW": "NL", "CW": "NL", "SX": "NL", "BQ": "NL",
+    "FO": "DK", "GL": "DK", "AX": "FI", "SJ": "NO", "BV": "NO",
+    "GI": "GB", "IM": "GB", "JE": "GB", "GG": "GB", "FK": "GB", "BM": "GB",
+    "KY": "GB", "VG": "GB", "AI": "GB", "MS": "GB", "TC": "GB", "SH": "GB",
+    "PR": "US", "VI": "US", "GU": "US", "AS": "US", "MP": "US",
 }
 
 

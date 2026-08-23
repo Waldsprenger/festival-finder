@@ -10,7 +10,7 @@ from ..kern import zeit
 from ..kern.fund import Fund, fund
 from ..kern.geld import betrag
 from ..kern.orte import ist_land, land_code
-from ..kern.text import clean, valid_band
+from ..kern.text import clean, feld, valid_band
 from ..netz import Abrufer, erstes_objekt, json_ld_events, sitemap_adressen
 from .basis import Quelle
 
@@ -21,7 +21,7 @@ def acts_aus_datenblatt(d: dict) -> list[str]:
     """performer-Liste eines schema.org-Blocks; Einträge sind Text oder Objekt."""
     namen = []
     for act in (d.get("performer") or []):
-        nm = clean(str(act.get("name", "") if isinstance(act, dict) else act))
+        nm = feld(act.get("name") if isinstance(act, dict) else act)
         if valid_band(nm):
             namen.append(nm)
     return namen
@@ -51,7 +51,7 @@ class Festapp(Quelle):
         if not ereignisse:
             return None
         d = ereignisse[0]
-        roh = clean(str(d.get("name", "")))
+        roh = feld(d.get("name"))
         if not roh:
             return None
         jm = re.search(r"\b(20\d{2})\b", roh)
@@ -61,9 +61,9 @@ class Festapp(Quelle):
         # „Dorfstrasse 22, 3457 Sumiswald, Switzerland": Die Anschrift beginnt
         # oft mit der Straße, deshalb zählt der Ortsname aus location.name. Das
         # Land steht zuverlässig am Ende.
-        teile = [t.strip() for t in clean(str(adresse.get("addressLocality", ""))).split(",")
+        teile = [t.strip() for t in feld(adresse.get("addressLocality")).split(",")
                  if t.strip()]
-        spielstaette = clean(str(platz.get("name", "")))
+        spielstaette = feld(platz.get("name"))
         stadt = spielstaette
         if not stadt and teile:
             # ohne location.name der vorletzte Teil, ohne führende Postleitzahl
@@ -74,7 +74,7 @@ class Festapp(Quelle):
             return None                       # ohne erkennbares Land kein Eintrag
 
         angebot = erstes_objekt(d.get("offers"))
-        wert = betrag(str(angebot.get("price", "")))
+        wert = betrag(feld(angebot.get("price")))
         preis = ("" if wert is None else
                  f"ab {angebot.get('priceCurrency', 'EUR')} "
                  + f"{wert:.2f}".replace(".", ","))
@@ -85,8 +85,8 @@ class Festapp(Quelle):
             von=zeit.aus_iso(d.get("startDate")), bis=zeit.aus_iso(d.get("endDate")),
             jahr=jm.group(1) if jm else "",
             stadt=stadt, land=land, ort=spielstaette,
-            plz=clean(str(adresse.get("postalCode", ""))),
-            preis=preis, webseite=clean(str(angebot.get("url", ""))),
-            abgesagt=str(d.get("eventStatus", "")).endswith("EventCancelled"),
+            plz=feld(adresse.get("postalCode")),
+            preis=preis, webseite=feld(angebot.get("url")),
+            abgesagt=feld(d.get("eventStatus")).endswith("EventCancelled"),
             lineup=acts_aus_datenblatt(d),
         )

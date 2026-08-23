@@ -77,6 +77,18 @@ class TestPreisverlauf:
         verlauf = json.loads(verlaufsdatei.read_text(encoding="utf-8"))
         assert list(verlauf) == ["neufest|2026|kiel"]
 
+    def test_die_geduld_zaehlt_ab_dem_letzten_sehen(self, verlaufsdatei):
+        """Nicht ab der letzten Preisänderung. Ein Preis, der ein halbes Jahr
+        gleich bleibt, ist der Normalfall — gälte sein Alter, fielen genau die
+        Einträge zuerst heraus, die die Geduld schützen soll."""
+        for tag in ("2026-01-05", "2026-04-05", "2026-06-30"):
+            preisverlauf.verfolgen([fest("89 €", name="Altfest")], heute=tag)
+        # Einen Tag später fehlt es - und muss trotzdem stehen bleiben
+        preisverlauf.verfolgen([fest("89 €", name="Neufest")], heute="2026-07-01")
+        verlauf = json.loads(verlaufsdatei.read_text(encoding="utf-8"))
+        assert "altfest|2026|kiel" in verlauf, verlauf
+        assert verlauf["altfest|2026|kiel"]["seit"] == "2026-01-05"
+
     def test_der_startpreis_ueberlebt_eine_luecke(self, verlaufsdatei):
         preisverlauf.verfolgen([fest("89 €")], heute="2026-06-01")
         preisverlauf.verfolgen([], heute="2026-06-02")          # Quelle schweigt
@@ -159,6 +171,31 @@ class TestSchnappschuss:
         roh = gzip.decompress(
             schnappschuss.datei("festivalticker").read_bytes()).decode("utf-8")
         assert '"von":"2026-06-01"' in roh
+
+    def test_ein_lauf_aus_dem_zwischenspeicher_datiert_nicht_um(self, ordner):
+        """Kam jede Seite von der Platte, hat die Quelle nichts Neues gesagt.
+        Trüge der Stand trotzdem das heutige Datum, verstummte die
+        Alterswarnung für immer."""
+        schnappschuss.schreiben("festivalticker", [satz()])
+        # den abgelegten Stand künstlich altern lassen
+        p = schnappschuss.datei("festivalticker")
+        inhalt = json.loads(gzip.decompress(p.read_bytes()).decode("utf-8"))
+        inhalt["stand"] = "2026-01-15"
+        p.write_bytes(gzip.compress(json.dumps(inhalt).encode("utf-8")))
+
+        assert schnappschuss.schreiben("festivalticker", [satz()],
+                                       frisch=False) is True
+        assert schnappschuss.lesen("festivalticker")[1] == "2026-01-15"
+
+        assert schnappschuss.schreiben("festivalticker", [satz()],
+                                       frisch=True) is True
+        assert schnappschuss.lesen("festivalticker")[1] == date.today().isoformat()
+
+    def test_ohne_alten_stand_gilt_doch_heute(self, ordner):
+        """Der allererste Lauf hat kein Datum zu erben."""
+        assert schnappschuss.schreiben("festivalticker", [satz()],
+                                       frisch=False) is True
+        assert schnappschuss.lesen("festivalticker")[1] == date.today().isoformat()
 
     def test_alter(self):
         assert schnappschuss.alter_in_tagen(date.today().isoformat()) == 0

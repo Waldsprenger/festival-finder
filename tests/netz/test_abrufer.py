@@ -168,6 +168,23 @@ class TestSpeicher:
         dienst(frisch, Antwort(200, "<p>neu</p>"))
         assert frisch.fetch("https://x.test/a") == "<p>neu</p>"
 
+    def test_er_weiss_was_wirklich_ueber_das_netz_kam(self, tmp_path, monkeypatch):
+        """Ein Lauf aus dem Zwischenspeicher liefert dieselben Seiten und sieht
+        von außen aus wie ein frischer. Wer daraus einen „Stand von heute"
+        macht, datiert alte Daten neu — und die Alterswarnung verstummt."""
+        monkeypatch.setattr("festivalfinder.netz.abrufer.time.sleep", lambda _s: None)
+        erst = Abrufer(cache=tmp_path)
+        dienst(erst, Antwort(200, "<p>a</p>"))
+        erst.fetch("https://x.test/a")
+        assert erst.hat_geholt(["https://x.test/a"]) is True
+
+        # Zweiter Lauf, alles von der Platte: nichts kam über das Netz
+        wieder = Abrufer(cache=tmp_path, max_age_h=0)
+        d = dienst(wieder, Antwort(200, "<p>a</p>"))
+        assert wieder.fetch("https://x.test/a") == "<p>a</p>"
+        assert d.gefragt == 0
+        assert wieder.hat_geholt(["https://x.test/a"]) is False
+
     def test_zwei_abrufer_teilen_sich_nichts(self, tmp_path, monkeypatch):
         """Der Kern des Umbaus: kein Zustand im Modul."""
         monkeypatch.setattr("festivalfinder.netz.abrufer.time.sleep", lambda _s: None)

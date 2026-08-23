@@ -13,7 +13,7 @@ import re
 from ..kern import zeit
 from ..kern.fund import Fund, fund
 from ..kern.orte import zahl_oder_nichts
-from ..kern.text import clean, valid_band
+from ..kern.text import clean, feld, valid_band
 from ..netz import Abrufer, erstes_objekt, json_ld_events, sitemap_adressen, soup
 from .basis import Quelle
 
@@ -47,29 +47,29 @@ class JamBase(Quelle):
 
     def lesen(self, netz: Abrufer, url: str, html: str) -> Fund | None:
         for d in json_ld_events(html):
-            name = clean(str(d.get("name", "")))
+            name = feld(d.get("name"))
             if not name:
                 continue
             platz = erstes_objekt(d.get("location"))
             anschrift = erstes_objekt(platz.get("address"))
             geo = erstes_objekt(platz.get("geo"))
-            acts = [clean(str(p.get("name", ""))) for p in (d.get("performer") or [])
+            acts = [feld(p.get("name")) for p in (d.get("performer") or [])
                     if isinstance(p, dict)]
             return fund(
                 self.name, url, name,
                 von=zeit.aus_iso(d.get("startDate")),
                 bis=zeit.aus_iso(d.get("endDate")),
-                stadt=clean(str(anschrift.get("addressLocality", ""))),
+                stadt=feld(anschrift.get("addressLocality")),
                 # Region statt Land: „NY" gehört zu US, nicht zu Norwegen
-                land=str(anschrift.get("addressCountry", "")),
-                ort=clean(str(platz.get("name", ""))),
-                plz=clean(str(anschrift.get("postalCode", ""))),
+                land=feld(anschrift.get("addressCountry")),
+                ort=feld(platz.get("name")),
+                plz=feld(anschrift.get("postalCode")),
                 lat=zahl_oder_nichts(geo.get("latitude")),
                 lon=zahl_oder_nichts(geo.get("longitude")),
                 webseite=self._webseite(html),
                 preis="Eintritt frei" if d.get("isAccessibleForFree") is True else "",
                 lineup=[b for b in acts if valid_band(b)],
-                abgesagt="cancel" in str(d.get("eventStatus", "")).lower(),
+                abgesagt="cancel" in feld(d.get("eventStatus")).lower(),
             )
         return None
 

@@ -70,8 +70,12 @@ def datenrahmen(zeilen: list) -> list[float]:
         return list(FEINRAHMEN)
     lats = [p[0] for p in punkte]
     lons = [p[1] for p in punkte]
-    return [round(min(lats), 2), round(max(lats), 2),
-            round(min(lons), 2), round(max(lons), 2)]
+    # Nach aussen runden, nicht zur naechsten Zahl: round(-46.4137, 2) ergibt
+    # -46.41 und laege noerdlich des suedlichsten Punktes - die Karte schnitte
+    # ihn ab.
+    ab = lambda w: math.floor(w * 100) / 100
+    auf = lambda w: math.ceil(w * 100) / 100
+    return [ab(min(lats)), auf(max(lats)), ab(min(lons)), auf(max(lons))]
 
 
 def frueheste_monatsgrenze(zeilen: list) -> str:
@@ -232,6 +236,7 @@ def bauen(festivals: list[Festival]) -> dict:
         "aus_cache": verorten.aus_cache,
         "aus_ortsverzeichnis": verorten.aus_ort,
         "aus_quelle": verorten.aus_quelle,
+        "cache_verworfen": verorten.verworfen,
         "mit_preis": sum(1 for z in zeilen if z[EURO] is not None),
         "mit_genre": sum(1 for z in zeilen if z[GENRES]),
         "acts": len(bands),

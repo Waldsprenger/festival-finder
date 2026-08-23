@@ -74,6 +74,9 @@ def fund(quelle: str, url: str, name: str, *,
     * Eine Koordinate muss auf der Erde liegen, nicht bei null Grad null — und
       in dem Land, das die Quelle nennt. Sonst steht Lollapalooza Berlin in
       Chicago und das LongLake Festival Lugano in Buenos Aires.
+    * Die Webseite muss eine Adresse sein. Acht Karten trugen einen Verweis
+      auf „None", weil ein Datenblattfeld null hieß; angeklickt führte er ins
+      Nichts.
     """
     if not orte.punkt_plausibel(lat, lon) or not orte.punkt_passt_zum_land(
             lat, lon, land):
@@ -93,7 +96,7 @@ def fund(quelle: str, url: str, name: str, *,
         lat=lat,
         lon=lon,
         preis=geld.ist_preis(preis),
-        webseite=webseite,
+        webseite=_adresse(webseite),
         genre=genre,
         besucher=text.besucherzahl(besucher),
         hinweis=hinweis,
@@ -102,3 +105,9 @@ def fund(quelle: str, url: str, name: str, *,
         # einzelne Acts zweimal, wenn sie an mehreren Tagen spielen.
         lineup=tuple(dict.fromkeys(lineup or ())),
     )
+
+
+def _adresse(wert: str) -> str:
+    """Nur was mit http beginnt, ist eine Adresse."""
+    wert = (wert or "").strip()
+    return wert if wert.lower().startswith("http") else ""

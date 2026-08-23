@@ -228,17 +228,27 @@ Serverlauf liest die Datei, wenn seine eigene Anfrage nichts einbringt. Keine
 Sperre wird dabei umgangen — die Daten stammen aus einem Abruf, den die Seite
 selbst beantwortet hat.
 
-Zwei Regeln halten das ehrlich, beide durch Tests festgehalten:
+Drei Regeln halten das ehrlich, alle durch Tests festgehalten:
 
 * **Geschrieben** wird nur, was auch gefunden wurde. Ein Lauf mit null Funden
   lässt die Datei unangetastet — sonst löschte ausgerechnet der Server, was
   der eigene Rechner mitgebracht hat. Teilläufe (`--limit`) schreiben nie.
 * **Gelesen** wird nur, wenn die Quelle im Lauf selbst nichts hergibt. Solange
   sie antwortet, gilt ihre Antwort.
+* **Datiert** wird nur, was die Quelle wirklich beantwortet hat. Ein Lauf, der
+  jede Seite aus dem Zwischenspeicher nimmt, sieht von außen aus wie ein
+  frischer und trug den Stand deshalb auf heute — zweimal geschehen, am 22.
+  und 23. August. Damit hätte die Alterswarnung unten nie angeschlagen. Jetzt
+  zählt, ob in diesem Lauf überhaupt eine Seite von diesem Rechner kam; sonst
+  bleibt das alte Datum stehen. Es steht auf dem 21. August 2026, dem Tag, an
+  dem die 1.971 Seiten tatsächlich ankamen.
 
 Der Wächter meldet für eine mitgebrachte Quelle nicht mehr ihr Schweigen,
 sondern das Alter ihres Standes: ab drei Wochen steht es als Warnung im
-Bericht und in der Zusammenfassung des Laufs.
+Bericht und in der Zusammenfassung des Laufs. Als Einbruch zählt sie dabei
+nicht — der Stand lässt sich nicht mehr auffrischen, die Warnung steht also in
+jedem Lauf, und der Maßstab für „ein Fünftel weniger als gestern" fröre sonst
+für immer auf dem höchsten je erreichten Wert ein.
 
 #### Seit dem 22. August 2026: eingefroren
 
@@ -415,7 +425,9 @@ offene Fälle.
 Verortet wird in vier Rängen:
 
 1. **Postleitzahl** — trifft den Zustellbereich und ist damit am genauesten.
-2. **Ortsname im Geo-Cache**, sofern Nominatim ihn schon einmal beantwortet hat.
+2. **Ortsname im Geo-Cache**, sofern Nominatim ihn schon einmal beantwortet
+   hat — und sofern die Adresse des Treffers nicht ein anderes Land nennt als
+   gesucht.
 3. **Ortsname im Ortsverzeichnis** (`data/verortung.json`, die Welt ab 1.000
    Einwohnern) — für alles, was der Cache noch nicht kennt.
 4. **Punkt aus dem Datenblatt** der Quellseite, aber nur, wenn er im Rahmen
@@ -424,6 +436,17 @@ Verortet wird in vier Rängen:
    dieselbe Koordinate für drei oder mehr verschiedene Orte herhalten muss. Bei
    37 Einträgen sitzt er im falschen Land: Lugano in Buenos Aires, Basel in
    Berlin, Andorra in Mexiko.
+
+**Das Land ist Bedingung, nicht Wunsch.** Beim Geokodieren stand es einmal nur
+im ersten von vier Versuchen; scheiterte der, suchte der zweite weltweit — und
+Nominatim antwortete willig. Buenos Aires lag danach in Spanien, Mumbai in
+Madrid, Jakarta in Berlin, Hongkong in Paris und Santiago de Chile in Kiew: 145
+Orte, 179 Festivals. Jetzt geht das Länderkürzel bei jedem Versuch mit, jeder
+Treffer wird gegen die Landesangabe seiner eigenen Adresse geprüft, und der
+Cache wird beim Bauen noch einmal danach durchgesehen. Nicht am Landesrahmen —
+der entsteht aus Ortsnamen und reicht nicht bis Réunion, Puerto Rico oder
+Spitzbergen; und ein Gebiet, dessen Anschrift auf den Mutterstaat lautet
+(Hongkong → China, Saint-Martin → Frankreich), widerspricht ihm nicht.
 
 **Warum Postleitzahlen weltweit.** Ortsnamen sind mehrdeutig — „Bernau"
 gibt es dreimal in Deutschland, und welches gemeint ist, weiß weder ein
@@ -612,6 +635,7 @@ einmal falsch in den Daten:
 | `tests/seite/test_sprachdatei.py` | Anführungszeichen, zehn Sprachen, Platzhalter, Schlüssel |
 | `tests/seite/test_aufbau.py` | Kette, Felder, Sortierung, Karte, Module, Faltung |
 | `tests/seite/test_rechtstexte.py` | Datenschutz und Fußnote gegen die Daten, die es wirklich gibt |
+| `tests/test_sammeln.py` | der Ablauf des Laufs: Parsefehler, Schweigen, Zwischenspeicher |
 | `tests/test_pruefung.py` | Selbstprüfung und Einbruchsmeldung |
 | `tests/test_werkzeug.py` | Preisgeschichte und mitgebrachter Stand |
 | `tests/test_werkzeug_netz.py` | Ausfall des Kartendienstes ist kein „Ort unbekannt" |
@@ -757,8 +781,27 @@ fest, nach Rang und Adresse. Gemischte Eingabe, gleiches Ergebnis.
 
 ## Fehler, die besondere Umstände brauchen
 
-Vier Klassen, die sich weder im Protokoll noch beim Lesen zeigen — nur im
-Vergleich, unter Zeitdruck oder an Eingaben, die es so noch nicht gab.
+Sechs Klassen, die sich weder im Protokoll noch beim Lesen zeigen — nur im
+Vergleich, unter Zeitdruck, an Eingaben, die es so noch nicht gab, oder erst an
+einem Tag, der noch nicht gekommen ist.
+
+**„None" stand als Ortsname auf 2.490 Karten.** `str(blatt.get("city", ""))`
+sieht sicher aus und ist es nicht: Steht der Schlüssel im Datenblatt und trägt
+den Wert `null`, greift der Standardwert nicht — `str(None)` ergibt die
+Zeichenkette „None". Sie stand als Ort in der Liste, in der Suche und auf der
+Karte, in 123 Fällen als Postleitzahl und in 8 als anklickbare Webseite; der
+Geokodierer fragte Nominatim in 111 Ländern nach einem Ort dieses Namens und
+bekam Antworten — ein Hotel in Texas, ein Verkehrslandeplatz in Sachsen, eine
+Adresse in Bangladesch für ein dänisches Festival. Es gibt jetzt `text.feld()`,
+das `null` als leer liest, den Trichter, der eine Webseite ohne `http` verwirft,
+und eine Selbstprüfung, die ein Nullwort in einem Textfeld meldet.
+
+**Ein Datum, das nach UTC gerechnet wird, ist östlich davon das von gestern.**
+`new Date().toISOString().slice(0,10)` liefert in Neuseeland zwölf Stunden lang
+und in Deutschland zwischen Mitternacht und zwei Uhr den Vortag. Die
+Voreinstellung „ab heute" zeigte dann Festivals, die gestern zu Ende gegangen
+sind. `FF.heute()` liest jetzt Jahr, Monat und Tag nach der Uhr des Betrachters;
+ein Test hält fest, dass in den Skripten der Seite kein `toISOString` mehr steht.
 
 **Ein Festival, das gerade läuft, verschwand.** Der Datumsfilter verglich nur
 den Beginn; die Vorgabe lautet „ab heute". An einem beliebigen Tag fielen damit
@@ -851,7 +894,10 @@ etwas hängt, das sich nicht wiederbeschaffen lässt.
 Dazu zwei Fälle, in denen ein Ausfall sonst dauerhaft würde: Ein Festival, das
 in einem Lauf fehlt, behält seine Preisgeschichte noch zwei Monate — sonst
 hätte der Tag, an dem eine Quelle schwieg, den Startpreis von 800 Festivals
-vergessen. Und ein Ort, den der Kartendienst gerade nicht beantwortet, gilt
+vergessen. Diese zwei Monate zählen ab dem letzten Sehen, nicht ab der letzten
+Preisänderung: Ein Preis, der ein halbes Jahr gleich bleibt, ist der Normalfall
+— gälte sein Alter, fielen genau die Einträge zuerst heraus, die die Frist
+schützen soll. Und ein Ort, den der Kartendienst gerade nicht beantwortet, gilt
 nicht als „unbekannt": Nur eine echte Fehlanzeige kommt in den Cache, ein
 Ausfall wird morgen erneut gefragt.
 

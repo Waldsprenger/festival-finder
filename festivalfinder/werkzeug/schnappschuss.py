@@ -15,13 +15,17 @@ Seite rund 1.900 Festivals von einem Tag auf den anderen.
 Dass sie altert, bleibt sichtbar: Ab `ALTERSGRENZE_TAGE` meldet die Prüfung
 nicht mehr das Schweigen der Quelle, sondern das Datum ihres Standes.
 
-Zwei Regeln halten das ehrlich:
+Drei Regeln halten das ehrlich:
 
 * Geschrieben wird nur, was auch wirklich gefunden wurde. Ein Lauf ohne Funde
   darf den Stand nicht leeren — sonst löschte ausgerechnet der Lauf, der
   nichts erreicht, die letzte Abschrift.
 * Gelesen wird nur, wenn die Quelle im Lauf selbst nichts hergibt. Sollte sie
   wieder antworten, gilt ihre Antwort.
+* Das Datum trägt nur ein Lauf ein, der die Quelle wirklich erreicht hat. Ein
+  Lauf aus dem Zwischenspeicher liefert dieselben Seiten und sähe von außen
+  aus wie ein frischer; datierte er den Stand neu, verstummte die
+  Alterswarnung für immer.
 """
 
 import gzip
@@ -62,14 +66,22 @@ def _aus_zeile(d: dict) -> Fund:
                    "lineup": tuple(d.get("lineup") or ())})
 
 
-def schreiben(quelle: str, funde: list[Fund]) -> bool:
-    """Den Stand einer Quelle ablegen. False, wenn es nichts abzulegen gab."""
+def schreiben(quelle: str, funde: list[Fund], *, frisch: bool = True) -> bool:
+    """Den Stand einer Quelle ablegen. False, wenn es nichts abzulegen gab.
+
+    `frisch=False` heißt: Jede Seite kam aus dem Zwischenspeicher, die Quelle
+    selbst hat in diesem Lauf nicht geantwortet. Der Inhalt darf dann trotzdem
+    geschrieben werden — er ist ja derselbe —, das Datum aber nicht: Sonst
+    trüge der Stand jeden Tag das heutige Datum, und die Alterswarnung
+    verstummte für immer, obwohl niemand mehr etwas Neues gesehen hat.
+    """
     if quelle not in MITGEBEN or not funde:
         return False
     ORDNER.mkdir(parents=True, exist_ok=True)
+    heute = datetime.now().astimezone().strftime("%Y-%m-%d")
     inhalt = json.dumps({
         "quelle": quelle,
-        "stand": datetime.now().astimezone().strftime("%Y-%m-%d"),
+        "stand": heute if frisch else (stand_von(quelle) or heute),
         # Nach Adresse sortiert: Die Seiten kommen aus vier Fäden zurück, also
         # in wechselnder Reihenfolge. Ohne das Sortieren unterschiede sich die
         # Datei nach jedem Lauf und stünde als neue Fassung in der Geschichte,
@@ -79,6 +91,15 @@ def schreiben(quelle: str, funde: list[Fund]) -> bool:
     # mtime auf 0, aus demselben Grund.
     schreib_bytes(datei(quelle), gzip.compress(inhalt, 9, mtime=0))
     return True
+
+
+def stand_von(quelle: str) -> str:
+    """Nur das Datum des abgelegten Standes; leer, wenn es keinen gibt."""
+    p = datei(quelle)
+    if not p.exists():
+        return ""
+    inhalt = json.loads(gzip.decompress(p.read_bytes()).decode("utf-8"))
+    return inhalt.get("stand", "")
 
 
 def lesen(quelle: str) -> tuple[list[Fund], str]:

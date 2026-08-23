@@ -2,7 +2,8 @@
 
 1. **Postleitzahl**: trifft den Zustellbereich und ist damit am genauesten. Die
    große Tabelle deckt 36 Länder ab; ohne sie bleibt es bei DE/AT/CH.
-2. **Ortsname im Geo-Cache** (Nominatim), sofern schon einmal gefragt.
+2. **Ortsname im Geo-Cache** (Nominatim), sofern schon einmal gefragt — und
+   sofern die Adresse des Treffers nicht ein anderes Land nennt als gesucht.
 3. **Ortsname im mitgebauten Ortsverzeichnis** — für alles, was der Cache noch
    nicht kennt. Das erspart die Nachfrage bei einem fremden Dienst.
 4. **Der Punkt aus dem Datenblatt der Quellseite**, aber nur, wenn er im Rahmen
@@ -16,7 +17,7 @@ steht, statt bestehende Koordinaten ohne Grund zu verschieben.
 """
 
 from ..kern.festival import Festival
-from ..kern.orte import land_code
+from ..kern.orte import GEHOERT_ZU, land_code
 from ..kern.text import fold
 
 
@@ -30,6 +31,22 @@ def laender_rahmen(orte: list) -> dict[str, tuple[float, float, float, float]]:
         r[0], r[1] = min(r[0], lat), max(r[1], lat)
         r[2], r[3] = min(r[2], lon), max(r[3], lon)
     return {cc: tuple(r) for cc, r in rahmen.items()}
+
+
+def _widerspruch(code: str, anzeige: str | None) -> bool:
+    """Nennt die Adresse des Geokodierers ein anderes Land als erwartet?
+
+    Nur ein klarer Widerspruch zählt: Lässt sich das letzte Glied der Adresse
+    keinem Kürzel zuordnen — Nominatim schreibt deutsch, und ein paar Namen
+    kennt die Liste nicht —, bleibt es beim Erwarteten. Lieber einen falschen
+    behalten als zehn richtige verwerfen. Und ein Gebiet, dessen Anschrift auf
+    den Mutterstaat lautet, widerspricht ihm nicht: Chek Lap Kok liegt in
+    Hongkong und die Adresse endet auf „China".
+    """
+    gefunden = land_code((anzeige or "").rsplit(",", 1)[-1])
+    if len(gefunden) != 2 or gefunden == code:
+        return False
+    return GEHOERT_ZU.get(code) != gefunden
 
 
 def platzhalter(festivals: list[Festival]) -> set[tuple[float, float]]:
@@ -55,6 +72,9 @@ class Verorter:
     def __init__(self, festivals: list[Festival], geo: dict, verortung: dict,
                  gazetteer: list, plz: list):
         self.aus_plz = self.aus_ort = self.aus_quelle = self.gefunden = 0
+
+        #: Cache-Einträge, deren Adresse ein anderes Land nannte
+        self.verworfen = 0
 
         self._plz_tabellen(verortung.get("plz") or
                            [[c, la, lo, cc] for c, _o, la, lo, cc in plz])
@@ -92,6 +112,14 @@ class Verorter:
 
         „Wacken|Deutschland" — die Festivals tragen inzwischen das Kürzel. Ein
         normalisierter Index erspart das erneute Geokodieren.
+
+        Geprüft wird er wie jede andere Herkunft auch — nur nicht am
+        Landesrahmen: Der entsteht aus Ortsnamen und reicht nicht bis Réunion,
+        Puerto Rico oder Spitzbergen. Es zählt, was der Geokodierer selbst über
+        seinen Treffer sagt: Nennt seine Adresse ein anderes Land als der
+        Schlüssel, gilt der Treffer nicht. Der Cache war die einzige der vier
+        Herkünfte ganz ohne Prüfung — und trug Buenos Aires nach Spanien,
+        Jakarta nach Berlin und Hongkong nach Paris.
         """
         self.cache_mit_land: dict[tuple[str, str], dict] = {}
         self.cache_ohne_land: dict[str, tuple[dict, str]] = {}
@@ -100,6 +128,9 @@ class Verorter:
                 continue
             ort, _, land = schluessel.partition("|")
             code = land_code(land)
+            if code and _widerspruch(code, wert.get("display")):
+                self.verworfen += 1
+                continue
             self.cache_mit_land.setdefault((ort.strip().casefold(), code), wert)
             # Fehlt in der Quelle die Landesangabe, liefert sie der Geokodierer
             # als letztes Glied seiner Adresse mit („..., Deutschland").
@@ -145,6 +176,16 @@ class Verorter:
             self.gefunden += 1
         return lat, lon, land
 
+    def im_rahmen(self, lat: float, lon: float, land: str) -> bool:
+        """Liegt der Punkt im groben Umriss seines Landes?
+
+        Ein Grad Zugabe, weil der Umriss aus Ortsnamen entsteht und an den
+        Rändern ausfranst — Inseln und Exklaven sonst ausgeschlossen wären.
+        Für ein Land ohne Umriss gilt die Frage als beantwortet.
+        """
+        r = self.rahmen.get(land)
+        return not r or (r[0] - 1 <= lat <= r[1] + 1 and r[2] - 1 <= lon <= r[3] + 1)
+
     def quellkoordinate(self, f: Festival, land: str):
         """Koordinate der Quellseite, sofern sie zum Land passt."""
         lat, lon = f.lat, f.lon
@@ -152,8 +193,7 @@ class Verorter:
             return None, None
         if (round(lat, 4), round(lon, 4)) in self.verdaechtig:
             return None, None
-        r = self.rahmen.get(land)
-        if r and not (r[0] - 1 <= lat <= r[1] + 1 and r[2] - 1 <= lon <= r[3] + 1):
+        if not self.im_rahmen(lat, lon, land):
             return None, None
         return lat, lon
 

@@ -10,7 +10,7 @@ import json
 from ..kern import zeit
 from ..kern.fund import Fund, fund
 from ..kern.orte import zahl_oder_nichts
-from ..kern.text import clean, genres_vereinen
+from ..kern.text import clean, feld, genres_vereinen
 from ..netz import Abrufer
 from .basis import Quelle
 
@@ -35,22 +35,22 @@ class FestivalNetworks(Quelle):
 
         funde = []
         for e in eintraege:
-            name = clean(str(e.get("Festival Name", "")))
-            von = zeit.aus_kurz(str(e.get("Start Date", "")))
+            name = feld(e.get("Festival Name"))
+            von = zeit.aus_kurz(feld(e.get("Start Date")))
             if not name or (von and von.year < seit):
                 continue
             preis = e.get("Ticket Price (EUR)")
             funde.append(fund(
                 self.name, f"{FN}/#{name}", name,
-                von=von, bis=zeit.aus_kurz(str(e.get("End Date", ""))),
-                stadt=clean(str(e.get("City/Region", ""))).split(",")[0],
-                land=str(e.get("Country", "")),
+                von=von, bis=zeit.aus_kurz(feld(e.get("End Date"))),
+                stadt=feld(e.get("City/Region")).split(",")[0],
+                land=feld(e.get("Country")),
                 lat=zahl_oder_nichts(e.get("Latitude")),
                 lon=zahl_oder_nichts(e.get("Longitude")),
-                webseite=str(e.get("Website", "")),
-                genre=genres_vereinen(str(e.get("Genre", "")),
-                                      str(e.get("Sub-Genre", ""))),
-                besucher=str(e.get("Capacity", "") or ""),
+                webseite=feld(e.get("Website")),
+                genre=genres_vereinen(feld(e.get("Genre")),
+                                      feld(e.get("Sub-Genre"))),
+                besucher=feld(e.get("Capacity")),
                 preis=f"ca. {preis} €" if isinstance(preis, (int, float)) and preis else "",
             ))
         return funde
