@@ -60,7 +60,7 @@
       <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="home.help">?</button>
     </h2>
     <div class="koerper">
-      <p class="lead" data-i18n="s1.lead">Postleitzahl oder Ort. Daraus ergeben sich Entfernungen und die
+      <p class="lead" data-i18n="s1.lead">Postleitzahl oder Ort. Daraus ergeben sich die Entfernungen und die
         Vorauswahl der Währung. Ohne Wohnort geht es auch — dann entfällt der Entfernungsfilter.</p>
       <div class="field">
         <div class="row">
@@ -70,7 +70,7 @@
           <button type="button" id="locate" data-i18n="home.search"
                   data-i18n-title="home.searchTitle">Suchen</button>
         </div>
-        <p class="hint" id="home-status" data-i18n="home.statusStart">Postleitzahl eingeben und „Suchen“ drücken.</p>
+        <p class="hint" id="home-status" data-i18n="home.statusStart">Postleitzahl oder Ort eingeben und „Suchen“ drücken.</p>
       </div>
       <div class="schritt-fuss">
         <button type="button" id="ort-skip" class="ghost" data-i18n="s1.skip"
@@ -85,8 +85,9 @@
       <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="date.help">?</button>
     </h2>
     <div class="koerper">
-      <p class="lead" data-i18n="s2.lead">Voreingestellt ist „ab heute“. Ein Festival zählt, sobald es in
-        deinen Zeitraum hineinreicht — auch wenn es vorher begonnen hat.</p>
+      <p class="lead" data-i18n="s2.lead">Voreingestellt ist „ab heute“. Das Feld „bis“ darf leer bleiben —
+        dann zählt alles ab dem Startdatum. Ein Festival zählt, sobald es in deinen Zeitraum
+        hineinreicht, auch wenn es vorher begonnen hat.</p>
       <div class="field">
         <div class="row dates">
           <input type="date" id="from" data-i18n-aria="date.from" aria-label="Frühester Start">
@@ -118,11 +119,11 @@
       <button type="button" class="help" aria-label="Hilfe" data-i18n-aria="help.aria" data-i18n-title="s3.help">?</button>
     </h2>
     <div class="koerper">
-      <p class="lead" data-i18n="s3.lead">Luftlinie ab deinem Wohnort. Zwei Felder statt eines Reglers: Bei
-        Entfernungen bis 18.000 km trifft man mit einem Regler nichts mehr.</p>
+      <p class="lead" data-i18n="s3.lead">Luftlinie ab deinem Wohnort. Es genügt eine Obergrenze — „ab 300 km“
+        sucht niemand. Bleibt das Feld leer, gilt keine Grenze.</p>
       <p class="hint err" id="entfernung-ohne-ort" hidden data-i18n="s3.needHome">Dafür fehlt der Wohnort — geh
         zurück zu Schritt 1 oder überspring diese Frage.</p>
-      <div class="wahl" role="group" data-i18n-aria="s.choiceGroup" aria-label="Auswahl">
+      <div class="wahl" role="group" data-i18n-aria="s.choiceGroup" aria-label="Ja oder Nein">
         <button type="button" class="ja" data-wahl="entfernung" data-wert="ja"
                 aria-pressed="false" data-i18n="s.yes">Ja</button>
         <button type="button" class="nein" data-wahl="entfernung" data-wert="nein"
@@ -155,8 +156,8 @@
     </h2>
     <div class="koerper">
       <p class="lead" data-i18n="s4.lead">Der günstigste Einstiegspreis. Zwei von drei Festivals nennen gar
-        keinen — die fallen sonst heraus, sofern du sie nicht mitzeigen lässt.</p>
-      <div class="wahl" role="group" data-i18n-aria="s.choiceGroup" aria-label="Auswahl">
+        keinen — die fallen heraus, sofern du sie nicht mitzeigen lässt.</p>
+      <div class="wahl" role="group" data-i18n-aria="s.choiceGroup" aria-label="Ja oder Nein">
         <button type="button" class="ja" data-wahl="preis" data-wert="ja"
                 aria-pressed="false" data-i18n="s.yes">Ja</button>
         <button type="button" class="nein" data-wahl="preis" data-wert="nein"
@@ -191,7 +192,7 @@
     <div class="koerper">
       <p class="lead" data-i18n-html="bands.lead">Suchen, anklicken, auswählen. Ein zweiter Klick auf <b>×2</b> gewichtet
         eine Band doppelt — sie zählt dann doppelt so stark für die Übereinstimmung.</p>
-      <div class="wahl" role="group" data-i18n-aria="s.choiceGroup" aria-label="Auswahl">
+      <div class="wahl" role="group" data-i18n-aria="s.choiceGroup" aria-label="Ja oder Nein">
         <button type="button" class="ja" data-wahl="bands" data-wert="ja"
                 aria-pressed="false" data-i18n="s.yes">Ja</button>
         <button type="button" class="nein" data-wahl="bands" data-wert="nein"
@@ -232,7 +233,7 @@
     <div class="koerper">
       <p class="lead" data-i18n="genre.lead">Die Musikrichtungen der Quellen sind zu Oberbegriffen zusammengefasst.
         Mehrere lassen sich anklicken — je mehr davon ein Festival abdeckt, desto weiter oben steht es.</p>
-      <div class="wahl" role="group" data-i18n-aria="s.choiceGroup" aria-label="Auswahl">
+      <div class="wahl" role="group" data-i18n-aria="s.choiceGroup" aria-label="Ja oder Nein">
         <button type="button" class="ja" data-wahl="genre" data-wert="ja"
                 aria-pressed="false" data-i18n="s.yes">Ja</button>
         <button type="button" class="nein" data-wahl="genre" data-wert="nein"
@@ -283,7 +284,7 @@
       <figcaption id="map-caption" data-i18n="map.captionNoHome">Wohnort eingeben, um den Suchradius zu sehen.</figcaption>
     </figure>
 
-    <p class="stat" id="result-stat" data-i18n="res.none">Keine Treffer.</p>
+    <p class="stat" id="result-stat" data-i18n="res.none">Kein Festival passt. Geh einen Schritt zurück und lockere ihn.</p>
     <ol class="festivals" id="festival-list"></ol>
 
     <!-- Diese Suche merken. Bleibt auf dem Gerät; der Link trägt sie weiter. -->

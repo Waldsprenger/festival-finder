@@ -7,6 +7,7 @@ ausführen, wohl aber die Form prüfen: Was hier nicht als Zeichenkette
 durchgeht, geht auch dort nicht durch.
 """
 
+import html
 import re
 
 from festivalfinder.pfade import SITE
@@ -134,6 +135,43 @@ def test_auch_die_umwegigen_schluessel_gibt_es():
             if s.split(".", 1)[0] in raeume and s not in vorhanden:
                 fehlt.add(f"{name}: {s}")
     assert not fehlt, f"unbekannte Textschlüssel: {fehlt}"
+
+
+def test_die_seite_steht_auf_deutsch_wie_die_tabelle():
+    """Ohne Skript gilt, was in index.html steht — und das muss noch stimmen.
+
+    Beim Umbau auf ein einziges Entfernungsfeld zog die Tabelle mit, die Seite
+    nicht: Dort erklärte der Vortext weiter „zwei Felder statt eines Reglers".
+    Mit Skript sieht das niemand, weil die Tabelle alles überschreibt; ohne
+    Skript, beim Laden und für Suchmaschinen steht der alte Satz da.
+    Texte mit Platzhaltern und leere Elemente füllt erst das Skript, die
+    bleiben außen vor.
+    """
+    tabelle = texte()
+
+    def glatt(s: str) -> str:
+        s = html.unescape(re.sub(r"<[^>]+>", "", s)).replace("\\'", "'")
+        return re.sub(r"\s+", " ", s).strip()
+
+    def deutsch(schluessel: str) -> str | None:
+        de = tabelle.get(schluessel, {}).get("de")
+        return None if de is None or "{" in de else glatt(de)
+
+    abweichend = []
+    for m in re.finditer(r'<(\w+)[^>]*?\sdata-i18n="([\w.]+)"[^>]*>(.*?)</\1>',
+                         SEITE, re.S):
+        soll = deutsch(m.group(2))
+        if soll is not None and glatt(m.group(3)) not in ("", soll):
+            abweichend.append(f"{m.group(2)}: {glatt(m.group(3))!r}")
+    for tag in re.findall(r"<[^>]+>", SEITE):
+        for art, attr in (("title", "title"), ("aria", "aria-label"),
+                          ("ph", "placeholder")):
+            k = re.search(rf'data-i18n-{art}="([\w.]+)"', tag)
+            v = re.search(rf'\s{attr}="([^"]*)"', tag)
+            soll = deutsch(k.group(1)) if k and v else None
+            if soll is not None and glatt(v.group(1)) != soll:
+                abweichend.append(f"{k.group(1)} ({attr}): {glatt(v.group(1))!r}")
+    assert not abweichend, "index.html weicht ab:\n" + "\n".join(abweichend)
 
 
 def test_keine_verwaisten_texte():
