@@ -151,9 +151,9 @@ def ausbeute(funde: dict[str, int], festivals: int,
     # schlechte Wert ab morgen als normal und die Warnung verstummt, obwohl
     # nichts repariert ist.
     #
-    # Nur bei einem Einbruch. Die Alterswarnung zählt hier nicht: Der Stand von
-    # festivalticker lässt sich nicht mehr auffrischen, sie steht also ab dem
-    # 11. September 2026 in jedem Lauf. Zählte sie mit, fröre der Maßstab für
+    # Nur bei einem Einbruch. Die Alterswarnung zählt hier nicht: Den Stand von
+    # festivalticker frischt nur ein Lauf von zu Hause auf, sie steht also oft
+    # wochenlang in jedem Lauf. Zählte sie mit, fröre der Maßstab für
     # immer auf dem höchsten je erreichten Wert ein — und meldete Jahre später
     # einen Einbruch, den es nie gab.
     gemerkt = {name: (vorher.get("quellen", {}).get(name, jetzt)

@@ -108,8 +108,9 @@ class TestAusbeute:
         assert any("Tage alt" in w for w in warnungen)
 
     def test_ein_alter_stand_friert_den_massstab_nicht_ein(self):
-        """Der Stand von festivalticker lässt sich nicht mehr auffrischen, die
-        Alterswarnung steht also in jedem Lauf. Zählte sie als Einbruch, bliebe
+        """Den Stand von festivalticker frischt nur ein Lauf von zu Hause auf,
+        die Alterswarnung steht also oft wochenlang in jedem Lauf. Zählte sie
+        als Einbruch, bliebe
         der Maßstab für immer auf dem höchsten je erreichten Wert stehen — und
         meldete Jahre später einen Einbruch, den es nie gab."""
         alt = {"festivalticker": "2020-01-01"}

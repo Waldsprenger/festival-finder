@@ -12,12 +12,18 @@ eigenen.
 
 Zwei Antworten bekommen eine eigene Behandlung, weil sie Verschiedenes meinen:
 
-* **403** — eine Entscheidung des Betreibers. Sie wird geachtet: kein zweiter
-  Anlauf, und nach fünf Absagen bleibt der Rechner für den Rest des Laufs in
-  Ruhe. Umgangen wird nichts.
+* **403** — eine Absage. Sie wird geachtet: kein zweiter Anlauf, und nach
+  fünf Absagen bleibt der Rechner für den Rest des Laufs in Ruhe. Umgangen
+  wird nichts.
 * **429** — „zu viele Anfragen", also unsere eigene Ungeduld. Der erste
   weltweite Lauf verlangte jambase 2.348 Seiten ab und bekam 1.575-mal ein
   429; nur 766 Seiten kamen an. Die richtige Antwort darauf ist warten.
+
+Auf ein 429 zu warten genügt aber nicht: Nicht jeder Rechner sagt, dass es
+ihm zu schnell geht. festivalticker sperrte im August 2026 die Adresse des
+eigenen Rechners wegen zu vieler Anfragen in zu kurzer Zeit — und meldete das
+mit 403, ohne Vorwarnung. Deshalb hält der Abrufer zu jedem Rechner einen
+Mindestabstand ein, bevor überhaupt etwas zurückkommt.
 """
 
 import gzip
@@ -44,6 +50,15 @@ SPERRE_AB = 5
 VERZOEGERUNG_MAX = 8.0
 #: So oft wird eine Bitte um Ruhe erfüllt, bevor die Seite liegen bleibt
 GEDULD_429 = 4
+#: Mindestabstand in Sekunden zwischen zwei Anfragen an denselben Rechner,
+#: von Beginn zu Beginn gezählt — gleich, wie viele Arbeitsfäden gerade fragen.
+#: Höchstens vier Anfragen je Sekunde, etwa so viel wie bisher, nur ohne Spitzen.
+ABSTAND = 0.25
+#: Rechner, die mehr Abstand brauchen, als ihre Antworten verraten.
+#: festivalticker sperrt bei zu dichter Folge die Adresse, statt um Ruhe zu
+#: bitten. Ein voller Durchgang mit rund 2.000 Seiten dauert so gut 100
+#: Minuten — die Alternative ist, gar nichts mehr zu bekommen.
+ABSTAND_JE_HAUS = {"www.festivalticker.de": 3.0}
 
 
 def code_von(exc: Exception) -> int | None:
@@ -73,6 +88,9 @@ class Abrufer:
         self.geholt: dict[str, int] = {}
         #: Wartezeit je Rechner in Sekunden — wächst, wenn er „zu schnell" meldet
         self.verzoegerung: dict[str, float] = {}
+        #: Rechner → frühester Zeitpunkt (time.monotonic) der nächsten Anfrage
+        self._naechste: dict[str, float] = {}
+        self._takt = threading.Lock()
 
     # ---------------- Verbindung ----------------
 
@@ -124,8 +142,31 @@ class Abrufer:
         """
         return any(self.geholt.get(urlparse(u).netloc) for u in set(urls))
 
-    def _wartezeit(self, url: str) -> float:
-        return self.verzoegerung.get(urlparse(url).netloc, 0.0)
+    def abstand(self, url: str) -> float:
+        """So viele Sekunden liegen mindestens zwischen zwei Anfragen dorthin.
+
+        Der feste Abstand des Rechners — oder mehr, wenn er im Lauf schon um
+        Ruhe gebeten hat.
+        """
+        haus = urlparse(url).netloc
+        return max(ABSTAND_JE_HAUS.get(haus, ABSTAND),
+                   self.verzoegerung.get(haus, 0.0))
+
+    def _anstellen(self, url: str) -> None:
+        """Warten, bis dieser Rechner wieder gefragt werden darf.
+
+        Jeder Arbeitsfaden reserviert sich den nächsten freien Zeitpunkt. Vier
+        Fäden bei vier verschiedenen Rechnern bleiben so schnell wie vorher,
+        vier Fäden bei einem einzigen werden nicht viermal so schnell wie
+        erlaubt. Genau das war bei festivalticker geschehen.
+        """
+        haus = urlparse(url).netloc
+        with self._takt:
+            jetzt = time.monotonic()
+            dran = max(jetzt, self._naechste.get(haus, 0.0))
+            self._naechste[haus] = dran + self.abstand(url)
+        if dran > jetzt:
+            time.sleep(dran - jetzt)
 
     def langsamer_werden(self, url: str, antwort=None) -> float:
         """Nach einem „zu viele Anfragen" künftig warten, bevor gefragt wird.
@@ -194,11 +235,9 @@ class Abrufer:
         versuch = gebeten = 0
         while versuch < retries:
             try:
+                self._anstellen(url)
                 with self.bremse:
-                    if (warten := self._wartezeit(url)):
-                        time.sleep(warten)
                     r = self.session().get(url, timeout=45)
-                    time.sleep(0.3)
                 if r.status_code in (404, 410):
                     return None
                 if r.status_code == 429:
@@ -243,6 +282,9 @@ class Abrufer:
         if not self.frisch and merker.exists():
             return merker.read_text(encoding="utf-8")
         try:
+            # Die Weiterleitung steht bei festivalticker selbst — sie zählt
+            # beim Abstand genauso wie eine Seite.
+            self._anstellen(link)
             with self.bremse:
                 r = self.session().head(link, allow_redirects=True, timeout=20)
             ziel = r.url if eigene_domain not in r.url else ""

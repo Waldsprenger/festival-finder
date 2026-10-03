@@ -40,7 +40,7 @@ nichts voneinander.
 | `festivalfinder/kern/fund.py` | `Fund`: was eine Quelle liefert, samt Trichter |
 | `festivalfinder/kern/festival.py` | `Festival`: was daraus wird, samt Ausgabeform |
 | **`netz/`** | **Abruf** |
-| `festivalfinder/netz/abrufer.py` | `Abrufer`: holen, zwischenspeichern, 403 achten, 429 abwarten |
+| `festivalfinder/netz/abrufer.py` | `Abrufer`: holen, zwischenspeichern, Abstand halten, 403 achten, 429 abwarten |
 | `festivalfinder/netz/lesen.py` | Elementbaum, Sitemap, Datenblatt (schema.org) |
 | **`quellen/`** | **eine Datei je Verzeichnis** |
 | `festivalfinder/quellen/basis.py` | was alle zwölf gemeinsam haben |
@@ -204,7 +204,9 @@ die lange niemand sah: Vom eigenen Rechner antwortet die Seite normal (200),
 dem täglichen Lauf auf GitHub-Servern dagegen mit **403 auf jede einzelne
 Listenseite**. Nach fünf Absagen fragt der Lauf dort für den Rest des
 Durchgangs nicht weiter — 213 abgewiesene Anfragen je Lauf sind niemandem
-gedient. Gespeicherte Seiten kommen weiter aus dem Cache.
+gedient. Gespeicherte Seiten kommen weiter aus dem Cache. Dass ein 403 von
+festivalticker auch heißen kann „ihr wart zu schnell", zeigte sich erst im
+August am eigenen Rechner (siehe unten).
 
 ### Weltweit statt nur Europa
 
@@ -249,21 +251,40 @@ Drei Regeln halten das ehrlich, alle durch Tests festgehalten:
 Der Wächter meldet für eine mitgebrachte Quelle nicht mehr ihr Schweigen,
 sondern das Alter ihres Standes: ab drei Wochen steht es als Warnung im
 Bericht und in der Zusammenfassung des Laufs. Als Einbruch zählt sie dabei
-nicht — der Stand lässt sich nicht mehr auffrischen, die Warnung steht also in
-jedem Lauf, und der Maßstab für „ein Fünftel weniger als gestern" fröre sonst
+nicht — den Stand frischt nur ein Lauf von zu Hause auf, die Warnung steht also
+oft wochenlang in jedem Lauf, und der Maßstab für „ein Fünftel weniger als gestern" fröre sonst
 für immer auf dem höchsten je erreichten Wert ein.
 
-#### Seit dem 22. August 2026: eingefroren
+#### Am 22. August 2026: zu schnell gefragt
 
 Bis dahin frischte eine Aufgabe der Windows-Aufgabenplanung den Stand jeden
 Abend vom eigenen Rechner auf und veröffentlichte ihn, wenn er sich geändert
-hatte. Seit dem 22. August weist festivalticker auch diesen Rechner ab — eine
-einzelne Anfrage von hier beantwortet die Seite mit 403, genau wie die des
-Servers. Damit gibt es nichts mehr aufzufrischen; die Aufgabe und die beiden
-Skripte dahinter sind entfernt.
+hatte. Am 22. August beantwortete festivalticker auch von hier jede Anfrage
+mit 403, genau wie die des Servers. Das sah aus wie eine Entscheidung gegen
+diesen Lauf; die Aufgabe und die beiden Skripte dahinter wurden entfernt.
+
+Es war eine Sperre der Adresse, und der Grund waren wir: zu viele Anfragen in
+zu kurzer Zeit. Bis zu vier Arbeitsfäden fragten gleichzeitig, jeder nur 0,3
+Sekunden nach seiner vorigen Antwort, rund 2.000 Seiten am Stück. Ein 429 als
+Vorwarnung kam nie — festivalticker sperrt gleich. Auf eine Bitte um Ruhe zu
+warten, wie es bei jambase hilft, konnte hier also nichts ausrichten.
+
+Seither hält der Abrufer zu jedem Rechner einen **Mindestabstand** ein,
+gezählt von Beginn zu Beginn und gleich, wie viele Fäden gerade fragen:
+höchstens vier Anfragen je Sekunde im Allgemeinen, bei festivalticker eine
+alle drei Sekunden (`ABSTAND_JE_HAUS` in `netz/abrufer.py`). Die Abfragen der
+Weiterleitungen zu den Festivalseiten zählen mit, denn sie stehen ebenfalls
+bei festivalticker. Ein voller Durchgang dort dauert damit gut 100 Minuten
+statt einiger Minuten — das ist der Preis dafür, nicht wieder gesperrt zu
+werden.
+
+Am 3. Oktober 2026 antwortete festivalticker dem eigenen Rechner wieder. Die
+abgelegte Datei ist trotzdem noch die vom 21. August: Auffrischen kann sie nur
+ein vollständiger Lauf von zu Hause, und den hat seitdem niemand gestartet.
+Der Serverlauf bekommt weiter 403 und liest die Datei.
 
 Die abgelegte Datei bleibt. Sie ist die letzte Abschrift dessen, was die
-Quelle beantwortet hat: 1.971 Datensätze vom 22. August 2026. Ohne sie fehlen
+Quelle beantwortet hat: 1.971 Datensätze vom 21. August 2026. Ohne sie fehlen
 der Seite rund 1.900 Festivals von einem Tag auf den anderen — mit ihr altern
 sie sichtbar. Vergangene Termine fallen ohnehin heraus, und ab drei Wochen
 steht das Datum des Standes als Warnung im Laufbericht. Wann diese Daten zu
@@ -768,7 +789,9 @@ Der Wächter schwieg dabei, weil eine Null als Maßstab unbrauchbar ist:
 Quelle, die gar nichts liefert — unabhängig davon, was sie früher lieferte. Der
 Bericht nennt dazu die Fehlerart samt Statuscode (`www.festivalticker.de
 HTTPError 403`), denn 403 ist etwas anderes als 429: das eine ist zu achten,
-das andere wäre unsere eigene Ungeduld.
+das andere wäre unsere eigene Ungeduld. Ganz sauber trennt das nicht —
+festivalticker antwortet auch auf Ungeduld mit 403. Dagegen hilft nur der
+Mindestabstand, bevor es so weit kommt.
 
 ## Tests
 
@@ -776,7 +799,7 @@ das andere wäre unsere eigene Ungeduld.
 pip install pytest pyflakes && python -m pytest tests -q
 ```
 
-711 Tests in gut acht Sekunden, ohne Netz und ohne Datenbestand. Sie halten
+741 Tests in knapp acht Sekunden, ohne Netz und ohne Datenbestand. Sie halten
 fest, warum die Regeln so aussehen, wie sie aussehen — fast jeder Fall stand
 einmal falsch in den Daten:
 
@@ -788,7 +811,7 @@ einmal falsch in den Daten:
 | `tests/kern/test_orte.py` | Länderschreibweisen, Koordinate gegen Land |
 | `tests/kern/test_genres.py` | Freitext zu Oberbegriffen, samt Irreführern |
 | `tests/kern/test_fund.py` | der Trichter — und was ein eingefrorener Datensatz zusagt |
-| `tests/netz/test_abrufer.py` | 403, 429 und Netzfehler: was der Lauf daraus macht |
+| `tests/netz/test_abrufer.py` | Abstand je Rechner; 403, 429 und Netzfehler: was der Lauf daraus macht |
 | `tests/quellen/test_korpus.py` | alle Leser an 21 echten, eingefrorenen Seiten |
 | `tests/quellen/test_eigenheiten.py` | was einzelne Quellen anders machen als alle anderen |
 | `tests/bund/test_stufen.py` | die acht Stufen, jede mit ihrer Sicherung |

@@ -2,12 +2,15 @@
 
 Drei Fälle, drei verschiedene Antworten darauf:
 
-* **403** — eine Entscheidung des Betreibers. Kein zweiter Anlauf, und nach
-  fünf Absagen bleibt der Rechner für den Rest des Laufs in Ruhe.
+* **403** — eine Absage. Kein zweiter Anlauf, und nach fünf Absagen bleibt
+  der Rechner für den Rest des Laufs in Ruhe.
 * **429** — „zu viele Anfragen", also unsere eigene Ungeduld. Der erste
   weltweite Lauf hat jambase 2.348 Seiten abverlangt und dafür 1.575-mal ein
   429 bekommen; nur 766 Seiten kamen an. Die richtige Antwort ist warten.
 * **Netzfehler** — noch einmal versuchen, dann aufgeben und melden.
+
+Und einer, der gar keine Antwort braucht: der Mindestabstand je Rechner.
+festivalticker hat nie um Ruhe gebeten, sondern gleich die Adresse gesperrt.
 
 Jeder Test bekommt seinen eigenen Abrufer. Vorher stand der Zustand im Modul,
 und jeder Test musste ihn von Hand leeren.
@@ -16,7 +19,8 @@ und jeder Test musste ihn von Hand leeren.
 import pytest
 import requests
 
-from festivalfinder.netz import GEDULD_429, SPERRE_AB, Abrufer
+from festivalfinder.netz import (ABSTAND, ABSTAND_JE_HAUS, GEDULD_429,
+                                 SPERRE_AB, Abrufer)
 
 
 class Antwort:
@@ -79,8 +83,8 @@ class TestZuVieleAnfragen:
     def test_die_wartezeit_gilt_fuer_den_ganzen_rechner(self, abrufer):
         dienst(abrufer, Antwort(429), Antwort(200), Antwort(200))
         abrufer.fetch("https://jambase.test/a")
-        assert abrufer._wartezeit("https://jambase.test/andere-seite") == 1.0
-        assert abrufer._wartezeit("https://woanders.test/seite") == 0.0
+        assert abrufer.abstand("https://jambase.test/andere-seite") == 1.0
+        assert abrufer.abstand("https://woanders.test/seite") == ABSTAND
 
     def test_irgendwann_bleibt_die_seite_liegen(self, abrufer):
         d = dienst(abrufer, *[Antwort(429)] * 12)
@@ -93,6 +97,97 @@ class TestZuVieleAnfragen:
         abrufer.fetch("https://jambase.test/a")
         assert len(abrufer.meldungen) == 1
         assert "bittet um Ruhe" in abrufer.meldungen[0]
+
+
+FT = "https://www.festivalticker.de"
+
+
+class Uhr:
+    """Eine Uhr, die nur weitergeht, wenn jemand wartet."""
+
+    def __init__(self):
+        self.jetzt = 1000.0
+        self.gewartet: list[float] = []
+
+    def monotonic(self):
+        return self.jetzt
+
+    def sleep(self, s):
+        self.gewartet.append(s)
+        self.jetzt += s
+
+
+@pytest.fixture
+def uhr(monkeypatch):
+    u = Uhr()
+    monkeypatch.setattr("festivalfinder.netz.abrufer.time.monotonic", u.monotonic)
+    monkeypatch.setattr("festivalfinder.netz.abrufer.time.sleep", u.sleep)
+    return u
+
+
+class TestAbstand:
+    """Nicht jeder Rechner sagt, dass es ihm zu schnell geht.
+
+    festivalticker sperrte im August 2026 die Adresse des eigenen Rechners —
+    zu viele Anfragen in zu kurzer Zeit, gemeldet mit 403 statt 429. Vier
+    Arbeitsfäden mit je 0,3 Sekunden Pause hatten die Seite mehrmals je
+    Sekunde gefragt, rund 2.000 Seiten lang.
+    """
+
+    def test_festivalticker_wird_nie_dichter_gefragt_als_erlaubt(self, tmp_path, uhr):
+        abrufer = Abrufer(cache=tmp_path)
+        zeiten = []
+
+        class Mitschrift(Dienst):
+            def get(self, url, **k):
+                zeiten.append(uhr.jetzt)
+                return super().get(url, **k)
+
+        abrufer.session = lambda d=Mitschrift(): d
+        for i in range(5):
+            abrufer.fetch(f"{FT}/festival/{i}/")
+        abstaende = [b - a for a, b in zip(zeiten, zeiten[1:])]
+        assert abstaende and min(abstaende) >= ABSTAND_JE_HAUS["www.festivalticker.de"]
+
+    def test_vier_faeden_machen_einen_rechner_nicht_schneller(self, tmp_path, monkeypatch):
+        """Vier Fäden kommen im selben Augenblick an — jeder wartet auf
+        seinen eigenen Zeitpunkt, keiner fragt gleichzeitig mit einem anderen."""
+        abrufer = Abrufer(cache=tmp_path)
+        gewartet = []
+        monkeypatch.setattr("festivalfinder.netz.abrufer.time.monotonic", lambda: 1000.0)
+        monkeypatch.setattr("festivalfinder.netz.abrufer.time.sleep", gewartet.append)
+        for i in range(4):
+            abrufer._anstellen(f"{FT}/festival/{i}/")
+        schritt = ABSTAND_JE_HAUS["www.festivalticker.de"]
+        assert gewartet == [schritt, 2 * schritt, 3 * schritt]
+
+    def test_andere_rechner_warten_nicht_mit(self, tmp_path, uhr):
+        abrufer = Abrufer(cache=tmp_path)
+        abrufer._anstellen(f"{FT}/a/")
+        abrufer._anstellen("https://jambase.test/a")
+        assert uhr.gewartet == []
+
+    def test_auch_die_weiterleitung_steht_an(self, tmp_path, uhr):
+        """Je Festival fragt der Lauf festivalticker zweimal: nach der Seite
+        und nach dem Ziel ihres Website-Links."""
+
+        class Kopf(Dienst):
+            def head(self, url, **k):
+                self.gefragt += 1
+                antwort = Antwort()
+                antwort.url = "https://festival.test/"
+                return antwort
+
+        abrufer = Abrufer(cache=tmp_path)
+        abrufer.session = lambda d=Kopf(): d
+        abrufer.fetch(f"{FT}/festival/1/")
+        assert abrufer.endziel(f"{FT}/link/1", "festivalticker.de") == "https://festival.test/"
+        assert uhr.gewartet == [ABSTAND_JE_HAUS["www.festivalticker.de"]]
+
+    def test_eine_bitte_um_ruhe_kann_den_abstand_nur_vergroessern(self, abrufer):
+        dienst(abrufer, Antwort(429), Antwort(200))
+        abrufer.fetch(f"{FT}/a/")
+        assert abrufer.abstand(f"{FT}/b/") == ABSTAND_JE_HAUS["www.festivalticker.de"]
 
 
 class TestAbgewiesen:

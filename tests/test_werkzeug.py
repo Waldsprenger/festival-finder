@@ -205,7 +205,7 @@ class TestSchnappschuss:
 
 def test_der_mitgelieferte_stand_laesst_sich_lesen():
     """Die Datei im Projekt ist die letzte Abschrift von festivalticker —
-    sie lässt sich nicht mehr auffrischen, also muss sie lesbar bleiben."""
+    der Serverlauf kann sie nicht auffrischen, also muss sie lesbar bleiben."""
     funde, datum = schnappschuss.lesen("festivalticker")
     assert len(funde) > 1000, "der mitgebrachte Stand fehlt oder ist leer"
     assert datum, "ohne Datum lässt sich sein Alter nicht beurteilen"

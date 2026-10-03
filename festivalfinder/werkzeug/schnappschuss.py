@@ -6,11 +6,13 @@ gegenüber Rechenzentrums-Adressen. Was der Lauf zu Hause ohnehin holte, wurde
 hier abgelegt und mitversioniert; der Serverlauf las es, wenn seine eigene
 Anfrage nichts einbrachte. Umgangen wurde dabei nichts.
 
-Seit dem 22. August 2026 weist festivalticker auch den Rechner zu Hause ab.
-Damit lässt sich der Stand nicht mehr auffrischen: Die Datei in
-`data/schnappschuss/` ist die letzte Abschrift dessen, was die Quelle
-beantwortet hat, und sie altert. Sie bleibt trotzdem — ohne sie fehlen der
-Seite rund 1.900 Festivals von einem Tag auf den anderen.
+Am 22. August 2026 sperrte festivalticker auch den Rechner zu Hause — nicht
+als Entscheidung gegen den Lauf, sondern weil er zu schnell gefragt hatte
+(seither hält der Abrufer Abstand, siehe `netz/abrufer.py`). Die abendliche
+Auffrischung ist seitdem entfernt. Die Datei in `data/schnappschuss/` ist die
+letzte Abschrift dessen, was die Quelle beantwortet hat, und sie altert, bis
+jemand zu Hause einen vollständigen Lauf startet. Sie bleibt trotzdem — ohne
+sie fehlen der Seite rund 1.900 Festivals von einem Tag auf den anderen.
 
 Dass sie altert, bleibt sichtbar: Ab `ALTERSGRENZE_TAGE` meldet die Prüfung
 nicht mehr das Schweigen der Quelle, sondern das Datum ihres Standes.
