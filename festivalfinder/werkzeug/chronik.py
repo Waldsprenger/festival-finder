@@ -41,6 +41,18 @@ def zeilen() -> list[dict]:
     return heraus
 
 
+def steht_schon(heute: str | None = None) -> bool:
+    """Hat dieser Monat seine Zeile schon?
+
+    Fehlt sie, ist dies der erste Lauf des Monats. Daran hängt auch die
+    monatliche Prüfung ruhender Quellen: Ihr Ergebnis landet so in genau der
+    Zeile, die dieser Lauf anlegt — und der Takt braucht keinen eigenen
+    Speicher, denn die Chronik wird ohnehin mitversioniert.
+    """
+    monat = (heute or date.today().isoformat())[:7]
+    return any(z.get("monat") == monat for z in zeilen())
+
+
 def nachtragen(lauf: dict, acts: int, heute: str | None = None) -> bool:
     """Die Zeile dieses Monats anlegen, falls es sie noch nicht gibt.
 
@@ -48,9 +60,9 @@ def nachtragen(lauf: dict, acts: int, heute: str | None = None) -> bool:
     es etwas zu veröffentlichen gibt.
     """
     monat = (heute or date.today().isoformat())[:7]
-    bisher = zeilen()
-    if any(z.get("monat") == monat for z in bisher):
+    if steht_schon(monat):
         return False
+    bisher = zeilen()
 
     zeile = {
         "monat": monat,
@@ -66,6 +78,8 @@ def nachtragen(lauf: dict, acts: int, heute: str | None = None) -> bool:
     # sähe es später aus, als hätte sie aufgehört, ohne dass es jemand merkte.
     if lauf.get("ruhend"):
         zeile["ruhend"] = lauf["ruhend"]
+    if lauf.get("ruhend_geprueft"):
+        zeile["ruhend_geprueft"] = lauf["ruhend_geprueft"]
     bisher.append(zeile)
     bisher.sort(key=lambda z: z.get("monat", ""))
     schreib_text(DATEI, "".join(

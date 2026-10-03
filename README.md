@@ -163,7 +163,14 @@ antwortet sie mit 403. Das Zeichen nachzuahmen hieße, die Schranke zu umgehen,
 die der Betreiber gerade eingebaut hat. Die Quelle **ruht** deshalb: `ruht`
 in ihrer Datei nennt den Grund, der Lauf fragt sie nicht mehr, zählt ihre Null
 nicht als Einbruch und vermerkt sie in Bericht und Chronik unter `ruhend`.
-Gibt der Betreiber die Datei wieder frei, genügt es, `ruht` zu leeren.
+
+Einmal im Monat fragt er doch: Der erste Lauf eines Monats, der also die
+Chronikzeile anlegt, ruft die Datei ab wie früher, ohne Zeichen
+(`wieder_offen`). Das Ergebnis steht unter `ruhend_geprueft` in Bericht und
+Chronik. Kommt die Datei wieder, steht zusätzlich eine Warnung dabei. In den
+Bestand fließt sie trotzdem nicht, sonst hätte er an einem Tag im Monat ein
+paar hundert Festivals mehr und am nächsten wieder nicht. Ob die Quelle wieder
+mitläuft, entscheidet ein Mensch: Dafür genügt es, `ruht` zu leeren.
 
 Was jede Quelle beiträgt und wo ihre Fallen liegen, steht im Kopf ihres
 Abschnitts in [quellen/](festivalfinder/quellen/). Drei Beispiele:

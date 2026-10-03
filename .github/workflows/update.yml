@@ -161,6 +161,9 @@ jobs:
               print(f"  {name:<18} {n:>6}")
           for name, grund in d.get("ruhend", {}).items():
               print(f"  {name:<18}  ruht: {grund}")
+          for name, offen in d.get("ruhend_geprueft", {}).items():
+              print(f"  {name:<18}  geprüft: "
+                    f"{'wieder offen' if offen else 'weiter gesperrt'}")
           for w in d["warnungen"]:
               print(f"  ! {w}")
           for m in d["meldungen"][:10]:

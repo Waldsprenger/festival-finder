@@ -100,6 +100,12 @@ def befehl_sammeln(args) -> int:
         for warnung in warnungen:
             print(f"  ! Einbruch gegenüber dem letzten Lauf: {warnung}",
                   file=sys.stderr)
+    # Kein Einbruch, aber genauso wichtig: Sonst ruht eine Quelle weiter, die
+    # längst wieder liefern könnte.
+    for name, offen in ergebnis.geprueft.items():
+        if offen:
+            warnungen.append(f"{name}: ruht, gibt aber wieder Daten heraus")
+            print(f"  ! {warnungen[-1]}", file=sys.stderr)
 
     # Der Zustand des Laufs geht mit auf die Webseite. Auf dem eigenen Rechner
     # steht er im Protokoll — beim Lauf auf fremden Servern kommt niemand an
@@ -110,6 +116,7 @@ def befehl_sammeln(args) -> int:
         "quellen": ergebnis.funde,
         "mitgebrachter_stand": ergebnis.mitgebracht,
         "ruhend": ergebnis.ruhend,
+        "ruhend_geprueft": ergebnis.geprueft,
         "festivals": len(festivals),
         "warnungen": warnungen,
         "nicht_ladbar": len(netz.fehlgeschlagen),

@@ -25,8 +25,9 @@ class Quelle:
     #: Ein Satz dazu, wofür diese Quelle gut ist
     zweck: str = ""
     #: Warum diese Quelle gerade nicht gefragt wird — leer, solange sie
-    #: mitläuft. Eine ruhende Quelle bekommt keine einzige Anfrage, gilt aber
-    #: auch nicht als ausgefallen; ihr Leser bleibt, bis sie wieder antwortet.
+    #: mitläuft. Eine ruhende Quelle bekommt bis auf eine Prüfung im Monat
+    #: (`wieder_offen`) keine Anfrage, gilt aber auch nicht als ausgefallen;
+    #: ihr Leser bleibt, bis sie wieder antwortet.
     ruht: str = ""
 
     def adressen(self, netz: Abrufer, seit: int) -> list[str]:
@@ -42,5 +43,14 @@ class Quelle:
 
         Dann gibt es keine Adressen je Festival, sondern einen Abruf, der alle
         Datensätze auf einmal zurückgibt.
+        """
+        return None
+
+    def wieder_offen(self, netz: Abrufer, seit: int) -> bool | None:
+        """Gibt eine ruhende Quelle wieder heraus, was sie gesperrt hat?
+
+        Gefragt wird einmal im Monat, und zwar mit so wenigen Anfragen wie
+        möglich — am besten einer. None heißt: Das lässt sich hier nicht
+        prüfen, die Quelle ruht ungeprüft weiter.
         """
         return None

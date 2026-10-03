@@ -66,6 +66,19 @@ class TestNachtragen:
         assert chronik.zeilen()[0]["ruhend"] == \
             {"festivalnetworks": "verlangt ein Zeichen"}
 
+    def test_die_monatliche_pruefung_steht_dabei(self):
+        lauf = dict(LAUF, ruhend={"festivalnetworks": "verlangt ein Zeichen"},
+                    ruhend_geprueft={"festivalnetworks": False})
+        chronik.nachtragen(lauf, 86266, heute="2026-11-01")
+        assert chronik.zeilen()[0]["ruhend_geprueft"] == {"festivalnetworks": False}
+
+    def test_steht_schon_kennt_den_monat(self):
+        """Daran hängt, ob ruhende Quellen geprüft werden."""
+        assert chronik.steht_schon("2026-10-01") is False
+        chronik.nachtragen(LAUF, 86266, heute="2026-10-01")
+        assert chronik.steht_schon("2026-10-31") is True
+        assert chronik.steht_schon("2026-11-01") is False
+
 
 class TestRobust:
     def test_ohne_datei_gibt_es_keine_zeilen(self):

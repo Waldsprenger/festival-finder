@@ -10,8 +10,9 @@ antwortet sie mit 403. Das ist eine Entscheidung des Betreibers und wird wie
 jedes 403 geachtet: Das Zeichen nachzuahmen hieße, genau die Schranke zu
 umgehen, die er eingebaut hat.
 
-Seit Oktober 2026 ruht die Quelle deshalb und wird gar nicht mehr gefragt.
-Gibt der Betreiber die Datei wieder frei, genügt es, `ruht` zu leeren.
+Seit Oktober 2026 ruht die Quelle deshalb. Einmal im Monat fragt der Lauf die
+Datei trotzdem ab, genau wie früher und ohne Zeichen: Kommt sie wieder, steht
+das als Warnung im Bericht. Dann genügt es, `ruht` zu leeren.
 """
 
 import json
@@ -75,3 +76,15 @@ class FestivalNetworks(Quelle):
                 preis=f"ca. {preis} €" if isinstance(preis, (int, float)) and preis else "",
             ))
         return funde
+
+    def wieder_offen(self, netz: Abrufer, seit: int) -> bool | None:
+        """Eine Anfrage ohne Zeichen — genau die, die seit September abgewiesen wird.
+
+        Eine Datei zählt nur, wenn sie wirklich über das Netz kam: Im
+        Zwischenspeicher kann noch eine von vor der Sperre liegen, und ein Lauf
+        mit `--max-age 0` nähme sie von dort.
+        """
+        funde = self.sammeldatei(netz, seit)
+        if funde and not netz.hat_geholt([FN]):
+            return None
+        return bool(funde)

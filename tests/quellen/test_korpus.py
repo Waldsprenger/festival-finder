@@ -122,6 +122,25 @@ class TestSammeldatei:
         assert LESER["festivalnetworks"].sammeldatei(netz, 2000) == []
         assert any("nicht ladbar" in m for m in netz.meldungen)
 
+    def test_die_monatliche_pruefung_fragt_einmal(self):
+        """Kommt die Datei wieder über das Netz, ist die Quelle wieder offen."""
+        roh = gzip.decompress(
+            (SEITEN / "festivalnetworks_feed.json.gz").read_bytes()).decode("utf-8")
+        netz = StillerAbrufer({"https://festivalnetworks.com/data-api.php?r=festivals": roh})
+        netz.geholt["festivalnetworks.com"] = 1
+        assert LESER["festivalnetworks"].wieder_offen(netz, 2000) is True
+        assert len(netz.gefragt) == 1
+
+    def test_eine_abweisung_heisst_weiter_gesperrt(self):
+        assert LESER["festivalnetworks"].wieder_offen(StillerAbrufer(), 2000) is False
+
+    def test_eine_datei_aus_dem_zwischenspeicher_prueft_nichts(self):
+        """Dort liegt womöglich noch eine von vor der Sperre."""
+        roh = gzip.decompress(
+            (SEITEN / "festivalnetworks_feed.json.gz").read_bytes()).decode("utf-8")
+        netz = StillerAbrufer({"https://festivalnetworks.com/data-api.php?r=festivals": roh})
+        assert LESER["festivalnetworks"].wieder_offen(netz, 2000) is None
+
     def test_eine_absage_ist_keine_festivalliste(self):
         netz = StillerAbrufer({"https://festivalnetworks.com/data-api.php?r=festivals":
                                '{"error":"Forbidden"}'})

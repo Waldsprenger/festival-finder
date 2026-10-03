@@ -13,7 +13,7 @@ import pytest
 from festivalfinder import sammeln
 from festivalfinder.kern.fund import fund
 from festivalfinder.quellen import Quelle
-from festivalfinder.werkzeug import schnappschuss
+from festivalfinder.werkzeug import chronik, schnappschuss
 
 from .conftest import StillerAbrufer
 
@@ -98,18 +98,68 @@ class TestMitgebrachterStand:
         assert schnappschuss.stand_von("festivalticker") == date.today().isoformat()
 
 
+class Ruhend(Verzeichnis):
+    """Eine Quelle, die ruht — und bei der Prüfung antwortet, wie man sie lässt."""
+
+    ruht = "verlangt ein Zugangszeichen"
+
+    def __init__(self, offen=None):
+        super().__init__()
+        self.offen = offen
+        self.geprueft = 0
+
+    def wieder_offen(self, netz, seit):
+        self.geprueft += 1
+        if isinstance(self.offen, Exception):
+            raise self.offen
+        return self.offen
+
+
 class TestRuhendeQuelle:
     def test_sie_wird_nicht_gefragt_und_zaehlt_nicht(self, ordner):
         """Keine Anfrage, keine Null in den Funden — sonst stünde jeden Tag
         „kein einziger Fund" im Bericht, obwohl das Schweigen gewollt ist."""
-        class Ruhend(Verzeichnis):
-            ruht = "verlangt ein Zugangszeichen"
-
         netz = netz_mit(["a", "b"])
-        funde, ergebnis = sammeln.funde_sammeln(netz, 2026, quellen=[Ruhend()])
-        assert funde == [] and netz.gefragt == []
+        quelle = Ruhend(offen=True)
+        funde, ergebnis = sammeln.funde_sammeln(netz, 2026, quellen=[quelle],
+                                                pruefen=False)
+        assert funde == [] and netz.gefragt == [] and quelle.geprueft == 0
         assert ergebnis.ruhend == {"festivalticker": "verlangt ein Zugangszeichen"}
         assert "festivalticker" not in ergebnis.funde
+        assert ergebnis.geprueft == {}
+
+    def test_bei_der_pruefung_wird_nachgesehen(self, ordner):
+        """Was die Prüfung bringt, fließt nicht in den Bestand."""
+        quelle = Ruhend(offen=True)
+        funde, ergebnis = sammeln.funde_sammeln(netz_mit(["a"]), 2026,
+                                                quellen=[quelle], pruefen=True)
+        assert quelle.geprueft == 1 and funde == []
+        assert ergebnis.geprueft == {"festivalticker": True}
+
+    def test_weiter_gesperrt_steht_auch_da(self, ordner):
+        _, ergebnis = sammeln.funde_sammeln(netz_mit([]), 2026,
+                                            quellen=[Ruhend(offen=False)],
+                                            pruefen=True)
+        assert ergebnis.geprueft == {"festivalticker": False}
+
+    def test_eine_gescheiterte_pruefung_heisst_nicht_gesperrt(self, ordner):
+        netz = netz_mit([])
+        _, ergebnis = sammeln.funde_sammeln(
+            netz, 2026, quellen=[Ruhend(offen=ValueError("kaputt"))], pruefen=True)
+        assert ergebnis.geprueft == {}
+        assert any("Prüfung gescheitert" in m for m in netz.meldungen)
+
+    def test_ohne_angabe_prueft_der_erste_lauf_des_monats(self, ordner, tmp_path,
+                                                         monkeypatch):
+        """Takt ist die Chronik: Fehlt die Zeile des Monats, wird geprüft."""
+        monkeypatch.setattr(chronik, "DATEI", tmp_path / "chronik.jsonl")
+        quelle = Ruhend(offen=False)
+        sammeln.funde_sammeln(netz_mit([]), 2026, quellen=[quelle])
+        assert quelle.geprueft == 1
+
+        chronik.nachtragen({"quellen": {}}, 0)
+        sammeln.funde_sammeln(netz_mit([]), 2026, quellen=[quelle])
+        assert quelle.geprueft == 1
 
 
 def _stand_setzen(datum: str) -> None:
