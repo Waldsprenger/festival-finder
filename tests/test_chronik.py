@@ -59,6 +59,13 @@ class TestNachtragen:
         chronik.nachtragen(LAUF, 86266, heute="2026-08-23")
         assert chronik.zeilen()[0]["warnungen"]
 
+    def test_eine_ruhende_quelle_steht_mit_grund_dabei(self):
+        """Unter „quellen" fehlt sie; ohne Grund sähe das aus wie ein Ausfall."""
+        lauf = dict(LAUF, ruhend={"festivalnetworks": "verlangt ein Zeichen"})
+        chronik.nachtragen(lauf, 86266, heute="2026-10-01")
+        assert chronik.zeilen()[0]["ruhend"] == \
+            {"festivalnetworks": "verlangt ein Zeichen"}
+
 
 class TestRobust:
     def test_ohne_datei_gibt_es_keine_zeilen(self):

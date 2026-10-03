@@ -24,6 +24,8 @@ class Ergebnis:
     funde: dict[str, int] = field(default_factory=dict)
     #: Quellenname → Datum des mitgebrachten Standes, falls einer einsprang
     mitgebracht: dict[str, str] = field(default_factory=dict)
+    #: Quellenname → Grund, falls die Quelle ruht und nicht gefragt wurde
+    ruhend: dict[str, str] = field(default_factory=dict)
     #: Quellenname → Seiten, an denen ihr Leser gescheitert ist
     parsefehler: dict[str, int] = field(default_factory=dict)
     #: Kürzel, die in diesem Bestand eine andere Band meinen
@@ -67,6 +69,14 @@ def funde_sammeln(netz: Abrufer, seit: int, *, limit: int = 0,
     alle_funde: list[Fund] = []
 
     print(f"Sammle Detail-Links ab Jahrgang {seit} ...", flush=True)
+    # Eine ruhende Quelle wird nicht gefragt, weder nach Adressen noch nach
+    # ihrer Datei. Sie zählt auch nicht mit: Ihre Null ist kein Einbruch,
+    # sondern so gewollt — und stünde sonst jeden Tag als Warnung im Bericht.
+    for quelle in quellen:
+        if quelle.ruht:
+            ergebnis.ruhend[quelle.name] = quelle.ruht
+            print(f"  {quelle.name} ruht: {quelle.ruht}", flush=True)
+    quellen = [q for q in quellen if not q.ruht]
     # Quellen mit einer Sammeldatei haben keine Adressen je Festival — ihr
     # Abruf steht weiter unten, wo auch die Seiten gelesen werden.
     adressen = {q.name: q.adressen(netz, seit) for q in quellen

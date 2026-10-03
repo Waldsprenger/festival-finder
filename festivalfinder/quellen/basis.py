@@ -24,6 +24,10 @@ class Quelle:
     startseite: str = ""
     #: Ein Satz dazu, wofür diese Quelle gut ist
     zweck: str = ""
+    #: Warum diese Quelle gerade nicht gefragt wird — leer, solange sie
+    #: mitläuft. Eine ruhende Quelle bekommt keine einzige Anfrage, gilt aber
+    #: auch nicht als ausgefallen; ihr Leser bleibt, bis sie wieder antwortet.
+    ruht: str = ""
 
     def adressen(self, netz: Abrufer, seit: int) -> list[str]:
         """Die Detailseiten ab Jahrgang `seit`."""

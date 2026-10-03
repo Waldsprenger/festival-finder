@@ -7,7 +7,11 @@ einzige Quelle ohne Adressliste.
 Seit dem 9. September 2026 gibt die Schnittstelle die Datei nur noch gegen ein
 kurzlebiges Zugangszeichen heraus, das die Karte sich vorher holt; ohne
 antwortet sie mit 403. Das ist eine Entscheidung des Betreibers und wird wie
-jedes 403 geachtet — der Lauf meldet die Datei als nicht ladbar.
+jedes 403 geachtet: Das Zeichen nachzuahmen hieße, genau die Schranke zu
+umgehen, die er eingebaut hat.
+
+Seit Oktober 2026 ruht die Quelle deshalb und wird gar nicht mehr gefragt.
+Gibt der Betreiber die Datei wieder frei, genügt es, `ruht` zu leeren.
 """
 
 import json
@@ -26,6 +30,7 @@ class FestivalNetworks(Quelle):
     name = "festivalnetworks"
     startseite = FN
     zweck = "624 Festivals in einer Datei"
+    ruht = "gibt ihre Datei seit dem 9. September 2026 nur noch mit Zugangszeichen heraus"
 
     def lesen(self, netz: Abrufer, url: str, html: str) -> Fund | None:
         raise NotImplementedError("diese Quelle liefert eine Sammeldatei")

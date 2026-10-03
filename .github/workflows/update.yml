@@ -159,6 +159,8 @@ jobs:
           print(f"Stand {d['stand']} - {d['festivals']} Festivals")
           for name, n in d["quellen"].items():
               print(f"  {name:<18} {n:>6}")
+          for name, grund in d.get("ruhend", {}).items():
+              print(f"  {name:<18}  ruht: {grund}")
           for w in d["warnungen"]:
               print(f"  ! {w}")
           for m in d["meldungen"][:10]:

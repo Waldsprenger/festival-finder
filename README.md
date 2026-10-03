@@ -147,7 +147,7 @@ Doppelklick öffnen.
 | festivalticker.de | alle Listenseiten: Jahres-, Monats-, Länder- und Statusarchive | 1.971 | 1.966 |
 | festival-alarm.com | Jahresseiten **und** die Regionsseiten je Land | 935 | 930 |
 | festivalhopper.de | `sitemap-festivals.xml`, Jahrgang steht in der Adresse | 746 | 705 |
-| festivalnetworks.com | **eine** JSON-Datei hinter ihrer Karte | 1 | 616 |
+| festivalnetworks.com | **eine** JSON-Datei hinter ihrer Karte; ruht seit Oktober 2026 | 1 | 616 |
 | festivalflyer.com | die Startseite, mehr ist nicht erreichbar | 12 | 1 |
 
 Die zweiten Wege sind nachgemessen, nicht geraten: Über die Länderseiten von
@@ -155,7 +155,15 @@ festivalsunited sind 30 Detailseiten erreichbar, die in der Sitemap fehlen —
 darunter das Exit Festival in Novi Sad. Und festivalnetworks liefert alles in
 einer einzigen Datei; die zu lesen ist genauer und rücksichtsvoller, als 624
 Seiten einzeln abzurufen. Dafür hat `Quelle` ein zweites Standbein bekommen:
-`feed` gibt alle Datensätze auf einmal zurück.
+`sammeldatei` gibt alle Datensätze auf einmal zurück.
+
+Seit dem 9. September 2026 gibt festivalnetworks diese Datei nur noch gegen
+ein kurzlebiges Zugangszeichen heraus, das sich ihre Karte vorher holt; ohne
+antwortet sie mit 403. Das Zeichen nachzuahmen hieße, die Schranke zu umgehen,
+die der Betreiber gerade eingebaut hat. Die Quelle **ruht** deshalb: `ruht`
+in ihrer Datei nennt den Grund, der Lauf fragt sie nicht mehr, zählt ihre Null
+nicht als Einbruch und vermerkt sie in Bericht und Chronik unter `ruhend`.
+Gibt der Betreiber die Datei wieder frei, genügt es, `ruht` zu leeren.
 
 Was jede Quelle beiträgt und wo ihre Fallen liegen, steht im Kopf ihres
 Abschnitts in [quellen/](festivalfinder/quellen/). Drei Beispiele:

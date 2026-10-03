@@ -52,7 +52,7 @@ def nachtragen(lauf: dict, acts: int, heute: str | None = None) -> bool:
     if any(z.get("monat") == monat for z in bisher):
         return False
 
-    bisher.append({
+    zeile = {
         "monat": monat,
         "stand": lauf.get("stand", ""),
         "festivals": lauf.get("festivals", 0),
@@ -61,7 +61,12 @@ def nachtragen(lauf: dict, acts: int, heute: str | None = None) -> bool:
         # Was an dem Tag nicht stimmte, gehört dazu: Ohne das steht später eine
         # Zahl da, ohne dass jemand weiß, warum sie so niedrig war.
         "warnungen": lauf.get("warnungen") or [],
-    })
+    }
+    # Eine ruhende Quelle fehlt unter „quellen". Warum, steht daneben — sonst
+    # sähe es später aus, als hätte sie aufgehört, ohne dass es jemand merkte.
+    if lauf.get("ruhend"):
+        zeile["ruhend"] = lauf["ruhend"]
+    bisher.append(zeile)
     bisher.sort(key=lambda z: z.get("monat", ""))
     schreib_text(DATEI, "".join(
         json.dumps(z, ensure_ascii=False, separators=(",", ":")) + "\n"

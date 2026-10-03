@@ -98,6 +98,20 @@ class TestMitgebrachterStand:
         assert schnappschuss.stand_von("festivalticker") == date.today().isoformat()
 
 
+class TestRuhendeQuelle:
+    def test_sie_wird_nicht_gefragt_und_zaehlt_nicht(self, ordner):
+        """Keine Anfrage, keine Null in den Funden — sonst stünde jeden Tag
+        „kein einziger Fund" im Bericht, obwohl das Schweigen gewollt ist."""
+        class Ruhend(Verzeichnis):
+            ruht = "verlangt ein Zugangszeichen"
+
+        netz = netz_mit(["a", "b"])
+        funde, ergebnis = sammeln.funde_sammeln(netz, 2026, quellen=[Ruhend()])
+        assert funde == [] and netz.gefragt == []
+        assert ergebnis.ruhend == {"festivalticker": "verlangt ein Zugangszeichen"}
+        assert "festivalticker" not in ergebnis.funde
+
+
 def _stand_setzen(datum: str) -> None:
     """Den abgelegten Stand künstlich altern lassen."""
     import gzip

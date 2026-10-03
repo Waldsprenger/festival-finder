@@ -109,6 +109,7 @@ def befehl_sammeln(args) -> int:
         "stand": datetime.now().astimezone().strftime("%Y-%m-%dT%H:%M%z"),
         "quellen": ergebnis.funde,
         "mitgebrachter_stand": ergebnis.mitgebracht,
+        "ruhend": ergebnis.ruhend,
         "festivals": len(festivals),
         "warnungen": warnungen,
         "nicht_ladbar": len(netz.fehlgeschlagen),
