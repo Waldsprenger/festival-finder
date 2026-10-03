@@ -115,6 +115,19 @@ class TestSammeldatei:
                                "kein JSON"})
         assert LESER["festivalnetworks"].sammeldatei(netz, 2000) == []
 
+    def test_eine_abgewiesene_datei_wird_gemeldet(self):
+        """Seit September 2026 antwortet die Schnittstelle ohne Zugangszeichen
+        mit 403. Der Bericht sagte dazu nur „kein einziger Fund"."""
+        netz = StillerAbrufer()
+        assert LESER["festivalnetworks"].sammeldatei(netz, 2000) == []
+        assert any("nicht ladbar" in m for m in netz.meldungen)
+
+    def test_eine_absage_ist_keine_festivalliste(self):
+        netz = StillerAbrufer({"https://festivalnetworks.com/data-api.php?r=festivals":
+                               '{"error":"Forbidden"}'})
+        assert LESER["festivalnetworks"].sammeldatei(netz, 2000) == []
+        assert netz.meldungen
+
 
 def test_preise_der_echten_seiten_sind_lesbar():
     """„8.900.00" hat float() einmal eine Ausnahme entlockt — und der Aufrufer

@@ -3,6 +3,11 @@
 Die Karte der Seite lädt ihre Punkte aus einer JSON-Datei. Die zu lesen ist
 genauer und schonender, als 624 Seiten einzeln abzurufen — deshalb ist dies die
 einzige Quelle ohne Adressliste.
+
+Seit dem 9. September 2026 gibt die Schnittstelle die Datei nur noch gegen ein
+kurzlebiges Zugangszeichen heraus, das die Karte sich vorher holt; ohne
+antwortet sie mit 403. Das ist eine Entscheidung des Betreibers und wird wie
+jedes 403 geachtet — der Lauf meldet die Datei als nicht ladbar.
 """
 
 import json
@@ -27,10 +32,21 @@ class FestivalNetworks(Quelle):
 
     def sammeldatei(self, netz: Abrufer, seit: int) -> list[Fund]:
         roh = netz.fetch(f"{FN}/data-api.php?r=festivals")
+        # Ein abgewiesener Abruf ist etwas anderes als eine leere Datei. Beides
+        # zu leeren Klammern zu machen, ließ im Bericht nur „kein einziger
+        # Fund" stehen — ohne Hinweis, woran es lag.
+        if roh is None:
+            netz.melde(f"Datei nicht ladbar: {FN}")
+            return []
         try:
-            eintraege = json.loads(roh or "[]")
+            eintraege = json.loads(roh)
         except json.JSONDecodeError:
             netz.melde(f"Datei nicht lesbar: {FN}")
+            return []
+        # Eine Absage kommt als {"error": "Forbidden"} — als Liste gelesen,
+        # wären das Schlüssel statt Festivals.
+        if not isinstance(eintraege, list):
+            netz.melde(f"Datei ohne Festivalliste: {FN}")
             return []
 
         funde = []
