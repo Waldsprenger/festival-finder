@@ -95,7 +95,8 @@
 
   /* ---------------- Karte ----------------
      Sie kommt erst auf Wunsch: Sie zeigt das Ergebnis, nicht die Frage — und
-     ein Canvas, das niemand ansieht, würde bei jeder Änderung mitgezeichnet. */
+     ein Canvas, das niemand ansieht, würde bei jeder Änderung mitgezeichnet.
+     Die Umrisse stehen in geo.js; die Karte wartet beim ersten Öffnen darauf. */
 
   let karteGestartet = false;
 
@@ -107,15 +108,17 @@
     knopf.textContent = t(an ? 'map.hide' : 'map.show');
     knopf.title = t(an ? 'map.hideTitle' : 'map.showTitle');
     if (!an) return;
-    if (!karteGestartet) {
-      karteStarten();
-      karteGestartet = true;
-    }
-    // Erst jetzt hat das Canvas eine Breite - vorher wäre es 0 Pixel breit.
-    KARTE.zeichnen();
+    FF.geo().then((geo) => {
+      if (!karteGestartet) {
+        karteStarten(geo || {});
+        karteGestartet = true;
+      }
+      // Erst jetzt hat das Canvas eine Breite - vorher wäre es 0 Pixel breit.
+      if (state.karte) KARTE.zeichnen();
+    });
   }
 
-  function karteStarten() {
+  function karteStarten(geo) {
     KARTE.start({
       t,
       sprache: FF.sprache,
@@ -123,9 +126,9 @@
       umkreisAktiv: () => state.entfernung.an && !!state.home,
       umkreisBis: () => state.entfernung.bis,
       datenRahmen: () => FF.D.dataBox || null,
-      welt: FF.D.world,
-      weltFein: FF.D.worldFine,
-      fineBox: FF.D.fineBox,
+      welt: geo.world || [],
+      weltFein: geo.worldFine || [],
+      fineBox: geo.fineBox || null,
       // Ein Klick auf einen Pin springt zum Eintrag - notfalls muss die Karte
       // dafuer erst nachgezeichnet werden.
       aufPinKlick: (eintragId) => {
@@ -318,6 +321,10 @@
     FF.genresZeichnen();
     FF.zeichnen();
     FF.wunsch.start();
+
+    // Die Geodaten im Leerlauf vorladen: Bis jemand „Suchen" drückt oder die
+    // Karte öffnet, sind sie meist da — und der erste Bildaufbau wartet nicht.
+    (window.requestIdleCallback || ((f) => setTimeout(f, 300)))(() => FF.geo());
   }
 
   document.addEventListener('DOMContentLoaded', init);

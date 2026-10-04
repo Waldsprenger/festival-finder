@@ -47,6 +47,8 @@ class Festival:
     #: Von `werkzeug.preisverlauf` gefüllt, sobald sich ein Preis geändert hat
     preis_start: str = ""
     preis_start_seit: str = ""
+    #: Unterscheidet Festivals, die sich Name, Jahr und Ort teilen (`kennung`)
+    zusatz: str = ""
 
     @classmethod
     def aus_fund(cls, f: Fund, rang: int) -> "Festival":
@@ -66,8 +68,12 @@ class Festival:
         bei jedem Lauf, und der Name schwankt zwischen den Quellen. Der
         Schlüssel aus Name, Jahrgang und Ort überlebt beides — die
         Preisgeschichte und das Tagebuch der Neuzugänge hängen daran.
+
+        Zwei Ausgaben eines Jahres oder zwei gleichnamige Feste in zwei Ländern
+        teilen sich diesen Schlüssel; sie trennt der `zusatz`.
         """
-        return f"{festival_key(self.name)}|{self.jahr}|{city_key(self.stadt)}"
+        grund = f"{festival_key(self.name)}|{self.jahr}|{city_key(self.stadt)}"
+        return f"{grund}|{self.zusatz}" if self.zusatz else grund
 
     @property
     def lineup(self) -> list[str]:

@@ -1,7 +1,8 @@
-"""festivalabroad.com — 3.261 Festivals weltweit, jedes mit Datenblatt.
+"""festivalabroad.com — gut 3.000 Festivals weltweit, fast jedes mit Datenblatt.
 
-Die vollständigste der weltweiten Quellen: Termin, Koordinate, offizielle
-Adresse, Kapazität und Genres stehen im Datenblatt der Seite.
+Die vollständigste der weltweiten Quellen: Termin, Koordinate, Kapazität und
+Genres stehen im Datenblatt der Seite. Feste ohne neuen Termin haben keins;
+dann trägt der Seitentitel Name, Ort und Land.
 """
 
 import re
@@ -28,38 +29,33 @@ class FestivalAbroad(Quelle):
 
     def adressen(self, netz: Abrufer, seit: int) -> list[str]:
         """Alle Festivalseiten aus der Sitemap; der Termin steht erst auf der Seite."""
-        index = sitemap_adressen(netz.fetch(f"{FB}/sitemap.xml"))
-        if not index:
+        if not (index := sitemap_adressen(netz.fetch(f"{FB}/sitemap.xml"))):
             netz.melde(f"Sitemap nicht ladbar: {FB}")
             return []
-        adressen: set[str] = set()
-        for karte in index:
-            if not karte.endswith(".xml"):
-                continue
-            for u in sitemap_adressen(netz.fetch(karte)):
-                if re.search(r"/festivals/[^/]+$", u):
-                    adressen.add(u)
-        return sorted(adressen)
+        return sorted({u for karte in index if karte.endswith(".xml")
+                       for u in sitemap_adressen(netz.fetch(karte))
+                       if re.search(r"/festivals/[^/]+$", u)})
 
     def lesen(self, netz: Abrufer, url: str, html: str) -> Fund | None:
         for d in json_ld_events(html):
-            name = feld(d.get("name"))
-            if not name:
+            if not (name := feld(d.get("name"))):
                 continue
             platz = erstes_objekt(d.get("location"))
             anschrift = erstes_objekt(platz.get("address"))
             geo = erstes_objekt(platz.get("geo"))
+            # Das Datenblatt nennt als `url` bei 85 Festivals die eigene Seite
+            # bei festivalabroad — eine offizielle Adresse ist das nicht.
+            webseite = feld(d.get("url"))
             return fund(
                 self.name, url, name,
-                von=zeit.aus_iso(d.get("startDate")),
-                bis=zeit.aus_iso(d.get("endDate")),
+                von=zeit.aus_iso(d.get("startDate")), bis=zeit.aus_iso(d.get("endDate")),
                 # „Dresden, Germany" — der Ort steht vorn, das Land dahinter
                 stadt=feld(anschrift.get("addressLocality")).split(",")[0],
                 land=feld(anschrift.get("addressCountry")),
                 ort=feld(platz.get("name")),
                 lat=zahl_oder_nichts(geo.get("latitude")),
                 lon=zahl_oder_nichts(geo.get("longitude")),
-                webseite=feld(d.get("url")),
+                webseite="" if "festivalabroad.com" in webseite else webseite,
                 genre=feld(d.get("keywords")),
                 besucher=feld(d.get("maximumAttendeeCapacity")),
                 preis="Eintritt frei" if d.get("isAccessibleForFree") is True else "",
@@ -68,33 +64,25 @@ class FestivalAbroad(Quelle):
         return self._ohne_datenblatt(url, html)
 
     def _ohne_datenblatt(self, url: str, html: str) -> Fund | None:
-        """Feste, deren nächster Termin noch aussteht.
+        """Feste, deren nächster Termin noch aussteht („TBA - last edition: 8 Jul 2026").
 
-        Für sie liefert die Seite kein Datenblatt — alles Nötige steht aber im
-        Titel: Name, Ort, Land. Ohne Termin, denn den gibt es noch nicht
-        („TBA - last edition: 8 Jul 2026").
+        Seit 2026 lautet der Titel „4 Peaks Music Festival – Dates to Be
+        Announced | Bend, Unit…" — so stand es bei allen 145 terminlosen
+        Festivals als Ort in den Daten, und keines fand zu seinem datierten
+        Eintrag. Vollständig steht der Ort im Verweis auf die Länderseite; der
+        Titel hilft, wo der Verweis fehlt.
         """
         s = soup(html)
-        titel = clean(s.title.get_text()) if s.title else ""
-        titel = re.sub(r"\s*[|–-]\s*Festival Abroad\s*$", "", titel)
-        m = TITEL.match(titel)
-        if not m:
+        titel = re.sub(r"\s*[|–-]\s*Festival Abroad\s*$", "",
+                       clean(s.title.get_text()) if s.title else "")
+        if not (m := TITEL.match(titel)) or not (name := clean(m.group(1))):
             return None
-        name = clean(m.group(1))
-        # Seit 2026 lautet der Titel „4 Peaks Music Festival – Dates to Be
-        # Announced | Bend, Unit…". Das stand so als Ort in den Daten, bei allen
-        # 145 Festivals ohne Termin — und weil ein terminloser Eintrag über den
-        # Ort zu seinem datierten findet, fand keiner davon zu seinem.
-        # Vollständig steht der Ort im Verweis auf die Länderseite; der Titel
-        # bleibt für Seiten ohne diesen Verweis.
         ort = next((clean(a.get_text()) for a in s.find_all("a", href=LAENDERSEITE)
                     if "," in a.get_text()), "") or (m.group(2) or "").split("|")[-1]
-        ort_land = [t.strip(" .…") for t in ort.split(",") if t.strip(" .…")]
-        if not name or len(ort_land) < 2:
+        teile = [t.strip(" .…") for t in ort.split(",") if t.strip(" .…")]
+        if len(teile) < 2:
             return None
-        # Lange Titel schneidet die Seite mit Auslassungszeichen ab: aus
-        # „United States" wird „United State…". Was dann kein Land mehr ergibt,
-        # bleibt lieber leer als falsch.
-        land = ort_land[-1]
-        return fund(self.name, url, name,
-                    stadt=ort_land[0], land=land if ist_land(land) else "")
+        # Ein abgeschnittener Titel macht aus „United States" „United State…";
+        # was kein Land mehr ergibt, bleibt lieber leer als falsch.
+        return fund(self.name, url, name, stadt=teile[0],
+                    land=teile[-1] if ist_land(teile[-1]) else "")

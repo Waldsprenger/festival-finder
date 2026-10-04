@@ -8,6 +8,8 @@ zwei Läufe über denselben Funden um bis zu 29 Festivals — ohne dass sich an 
 Quellen etwas geändert hätte.
 """
 
+from datetime import date
+
 from ..kern.festival import Festival
 from ..kern.fund import Fund
 from ..kern.orte import land_code, punkt_passt_zum_land
@@ -37,7 +39,35 @@ def zusammenfuehren(funde: list[Fund], namen: dict[str, str],
             f.lat = f.lon = None
 
     festivals.sort(key=_reihenfolge)
+    _kennungen_eindeutig(festivals)
     return festivals
+
+
+def _kennungen_eindeutig(festivals: list[Festival]) -> None:
+    """Jedem Festival seine eigene Kennung.
+
+    Bo-Mit-Rock im März und im September, Edgefest in Kanada und in
+    Neuseeland: Name, Jahr und Ort sind gleich, Preisgeschichte und Neuzugänge
+    gehören trotzdem getrennt. Der früheste Eintrag behält die bisherige
+    Kennung — so wird kein schon bekanntes Fest über Nacht „neu" —, die übrigen
+    bekommen ihr Land oder, im selben Land, ihren Termin dazu.
+    """
+    gruppen: dict[str, list[Festival]] = {}
+    for f in festivals:
+        gruppen.setdefault(f.kennung, []).append(f)
+    vergeben = set(gruppen)
+    for gruppe in gruppen.values():
+        if len(gruppe) < 2:
+            continue
+        erster, *rest = sorted(gruppe, key=lambda f: (f.von or date.max, f.land, f.name))
+        for f in rest:
+            zusatz = (f.land if f.land != erster.land
+                      else f.von.isoformat() if f.von else f.land) or "2"
+            f.zusatz = zusatz
+            n = 2
+            while f.kennung in vergeben:
+                f.zusatz, n = f"{zusatz}-{n}", n + 1
+            vergeben.add(f.kennung)
 
 
 def _reihenfolge(f: Festival):

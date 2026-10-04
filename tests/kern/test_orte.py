@@ -6,9 +6,9 @@ Erde nicht gibt, und einen, der nicht zu dem Land passt, das die Quelle nennt.
 
 import pytest
 
-from festivalfinder.kern.orte import (FEINRAHMEN, ISO_CODES, ist_land,
-                                      kontinent, land_code, punkt_plausibel,
-                                      punkt_passt_zum_land, zahl_oder_nichts)
+from festivalfinder.kern.orte import (FEINRAHMEN, ISO_CODES, ist_land, land_code,
+                                      punkt_plausibel, punkt_passt_zum_land,
+                                      zahl_oder_nichts)
 
 
 class TestLandCode:
@@ -40,13 +40,6 @@ class TestIstLand:
     def test_die_welt_ist_dabei(self):
         """Früher hieß die Frage „liegt das in Europa?"."""
         assert len(ISO_CODES) > 200
-
-
-class TestKontinent:
-    def test_erdteile(self):
-        assert kontinent("DE") == "EU"
-        assert kontinent("JP") == "AS"
-        assert kontinent("Bayern") == ""
 
 
 class TestPunktPlausibel:

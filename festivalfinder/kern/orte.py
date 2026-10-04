@@ -11,12 +11,13 @@ Lugano in Buenos Aires.
 """
 
 import re
+from functools import lru_cache
 
 from ..pfade import DATA, lies_json
 
-# Umgangssprachliche und deutsche Namen. Die englischen Namen aller 252 Staaten
-# kommen aus data/laender.json dazu — diese Liste hier steht für die Fälle, die
-# eine Länderliste nicht hergibt: „BRD", „England", „Holland", „Kattowitz".
+# Umgangssprachliche und deutsche Namen. Die englischen Namen aller Staaten
+# kommen aus data/laender.json dazu; hier steht, was eine Länderliste nicht
+# hergibt: „BRD", „England", „Holland", deutsche Schreibweisen.
 NAMEN_HAND = {
     "deutschland": "DE", "germany": "DE", "de": "DE", "brd": "DE",
     "oesterreich": "AT", "österreich": "AT", "austria": "AT", "at": "AT",
@@ -85,19 +86,18 @@ NAMEN_HAND = {
     "myanmar": "MM", "costa rica": "CR", "panama": "PA", "guatemala": "GT",
     "honduras": "HN", "nicaragua": "NI", "el salvador": "SV", "belize": "BZ",
     "fidschi": "FJ", "papua-neuguinea": "PG",
-    # Deutsche Namen, die von der englischen Länderliste zu weit abweichen.
-    # Nominatim antwortet auf Deutsch, und wo der Name nicht auflösbar war,
-    # ließ sich der Treffer nicht gegen das gesuchte Land prüfen.
+    # Deutsche Namen, die von der englischen Länderliste zu weit abweichen —
+    # Nominatim antwortet auf Deutsch, und ohne sie ließe sich ein Treffer
+    # nicht gegen das gesuchte Land prüfen.
     "russland": "RU", "moldau": "MD", "republik moldau": "MD",
     "surinam": "SR", "madagaskar": "MG", "gazastreifen": "PS",
     "palaestina": "PS", "palästina": "PS", "westjordanland": "PS",
-    "saint vincent und die grenadinen": "VC",
+    "saint vincent und die grenadinen": "VC", "hongkong": "HK",
 }
 
-
-#: Gebiete mit eigenem Kürzel, deren Postanschrift auf den Mutterstaat lautet.
-#: Nominatim schreibt bei Chek Lap Kok „Hongkong, China" und bei Saint-Martin
-#: „Frankreich"; ohne diese Zuordnung sähe das nach einem Widerspruch aus.
+#: Gebiete mit eigenem Kürzel, deren Postanschrift auf den Mutterstaat lautet:
+#: Nominatim schreibt bei Chek Lap Kok „Hongkong, China", bei Saint-Martin
+#: „Frankreich". Das ist kein Widerspruch.
 GEHOERT_ZU = {
     "HK": "CN", "MO": "CN",
     "MF": "FR", "GP": "FR", "MQ": "FR", "RE": "FR", "YT": "FR", "GF": "FR",
@@ -109,39 +109,26 @@ GEHOERT_ZU = {
     "PR": "US", "VI": "US", "GU": "US", "AS": "US", "MP": "US",
 }
 
+#: data/laender.json (aus GeoNames, siehe werkzeug/gazetteer.py). Fehlt sie —
+#: frischer Klon vor dem ersten Lauf —, bleibt es bei den Namen von Hand.
+_WELT = lies_json(DATA / "laender.json", {}) or {}
 
-def _welttabelle() -> tuple[dict[str, dict], dict[str, str]]:
-    """data/laender.json: alle Staaten mit Kontinent, dazu ihre Namen.
+#: Alle gültigen Länderkürzel
+ISO_CODES = set(_WELT) | set(NAMEN_HAND.values())
 
-    Die Datei entsteht in `werkzeug/gazetteer.py` aus der Länderliste von
-    GeoNames. Fehlt sie (frischer Klon vor dem ersten Lauf), bleibt es bei den
-    handgeschriebenen Namen — der Lauf soll daran nicht scheitern.
-    """
-    roh = lies_json(DATA / "laender.json", {}) or {}
-    namen: dict[str, str] = {}
-    for code, eintrag in roh.items():
-        namen[code.lower()] = code
-        if (name := (eintrag.get("name") or "").lower()):
-            namen[name] = code
-    return roh, namen
+# Die handgeschriebenen Namen zuletzt und damit obenauf: „england" bleibt GB,
+# obwohl GeoNames „United Kingdom" führt.
+NAMEN = {**{c.lower(): c for c in _WELT},
+         **{(e.get("name") or "").lower(): c for c, e in _WELT.items() if e.get("name")},
+         **NAMEN_HAND}
 
-
-WELT, _WELT_NAMEN = _welttabelle()
-
-#: Alle gültigen Länderkürzel. Ohne die Datei zählt, was hier steht.
-ISO_CODES = set(WELT) | set(NAMEN_HAND.values())
-
-#: Kürzel → Kontinent (EU, NA, SA, AS, AF, OC, AN)
-KONTINENT = {code: e.get("kontinent", "") for code, e in WELT.items()}
-
-# Reihenfolge: die handgeschriebenen Namen zuletzt und damit obenauf. So bleibt
-# „england" bei GB, obwohl GeoNames „United Kingdom" führt.
-NAMEN = {**_WELT_NAMEN, **NAMEN_HAND}
+_LEERRAUM = re.compile(r"\s+")
 
 
+@lru_cache(maxsize=4096)
 def land_code(country: str) -> str:
     """Länderkürzel; unbekannte Angaben bleiben unverändert."""
-    roh = re.sub(r"\s+", " ", (country or "")).strip()
+    roh = _LEERRAUM.sub(" ", country or "").strip()
     if not roh:
         return ""
     if (code := NAMEN.get(roh.lower())):
@@ -150,29 +137,18 @@ def land_code(country: str) -> str:
 
 
 def ist_land(country: str) -> bool:
-    """Ist das ein Staat, den es gibt?
-
-    Früher hieß die Frage „liegt das in Europa?" und entschied darüber, was in
-    den Bestand kam. Jetzt zählt nur, ob hinter der Angabe ein Land steht:
-    „Bayern" und „Region Hannover" sind keins, „Japan" und „BR" schon.
-    """
+    """Ist das ein Staat, den es gibt? „Bayern" nicht, „Japan" und „BR" schon."""
     return land_code(country) in ISO_CODES
-
-
-def kontinent(country: str) -> str:
-    """Erdteil eines Landes, leer wenn unbekannt."""
-    return KONTINENT.get(land_code(country), "")
 
 
 # --------------------------------------------------------------------------
 # Koordinaten
 # --------------------------------------------------------------------------
 
-#: Der Ausschnitt, fuer den feine Kartenumrisse vorliegen: lat0, lat1, lon0, lon1.
-#: Von den Azoren bis zur Osttuerkei, von Zypern bis Nordnorwegen.
-#: `werkzeug/weltkarte.py` erzeugt `data/welt_fein.json` fuer genau diesen
-#: Kasten, und die Karte im Browser schaltet innerhalb davon auf die feine
-#: Zeichnung um. Ein Filter ist er nicht mehr - gesammelt wird weltweit.
+#: Der Ausschnitt, für den feine Kartenumrisse vorliegen: lat0, lat1, lon0,
+#: lon1 — von den Azoren bis zur Osttürkei, von Zypern bis Nordnorwegen.
+#: `werkzeug/weltkarte.py` erzeugt `data/welt_fein.json` für genau diesen
+#: Kasten; die Karte schaltet darin auf die feine Zeichnung um.
 FEINRAHMEN = (27.0, 72.0, -32.0, 46.0)
 
 #: Der Kasten je Land (lat0, lat1, lon0, lon1), aus dem Ortsverzeichnis
@@ -180,20 +156,15 @@ RAHMEN = {cc: tuple(werte) for cc, werte
           in (lies_json(DATA / "laender_rahmen.json", {}) or {}).items()
           if len(werte) == 4}
 
-#: Zuschlag auf jeden Kasten. Ein Festival kann dicht hinter der Grenze liegen,
+#: Zuschlag auf jeden Kasten: Ein Festival kann dicht hinter der Grenze liegen,
 #: und das Ortsverzeichnis kennt nicht jede Insel.
 ZUSCHLAG = 2.0
 
 
 def punkt_plausibel(lat: float | None, lon: float | None) -> bool:
-    """Ein Punkt auf der Erde — und nicht der Nullpunkt.
-
-    0/0 liegt im Golf von Guinea und steht in Datenblättern für „kein Wert
-    eingetragen". Ein Festival war dort noch nie.
-    """
-    if lat is None or lon is None:
-        return False
-    if abs(lat) > 90 or abs(lon) > 180:
+    """Ein Punkt auf der Erde — und nicht der Nullpunkt, der in Datenblättern
+    für „kein Wert eingetragen" steht."""
+    if lat is None or lon is None or abs(lat) > 90 or abs(lon) > 180:
         return False
     return not (abs(lat) < 0.01 and abs(lon) < 0.01)
 
@@ -202,8 +173,7 @@ def punkt_passt_zum_land(lat: float | None, lon: float | None, country: str) -> 
     """Liegt der Punkt in dem Land, das die Quelle nennt?
 
     Ohne Land oder ohne Kasten gilt der Punkt als in Ordnung — geraten wird
-    nicht. Bekannt ist der Kasten für die Länder aus dem Ortsverzeichnis; er
-    stammt aus 116.653 Orten und ist bewusst weit.
+    nicht.
     """
     if lat is None or lon is None:
         return False

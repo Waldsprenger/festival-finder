@@ -33,6 +33,7 @@ Zwei Regeln halten das ruhig:
 from datetime import date
 
 from ..kern.festival import Festival
+from ..kern.zeit import tage_her
 from ..pfade import DATA, lies_json, schreib_json
 
 #: Seit wann wir welches Festival und welche Band kennen
@@ -40,14 +41,6 @@ DATEI = DATA / "bestand_verlauf.json"
 
 #: So lange bleibt ein Festival stehen, auch wenn es gerade in keiner Quelle ist
 GEDULD_TAGE = 60
-
-
-def _tage_her(stand: str, heute: str) -> int:
-    """Tage zwischen zwei ISO-Daten; ohne lesbares Datum: unendlich lange her."""
-    try:
-        return (date.fromisoformat(heute) - date.fromisoformat(stand)).days
-    except ValueError:
-        return 10 ** 6
 
 
 def lesen() -> dict:
@@ -68,10 +61,10 @@ def verfolgen(festivals: list[Festival], heute: str | None = None) -> dict[str, 
     # diese Ausnahme wäre nach einer Pause der ganze Bestand „neu"; GitHub
     # schaltet zeitgesteuerte Läufe nach 60 Tagen ohne Aktivität ab, die Pause
     # ist also keine Erfindung.
-    pause = _tage_her(vorher["stand"], heute) if vorher["stand"] else 0
+    pause = tage_her(vorher["stand"], heute) if vorher["stand"] else 0
     bekannt = dict(vorher["feste"]) if pause > GEDULD_TAGE else {
         k: e for k, e in vorher["feste"].items()
-        if _tage_her(e.get("stand", ""), heute) <= GEDULD_TAGE}
+        if tage_her(e.get("stand", ""), heute) <= GEDULD_TAGE}
 
     feste: dict[str, dict] = {}
     neue_feste = neue_bands = 0

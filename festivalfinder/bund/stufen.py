@@ -8,19 +8,22 @@ Festival laufen unter einem Namen an 30 Orten und müssen getrennt bleiben, und
 zwei Festivals gleichen Namens in verschiedenen Städten erst recht.
 
 Der Schlüssel einer Gruppe ist überall derselbe: (Namensschlüssel, Jahr,
-Ortsschlüssel).
+Ortsschlüssel), bei einer zweiten Ausgabe oder einem zweiten Land unter
+demselben Schlüssel ergänzt um eine laufende Nummer.
 """
 
 from ..kern import zeit
 from ..kern.festival import Festival
 from ..kern.fund import Fund
+from ..kern.orte import GEHOERT_ZU
 from ..kern.text import city_key, clean, festival_key, fold, genres_vereinen
 from .regeln import (adresse, dieselbe_veranstaltung, name_deckt_sich,
                      name_steckt_drin, namen_verwandt, ort_deckt_sich,
                      schreibweise_gleich)
 
-#: Schlüssel einer Gruppe: Namensschlüssel, Jahr, Ortsschlüssel
-Schluessel = tuple[str, str, str]
+#: Schlüssel einer Gruppe: Namensschlüssel, Jahr, Ortsschlüssel — und, wo
+#: Stufe 1 zwei Ausgaben oder zwei Länder auseinanderhält, eine laufende Nummer
+Schluessel = tuple
 Bestand = dict[Schluessel, Festival]
 
 #: Felder, bei denen der gefüllte Wert den leeren ersetzt
@@ -95,20 +98,68 @@ def _paarweise(bestand: Bestand, gruppen: dict, passt, spanne: bool = False,
 # Stufe 1: der Grundstock
 # --------------------------------------------------------------------------
 
+def _weit(a, b) -> bool:
+    """Liegen zwei Termine weiter auseinander, als Quellen sich je irren?"""
+    return bool(a and b) and abs((a - b).days) > NAHER_TERMIN
+
+
+def _anderes_land(a: str, b: str) -> bool:
+    """Zwei verschiedene Länder — ein Überseegebiet zählt zu seinem Staat."""
+    return bool(a and b) and a != b and GEHOERT_ZU.get(a) != b and GEHOERT_ZU.get(b) != a
+
+
+def _ausgaben(funde: list[Fund]) -> set[tuple]:
+    """Schlüssel, unter denen eine Quelle selbst zwei Ausgaben eines Jahres führt.
+
+    „Bo-Mit-Rock" im März und im September, „Mammut" im März und im Oktober:
+    Steht eine Quelle für beide Termine, sind es zwei Feste. Nennt dagegen nur
+    eine Quelle einen abweichenden Termin, irrt sie meist (festival-alarm
+    datierte Elbjazz auf den Juni) — dann bleibt es bei einem.
+    """
+    termine: dict[tuple, dict[str, list]] = {}
+    for f in funde:
+        if f.von:
+            k = (festival_key(f.name), f.jahr, city_key(f.stadt))
+            termine.setdefault(k, {}).setdefault(f.quelle, []).append(f.von)
+    return {k for k, je_quelle in termine.items()
+            if any(_weit(min(t), max(t)) for t in je_quelle.values())}
+
+
 def stufe1_exakt(funde: list[Fund], namen: dict[str, str],
                  band_key, rang: dict[str, int]) -> Bestand:
     """Gleicher Name, gleiches Jahr, gleiche Stadt.
 
     Die Stadt gehört bewusst zum Schlüssel: Tour-Formate laufen unter einem
     Namen an vielen Orten und sind eigenständige Termine.
+
+    Zwei Ausnahmen, wo der Schlüssel allein zu viel verbindet:
+
+    * Führt eine Quelle unter demselben Schlüssel zwei Termine, die weit
+      auseinanderliegen, sind es zwei Ausgaben (siehe `_ausgaben`).
+    * Nennen zwei Einträge verschiedene Länder, sind es zwei Feste — sofern
+      beide terminlos sind oder ihre Termine weit auseinanderliegen. Sonst
+      wurden „Bergenfest" in Norwegen und „Bergen Live" in den Niederlanden
+      eins, und das „Summer Breeze" aus Deutschland, Südkorea und den USA,
+      die festivism ohne Ort und Termin führt, ebenso. Bei nahem Termin irrt
+      eher eine Quelle beim Land (wannafest führt „Noisy" in Hamburg unter NL).
     """
+    ausgaben = _ausgaben(funde)
     bestand: Bestand = {}
+    #: Grundschlüssel → Schlüssel der Einträge darunter
+    eintraege: dict[tuple, list[tuple]] = {}
     for f in funde:
-        key = (festival_key(f.name), f.jahr, city_key(f.stadt))
-        cur = bestand.get(key)
-        if cur is None:
-            cur = Festival.aus_fund(f, rang.get(f.quelle, len(rang)))
-            bestand[key] = cur
+        grund = (festival_key(f.name), f.jahr, city_key(f.stadt))
+        key = next((k for k in eintraege.get(grund, ())
+                    if not (grund in ausgaben and _weit(bestand[k].von, f.von))
+                    and not (_anderes_land(bestand[k].land, f.land)
+                             and (not bestand[k].von and not f.von
+                                  or _weit(bestand[k].von, f.von)))), None)
+        if key is None:
+            schon = eintraege.setdefault(grund, [])
+            key = grund if not schon else (*grund, len(schon))
+            schon.append(key)
+            bestand[key] = Festival.aus_fund(f, rang.get(f.quelle, len(rang)))
+        cur = bestand[key]
 
         for feld in FELDER:
             if not getattr(cur, feld) and getattr(f, feld):

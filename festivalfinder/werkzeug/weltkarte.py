@@ -89,6 +89,13 @@ def sammeln(netz: Abrufer, datei: str, kasten: bool) -> list:
     return ringe
 
 
+def vorhanden() -> bool:
+    """Liegen beide Umrisse schon vor? Sie sind mitversioniert und ändern sich
+    nur, wenn jemand sie ausdrücklich neu erzeugt."""
+    return all((DATA / n).exists() and (DATA / n).stat().st_size > 0
+               for n in ("welt_grob.json", "welt_fein.json"))
+
+
 def bauen(netz: Abrufer) -> dict:
     zahlen = {}
     for datei, kasten, name, was in (

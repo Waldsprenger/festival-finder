@@ -6,18 +6,16 @@ data/festivals.json
 data/festivals.csv
 data/lineups.csv
 data/bands.csv
-data/band_normalisierung.json
 data/uebersicht.html
 data/failed.txt
 data/lauf.json
 data/verortung.json
 site/data.js
+site/geo.js
 site/orte.js
 site/artifact.html
-site/fonts.css
 site/manifest.webmanifest
 site/sw.js
-site/icons/
 
 # Zwischenstände, die sich lohnen zu behalten, stehen bewusst NICHT hier:
 #   data/geo.json       - erspart ~2000 Nominatim-Anfragen je Lauf
@@ -25,10 +23,13 @@ site/icons/
 #   data/plz.json       - Postleitzahlen DE/AT/CH
 #   data/laender.json   - alle 252 Staaten mit Erdteil, aendert sich nie
 #   data/welt_*.json    - Kartenumrisse in zwei Aufloesungen, statisch
+#   site/fonts.css      - die eingebettete Schrift; neu mit `schrift`
+#   site/icons/         - die App-Symbole; neu mit `symbole`
 
 # lokale Werkzeug-Einstellungen, geraetespezifisch
 .claude/settings.local.json
 
+# Zustände der Läufe; der Serverlauf hält sie in seinem Zwischenspeicher
 __pycache__/
 *.pyc
 .venv/

@@ -20,6 +20,7 @@ Festivals löschen.
 from datetime import date
 
 from ..kern.festival import Festival
+from ..kern.zeit import tage_her
 from ..pfade import DATA, lies_json, schreib_json
 
 DATEI = DATA / "preis_verlauf.json"
@@ -32,14 +33,6 @@ GEDULD_TAGE = 60
 #   aktuell der jetzt geltende Preis
 #   stand   wann das Festival zuletzt gesehen wurde - daran misst sich die
 #           Geduld weiter unten, nicht an der letzten Preisänderung
-
-
-def _tage_her(stand: str, heute: str) -> int:
-    """Tage zwischen zwei ISO-Daten; ohne lesbares Datum: unendlich lange her."""
-    try:
-        return (date.fromisoformat(heute) - date.fromisoformat(stand)).days
-    except ValueError:
-        return 10 ** 6
 
 
 def verfolgen(festivals: list[Festival], heute: str | None = None) -> dict[str, int]:
@@ -83,7 +76,7 @@ def verfolgen(festivals: list[Festival], heute: str | None = None) -> dict[str, 
     # einmal. Ihre Geschichte einfach zu löschen hieße, den Startpreis beim
     # nächsten Auftauchen neu zu erfinden.
     for k, alt in vorher.items():
-        if k not in verlauf and _tage_her(alt.get("stand", ""), heute) <= GEDULD_TAGE:
+        if k not in verlauf and tage_her(alt.get("stand", ""), heute) <= GEDULD_TAGE:
             verlauf[k] = alt
 
     schreib_json(DATEI, verlauf)

@@ -7,7 +7,7 @@ from ..kern.fund import Fund, fund
 from ..kern.orte import ist_land, land_code
 from ..kern.text import clean, valid_band
 from ..netz import Abrufer, sitemap_adressen, soup
-from .basis import Quelle
+from .basis import Quelle, erster_link, felder, jahr_aus, ohne_jahr
 
 FH = "https://www.festivalhopper.de"
 
@@ -18,12 +18,14 @@ FELDER = {
     "genre":    r"Musikart:[^A-Za-z0-9]*(.*?)\s*(?:Region:|Festivalort:|Besucher:)",
     "region":   r"Region:[^A-Za-z0-9]*(.*?)\s*(?:Festivalort:|Besucher:|Tickets:)",
     "ort":      r"Festivalort:[^A-Za-z0-9]*(.*?)\s*(?:Besucher:|Tickets:|Infos)",
-    # Dicht am Wort: „Besucher:[^0-9]*" sprang über ganze Absätze hinweg und
-    # holte die nächste Ziffer irgendwo auf der Seite — auf Seiten mit
-    # „Besucherinformationen" wurden daraus Zahlen mit 66 Stellen.
+    # Dicht am Wort: „Besucher:[^0-9]*" sprang über ganze Absätze und holte
+    # die nächste Ziffer der Seite — auf Seiten mit „Besucherinformationen"
+    # ergab das Zahlen mit 66 Stellen.
     "besucher": r"Besucher:\s{0,3}([\d.]{1,9})",
     "preis":    r"Tickets:[^A-Za-z0-9]*(.*?)\s*(?:Infos zum|Anfahrt|Lineup)",
 }
+
+LEER = re.compile(r"(?i)^(unbekannt|keine angabe|-)$")
 
 
 class FestivalHopper(Quelle):
@@ -32,8 +34,7 @@ class FestivalHopper(Quelle):
     zweck = "deutschsprachig, Lineups als Verweise"
 
     def adressen(self, netz: Abrufer, seit: int) -> list[str]:
-        xml = netz.fetch(f"{FH}/sitemap-festivals.xml")
-        if not xml:
+        if not (xml := netz.fetch(f"{FH}/sitemap-festivals.xml")):
             netz.melde("festivalhopper: Sitemap nicht ladbar")
             return []
         muster = re.compile(rf"{FH}/festival/([a-z0-9\-]+?)-((?:19|20)\d{{2}})")
@@ -43,66 +44,37 @@ class FestivalHopper(Quelle):
     def lesen(self, netz: Abrufer, url: str, html: str) -> Fund | None:
         s = soup(html)
         h1 = s.find("h1")
-        roh = clean(h1.get_text()) if h1 else ""
-        if not roh:
+        if not (roh := clean(h1.get_text()) if h1 else ""):
             return None
-        jm = re.search(r"\b(20\d{2})\b", roh)
-        name = re.sub(r"\s*\b20\d{2}\b\s*$", "", roh).strip()
-        if not name:
-            return None
+        name = ohne_jahr(roh)
 
         flach = clean(s.get_text(" ", strip=True))
-        tm = TERMIN.search(flach)
+        werte = felder(flach, FELDER, LEER)
 
-        feld: dict[str, str] = {}
-        for schluessel, muster in FELDER.items():
-            m = re.search(muster, flach, re.S)
-            wert = clean(m.group(1)) if m else ""
-            if wert and wert.lower() not in ("unbekannt", "keine angabe", "-"):
-                feld[schluessel] = wert
-
-        # „Bayern , 🇩🇪 Deutschland" — das Land steht hinten, mit Flaggenzeichen
-        # davor, das kein Buchstabe ist.
-        land_roh = feld.get("region", "").split(",")[-1]
-        land = land_code(clean(re.sub(r"[^\w ÄÖÜäöüß-]", " ", land_roh)))
+        # „Bayern , 🇩🇪 Deutschland" — das Land steht hinten, mit Flagge davor
+        land = land_code(clean(re.sub(r"[^\w ÄÖÜäöüß-]", " ",
+                                      werte.get("region", "").split(",")[-1])))
         if land and not ist_land(land):
             return None                       # „Bayern" ist kein Land
 
-        # „91550 Dinkelsbühl", aber auch „CH-8152 Glattbrugg" oder „A-1010 Wien"
-        ort_roh = feld.get("ort", "")
-        plz_m = re.match(r"\s*(?:[A-Z]{1,2}-)?(\d{4,5})\b\s*(.*)$", ort_roh)
-
-        preis = feld.get("preis", "")
-        if preis and not re.search(r"\d", preis):
-            preis = ""
-
-        # Bandnamen stehen als einzelne Verweise. Die Bandkarten liegen unter
-        # /bands/karten/; die kürzeren /bands/-Adressen sind Menüpunkte.
-        lineup = [clean(a.get_text()) for a in s.find_all("a", href=True)
-                  if "/bands/karten/" in a["href"] and valid_band(a.get_text())]
-
+        preis = werte.get("preis", "")
+        tm = TERMIN.search(flach)
         von = zeit.aus_deutsch(tm.group(1)) if tm else None
         return fund(
             self.name, url, name,
             von=von, bis=zeit.aus_deutsch(tm.group(2)) if tm else None,
-            jahr=jm.group(1) if jm else "",
-            stadt=clean(plz_m.group(2)) if plz_m else ort_roh,
-            land=land,
-            plz=plz_m.group(1) if plz_m else "",
-            preis=preis, webseite=self._webseite(s), genre=feld.get("genre", ""),
-            besucher=feld.get("besucher", ""),
+            jahr=jahr_aus(roh),
+            # „91550 Dinkelsbühl", „CH-8152 Glattbrugg", „RG2 Reading": die
+            # Postleitzahl löst fund()
+            stadt=werte.get("ort", ""), land=land,
+            preis=preis if re.search(r"\d", preis) else "",
+            webseite=erster_link(s, ausser="festivalhopper", ziel_im_text=True,
+                                 weg=r"openstreetmap|facebook|instagram|youtube|"
+                                     r"twitter|ticket"),
+            genre=werte.get("genre", ""), besucher=werte.get("besucher", ""),
             hinweis="" if von else "Termin noch nicht veröffentlicht",
-            lineup=lineup,
+            # Bandkarten liegen unter /bands/karten/; kürzere /bands/-Adressen
+            # sind Menüpunkte
+            lineup=[clean(a.get_text()) for a in s.find_all("a", href=True)
+                    if "/bands/karten/" in a["href"] and valid_band(a.get_text())],
         )
-
-    def _webseite(self, s) -> str:
-        for a in s.find_all("a", href=True):
-            ziel = a["href"].strip()
-            if not ziel.startswith("http") or "festivalhopper" in ziel:
-                continue
-            if re.search(r"(?i)openstreetmap|facebook|instagram|youtube|twitter|ticket",
-                         ziel):
-                continue
-            if clean(a.get_text()).lower().replace("www.", "") in ziel.lower():
-                return ziel
-        return ""

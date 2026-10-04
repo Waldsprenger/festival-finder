@@ -11,9 +11,9 @@ import json
 import pytest
 
 from festivalfinder.ausgabe import daten_js
-from festivalfinder.ausgabe.daten_js import (aufrunden, als_javascript,
-                                             datenrahmen,
-                                             frueheste_monatsgrenze, pruefe)
+from festivalfinder.ausgabe.daten_js import (als_javascript, datenrahmen,
+                                             frueheste_monatsgrenze, pruefe,
+                                             schreiben_wenn_neu)
 from festivalfinder.kern.festival import Festival
 from festivalfinder.werkzeug import neuheiten
 
@@ -90,12 +90,30 @@ class TestAlsJavascript:
         assert als_javascript("ORTE_WELT", {}).startswith("window.ORTE_WELT = JSON.parse('")
 
 
-class TestGrenzen:
-    def test_aufrunden(self):
-        assert aufrunden(137) == 140
-        assert aufrunden(455) == 500
-        assert aufrunden(1234) == 1300
+class TestGeodaten:
+    """geo.js ändert sich fast nie — und darf deshalb auch nicht neu entstehen.
 
+    Vorher steckten die Geodaten in data.js, und jeder Besucher lud nach jedem
+    täglichen Lauf 5 MB neu, die sich nicht geändert hatten.
+    """
+
+    @pytest.fixture(autouse=True)
+    def eigener_ordner(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(daten_js, "SITE", tmp_path)
+        return tmp_path
+
+    def test_gleicher_inhalt_gleiche_kennung_keine_neue_datei(self, eigener_ordner):
+        k1 = schreiben_wenn_neu("geo.js", "window.GEO = 1;\n")
+        zeit = (eigener_ordner / "geo.js").stat().st_mtime_ns
+        assert schreiben_wenn_neu("geo.js", "window.GEO = 1;\n") == k1
+        assert (eigener_ordner / "geo.js").stat().st_mtime_ns == zeit
+
+    def test_anderer_inhalt_andere_kennung(self, eigener_ordner):
+        assert schreiben_wenn_neu("geo.js", "a") != schreiben_wenn_neu("geo.js", "b")
+        assert (eigener_ordner / "geo.js").read_text(encoding="utf-8") == "b"
+
+
+class TestGrenzen:
     def test_datenrahmen_umschliesst_alle_punkte(self):
         zeilen = [zeile(lat=54.3, lon=10.1), zeile(lat=48.1, lon=11.6)]
         lat0, lat1, lon0, lon1 = datenrahmen(zeilen)

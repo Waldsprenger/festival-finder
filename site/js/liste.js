@@ -1,9 +1,7 @@
 /* Die Treffer: Satz, Liste, Karten.
 
-   Nur die ersten Treffer werden gezeichnet und auf Wunsch nachgelegt. Alle 300
-   auf einmal ergaben am Telefon eine Seite von 109.000 Pixeln Höhe — über
-   hundert Bildschirme, die niemand durchwischt, und jede Karte kostet
-   Aufbauzeit. */
+   Nur die ersten Treffer werden gezeichnet und auf Wunsch nachgelegt: Alle 300
+   auf einmal ergaben am Telefon eine Seite von 109.000 Pixeln Höhe. */
 
 (() => {
   'use strict';
@@ -21,18 +19,15 @@
   /* ---------------- Ein Durchgang ---------------- */
 
   function zeichnen() {
-    FF.ketteZeichnen();
+    const { rest, treffer: pool } = FF.auswerten();
+    FF.ketteZeichnen(rest);
     if ($('s-ergebnis').hidden) return;
 
     // Was zu ordnen ist, ändert sich mit der Auswahl — die Liste also auch.
     sortierungZeichnen();
-
-    const pool = FF.gefiltert();
     statZeichnen(pool.length);
 
-    const bewertet = pool.map(FF.bewerten);
-    bewertet.sort(FF.vergleicher());
-
+    const bewertet = pool.map(FF.bewerten).sort(FF.vergleicher());
     $('result-stat').textContent = !bewertet.length ? t('res.none')
       : bewertet.length === 1 ? t('res.one')
       : t('res.many', { n: zahl(bewertet.length) });
@@ -75,7 +70,6 @@
   function sortierungZeichnen() {
     const wahl = $('sort');
     if (!wahl) return;
-    const aktiv = FF.sortierung();
     wahl.innerHTML = '';
     for (const key of FF.sortierungen()) {
       const o = document.createElement('option');
@@ -83,19 +77,16 @@
       o.textContent = t('sort.' + key);
       wahl.append(o);
     }
-    wahl.value = aktiv;
+    wahl.value = FF.sortierung();
   }
 
   function nachlegen() {
     const liste = $('festival-list');
     const bisher = liste.querySelectorAll('.fest').length;
-    const mehrKnopf = liste.querySelector('.mehr');
-    if (mehrKnopf) mehrKnopf.remove();
+    liste.querySelector('.mehr')?.remove();
 
     const frag = document.createDocumentFragment();
-    for (let n = bisher; n < Math.min(gezeigt, treffer.length); n++) {
-      frag.append(karte(treffer[n]));
-    }
+    for (let n = bisher; n < Math.min(gezeigt, treffer.length); n++) frag.append(karte(treffer[n]));
     liste.append(frag);
 
     if (gezeigt < treffer.length) {
@@ -105,8 +96,7 @@
       btn.type = 'button';
       btn.className = 'ghost';
       btn.textContent = t('res.showMore', {
-        n: Math.min(stapel(), treffer.length - gezeigt),
-        rest: treffer.length - gezeigt,
+        n: Math.min(stapel(), treffer.length - gezeigt), rest: treffer.length - gezeigt,
       });
       btn.addEventListener('click', () => { gezeigt += stapel(); nachlegen(); });
       li.append(btn);
@@ -134,7 +124,7 @@
       : FF.datum(row[SPALTE.VON]);
   }
 
-  /** Preisangabe einer Karte — heutiger Stand, davor der Startpreis. */
+  /** Preisangabe einer Karte — heutiger Stand, dahinter der Startpreis. */
   function preis(row) {
     const start = (row[SPALTE.PREIS_START] || '').trim();
     const seit = start ? ` (${t('card.priceStart')} ${start})` : '';
@@ -145,70 +135,61 @@
 
     const eur = `${row[SPALTE.EUR].toLocaleString(FF.sprache(),
                                                   { minimumFractionDigits: 2 })} €`;
-    // Fremde Währung: umgerechnet zeigen, den Originalpreis dahinter.
+    // Fremde Währung: umgerechnet zeigen, den Originalpreis dahinter. Sonst den
+    // Quelltext nur, wenn er mehr sagt als die Zahl selbst.
     if (FF.FREMDWAEHRUNG.test(roh)) return `${t('card.from')} ${eur} (${roh})` + seit;
-    // Sonst den Quelltext nur zeigen, wenn er mehr sagt als die Zahl selbst.
     return (FF.preisZusatz(roh) ? roh : `${t('card.from')} ${eur}`) + seit;
   }
 
+  const element = (tag, klasse, text) => {
+    const el = document.createElement(tag);
+    if (klasse) el.className = klasse;
+    if (text !== undefined) el.textContent = text;
+    return el;
+  };
+
+  function link(row, text) {
+    const a = element('a', '', text);
+    a.href = row[SPALTE.WEB]; a.target = '_blank'; a.rel = 'noopener';
+    a.title = t('card.websiteTitle', { name: row[SPALTE.NAME] });
+    return a;
+  }
+
   function karte(s) {
-    const row = s.row;
-    const li = document.createElement('li');
-    li.className = 'fest' + (s.pct !== null && s.pct >= 50 ? ' top' : '') +
-                   (row[SPALTE.ABGESAGT] ? ' cancelled' : '');
+    const li = element('li', 'fest' + (s.pct !== null && s.pct >= 50 ? ' top' : '') +
+                             (s.row[SPALTE.ABGESAGT] ? ' cancelled' : ''));
     li.id = s.eintragId;
     li.append(kopf(s), fakten(s), treffernamen(s), lineup(s));
     return li;
   }
 
-  function titel(row) {
-    const h3 = document.createElement('h3');
-    if (row[SPALTE.WEB]) {
-      const a = document.createElement('a');
-      a.href = row[SPALTE.WEB]; a.target = '_blank'; a.rel = 'noopener';
-      a.textContent = row[SPALTE.NAME];
-      a.title = t('card.websiteTitle', { name: row[SPALTE.NAME] });
-      h3.append(a);
-    } else {
-      h3.textContent = row[SPALTE.NAME];
-    }
-    return h3;
-  }
-
   function kopf(s) {
     const row = s.row;
-    const head = document.createElement('div');
-    head.className = 'fest-head';
-
-    const kasten = document.createElement('div');
+    const head = element('div', 'fest-head');
+    const kasten = element('div');
     if (row[SPALTE.ABGESAGT]) {
-      const flagge = document.createElement('span');
-      flagge.className = 'flag';
-      flagge.textContent = t('card.cancelled');
+      const flagge = element('span', 'flag', t('card.cancelled'));
       flagge.title = t('card.cancelledTitle');
       kasten.append(flagge);
     }
-    kasten.append(titel(row));
+    const h3 = element('h3');
+    if (row[SPALTE.WEB]) h3.append(link(row, row[SPALTE.NAME]));
+    else h3.textContent = row[SPALTE.NAME];
+    kasten.append(h3);
     head.append(kasten);
 
     if (s.pct !== null) {
-      const pct = document.createElement('div');
-      pct.className = 'pct';
-      pct.textContent = `${s.pct.toFixed(0)} %`;
-      const klein = document.createElement('small');
-      klein.textContent = t('card.match');
-      pct.append(klein);
-      head.append(pct);
+      const p = element('div', 'pct', `${s.pct.toFixed(0)} %`);
+      p.append(element('small', '', t('card.match')));
+      head.append(p);
     }
     return head;
   }
 
   function fakten(s) {
     const row = s.row;
-    const ul = document.createElement('ul');
-    ul.className = 'facts';
-    const platz = [row[SPALTE.ORT], row[SPALTE.STADT], row[SPALTE.LAND]]
-      .filter(Boolean).join(', ');
+    const ul = element('ul', 'facts');
+    const platz = [row[SPALTE.ORT], row[SPALTE.STADT], row[SPALTE.LAND]].filter(Boolean).join(', ');
     const zeilen = [
       [t('card.date'), termin(row)],
       [t('card.price'), preis(row)],
@@ -218,80 +199,62 @@
         : `${zahl(s.dist)} km`],
     ];
     for (const [k, v] of zeilen) {
-      const el = document.createElement('li');
-      el.innerHTML = `${k}: <b></b>`;
-      el.querySelector('b').textContent = v;
-      ul.append(el);
+      const li = element('li');
+      li.append(`${k}: `, element('b', '', v));
+      ul.append(li);
     }
 
     // Genre-Oberbegriffe des Festivals; die gewählten sind hervorgehoben.
     const genres = row[SPALTE.GENRES] || [];
     if (genres.length) {
-      const el = document.createElement('li');
-      el.className = 'genre-line';
-      el.append(document.createTextNode(t('card.genre') + ': '));
+      const li = element('li', 'genre-line');
+      li.append(t('card.genre') + ': ');
       const getroffen = new Set(s.gHits);
       genres.forEach((g, n) => {
-        const span = document.createElement(getroffen.has(g) ? 'mark' : 'b');
-        span.textContent = FF.genreName(g);
-        el.append(span);
-        if (n < genres.length - 1) el.append(document.createTextNode(' · '));
+        li.append(element(getroffen.has(g) ? 'mark' : 'b', '', FF.genreName(g)));
+        if (n < genres.length - 1) li.append(' · ');
       });
-      ul.append(el);
+      ul.append(li);
     }
 
     if (row[SPALTE.WEB]) {
-      const el = document.createElement('li');
-      const a = document.createElement('a');
-      a.href = row[SPALTE.WEB]; a.target = '_blank'; a.rel = 'noopener';
-      a.textContent = t('card.website');
-      a.title = t('card.websiteTitle', { name: row[SPALTE.NAME] });
-      el.append(a);
-      ul.append(el);
+      const li = element('li');
+      li.append(link(row, t('card.website')));
+      ul.append(li);
     }
     return ul;
   }
 
   function treffernamen(s) {
-    const p = document.createElement('p');
-    p.className = 'hits';
+    const p = element('p', 'hits');
     if (!s.hits.length) { p.hidden = true; return p; }
     const namen = s.hits.sort((a, b) => b[1] - a[1] ||
-      BANDS[a[0]].localeCompare(BANDS[b[0]], FF.sprache()));
-    p.append(document.createTextNode(t('card.yourBands')));
+                                        FF.sammler().compare(BANDS[a[0]], BANDS[b[0]]));
+    p.append(t('card.yourBands'));
     namen.forEach(([b, w], n) => {
-      const span = document.createElement('span');
-      span.className = 'hit' + (w === 2 ? ' dbl' : '');
-      span.textContent = BANDS[b];
-      span.title = t(w === 2 ? 'card.bandDouble' : 'card.bandSingle',
-                     { band: BANDS[b] });
+      const span = element('span', 'hit' + (w === 2 ? ' dbl' : ''), BANDS[b]);
+      span.title = t(w === 2 ? 'card.bandDouble' : 'card.bandSingle', { band: BANDS[b] });
       p.append(span);
-      if (n < namen.length - 1) p.append(document.createTextNode(', '));
+      if (n < namen.length - 1) p.append(', ');
     });
     return p;
   }
 
   function lineup(s) {
     const row = s.row;
-    const det = document.createElement('details');
-    det.className = 'lineup';
-    const kopfzeile = document.createElement('summary');
-    kopfzeile.textContent = t('card.lineup', { n: row[SPALTE.LINEUP].length });
+    const det = element('details', 'lineup');
+    const kopfzeile = element('summary', '', t('card.lineup', { n: row[SPALTE.LINEUP].length }));
     kopfzeile.title = t('card.lineupTitle');
-
-    const alle = document.createElement('div');
-    alle.className = 'all';
+    const alle = element('div', 'all');
     const gewaehlt = new Set(s.hits.map((h) => h[0]));
+    const ordnung = FF.sammler();
     const namen = row[SPALTE.LINEUP].map((b) => [BANDS[b], gewaehlt.has(b)])
-      .sort((a, b) => a[0].localeCompare(b[0], FF.sprache()));
-    namen.forEach(([n, istTreffer], k) => {
-      const el = document.createElement(istTreffer ? 'mark' : 'span');
-      el.textContent = n;
-      alle.append(el);
-      if (k < namen.length - 1) alle.append(document.createTextNode(' · '));
-    });
+      .sort((a, b) => ordnung.compare(a[0], b[0]));
     if (!namen.length) alle.textContent = t('card.noLineup');
-
+    namen.forEach(([n, istTreffer], k) => {
+      alle.append(element(istTreffer ? 'mark' : 'span', '', n));
+      if (k < namen.length - 1) alle.append(' · ');
+    });
     det.append(kopfzeile, alle);
     return det;
   }

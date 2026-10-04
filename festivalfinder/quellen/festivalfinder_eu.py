@@ -11,13 +11,15 @@ from ..kern.fund import Fund, fund
 from ..kern.orte import ist_land, land_code
 from ..kern.text import clean
 from ..netz import Abrufer, soup
-from .basis import Quelle
+from .basis import Quelle, erster_link, ohne_jahr
 
 FF = "https://www.festivalfinder.eu"
 
 LISTE = re.compile(r'href="(/find-festival-organisations/[a-z0-9\-]+)"')
 #: „21 Aug 2026 - 30 Nov 2026", danach „Didymoteicho, Greece"
 TERMIN = re.compile(r"(\d{1,2} [A-Z][a-z]{2} \d{4})\s*[-–]\s*(\d{1,2} [A-Z][a-z]{2} \d{4})")
+ORT = re.compile(r"\s*([^,]{2,40}),\s*([A-Za-zÄÖÜäöü' \-]{3,40}?)\s+"
+                 r"(?:Visit|facebook|instagram|X\b|youtube|The |This )")
 
 
 class FestivalFinderEu(Quelle):
@@ -30,8 +32,8 @@ class FestivalFinderEu(Quelle):
         links: dict[str, None] = {}
         for seite in range(1, 260):
             pfad = f"{FF}/find-festival-organisations" + ("" if seite == 1 else f"/p{seite}")
-            html = netz.fetch(f"{pfad}?query&country&daterange&artDisciplines%5B0%5D=music")
-            if not html:
+            if not (html := netz.fetch(f"{pfad}?query&country&daterange"
+                                       f"&artDisciplines%5B0%5D=music")):
                 break
             neu = {FF + t for t in LISTE.findall(html)
                    if t.rstrip("/") != "/find-festival-organisations"} - set(links)
@@ -48,33 +50,19 @@ class FestivalFinderEu(Quelle):
         name = re.sub(r"\s*[-–|]\s*European Festivals Association\s*$", "", titel)
         if not name or name.lower().startswith("we could not find"):
             return None
-        name = re.sub(r"\s*\b20\d{2}\b\s*$", "", name).strip() or name
 
         flach = clean(s.get_text(" ", strip=True))
-        tm = TERMIN.search(flach)
-        von = zeit.aus_englisch(tm.group(1)) if tm else None
-
-        # Hinter dem Termin stehen Ort und Land: „Didymoteicho, Greece"
         stadt = land = ""
-        if tm:
-            om = re.match(r"\s*([^,]{2,40}),\s*([A-Za-zÄÖÜäöü' \-]{3,40}?)\s+"
-                          r"(?:Visit|facebook|instagram|X\b|youtube|The |This )",
-                          flach[tm.end():tm.end() + 120])
-            if om:
-                stadt = clean(om.group(1))
-                land = land_code(clean(om.group(2)))
+        if (tm := TERMIN.search(flach)) and (om := ORT.match(flach[tm.end():tm.end() + 120])):
+            stadt, land = clean(om.group(1)), land_code(clean(om.group(2)))
         if not ist_land(land):
             return None
 
-        webseite = ""
-        for a in s.find_all("a", href=True):
-            if "visit website" in clean(a.get_text()).lower():
-                webseite = a["href"].strip()
-                break
-
+        von = zeit.aus_englisch(tm.group(1))
         return fund(
-            self.name, url, name,
-            von=von, bis=zeit.aus_englisch(tm.group(2)) if tm else None,
-            stadt=stadt, land=land, webseite=webseite,
+            self.name, url, ohne_jahr(name),
+            von=von, bis=zeit.aus_englisch(tm.group(2)),
+            stadt=stadt, land=land,
+            webseite=erster_link(s, text="visit website"),
             hinweis="" if von else "Termin noch nicht veröffentlicht",
         )

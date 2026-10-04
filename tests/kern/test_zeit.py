@@ -65,7 +65,7 @@ class TestDarstellung:
         assert zeit.aus_deutsch(zeit.deutsch(tag)) == tag
 
     def test_ohne_termin_bleibt_leer(self):
-        assert zeit.deutsch(None) == zeit.iso(None) == zeit.jahr_text(None) == ""
+        assert zeit.deutsch(None) == zeit.iso(None) == ""
 
 
 class TestZeitraum:

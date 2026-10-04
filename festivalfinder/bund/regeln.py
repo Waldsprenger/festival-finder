@@ -15,6 +15,9 @@ from ..kern.text import city_key, eng, festival_key, fold
 #: Eine vorangestellte Ausgabenummer: „37. Fränkische Musiktage", „30th Denton"
 ORDNUNGSZAHL = re.compile(r"^\d+\s*(?:th|st|nd|rd)?\s+")
 
+#: Ein Zusatz, der eine eigene Veranstaltung rund um das Fest benennt
+BEIPROGRAMM = re.compile(r"\b(?:road to|warm ?up|pre ?party|after ?party|after ?show)\b")
+
 #: Deutsche Umlaute schreiben die Quellen mal so, mal so. „Glücksgefühle"
 #: wird zu „glucksgefuhle", „Gluecksgefuehle" zu „gluecksgefuehle" — zwei
 #: Schlüssel für ein Fest. Zusammengezogen treffen sie sich wieder.
@@ -106,10 +109,14 @@ def name_deckt_sich(ka: str, kb: str) -> bool:
     Veranstaltungen. Verlangt wird, dass ein Name vollständig im anderen steckt
     („Neuborn" in „NOAF Neuborn") oder beide ohne Leerzeichen gleich sind
     („R.O.I. Rock On Isens" und „ROI Rock On Isens").
+
+    Kein Treffer ist ein Name, der nur um ein Beiprogramm länger ist: Die
+    „Road To Bay Fest"-Reihe endet am ersten Tag des „Bay Fest", überschneidet
+    sich also, und ist trotzdem eine eigene Veranstaltung.
     """
     ta, tb = set(ka.split()), set(kb.split())
     if ta and tb and (ta <= tb or tb <= ta):
-        return True
+        return bool(BEIPROGRAMM.search(ka)) == bool(BEIPROGRAMM.search(kb))
     return ka.replace(" ", "") == kb.replace(" ", "")
 
 

@@ -95,6 +95,19 @@
   //: Währungen, die erst umgerechnet vergleichbar sind
   const FREMDWAEHRUNG = /\b(CHF|GBP|USD|DKK|SEK|NOK|PLN|CZK|HUF)\b|£|\$/i;
 
+  /** Alphabetische Ordnung in der geltenden Sprache — einmal je Sprache
+      gebaut. `a.localeCompare(b, sprache)` baut sie bei jedem Vergleich neu,
+      und eine Bandsuche vergleicht Tausende Namen. */
+  let ordnungFuer = null, ordnung = null;
+  function sammler() {
+    const sprache = FF.sprache();
+    if (sprache !== ordnungFuer) {
+      ordnung = new Intl.Collator(sprache);
+      ordnungFuer = sprache;
+    }
+    return ordnung;
+  }
+
   Object.assign(FF, { fold, heute, datum, stand, preisZusatz, aufzaehlen,
-                    FREMDWAEHRUNG });
+                    FREMDWAEHRUNG, sammler });
 })();

@@ -157,8 +157,41 @@ def kurze_codes(alle: list[list]) -> set[str]:
     return {cc for cc, n in laenge.items() if n <= 4}
 
 
+#: Was dieser Schritt aus dem Netz holt — und damit alles, was in ORDNER liegen darf
+QUELLEN = (["countryInfo.txt", "zip_allCountries.zip", "dump_cities15000.zip",
+            "dump_cities1000.zip"] + [f"dump_{cc}.zip" for cc in FEIN_BAU])
+#: Was er schreibt
+ERGEBNISSE = ["laender.json", "gazetteer.json", "laender_rahmen.json", "plz.json",
+              "verortung.json"]
+
+
+def aktuell() -> bool:
+    """Sind alle Ergebnisse da und jünger als jede heruntergeladene Quelle?
+
+    Dann gäbe ein neuer Durchgang dieselben Dateien — 13 Sekunden und das
+    Einlesen von 60 MB Zip-Archiven für nichts. GeoNames-Daten ändern sich
+    hier nur, wenn jemand die Downloads löscht.
+    """
+    quellen = [ORDNER / q for q in QUELLEN]
+    ergebnisse = [DATA / e for e in ERGEBNISSE]
+    if not all(p.exists() for p in quellen + ergebnisse):
+        return False
+    return min(p.stat().st_mtime for p in ergebnisse) >= max(p.stat().st_mtime for p in quellen)
+
+
+def aufraeumen() -> list[str]:
+    """Downloads unter früheren Namen löschen. Sie lagen jahrelang im
+    Zwischenspeicher des Serverlaufs — 34 MB, die niemand mehr las."""
+    weg = []
+    for datei in ORDNER.glob("*"):
+        if datei.is_file() and datei.name not in QUELLEN:
+            datei.unlink()
+            weg.append(datei.name)
+    return weg
+
+
 def bauen(netz: Abrufer) -> dict:
-    """Alle vier Dateien erzeugen; gibt die Kennzahlen zurück."""
+    """Alle fünf Dateien erzeugen; gibt die Kennzahlen zurück."""
     laender = laendertabelle(netz)
     schreib_json(DATA / "laender.json", laender)
 

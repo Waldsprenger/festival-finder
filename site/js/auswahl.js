@@ -73,8 +73,8 @@
       }
     }
     const alle = anfang.concat(enthalten);
-    alle.sort((a, b) => bandFreq[b] - bandFreq[a] ||
-                        BANDS[a].localeCompare(BANDS[b], FF.sprache()));
+    const ordnung = FF.sammler();
+    alle.sort((a, b) => bandFreq[b] - bandFreq[a] || ordnung.compare(BANDS[a], BANDS[b]));
     return alle;
   }
 
@@ -158,7 +158,7 @@
     }
 
     const eintraege = [...state.bands.auswahl.entries()]
-      .sort((a, b) => BANDS[a[0]].localeCompare(BANDS[b[0]], FF.sprache()));
+      .sort((a, b) => FF.sammler().compare(BANDS[a[0]], BANDS[b[0]]));
 
     for (const [i, gewicht] of eintraege) {
       const li = document.createElement('li');
@@ -201,7 +201,7 @@
     liste.innerHTML = '';
 
     const reihe = GENRES.map((_, i) => i)
-      .sort((a, b) => genreName(a).localeCompare(genreName(b), FF.sprache()));
+      .sort((a, b) => FF.sammler().compare(genreName(a), genreName(b)));
 
     const frag = document.createDocumentFragment();
     for (const i of reihe) {

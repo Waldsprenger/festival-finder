@@ -5,20 +5,20 @@ eine statische Webseite, die daraus Schritt für Schritt nach Ort, Zeitraum,
 Entfernung, Preis, Bands und Genre filtert. Ein Datenlauf hält beides aktuell,
 ohne dass ein Rechner dafür laufen muss.
 
-**Stand:** 13.339 Festivals in 135 Ländern, 86.266 Acts, 3.049 Festivals aus mehr
+**Stand:** 13.563 Festivals in 136 Ländern, 92.187 Acts, 3.422 Festivals aus mehr
 als einer Quelle · [Änderungshistorie](https://github.com/Waldsprenger/festival-finder/commits/main)
 
 ```
    zwölf Quellen
         │  quellen/          je Quelle eine Datei: Adressen finden, Seite lesen
         ▼
-   23.805 Funde              Fund: eingefrorener Datensatz mit festen Feldern
+   24.231 Funde              Fund: eingefrorener Datensatz mit festen Feldern
         │  bund/             acht Stufen gegen Dubletten
         ▼
-   13.339 Festivals   →   data/festivals.json
+   13.563 Festivals   →   data/festivals.json
         │  ausgabe/          Koordinaten, Preise, Genres, Zahlenreihen
         ▼
-   site/data.js  →  die Webseite
+   site/data.js + geo.js  →  die Webseite
 ```
 
 ## Der Aufbau
@@ -35,7 +35,7 @@ nichts voneinander.
 | `festivalfinder/kern/zeit.py` | jede Schreibweise der Quellen → ein `date` |
 | `festivalfinder/kern/text.py` | Namen vereinheitlichen: Schlüssel, Bandnamen, Kürzel |
 | `festivalfinder/kern/geld.py` | Preise lesen, prüfen, in Euro umrechnen |
-| `festivalfinder/kern/orte.py` | Länder, Erdteile, Länderkästen, Koordinatenprüfung |
+| `festivalfinder/kern/orte.py` | Länder, Überseegebiete, Länderkästen, Koordinatenprüfung |
 | `festivalfinder/kern/genres.py` | Genre-Freitext → 17 Oberbegriffe |
 | `festivalfinder/kern/fund.py` | `Fund`: was eine Quelle liefert, samt Trichter |
 | `festivalfinder/kern/festival.py` | `Festival`: was daraus wird, samt Ausgabeform |
@@ -64,7 +64,7 @@ nichts voneinander.
 | **`ausgabe/`** | **was der Lauf hinterlässt** |
 | `festivalfinder/ausgabe/dateien.py` | `data/festivals.json` und drei CSV-Tabellen |
 | `festivalfinder/ausgabe/verorten.py` | vier Ränge auf dem Weg zur Koordinate |
-| `festivalfinder/ausgabe/daten_js.py` | → `site/data.js` und `site/orte.js` |
+| `festivalfinder/ausgabe/daten_js.py` | → `site/data.js`, `site/geo.js` und `site/orte.js` |
 | `festivalfinder/ausgabe/seitenteile.py` | welche Dateien die Seite lädt — aus ihr selbst gelesen |
 | `festivalfinder/ausgabe/uebersicht.py` | → `data/uebersicht.html`, Kontrolltabelle |
 | `festivalfinder/ausgabe/pwa.py` | Manifest, App-Symbole, Service Worker |
@@ -94,7 +94,7 @@ Der Service Worker und die gebündelte Einzelseite lesen genau diese Liste.
 | `site/style.css` | Aussehen, inklusive der Regeln fürs Telefon |
 | `site/js/config.js` | einzige Einstellung: Kennung für die Zugriffszählung |
 | `site/js/i18n.js` | rund 220 Texte in zehn Sprachen |
-| `site/js/daten.js` | `window.DATA`, Spaltennamen, abgeleitete Register |
+| `site/js/daten.js` | `window.DATA`, Spaltennamen, abgeleitete Register, Geodaten nachladen |
 | `site/js/text.js` | `fold` nach den Regeln aus `data/faltung.json`, Formatierung |
 | `site/js/sprache.js` | Übersetzen und Umschalten |
 | `site/js/zustand.js` | was eingestellt ist, was daraus folgt, wie sortiert wird |
@@ -106,7 +106,8 @@ Der Service Worker und die gebündelte Einzelseite lesen genau diese Liste.
 | `site/js/wunsch.js` | gemerkte Suchen und was seit dem letzten Besuch dazukam |
 | `site/js/oberflaeche.js` | Hilfetexte, Installation, Zählung, Rückmeldung, Rechtstexte |
 | `site/js/start.js` | die Verdrahtung |
-| `site/data.js` | die Daten, von `ausgabe/daten_js.py` erzeugt |
+| `site/data.js` | die Festivals, von `ausgabe/daten_js.py` täglich erzeugt |
+| `site/geo.js` | Orte, Postleitzahlen, Kartenumrisse — ändern sich selten, bleiben im Speicher |
 | `site/orte.js` | das große Ortsverzeichnis, nur bei Bedarf nachgeladen |
 
 ## Selbst bauen
@@ -128,10 +129,19 @@ starten:
 python -m festivalfinder sammeln --limit 20   # Testlauf mit wenigen Seiten
 python -m festivalfinder sammeln --frisch     # jede Seite neu abrufen
 python -m festivalfinder sammeln --since 2006 # das komplette Archiv
+python -m festivalfinder alles --offline      # nur aus dem Zwischenspeicher, kein Abruf
 python -m festivalfinder bauen                # nur die Webseite
 python -m festivalfinder verzeichnis          # Ortsverzeichnis erneuern
 python -m festivalfinder karte                # Kartengrenzen erneuern
+python -m festivalfinder symbole              # App-Symbole neu zeichnen
 ```
+
+`--offline` nimmt jede Seite aus `cache/`, gleich wie alt, und fragt keinen
+Rechner — weder die Quellen noch Nominatim. Damit lässt sich eine Änderung am
+Code gegen genau dieselben Seiten prüfen, ohne die Quellen ein zweites Mal zu
+belasten. Ortsverzeichnis und Kartengrenzen überspringt `alles` von selbst,
+solange ihre Dateien vollständig da sind; die Schrift gehört nicht mehr zum
+täglichen Lauf, sie liegt fertig im Projekt.
 
 Die Webseite braucht keinen Server; `site/index.html` lässt sich per
 Doppelklick öffnen.
@@ -241,8 +251,8 @@ Geokodierer. An ihre Stelle ist die Frage getreten, die immer die eigentliche
 war: **Ist das überhaupt ein Land?** Sie hält „Bayern" und „Region Hannover"
 draußen, ohne einen Erdteil auszuschließen.
 
-Dafür kennt `gemeinsam.py` jetzt alle 252 Staaten samt Erdteil — die Liste
-entsteht in `build_gazetteer.py` aus der Länderdatei von GeoNames und liegt als
+Dafür kennt `festivalfinder/kern/orte.py` jetzt alle 252 Staaten — die Liste
+entsteht in `festivalfinder/werkzeug/gazetteer.py` aus der Länderdatei von GeoNames und liegt als
 `data/laender.json` bei. Deutsche Namen stehen weiter von Hand darin, weil die
 Quellen deutsch schreiben; die englischen kommen aus der Datei.
 
@@ -356,17 +366,17 @@ ein Tippfehler in genau dem Wort, das den Namen ausmacht. Die Liste lässt sich
 ohne Codeänderung erweitern; der Name wird schon beim Einlesen ersetzt, sodass
 alle Stufen und die Anzeige dieselbe Schreibweise sehen.
 
-**Sieben Stufen** führen die Einträge zusammen. Die ersten sechs verlangen
+**Acht Stufen** führen die Einträge zusammen. Die ersten sechs verlangen
 verschiedene Quellen — dieselbe Quelle führt kein Festival zweimal, wohl aber
 zwei gleichnamige an verschiedenen Orten. Die siebte ist die eng gefasste
 Ausnahme davon:
 
 | Stufe | Kriterium | Fängt ab |
 |---|---|---|
-| 1 | Name + Jahr + Stadt exakt | den Normalfall |
+| 1 | Name + Jahr + Stadt exakt — außer eine Quelle nennt selbst zwei weit entfernte Termine, oder die Länder unterscheiden sich bei weit entferntem oder fehlendem Termin | den Normalfall; getrennt bleiben Bo-Mit-Rock im März und im September, „Bergenfest" (NO) und „Bergen Live" (NL) |
 | 2 | eindeutige Quellenpaare zu Name + Jahr, Termine höchstens 14 Tage auseinander | abweichende Ortsschreibweisen („Stemwede" / „Wehdem", „Kattowitz" / „Katowice") |
 | 3 | gleicher Starttermin + Ort + gemeinsamer Namensteil | „Kosmos Festival" gegen „Kosmos Festival Chemnitz" |
-| 4 | überlappender Zeitraum + Ort **oder Spielstätte**, Name steckt im anderen | um einen Tag versetzte Termine (Neuborn Open Air), Gemeinde gegen Spielstätte (Thallichtenberg / Burg Lichtenberg) |
+| 4 | überlappender Zeitraum + Ort **oder Spielstätte**, Name steckt im anderen, kein Beiprogramm („Road to", „Warm-up", „Afterparty") | um einen Tag versetzte Termine (Neuborn Open Air), Gemeinde gegen Spielstätte (Thallichtenberg / Burg Lichtenberg) |
 | 5 | ähnliche Schreibweise (82 %), gleicher Ort, überlappender Zeitraum | „SonneMondSterne", „Elbriot", „Szigit" |
 | 6 | gleicher Name, eine Quelle ohne Termin, gleicher Ort **oder dieselbe offizielle Adresse** | Übersichtsseiten ohne bestätigtes Datum |
 | 7 | derselbe Namenskern, gleicher Ort, überlappender Termin — auch aus einer Quelle | „Glücksgefühle" und „Gluecksgefuehle" in Hockenheim; „Time Warp Festival" und „Time Warp Germany" in Mannheim |
@@ -413,6 +423,36 @@ Festivals ist, sonst verlöre „Rock am Ring" seinen Ring.
 Zwei Ausgaben desselben Festivals im selben Jahr (Heartbeatz im Juni und im
 September) trennt weiterhin der Termin.
 
+**Wo der genaue Schlüssel zu viel verbindet.** Stufe 1 fragte bis Oktober 2026
+nur nach Name, Jahr und Stadt. Das verband dreierlei, was nicht zusammengehört:
+
+* **Zwei Ausgaben eines Jahres.** festivalsunited führt das Bassmania Festival
+  in Münster fünfmal, festivalticker Bo-Mit-Rock im März und im September — je
+  mit eigener Seite. Daraus wurde ein Eintrag mit dem frühesten Termin und der
+  Adresse der zuletzt gelesenen Seite. Jetzt gilt: Nennt **eine Quelle selbst**
+  zwei Termine, die mehr als 14 Tage auseinanderliegen, sind es zwei Feste.
+  Nennt nur eine Quelle einen abweichenden Termin, irrt sie meist —
+  festival-alarm datierte Elbjazz auf den Juni —, und es bleibt bei einem.
+* **Zwei Länder.** „Bergenfest" in Norwegen und „Bergen Live" in den
+  Niederlanden haben denselben Schlüssel. Und festivism führt „Edgefest" für
+  Kanada, Neuseeland und die USA ohne Ort und Termin; aus allen dreien wurde
+  einer, und „Africa Festival" in Würzburg verlinkte auf „Africa Live" im
+  Senegal. Ein anderes Land trennt jetzt, wenn die Termine weit
+  auseinanderliegen oder beide fehlen. Bei nahem Termin irrt eher eine Quelle
+  beim Land: wannafest führt manches Hamburger Fest unter den Niederlanden.
+* **Ein Beiprogramm** (Stufe 4). Die „Road To Bay Fest"-Reihe läuft vom 10.
+  Juli bis zum 12. August und endet am ersten Tag des „Bay Fest"; ein Name
+  steckt im anderen, die Zeiträume überlappen. Ein Name, der nur um „Road to",
+  „Warm-up", „Pre-Party" oder „Afterparty" länger ist, gilt jetzt nicht mehr
+  als derselbe. Ein späterer Beginn allein trennt dagegen nicht: Die
+  Konzertreihe ICÓNICA in Sevilla beginnt bei drei Quellen am 29. Mai, am 1.
+  und am 17. Juni und ist trotzdem eine.
+
+Zusammen 24 Festivals mehr, jedes mit dem Link auf seine eigene Seite. Weil sich die getrennten Einträge Name, Jahr und Ort teilen, bekommen
+sie für Preisgeschichte und Neuzugänge einen Zusatz zur Kennung — das Land oder
+den Termin. Der früheste behält die bisherige, damit kein bekanntes Fest über
+Nacht als neu erscheint.
+
 Beim Verbinden füllt jede Quelle die Lücken der anderen, Genres werden
 gesammelt statt ersetzt, eine Absage aus einer Quelle genügt, und der Zeitraum
 spannt vom frühesten Beginn bis zum spätesten Ende.
@@ -420,7 +460,7 @@ spannt vom frühesten Beginn bis zum spätesten Ende.
 **Was kein Land ist, fliegt raus** — „Bayern" und „Region Hannover" stehen
 manchmal im Länderfeld. Die Prüfung fragt nicht mehr nach dem Erdteil, sondern
 ob hinter der Angabe ein Staat steht: `data/laender.json` führt alle 252 mit
-ISO-Kürzel und Erdteil, dazu kommen die deutschen Namen aus `gemeinsam.py`.
+ISO-Kürzel, dazu kommen die deutschen Namen aus `festivalfinder/kern/orte.py`.
 Eine unbekannte längere Angabe kostet nur das Länderfeld, nicht das Festival:
 Ort und Koordinate bleiben.
 
@@ -580,9 +620,19 @@ verschwinden, fallen aus der Datei — sonst wüchse sie mit jedem Jahrgang.
 ## Die Webseite (`site/`)
 
 Reines HTML und JavaScript, kein Server, keine Cookies, keine fremden Dateien.
-Alle Daten stehen in `site/data.js` als Zahlenreihen: Bands und Genres nur als
-Index, das drückt 5.524 Festivals mit 40.547 Acts auf 6,1 MB (2,1 MB über die
-Leitung, weil GitHub Pages komprimiert).
+Die Festivals stehen in `site/data.js` als Zahlenreihen: Bands und Genres nur
+als Index, das drückt 13.563 Festivals mit 92.187 Acts auf 4,6 MB (1,9 MB über
+die Leitung, weil GitHub Pages komprimiert).
+
+**Was sich täglich ändert, und was nicht.** Bis Oktober 2026 standen auch
+Ortsverzeichnis, Postleitzahlen und Kartenumrisse in `data.js` — 5,1 MB, die
+sich fast nie ändern und trotzdem nach jedem nächtlichen Lauf neu geladen
+wurden. Sie stehen jetzt in `site/geo.js?v=<Stand>`: Der Stand ist ein
+Prüfwert über den Inhalt, und eine Datei mit Stand im Namen ändert sich nie.
+Der Service Worker hält sie deshalb ohne Rückfrage vor; neu geladen wird erst,
+wenn sich das Verzeichnis wirklich ändert. Die Seite zeichnet die Liste, bevor
+`geo.js` da ist, und holt sie im Leerlauf nach — Karte und Wohnortsuche warten
+darauf, die Liste nicht.
 
 Der Code liegt in zwölf Teilen: `karte.js` zeichnet die Landkarte und kennt vom
 Rest nur vier Handgriffe (`start`, `zeichnen`, `setzePins`, `zentrieren`), die
@@ -597,10 +647,10 @@ angeben, per Postleitzahl oder Ortsname; daraus rechnet die Seite jede
 Entfernung. Vier
 Stufen, von der billigsten zur teuersten:
 
-1. **Mitgeliefert** (in `data.js`): die Postleitzahlen von DE/AT/CH und alle
+1. **Mitgeliefert** (in `geo.js`): die Postleitzahlen von DE/AT/CH und alle
    Orte der Welt ab 15.000 Einwohnern, DE/AT/CH vollständig — 116.653 Stück.
    Damit ist der Normalfall ohne einen einzigen Netzabruf beantwortet.
-2. **Nachgeladen** (`site/orte.js`, 1,9 MB übertragen): 155.344 Orte bis
+2. **Nachgeladen** (`site/orte.js`, 3,2 MB übertragen): 155.344 Orte bis
    hinunter zu kleinen Gemeinden und 24.893 Postleitzahlen der Länder, deren
    Codes höchstens vierstellig sind. Die Datei kommt erst, wenn die kleine
    Tabelle nichts hergibt — wer „97209" eingibt, lädt sie nie.
@@ -628,7 +678,7 @@ fehlende Angaben immer am Ende. Gezeichnet wird in Stapeln — 25 Karten am
 Telefon, 50 am Rechner; alle 300 auf einmal ergaben eine Seite von 109.000
 Pixeln Höhe.
 
-`build_site.py` prüft seine eigene Ausgabe, bevor sie in die Datei geht: 15
+`festivalfinder/ausgabe/daten_js.py` prüft seine eigene Ausgabe, bevor sie in die Datei geht: 16
 Spalten je Zeile, jede Bandnummer und jeder Genreindex innerhalb der Liste,
 Koordinaten immer paarweise, Preise im plausiblen Bereich. Stimmt etwas nicht,
 bricht der Lauf ab — dann bleibt die veröffentlichte Seite beim letzten guten
@@ -639,7 +689,9 @@ Stand, statt still leer zu bleiben.
 liest JSON etwa doppelt so schnell wie gleichwertigen Quelltext (gemessen 64
 statt 137 ms für 6 MB — auf dem Telefon entsprechend mehr). Der Service Worker
 gibt dem Netz 2,5 Sekunden; danach zeigt er den gespeicherten Stand und lädt im
-Hintergrund weiter, statt am leeren Bildschirm zu warten. Ortsverzeichnis und
+Hintergrund weiter, statt am leeren Bildschirm zu warten. Dateien mit Stand im
+Namen (`geo.js?v=…`, `orte.js?v=…`) fragt er gar nicht erst nach, und beim
+Wechsel auf einen neuen Stand räumt er den alten weg. Ortsverzeichnis und
 Postleitzahlen werden auf drei Nachkommastellen gekürzt — 110 Meter genügen für
 einen Wohnort, den ein Umkreisfilter in Kilometern auswertet.
 
@@ -691,8 +743,8 @@ Vier Entscheidungen, die dahinterstehen:
   Sie zeigen mit Zeilen- und Bandnummern in `data.js` hinein, und die werden
   bei jedem Bau neu vergeben; zwei getrennte Dateien können aus zwei
   verschiedenen Läufen stammen. Genau das wäre der Normalfall gewesen, nicht
-  die Ausnahme: Der Service Worker gibt dem Netz 2,5 Sekunden, und die 9,2 MB
-  von `data.js` verlieren dieses Rennen auf dem Telefon fast immer, während
+  die Ausnahme: Der Service Worker gibt dem Netz 2,5 Sekunden, und die
+  Megabytes von `data.js` verlieren dieses Rennen auf dem Telefon fast immer, während
   eine kleine Nebendatei es gewinnt. In der installierten App hätte die
   Meldung damit meistens geschwiegen — ohne ein Wort dazu. In einer Datei kann
   das nicht passieren, und die gebündelte Einzelseite bekommt sie gratis mit.
@@ -747,7 +799,7 @@ erspart den zwölf Quellen einen Abruf je Commit und dem Lauf zehn Minuten; die
 Seite ist trotzdem gleich nach dem Push auf dem neuen Stand. Möglich ist das,
 weil ein Sammellauf genau ein Ergebnis hinterlässt — `data/festivals.json` —
 und alles Weitere daraus abgeleitet wird: die drei CSV-Tabellen, die
-Kontrolltabelle, `data.js`, `orte.js`, die Einzelseite. Fehlt der Bestand, weil
+Kontrolltabelle, `data.js`, `geo.js`, `orte.js`, die Einzelseite. Fehlt der Bestand, weil
 der Zwischenspeicher abgelaufen ist, läuft stattdessen der volle Lauf; ohne ihn
 gäbe es nichts zu bauen.
 
@@ -824,7 +876,7 @@ Mindestabstand, bevor es so weit kommt.
 pip install pytest pyflakes && python -m pytest tests -q
 ```
 
-769 Tests in knapp acht Sekunden, ohne Netz und ohne Datenbestand. Sie halten
+780 Tests in knapp acht Sekunden, ohne Netz und ohne Datenbestand. Sie halten
 fest, warum die Regeln so aussehen, wie sie aussehen — fast jeder Fall stand
 einmal falsch in den Daten:
 
@@ -1132,6 +1184,45 @@ dasselbe Ergebnis. Und jambase baut für den einen Verweis, den es von der
 Seite braucht, nur noch die Verweise als Baum auf: 40 statt 61 Millisekunden
 je Seite.
 
+### Der Neuaufbau im Oktober 2026
+
+Jedes Modul wurde neu geschrieben und gegen den alten Code geprüft, auf genau
+denselben Seiten: Beide lasen offline dieselben 24.231 Funde aus dem
+Zwischenspeicher, und jeder Unterschied im Ergebnis musste sich als behobener
+Fehler erklären lassen. Gefunden hat das:
+
+* **Postleitzahlen im Ort** in jeder Schreibweise, die nicht deutsch ist:
+  „BN2 Brighton", „80-873 Gdańsk", „6060-133 Idanha-a-Nova", „1012 AB
+  Amsterdam". Der Ort taugte so weder fürs Zusammenführen noch für die Karte.
+* **„und weitere"** als Act in 302 Lineups, **Prosa als Künstlerliste** bei
+  festival-alarm, eine Jahreszahl oder Wikidata-Kennung als Ort, 85
+  festivalabroad-Einträge, deren „offizielle Seite" die eigene war, 1.054
+  Adressen mit Zählparametern (`utm_…`), die Spielstätte als Wiederholung des
+  Orts, festapp-Regionen („QC H2X") statt Städten, „- 2026" im Namen.
+* **Die Zusammenführung** — siehe „Wo der genaue Schlüssel zu viel verbindet".
+
+Und schneller wurde, was nicht jeden Tag neu sein muss:
+
+* **`data.js` von 9,8 auf 4,6 MB**, weil Orte und Karte in `geo.js` gezogen
+  sind und dort im Speicher bleiben. Dazu fielen Felder weg, die die Seite
+  nicht mehr las: die Erdteile und die Höchstwerte der Schieberegler, die es
+  seit der Umstellung auf ein Eingabefeld nicht mehr gibt.
+* **Unveränderte Schritte laufen nicht.** Ortsverzeichnis und Kartengrenzen
+  werden nur gebaut, wenn ihre Dateien fehlen; Dateien werden nur geschrieben,
+  wenn sich ihr Inhalt geändert hat, und App-Symbole nur gezeichnet, wenn es
+  sie nicht gibt.
+* **Die Seite rechnet einmal statt sechsmal**: Die Restzahl je Schritt kommt
+  aus einem Durchlauf über alle Festivals, Entfernungen werden je Wohnort
+  einmal gerechnet und gemerkt.
+
+Gemessen und offen gelassen: Liest ein Lauf alles aus dem Zwischenspeicher,
+dauert er gut sieben Minuten, und neun Zehntel davon gehen an den HTML-Parser
+von Python (30 ms je Seite bei festivalsunited). Im täglichen Lauf fällt das
+nicht ins Gewicht — festivalticker braucht mit seinem Abstand ohnehin 110
+Minuten, und gelesen wird nebenher. Das Paket `lxml` würde den Parser etwa
+verdreifachen, ist aber eine zusätzliche Abhängigkeit und müsste gegen alle
+24.231 Funde geprüft werden; es ist deshalb nicht eingebaut.
+
 ### Was nachweislich in Ordnung ist
 
 Nicht jede Prüfung findet etwas, und das ist auch ein Ergebnis. Nachgemessen
@@ -1176,15 +1267,16 @@ Ausfall wird morgen erneut gefragt.
 
 ## Bekannte Grenzen
 
-- **Die Seite wiegt 3,4 MB** (gepackt; 9,1 MB roh). Das ist der Preis dafür,
-  dass alles in einer Datei steht und ohne Server läuft: 13.435 Festivals,
-  81.004 Acts, 116.653 Orte. Nach dem ersten Besuch liegt sie im
-  Anwendungsspeicher; unterwegs beim ersten Mal ist es viel.
-- **5.621 Festivals haben keinen Termin.** Sie kommen aus festivism und aus
+- **Die Seite wiegt beim ersten Besuch 3,6 MB** (gepackt; 9,7 MB roh): 1,9 MB
+  Festivals, die täglich neu kommen, und 1,8 MB Orte und Karte, die bleiben.
+  Das ist der Preis dafür, dass alles ohne Server läuft: 13.563 Festivals,
+  92.187 Acts, 116.653 Orte. Danach lädt ein Besuch nur noch die
+  Festivaldatei; unterwegs beim ersten Mal ist es trotzdem viel.
+- **3.991 Festivals haben keinen Termin.** Sie kommen aus festivism und aus
   den festivalabroad-Seiten, deren nächste Ausgabe noch nicht feststeht.
   Voreingestellt sind sie ausgeblendet; der Schalter „Festivals ohne Termin
   mitzeigen" holt sie herein.
-- **Lineups gibt es für 4.611 Festivals**, überwiegend aus festivalsunited,
+- **Lineups gibt es für 5.332 Festivals**, überwiegend aus festivalsunited,
   festivalhopper und jambase. festivalabroad hat 10.000 Künstlerseiten, die
   Auftritte nennen könnten — in einer Stichprobe von acht hatte genau eine
   einen Eintrag. 10.000 Abrufe für schätzungsweise 1.500 Zeilen wären der

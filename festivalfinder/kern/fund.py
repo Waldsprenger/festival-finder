@@ -1,28 +1,25 @@
 """Ein Fund: was eine Quelle über eine Veranstaltung hergibt.
 
-Früher war das ein Wörterbuch mit zweiundzwanzig Schlüsseln. `rec["date_form"]`
-statt `rec["date_from"]` fiel dann erst zur Laufzeit auf — bei `.get()` gar
-nicht, da kam still `None` zurück. Jetzt ist es ein eingefrorener Datensatz mit
-festen Feldern: Ein Tippfehler wirft einen `AttributeError`, sobald die Zeile
-läuft, und ein Fund lässt sich nach dem Bauen nicht mehr heimlich ändern.
+Ein eingefrorener Datensatz mit festen Feldern: Ein Tippfehler im Feldnamen
+wirft sofort, und nach dem Bauen lässt sich nichts mehr heimlich ändern.
 
 `fund()` ist der Trichter, durch den jede Quelle geht. Hier steht, was für alle
 zwölf gilt — und nirgends sonst.
 """
 
+import re
 from dataclasses import dataclass, field
 from datetime import date
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from . import geld, orte, text
 
 
 @dataclass(frozen=True, slots=True)
 class Fund:
-    """Was eine Quelle liefert — geprüft und geradegezogen.
-
-    Gebaut wird ein Fund über `fund()`, nicht über den Konstruktor: Nur dort
-    laufen die Prüfungen, die für alle Quellen gelten.
-    """
+    """Was eine Quelle liefert — geprüft und geradegezogen. Gebaut wird ein
+    Fund über `fund()`, nicht über den Konstruktor: Nur dort laufen die
+    Prüfungen."""
 
     quelle: str
     url: str
@@ -45,6 +42,12 @@ class Fund:
     lineup: tuple[str, ...] = field(default_factory=tuple)
 
 
+#: Was als Ortsname dasteht, aber keiner ist: eine Jahreszahl gehört zum
+#: Festivalnamen („Immergut Festival 2026" stand bei 24 Festivals im
+#: Ortsfeld), eine Wikidata-Kennung („Q226941") zum Datenblatt dahinter.
+_KEIN_ORT = re.compile(r"\b(?:19|20)\d\d\b|^Q\d+$")
+
+
 def fund(quelle: str, url: str, name: str, *,
          von: date | None = None, bis: date | None = None, jahr: str = "",
          stadt: str = "", land: str = "", ort: str = "", plz: str = "",
@@ -52,68 +55,61 @@ def fund(quelle: str, url: str, name: str, *,
          preis: str = "", webseite: str = "", genre: str = "",
          besucher: str = "", hinweis: str = "", abgesagt: bool = False,
          lineup=None) -> Fund:
-    """Ein Fund, wie ihn alle Quellen abliefern.
+    """Ein Fund, wie ihn alle Quellen abliefern. Geradegezogen wird hier:
 
-    Hier wird geradegezogen, was sonst jede Quelle einzeln beachten müsste —
-    und hier steht die Plausibilitätsprüfung, die für alle zwölf gilt:
-
-    * Der Name folgt der Liste in `data/festival_aliase.json`, falls er dort
-      steht — für Fälle, die kein Buchstabenvergleich findet.
-    * Das Jahr richtet sich nach dem Termin. Steht im Titel ein anderes als im
-      Datum („Sommer im Park Gera 2027" mit Termin im August 2026), gilt der
-      Termin: Er ist die genauere Angabe.
-    * Das Land als Kürzel, nicht als Name. Sechs Leser lieferten „DE", zwei
-      „Deutschland", und geradegezogen wurde es erst beim Zusammenführen. Zwei
-      Schreibweisen für dieselbe Sache sind eine Fehlerquelle, auch wenn am
-      Ende beide richtig ankommen.
-    * Die Besucherzahl ist eine einzelne, plausible Zahl — oder keine.
-    * Ein Act steht einmal im Lineup, auch wenn er an zwei Tagen spielt.
-    * Der Preis nennt eine Zahl oder freien Eintritt; „Pop Punk" ist kein Preis.
-    * Steht die Postleitzahl im Ortsfeld („104 45 Athen"), gehört sie ins
-      Postleitzahlfeld.
+    * Der Name folgt `data/festival_aliase.json`, wo kein Buchstabenvergleich
+      hilft.
+    * Ein Termin, der vor seinem Anfang endet, ist keiner (festivalabroad:
+      NorthSide vom 12. bis 6. Juni). Ohne Termin findet der Eintrag über Ort
+      und Namen zu dem, den die anderen Quellen datieren.
+    * Das Jahr richtet sich nach dem Termin, nicht nach dem Titel.
+    * Das Land als Kürzel, nicht als Name.
+    * Die Postleitzahl gehört ins Postleitzahlfeld, nicht vor den Ortsnamen;
+      eine Jahreszahl oder Wikidata-Kennung ist kein Ort.
+    * Eine Spielstätte, die nur den Ort wiederholt, sagt nichts — auf der
+      Karte stand sonst „Winnipeg, Winnipeg, CA", bei allen 2.960 Funden von
+      festapp.
     * Eine Koordinate muss auf der Erde liegen, nicht bei null Grad null — und
-      in dem Land, das die Quelle nennt. Sonst steht Lollapalooza Berlin in
-      Chicago und das LongLake Festival Lugano in Buenos Aires.
-    * Die Webseite muss eine Adresse sein. Acht Karten trugen einen Verweis
-      auf „None", weil ein Datenblattfeld null hieß; angeklickt führte er ins
-      Nichts.
-    * Ein Termin, der vor seinem Anfang endet, ist keiner. festivalabroad
-      datierte das NorthSide Festival auf den 12. bis 6. Juni — welche Hälfte
-      falsch ist, verrät der Eintrag nicht. Ohne Termin findet er über Ort und
-      Namen zu dem Eintrag, den fünf andere Quellen übereinstimmend datieren.
+      in dem Land, das die Quelle nennt.
+    * Preis, Besucherzahl und Webseite müssen sein, was sie behaupten; aus der
+      Webseite fallen Werbeparameter wie `utm_source=wannafest`.
+    * Ein Act steht einmal im Lineup, auch wenn er an zwei Tagen spielt.
     """
-    if not orte.punkt_plausibel(lat, lon) or not orte.punkt_passt_zum_land(
-            lat, lon, land):
-        lat = lon = None
     if von and bis and bis < von:
         von = bis = None
+    if not orte.punkt_plausibel(lat, lon) or not orte.punkt_passt_zum_land(lat, lon, land):
+        lat = lon = None
     stadt, plz = text.plz_und_stadt(stadt, plz)
+    if _KEIN_ORT.search(stadt):
+        stadt = ""
+    ort = text.clean(ort)
+    if ort.casefold() == stadt.casefold():
+        ort = ""
     return Fund(
-        quelle=quelle,
-        url=url,
-        name=text.festival_name(name),
-        von=von,
-        bis=bis or von,
+        quelle=quelle, url=url, name=text.festival_name(name),
+        von=von, bis=bis or von,
         jahr=str(von.year) if von else jahr,
-        stadt=stadt,
-        land=orte.land_code(land),
-        ort=ort,
-        plz=plz,
-        lat=lat,
-        lon=lon,
-        preis=geld.ist_preis(preis),
-        webseite=_adresse(webseite),
-        genre=genre,
-        besucher=text.besucherzahl(besucher),
-        hinweis=hinweis,
-        abgesagt=abgesagt,
-        # Ohne Wiederholungen, Reihenfolge wie geliefert: jambase nennt
-        # einzelne Acts zweimal, wenn sie an mehreren Tagen spielen.
+        stadt=stadt, land=orte.land_code(land), ort=ort, plz=plz,
+        lat=lat, lon=lon,
+        preis=geld.ist_preis(preis), webseite=adresse(webseite),
+        genre=genre, besucher=text.besucherzahl(besucher),
+        hinweis=hinweis, abgesagt=abgesagt,
         lineup=tuple(dict.fromkeys(lineup or ())),
     )
 
 
-def _adresse(wert: str) -> str:
-    """Nur was mit http beginnt, ist eine Adresse."""
+def adresse(wert: str) -> str:
+    """Eine Adresse, die mit http beginnt — ohne Werbeparameter.
+
+    Acht Karten trugen einen Verweis auf „None", weil ein Datenblattfeld null
+    hieß. Und wannafest hängt an 1.054 Adressen „?utm_source=wannafest" an.
+    """
     wert = (wert or "").strip()
-    return wert if wert.lower().startswith("http") else ""
+    if not wert.lower().startswith("http"):
+        return ""
+    teile = urlsplit(wert)
+    if "utm_" not in teile.query:
+        return wert
+    rest = [(k, v) for k, v in parse_qsl(teile.query, keep_blank_values=True)
+            if not k.lower().startswith("utm_")]
+    return urlunsplit(teile._replace(query=urlencode(rest)))

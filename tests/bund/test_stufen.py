@@ -15,9 +15,10 @@ from festivalfinder.kern.fund import fund
 from festivalfinder.kern.zeit import aus_deutsch, ueberlappt
 
 
-def f(quelle, name, *, von=None, bis=None, stadt="", land="DE", lineup=(), **rest):
+def f(quelle, name, *, von=None, bis=None, stadt="", land="DE", lineup=(), seite="",
+      **rest):
     """Ein Fund einer Quelle, wie ihn ein Leser abliefert."""
-    return fund(quelle, f"https://{quelle}.example/{name}", name,
+    return fund(quelle, f"https://{quelle}.example/{seite or name}", name,
                 von=aus_deutsch(von), bis=aus_deutsch(bis),
                 stadt=stadt, land=land, lineup=list(lineup), **rest)
 
@@ -65,6 +66,74 @@ class TestStufe1Exakt:
         a = f("festivalticker", "Testival", von="01.06.2026", stadt="Kiel",
               genre="Ska, Elektro, ska, ELEKTRO")
         assert bund(a)[0].genre == "Ska, Elektro"
+
+
+class TestStufe1AusgabenUndLaender:
+    """Wo derselbe Schlüssel zwei Feste meint — und wo nur eine Quelle irrt."""
+
+    def test_zwei_ausgaben_derselben_quelle_bleiben_zwei(self):
+        # Bo-Mit-Rock im März und im September, beide bei festivalticker
+        a = f("festivalticker", "Bo-Mit-Rock", von="07.03.2026", stadt="Bochum",
+              seite="bo_mit_rock")
+        b = f("festivalticker", "Bo-Mit-Rock", von="25.09.2026", stadt="Bochum",
+              seite="bo_mit_rock_2")
+        c = f("festivalsunited", "Bo-Mit-Rock", von="07.03.2026", stadt="Bochum")
+        maerz, september = sorted(bund(a, b, c), key=lambda x: x.von)
+        assert set(maerz.quellen.values()) == {a.url, c.url}
+        assert september.quellen == {"festivalticker": b.url}
+
+    def test_ein_abweichender_termin_allein_trennt_nicht(self):
+        # festival-alarm datierte Elbjazz auf den Juni; die anderen auf den Mai
+        a = f("festivalticker", "Elbjazz", von="22.05.2026", stadt="Hamburg")
+        b = f("festivalalarm", "Elbjazz", von="19.06.2026", stadt="Hamburg")
+        assert len(bund(a, b)) == 1
+
+    def test_gleicher_ort_anderes_land_weit_auseinander(self):
+        # Bergenfest in Norwegen, Bergen Live in den Niederlanden
+        a = f("festivalticker", "Bergenfest", von="10.06.2026", stadt="Bergen", land="NO")
+        b = f("wannafest", "Bergen Live", von="05.09.2026", stadt="Bergen", land="NL")
+        assert {x.land for x in bund(a, b)} == {"NO", "NL"}
+
+    def test_anderes_land_bei_nahem_termin_ist_ein_irrtum(self):
+        # wannafest führt ein Hamburger Fest unter den Niederlanden
+        a = f("festivalticker", "Noisy", von="12.06.2026", stadt="Hamburg")
+        b = f("wannafest", "Noisy", von="12.06.2026", stadt="Hamburg", land="NL")
+        assert len(bund(a, b)) == 1
+
+    def test_terminlos_in_verschiedenen_laendern(self):
+        # festivism führt „Edgefest" für Kanada, Neuseeland und die USA —
+        # ohne Ort und Termin. Bisher wurde daraus ein Eintrag mit der
+        # Adresse des zuletzt gelesenen.
+        funde = [f("festivism", "Edgefest", land=land, seite=f"edgefest-{land.lower()}")
+                 for land in ("CA", "NZ", "US")]
+        ergebnis = bund(*funde)
+        assert {x.land for x in ergebnis} == {"CA", "NZ", "US"}
+        assert {x.quellen["festivism"] for x in ergebnis} == {x.url for x in funde}
+
+    def test_jede_ausgabe_hat_ihre_eigene_kennung(self):
+        """Preisgeschichte und Neuzugänge hängen an der Kennung.
+
+        Die frühere Ausgabe behält die, die sie vor der Trennung hatte — sonst
+        stünde ein längst bekanntes Fest über Nacht als neu da.
+        """
+        a = f("festivalticker", "Bo-Mit-Rock", von="07.03.2026", stadt="Bochum",
+              seite="bo_mit_rock")
+        b = f("festivalticker", "Bo-Mit-Rock", von="25.09.2026", stadt="Bochum",
+              seite="bo_mit_rock_2")
+        maerz, september = sorted(bund(b, a), key=lambda x: x.von)
+        assert maerz.kennung == "bo mit rock|2026|bochum"
+        assert september.kennung == "bo mit rock|2026|bochum|2026-09-25"
+
+    def test_gleichnamig_in_zwei_laendern_hat_zwei_kennungen(self):
+        funde = [f("festivism", "Edgefest", land=land, seite=f"edgefest-{land.lower()}")
+                 for land in ("NZ", "CA", "US")]
+        assert sorted(x.kennung for x in bund(*funde)) == [
+            "edge||", "edge|||NZ", "edge|||US"]
+
+    def test_ueberseegebiet_ist_kein_anderes_land(self):
+        a = f("festivism", "Testival", land="FR", seite="testival-fr")
+        b = f("festivism", "Testival", land="RE", seite="testival-re")
+        assert len(bund(a, b)) == 1
 
 
 class TestStufe2Quellenpaare:
@@ -134,6 +203,22 @@ class TestStufe4Ueberlappung:
         b = f("festivalsunited", "Afrika Tage Wien", von="11.07.2026",
               bis="13.07.2026", stadt="Wien", land="AT")
         assert len(bund(a, b)) == 2
+
+    def test_vorrunde_ist_eine_eigene_veranstaltung(self):
+        # Die Road-To-Reihe endet am ersten Tag des Bay Fest
+        a = f("festivalsunited", "Road To Bay Fest", von="10.07.2026",
+              bis="12.08.2026", stadt="Bellaria-Igea Marina", land="IT")
+        b = f("festivalabroad", "Bay Fest", von="10.08.2026",
+              bis="13.08.2026", stadt="Bellaria-Igea Marina", land="IT")
+        assert len(bund(a, b)) == 2
+
+    def test_lange_reihe_mit_spaeterem_beginn_bleibt_eins(self):
+        # ICÓNICA in Sevilla: Konzertreihe, drei Quellen, drei Anfänge
+        a = f("festivalsunited", "ICÓNICA Fest Sevilla", von="29.05.2026",
+              bis="05.07.2026", stadt="Sevilla", land="ES")
+        b = f("festivalabroad", "Iconica Santalucia Sevilla Festival", von="17.06.2026",
+              bis="16.07.2026", stadt="Sevilla", land="ES")
+        assert len(bund(a, b)) == 1
 
 
 class TestStufe5Schreibweise:
@@ -282,6 +367,11 @@ class TestVergleiche:
     def test_name_muss_ganz_stecken(self):
         assert name_deckt_sich("neuborn", "noaf neuborn")
         assert not name_deckt_sich("metastadt wien", "afrika tage wien")
+
+    def test_beiprogramm_ist_nicht_das_fest(self):
+        assert not name_deckt_sich("road to bay", "bay")
+        assert not name_deckt_sich("rock am ring warm up", "rock am ring")
+        assert name_deckt_sich("road to bay", "road to bay italy")
 
     def test_schreibweise(self):
         assert schreibweise_gleich("Sonne Mond Sterne", "SonneMondSterne")

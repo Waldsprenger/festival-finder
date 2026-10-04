@@ -1,11 +1,9 @@
 """Aus site/ eine einzige, in sich geschlossene HTML-Datei.
 
-Veröffentlichte Artifacts dürfen keine externen Dateien nachladen und bestehen
-aus genau einer Seite. Deshalb werden CSS, Daten und Skripte inline gesetzt und
-die beiden Rechtstexte als Abschnitte angehängt.
-
-Welche Dateien und in welcher Reihenfolge, steht nicht hier, sondern in
-`index.html` — sonst vergisst diese Datei beim nächsten neuen Skript eines.
+Eine veröffentlichte Einzelseite darf keine externen Dateien nachladen. CSS,
+Daten und Skripte stehen deshalb inline, die Geodaten gleich hinter den Daten
+(die Seite lädt sie sonst nach), und die beiden Rechtstexte als Abschnitte.
+Welche Skripte in welcher Reihenfolge, steht in `index.html`.
 """
 
 import re
@@ -16,12 +14,10 @@ from .seitenteile import skripte, stile
 ZIEL = SITE / "artifact.html"
 
 
-def lies(name: str, pflicht: bool = True) -> str:
-    """Liest eine Datei aus site/. Nicht zwingende fehlen sang- und klanglos."""
+def lies(name: str) -> str:
+    """Eine Datei aus site/; was fehlt (config.js), bleibt leer."""
     pfad = SITE / name
-    if not pflicht and not pfad.exists():
-        return ""
-    return pfad.read_text(encoding="utf-8")
+    return pfad.read_text(encoding="utf-8") if pfad.exists() else ""
 
 
 def html_ascii(text: str) -> str:
@@ -30,12 +26,8 @@ def html_ascii(text: str) -> str:
 
 
 def js_ascii(text: str) -> str:
-    """Sonderzeichen als \\uXXXX — Entities wirken im <script> nicht.
-
-    Die Einzeldatei hat keinen <head>, in den eine Zeichensatz-Angabe passen
-    würde. Ohne diese Absicherung hängt die Darstellung von Umlauten davon ab,
-    was der ausliefernde Server als Charset mitschickt.
-    """
+    """Sonderzeichen als \\uXXXX — Entities wirken im <script> nicht, und die
+    Einzeldatei hat keinen <head> für eine Zeichensatzangabe."""
     raus = []
     for ch in text:
         cp = ord(ch)
@@ -49,48 +41,39 @@ def js_ascii(text: str) -> str:
     return "".join(raus)
 
 
-def koerper_von(html: str) -> str:
-    m = re.search(r"<body[^>]*>(.*)</body>", html, re.S)
-    return m.group(1) if m else html
-
-
 def artikel_von(html: str) -> str:
     m = re.search(r'<article class="legal">(.*?)</article>', html, re.S)
-    text = m.group(1) if m else ""
     # Rückverweise auf index.html ergeben in der Einzelseite keinen Sinn
-    return re.sub(r'<a class="back".*?</a>', "", text, flags=re.S).strip()
+    return re.sub(r'<a class="back".*?</a>', "", m.group(1) if m else "", flags=re.S).strip()
 
 
 def bauen() -> dict:
     css = "\n".join(lies(d) for d in stile())
-    # orte.js bleibt draußen: zehn Megabyte, die die Einzelseite verdoppeln
-    # würden, für eine Ortssuche, die dort ohnehin keinen fremden Dienst
-    # erreichen darf.
-    js = [(d, lies(d, pflicht=(d != "config.js")))
-          for d in skripte() if d != "orte.js"]
-
-    koerper = koerper_von(lies("index.html"))
-    koerper = re.sub(r"<script[^>]*></script>\s*", "", koerper)
-    # Fußnavigation zeigt auf die Abschnitte derselben Seite
-    koerper = koerper.replace('href="impressum.html"', 'href="#impressum"')
-    koerper = koerper.replace('href="datenschutz.html"', 'href="#datenschutz"')
-
-    rechtstexte = f"""
-<section class="legal" id="impressum">
-{artikel_von(lies('impressum.html'))}
-</section>
-<section class="legal" id="datenschutz">
-{artikel_von(lies('datenschutz.html'))}
-</section>
-"""
-
+    # orte.js bleibt draußen: zehn Megabyte für eine Ortssuche, die dort ohnehin
+    # keinen fremden Dienst erreichen darf.
+    namen = []
+    for d in skripte():
+        if d != "orte.js":
+            namen.append(d)
+            if d == "data.js":
+                namen.append("geo.js")
     bloecke = "\n".join(f"<script>\n{js_ascii(inhalt)}\n</script>"
-                        for _name, inhalt in js if inhalt)
+                        for d in namen if (inhalt := lies(d)))
+
+    m = re.search(r"<body[^>]*>(.*)</body>", lies("index.html"), re.S)
+    koerper = re.sub(r"<script[^>]*></script>\s*", "", m.group(1) if m else "")
+    # Fußnavigation zeigt auf die Abschnitte derselben Seite
+    koerper = (koerper.replace('href="impressum.html"', 'href="#impressum"')
+                      .replace('href="datenschutz.html"', 'href="#datenschutz"'))
+    rechtstexte = (f'\n<section class="legal" id="impressum">\n'
+                   f'{artikel_von(lies("impressum.html"))}\n</section>\n'
+                   f'<section class="legal" id="datenschutz">\n'
+                   f'{artikel_von(lies("datenschutz.html"))}\n</section>\n')
 
     doc = f"""<title>Festival Finder &#8212; Lineup-Abgleich weltweit</title>
 <style>
-/* Die Seite ist bewusst durchgehend dunkel gestaltet (Konzertplakat-Look)
-   und uebernimmt deshalb keine helle Darstellung des Betrachters. */
+/* Die Seite ist bewusst durchgehend dunkel (Konzertplakat) und uebernimmt
+   keine helle Darstellung des Betrachters. */
 :root {{ color-scheme: dark; }}
 html, body {{ background: #0b0b0d; }}
 {html_ascii(css)}
@@ -100,5 +83,4 @@ html, body {{ background: #0b0b0d; }}
 {bloecke}
 """
     schreib_text(ZIEL, doc)
-    return {"mb": ZIEL.stat().st_size / 1e6,
-            "skripte": [n for n, _ in js], "stile": stile()}
+    return {"mb": ZIEL.stat().st_size / 1e6, "skripte": namen, "stile": stile()}

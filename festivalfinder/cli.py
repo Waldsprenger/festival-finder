@@ -1,15 +1,14 @@
-"""Ein Einstiegspunkt für alles.
+"""Ein Einstieg für alles.
 
-    python -m festivalfinder alles            der komplette Lauf
-    python -m festivalfinder alles --frisch   jede Seite neu holen
-    python -m festivalfinder sammeln          nur Daten sammeln
-    python -m festivalfinder bauen            nur die Seite bauen
-    python -m festivalfinder verzeichnis      Ortsverzeichnis erneuern
-    python -m festivalfinder karte            Kartengrenzen erneuern
-    python -m festivalfinder schrift          Schrift einbetten
-
-Vorher waren das neun Skripte, die einander unter blankem Namen importierten
-und über `sys.path` zueinander fanden. Jetzt ist es ein Paket mit einer Tür.
+    python -m festivalfinder alles              der komplette Lauf
+    python -m festivalfinder alles --frisch     jede Seite neu holen
+    python -m festivalfinder alles --offline    nur aus dem Zwischenspeicher, keine Anfrage
+    python -m festivalfinder sammeln            nur Daten sammeln
+    python -m festivalfinder bauen              nur die Seite bauen
+    python -m festivalfinder verzeichnis        Ortsverzeichnis erneuern
+    python -m festivalfinder karte              Kartengrenzen erneuern
+    python -m festivalfinder schrift            Schrift neu einbetten
+    python -m festivalfinder symbole            App-Symbole neu zeichnen
 """
 
 import argparse
@@ -26,38 +25,36 @@ from .werkzeug import (chronik, gazetteer, geokodieren, neuheiten, preisverlauf,
                        schriften, weltkarte)
 
 
+def _zaehlen(fehlgeschlagen: list[str], mit_grund: bool) -> dict[str, int]:
+    """Nicht ladbare Adressen je Rechner — mit Fehlerart, wenn gewünscht.
+
+    Ein abgewiesener Zugriff (HTTPError 403) ist etwas anderes als eine
+    Leitung, die nicht zustande kommt (ConnectionError, Timeout).
+    """
+    zaehler: dict[str, int] = {}
+    for eintrag in fehlgeschlagen:
+        adresse, _, art = eintrag.partition(" ")
+        k = urlparse(adresse).netloc
+        if mit_grund:
+            k += " " + (art.strip("()") or "unbekannt")
+        zaehler[k] = zaehler.get(k, 0) + 1
+    return dict(sorted(zaehler.items(), key=lambda p: -p[1]))
+
+
+def _netz(args) -> Abrufer:
+    return Abrufer(max_age_h=args.max_age, frisch=args.frisch, offline=args.offline)
+
+
 # --------------------------------------------------------------------------
 # Sammeln
 # --------------------------------------------------------------------------
 
-def _haeuser(adressen: list[str]) -> dict[str, int]:
-    """Nicht ladbare Adressen je Rechnername — welche Quelle hakt, nicht welche Seite."""
-    zaehler: dict[str, int] = {}
-    for eintrag in adressen:
-        haus = urlparse(eintrag.split(" ")[0]).netloc
-        zaehler[haus] = zaehler.get(haus, 0) + 1
-    return dict(sorted(zaehler.items(), key=lambda p: -p[1]))
-
-
-def _gruende(adressen: list[str]) -> dict[str, int]:
-    """Woran es scheiterte, je Rechnername und Fehlerart.
-
-    Ein abgewiesener Zugriff (HTTPError) ist etwas anderes als eine Leitung,
-    die nicht zustande kommt (ConnectionError, Timeout) — und nur das eine wäre
-    eine Entscheidung des Betreibers.
-    """
-    zaehler: dict[str, int] = {}
-    for eintrag in adressen:
-        adresse, _, art = eintrag.partition(" ")
-        schluessel = f"{urlparse(adresse).netloc} {art.strip('()') or 'unbekannt'}"
-        zaehler[schluessel] = zaehler.get(schluessel, 0) + 1
-    return dict(sorted(zaehler.items(), key=lambda p: -p[1]))
-
-
 def befehl_sammeln(args) -> int:
-    netz = Abrufer(max_age_h=args.max_age, frisch=args.frisch)
+    netz = _netz(args)
     t0 = time.time()
-    if args.frisch:
+    if args.offline:
+        print("Offline: nur der Zwischenspeicher, keine einzige Anfrage.", flush=True)
+    elif args.frisch:
         print("Frischer Lauf: der Seitencache wird übergangen.", flush=True)
 
     funde, ergebnis = sammeln.funde_sammeln(netz, args.since, limit=args.limit)
@@ -65,14 +62,10 @@ def befehl_sammeln(args) -> int:
     if doppelt:
         print("  Kürzel als eigener Act im Programm, Alias bleibt aus: "
               + ", ".join(x.upper() for x in doppelt))
-
     festivals = lauf.zusammenfuehren(funde, namen, kuerzel)
 
-    # Vergangene Ausgaben aussortieren: Über die Länderseiten tauchen Seiten
-    # auf, deren letzte Ausgabe Jahre zurückliegt („Weekend Festival Baltic
-    # 2018"). Einträge ohne Termin bleiben — das sind angekündigte Festivals
-    # ohne bestätigtes Datum —, es sei denn, ihr Name nennt ein vergangenes
-    # Jahr.
+    # Vergangene Ausgaben aussortieren. Einträge ohne Termin bleiben — das sind
+    # angekündigte Festivals —, es sei denn, ihr Name nennt ein vergangenes Jahr.
     vorher = len(festivals)
     festivals = [f for f in festivals
                  if (not f.von or (f.bis or f.von).year >= args.since)
@@ -80,37 +73,26 @@ def befehl_sammeln(args) -> int:
     if vorher != len(festivals):
         print(f"  {vorher - len(festivals)} Einträge älter als {args.since} verworfen")
 
-    # Preise vergleichen, bevor geprüft und geschrieben wird
     preise = preisverlauf.verfolgen(festivals)
-    # ... und was seit gestern dazugekommen ist, fürs Tagebuch
     neues = neuheiten.verfolgen(festivals)
-
     for widerspruch in pruefung.stimmigkeit(festivals):
         print(f"  ! Widerspruch in den Daten: {widerspruch}", file=sys.stderr)
-
     ausgabe.dateien.bestand(festivals)
-    schreib_json(DATA / "band_normalisierung.json", bandstatistik)
 
-    # Nur bei einem vollständigen Lauf vergleichen — ein Testlauf mit --limit
-    # liefert naturgemäß weniger.
-    warnungen: list[str] = []
-    if not args.limit:
-        warnungen = pruefung.ausbeute(ergebnis.funde, len(festivals),
-                                      ergebnis.mitgebracht)
-        for warnung in warnungen:
-            print(f"  ! Einbruch gegenüber dem letzten Lauf: {warnung}",
-                  file=sys.stderr)
-    # Kein Einbruch, aber genauso wichtig: Sonst ruht eine Quelle weiter, die
-    # längst wieder liefern könnte.
+    # Nur ein vollständiger Lauf misst sich am letzten — ein Teillauf liefert
+    # naturgemäß weniger.
+    warnungen = [] if args.limit else pruefung.ausbeute(
+        ergebnis.funde, len(festivals), ergebnis.mitgebracht)
+    for warnung in warnungen:
+        print(f"  ! Einbruch gegenüber dem letzten Lauf: {warnung}", file=sys.stderr)
+    # Sonst ruht eine Quelle weiter, die längst wieder liefern könnte
     for name, offen in ergebnis.geprueft.items():
         if offen:
             warnungen.append(f"{name}: ruht, gibt aber wieder Daten heraus")
             print(f"  ! {warnungen[-1]}", file=sys.stderr)
 
-    # Der Zustand des Laufs geht mit auf die Webseite. Auf dem eigenen Rechner
-    # steht er im Protokoll — beim Lauf auf fremden Servern kommt niemand an
-    # dessen Protokoll heran, und eine Quelle, die dort nichts liefert, fiele
-    # sonst nur als kleinere Zahl auf.
+    # Der Zustand des Laufs geht mit auf die Webseite: Beim Lauf auf fremden
+    # Servern kommt niemand an dessen Protokoll heran.
     bericht = {
         "stand": datetime.now().astimezone().strftime("%Y-%m-%dT%H:%M%z"),
         "quellen": ergebnis.funde,
@@ -120,22 +102,24 @@ def befehl_sammeln(args) -> int:
         "festivals": len(festivals),
         "warnungen": warnungen,
         "nicht_ladbar": len(netz.fehlgeschlagen),
-        "nicht_ladbar_je_haus": _haeuser(netz.fehlgeschlagen),
-        "nicht_ladbar_grund": _gruende(netz.fehlgeschlagen),
+        "nicht_ladbar_je_haus": _zaehlen(netz.fehlgeschlagen, False),
+        "nicht_ladbar_grund": _zaehlen(netz.fehlgeschlagen, True),
         "meldungen": netz.meldungen[:40],
     }
     schreib_json(DATA / "lauf.json", bericht)
+    # Immer schreiben, auch leer: Sonst blieb nach einem fehlerfreien Lauf die
+    # Liste des vorigen stehen und täuschte Ausfälle vor.
+    schreib_text(DATA / "failed.txt", "\n".join(netz.fehlgeschlagen))
 
     acts = len({b for f in festivals for b in f.lineup})
-    # Ein Strich je Monat, mitversioniert: die einzige Stelle zum Zurückschauen
-    # — und der Schreibvorgang, der den zeitgesteuerten Lauf am Leben hält.
-    if chronik.nachtragen(bericht, acts):
+    # Ein Strich je Monat, mitversioniert — nur aus einem Lauf, der die
+    # Quellen wirklich gefragt hat.
+    if not args.offline and chronik.nachtragen(bericht, acts):
         print(f"Chronik                  : Zeile für {bericht['stand'][:7]} angelegt")
     print(f"Preise beobachtet        : {preise['beobachtet']}, "
           f"seit dem ersten Mal geändert: {preise['geändert']}")
     print(f"Seit gestern dazu        : {neues['festivals']} Festivals, "
-          f"{neues['bands']} bestätigte Bands "
-          f"({neues['bekannt']} aufgezeichnet)")
+          f"{neues['bands']} bestätigte Bands ({neues['bekannt']} aufgezeichnet)")
     print(f"\nFestivals gesamt        : {len(festivals)}")
     print(f"  aus mehreren Quellen  : {sum(1 for f in festivals if len(f.quellen) > 1)}")
     print(f"  mit Lineup            : {sum(1 for f in festivals if f.lineup)}")
@@ -148,8 +132,7 @@ def befehl_sammeln(args) -> int:
               + ", ".join(f"{q} {n}" for q, n in sorted(ergebnis.parsefehler.items())))
     if netz.fehlgeschlagen:
         print(f"Nicht ladbar: {len(netz.fehlgeschlagen)} Seiten (siehe data/failed.txt)")
-        schreib_text(DATA / "failed.txt", "\n".join(netz.fehlgeschlagen))
-    if args.frisch and not args.limit:
+    if args.frisch and not args.limit and not args.offline:
         # Alles Verlinkte wurde soeben geschrieben; was seit einer Woche
         # niemand angefasst hat, ist verwaist.
         weg, mb = netz.aufraeumen(t0 - 7 * 24 * 3600)
@@ -184,8 +167,7 @@ def _festivals_lesen():
 
 
 def befehl_bauen(args) -> int:
-    festivals = _festivals_lesen()
-    if not festivals:
+    if not (festivals := _festivals_lesen()):
         print("data/festivals.json ist leer - erst sammeln.", file=sys.stderr)
         return 1
 
@@ -194,9 +176,8 @@ def befehl_bauen(args) -> int:
     print(f"uebersicht.html  ({z['mb']:.1f} MB, {z['festivals']} Festivals)")
 
     z = ausgabe.daten_js.bauen(festivals)
-    print(f"orte.js   ({z['orte_js_mb']:.1f} MB zum Nachladen: "
-          f"{z['welt_orte']} Orte, {z['welt_plz']} Postleitzahlen)")
-    print(f"data.js   ({z['data_js_mb']:.1f} MB)")
+    print(f"data.js   ({z['data_js_mb']:.1f} MB)  geo.js ({z['geo_js_mb']:.1f} MB, "
+          f"Stand {z['versionen']['geo']})  orte.js ({z['orte_js_mb']:.1f} MB zum Nachladen)")
     print(f"  Koordinaten aus Postleitzahl: {z['aus_plz']}, aus dem Geo-Cache: "
           f"{z['aus_cache']}, aus dem Ortsverzeichnis: {z['aus_ortsverzeichnis']}, "
           f"aus der Quellseite: {z['aus_quelle']}")
@@ -206,17 +187,15 @@ def befehl_bauen(args) -> int:
     print(f"  Festivals {z['festivals']} | mit Koordinaten {z['mit_koordinaten']} | "
           f"mit Preis in EUR {z['mit_preis']} | Acts {z['acts']} | "
           f"Orte {z['orte']} | PLZ {z['plz']}")
-    print(f"  Genre zugeordnet {z['mit_genre']} | Bandkürzel {z['bandkuerzel']}")
+    print(f"  Genre zugeordnet {z['mit_genre']} | Bandkürzel {z['bandkuerzel']} | "
+          f"Kalender ab {z['ab_datum'] or 'unbegrenzt'}")
     print(f"  Als neu vermerkt: {z['neue_festivals']} Festivals, "
           f"{z['neue_bands']} bestätigte Bands")
-    print(f"  Grenzen: Entfernung bis {z['max_km']} km (ab {ausgabe.daten_js.REF_PLZ}), "
-          f"Preis bis {z['max_preis']} EUR, Kalender ab {z['ab_datum'] or 'unbegrenzt'}")
 
-    z = ausgabe.pwa.bauen()
-    print(f"manifest.webmanifest, sw.js ({len(z['vorrat'])} Dateien im Vorrat)")
-
-    z = ausgabe.artefakt.bauen()
-    print(f"artifact.html  ({z['mb']:.2f} MB, {len(z['skripte'])} Skripte)")
+    z2 = ausgabe.pwa.bauen(z["versionen"])
+    print(f"manifest.webmanifest, sw.js ({len(z2['vorrat'])} Dateien im Vorrat)")
+    z2 = ausgabe.artefakt.bauen()
+    print(f"artifact.html  ({z2['mb']:.2f} MB, {len(z2['skripte'])} Skripte)")
     return 0
 
 
@@ -225,7 +204,12 @@ def befehl_bauen(args) -> int:
 # --------------------------------------------------------------------------
 
 def befehl_verzeichnis(args) -> int:
-    z = gazetteer.bauen(Abrufer())
+    if (weg := gazetteer.aufraeumen()):
+        print(f"  alte Downloads gelöscht: {', '.join(weg)}")
+    if gazetteer.aktuell() and not args.frisch:
+        print("Ortsverzeichnis aktuell - nichts zu tun.")
+        return 0
+    z = gazetteer.bauen(_netz(args))
     print(f"laender.json ({z['laender']}) | gazetteer.json ({z['orte_klein']} Orte) | "
           f"laender_rahmen.json ({z['rahmen']}) | plz.json ({z['plz_dach']})")
     print(f"verortung.json: {z['plz_welt']} Postleitzahlen, {z['orte_fein']} Orte, "
@@ -234,7 +218,10 @@ def befehl_verzeichnis(args) -> int:
 
 
 def befehl_karte(args) -> int:
-    for name, z in weltkarte.bauen(Abrufer()).items():
+    if weltkarte.vorhanden() and not args.frisch:
+        print("Kartengrenzen vorhanden - nichts zu tun.")
+        return 0
+    for name, z in weltkarte.bauen(_netz(args)).items():
         print(f"{name:<16} {z['was']:<18} {z['mb']:>5.2f} MB, "
               f"{z['ringe']:>5} Ringe, {z['punkte']:>7} Punkte")
     return 0
@@ -248,7 +235,16 @@ def befehl_schrift(args) -> int:
     return 0
 
 
+def befehl_symbole(args) -> int:
+    for eintrag in ausgabe.pwa.symbole(neu=True):
+        print(f"  {eintrag['src']}")
+    return 0
+
+
 def befehl_orte(args) -> int:
+    if args.offline:
+        print("Offline: Nominatim wird nicht gefragt.")
+        return 0
     z = geokodieren.auffuellen(_festivals_lesen())
     print(f"fertig: {z['mit_koordinaten']}/{z['im_cache']} Orte mit Koordinaten")
     return 0
@@ -256,30 +252,25 @@ def befehl_orte(args) -> int:
 
 # --------------------------------------------------------------------------
 
-#: Der komplette Lauf, in der Reihenfolge, in der die Schritte aufeinander bauen
+#: Der komplette Lauf, in der Reihenfolge, in der die Schritte aufeinander
+#: bauen. Schrift und Symbole liegen versioniert bei und gehören nicht dazu:
+#: Jeder Lauf holte die Schrift sonst bei Google ab.
 ALLES = [
     ("Festivaldaten", befehl_sammeln),
-    # Das Ortsverzeichnis steht vor der Geokodierung: Was dort schon drinsteht,
-    # muss nicht bei Nominatim erfragt werden.
+    # Vor der Geokodierung: Was im Verzeichnis steht, fragt niemand bei Nominatim
     ("Ortsverzeichnis", befehl_verzeichnis),
     ("Ortskoordinaten", befehl_orte),
-    # Kartengrenzen und Schrift ändern sich kaum und laufen aus dem Cache. Sie
-    # stehen trotzdem hier, damit ein frischer Klon vollständig baut.
     ("Kartengrenzen", befehl_karte),
-    ("Schrift", befehl_schrift),
     ("Webseite", befehl_bauen),
 ]
 
 
 def befehl_alles(args) -> int:
-    # Ein Push aendert Code, keine Termine: Dann faellt nur der Sammellauf weg,
-    # alles Uebrige wird neu erzeugt. Frueher lief dabei allein `bauen` - und
-    # scheiterte an site/fonts.css, die ein anderer Schritt erzeugt und die
-    # nicht mitversioniert wird.
-    schritte = [s for s in ALLES
-                if not (args.ohne_sammeln and s[1] is befehl_sammeln)]
+    # Ein Push ändert Code, keine Termine: Dann fällt nur das Sammeln weg.
     fehler = 0
-    for name, funktion in schritte:
+    for name, funktion in ALLES:
+        if args.ohne_sammeln and funktion is befehl_sammeln:
+            continue
         print(f"\n=== {name} " + "=" * (60 - len(name)), flush=True)
         t0 = time.time()
         try:
@@ -291,30 +282,26 @@ def befehl_alles(args) -> int:
             fehler += 1
             continue
         fehler += bool(code)
-        print(f"[{name}] {'ok' if not code else 'FEHLER'} nach {time.time()-t0:.0f}s")
+        print(f"[{name}] {'ok' if not code else 'FEHLER'} nach {time.time() - t0:.0f}s")
     return 1 if fehler else 0
 
 
 def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(prog="festivalfinder",
-                                 description=__doc__.splitlines()[0])
-    ap.add_argument("--limit", type=int, default=0,
-                    help="nur N Detailseiten je Quelle")
+    ap = argparse.ArgumentParser(prog="festivalfinder", description=__doc__.splitlines()[0])
+    ap.add_argument("--limit", type=int, default=0, help="nur N Detailseiten je Quelle")
     ap.add_argument("--max-age", type=float, default=24.0,
                     help="Cache-Alter in Stunden, ab dem neu geladen wird (0 = nie)")
     ap.add_argument("--frisch", action="store_true",
                     help="jede Seite neu abrufen und verwaisten Cache löschen")
+    ap.add_argument("--offline", action="store_true",
+                    help="nur aus dem Zwischenspeicher, keine einzige Anfrage")
     ap.add_argument("--since", type=int, default=date.today().year,
                     help="frühester Jahrgang; 2006 holt das komplette Archiv")
     ap.add_argument("--ohne-sammeln", action="store_true",
                     help="alles außer dem Sammellauf — für einen reinen Bauschritt")
-    ap.add_argument("befehl", nargs="?", default="alles",
-                    choices=["alles", "sammeln", "bauen", "verzeichnis", "karte",
-                             "schrift", "orte"])
+    befehle = {"alles": befehl_alles, "sammeln": befehl_sammeln, "bauen": befehl_bauen,
+               "verzeichnis": befehl_verzeichnis, "karte": befehl_karte,
+               "schrift": befehl_schrift, "symbole": befehl_symbole, "orte": befehl_orte}
+    ap.add_argument("befehl", nargs="?", default="alles", choices=list(befehle))
     args = ap.parse_args(argv)
-
-    befehle = {"alles": befehl_alles, "sammeln": befehl_sammeln,
-               "bauen": befehl_bauen, "verzeichnis": befehl_verzeichnis,
-               "karte": befehl_karte, "schrift": befehl_schrift,
-               "orte": befehl_orte}
     return befehle[args.befehl](args)

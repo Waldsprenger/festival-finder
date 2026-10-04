@@ -1,13 +1,13 @@
 /* Was eingestellt ist — und was daraus folgt.
 
-   Je Schritt ein Block. `an` sagt, ob dieser Schritt filtert; `antwort` sagt,
-   ob die Frage überhaupt schon beantwortet ist. Das sind zwei verschiedene
-   Dinge: Eine unbeantwortete Frage sperrt die nächste, eine mit „Nein"
-   beantwortete nicht.
+   Je Schritt ein Block. `an` sagt, ob dieser Schritt filtert; `antwort`, ob
+   die Frage beantwortet ist. Eine unbeantwortete Frage sperrt die nächste,
+   eine mit „Nein" beantwortete nicht.
 
-   Dazu die Prüfungen. Je Schritt eine — so lässt sich ausrechnen, wie viele
-   Festivals nach jedem einzelnen Schritt noch übrig sind. Ohne diese Zahl
-   klickt man sechs Fragen durch, ohne zu sehen, was sie bewirken. */
+   Dazu je Schritt eine Prüfung. `auswerten()` geht die Festivals einmal durch
+   und zählt dabei, wie viele nach jedem Schritt übrig sind — früher lief
+   dafür je sichtbarem Schritt ein eigener Durchgang über alle Festivals, bei
+   jedem Tastendruck sechs. */
 
 (() => {
   'use strict';
@@ -23,11 +23,9 @@
 
     home: null,                  // {lat, lon, label, land}
     zeit: { von: '', bis: '', minDate: '', ohneTermin: false, abgesagte: false },
-    // Nur eine Obergrenze, kein Bereich: „ab 300 km“ sucht niemand, und
-    // „ab 50 €“ erst recht nicht.
+    // Nur eine Obergrenze, kein Bereich: „ab 300 km" sucht niemand.
     entfernung: { an: false, bis: null, ohneKoordinate: false },
-    preis: { an: false, bis: null, waehrung: 'EUR',
-             gewaehlt: false, ohnePreis: true },
+    preis: { an: false, bis: null, waehrung: 'EUR', gewaehlt: false, ohnePreis: true },
     bands: { an: false, auswahl: new Map() },   // bandIndex -> Gewicht (1 oder 2)
     genre: { an: false, auswahl: new Set(), ohneGenre: false },
 
@@ -36,9 +34,8 @@
   };
 
   /* ---------------- Währung ----------------
-     Preisgrenzen darf man in der eigenen Währung eingeben. Verglichen wird
-     intern immer in Euro: Die Daten führen einen umgerechneten Eurobetrag, und
-     zwei Zahlen in verschiedenen Währungen zu vergleichen wäre falsch. */
+     Grenzen in der eigenen Währung; verglichen wird in Euro, denn die Daten
+     führen einen umgerechneten Eurobetrag. */
 
   const KURSE = D.kurse || { EUR: 1 };
   const ZEICHEN = { EUR: '€', CHF: 'CHF', GBP: '£', USD: '$', DKK: 'kr.',
@@ -47,13 +44,14 @@
   const nachEuro = (betrag, waehrung) =>
     betrag * (KURSE[waehrung || state.preis.waehrung] || 1);
 
-  /** Welche Währung gilt an diesem Ort? Ohne bekanntes Land: Euro. */
   function waehrungFuerLand(land) {
     const gefunden = (D.waehrungLand || {})[land];
     return gefunden && KURSE[gefunden] ? gefunden : 'EUR';
   }
 
-  /* ---------------- Entfernung ---------------- */
+  /* ---------------- Entfernung ----------------
+     Für den eingestellten Wohnort einmal je Festival gerechnet und gemerkt:
+     Jede Änderung an Preis oder Genre zeichnete sonst 13.000 Luftlinien neu. */
 
   function luftlinie(aLat, aLon, bLat, bLon) {
     const R = 6371, rad = Math.PI / 180;
@@ -63,17 +61,30 @@
     return Math.round(2 * R * Math.asin(Math.sqrt(s)));
   }
 
-  function entfernungVon(row, heim) {
+  const abstaende = new Float64Array(F.length);
+  let abstaendeFuer = null;
+
+  function entfernungVon(row, heim, i) {
     const h = heim === undefined ? state.home : heim;
     if (!h || row[SPALTE.LAT] == null) return null;
-    return luftlinie(h.lat, h.lon, row[SPALTE.LAT], row[SPALTE.LON]);
+    if (i == null || h !== state.home) {
+      return luftlinie(h.lat, h.lon, row[SPALTE.LAT], row[SPALTE.LON]);
+    }
+    if (abstaendeFuer !== h) {
+      for (let k = 0; k < F.length; k++) {
+        const r = F[k];
+        abstaende[k] = r[SPALTE.LAT] == null ? NaN
+          : luftlinie(h.lat, h.lon, r[SPALTE.LAT], r[SPALTE.LON]);
+      }
+      abstaendeFuer = h;
+    }
+    return abstaende[i];
   }
 
   /* ---------------- Prüfungen je Schritt ----------------
-     Jede Prüfung bekommt den Filter als erstes Argument, statt ihn sich aus
-     `state` zu holen. Das kostet ein Zeichen und spart eine zweite Fassung:
-     Eine gemerkte Wunschliste ist derselbe Filter, nur nicht der gerade
-     eingestellte — und wird mit denselben Regeln geprüft. */
+     Jede bekommt den Filter als erstes Argument, statt ihn aus `state` zu
+     holen: Eine gemerkte Suche ist derselbe Filter, nur nicht der gerade
+     eingestellte, und wird mit denselben Regeln geprüft. */
 
   const PRUEFUNG = {
     // Der Wohnort filtert nicht, er misst nur.
@@ -82,18 +93,16 @@
     zeit(s, row) {
       if (row[SPALTE.ABGESAGT] && !s.zeit.abgesagte) return false;
       if (!row[SPALTE.VON]) return s.zeit.ohneTermin;
-      // Der Zeitraum zählt, nicht der Beginn: Ein Festival, das gestern
-      // angefangen hat und bis Sonntag läuft, ist heute noch zu erreichen.
-      const ende = row[SPALTE.BIS] || row[SPALTE.VON];
-      if (s.zeit.von && ende < s.zeit.von) return false;
-      if (s.zeit.bis && row[SPALTE.VON] > s.zeit.bis) return false;
-      return true;
+      // Der Zeitraum zählt, nicht der Beginn: Wer gestern anfing und bis
+      // Sonntag läuft, ist heute noch zu erreichen.
+      if (s.zeit.von && (row[SPALTE.BIS] || row[SPALTE.VON]) < s.zeit.von) return false;
+      return !(s.zeit.bis && row[SPALTE.VON] > s.zeit.bis);
     },
 
-    entfernung(s, row) {
+    entfernung(s, row, i) {
       const e = s.entfernung;
       if (!e.an || !s.home) return true;
-      const d = entfernungVon(row, s.home);
+      const d = entfernungVon(row, s.home, i);
       if (d === null) return e.ohneKoordinate;
       return e.bis === null || d <= e.bis;
     },
@@ -106,8 +115,8 @@
       return p.bis === null || wert <= nachEuro(p.bis, p.waehrung);
     },
 
-    // Eine ausgewählte Band genügt: Wer fünf nennt, sucht nicht das Festival,
-    // auf dem alle fünf spielen, sondern jedes, auf dem eine davon spielt.
+    // Eine ausgewählte Band genügt: Wer fünf nennt, sucht jedes Festival, auf
+    // dem eine davon spielt — nicht das eine, auf dem alle fünf spielen.
     bands(s, row, i) {
       if (!s.bands.an || !s.bands.auswahl.size) return true;
       const drin = i == null ? new Set(row[SPALTE.LINEUP] || []) : sets[i];
@@ -123,41 +132,34 @@
     },
   };
 
-  /** Wie viele Festivals überstehen die Schritte bis einschließlich `name`? */
-  function uebrig(name) {
-    const bis = KETTE.indexOf(name);
-    const pruefungen = KETTE.slice(0, bis + 1).map((n) => PRUEFUNG[n]);
-    let n = 0;
-    for (let i = 0; i < F.length; i++) {
-      if (pruefungen.every((p) => p(state, F[i], i))) n++;
-    }
-    return n;
-  }
+  const PRUEFUNGEN = KETTE.map((n) => PRUEFUNG[n]);
 
-  /** Die Zeilennummern, die alle Schritte überstehen. */
-  function gefiltert() {
-    const raus = [];
+  /** Ein Durchgang: wie viele nach jedem Schritt übrig sind, und welche
+      Zeilen alle überstehen. */
+  function auswerten() {
+    const rest = new Array(KETTE.length).fill(0);
+    const treffer = [];
     for (let i = 0; i < F.length; i++) {
-      if (KETTE.every((n) => PRUEFUNG[n](state, F[i], i))) raus.push(i);
+      let k = 0;
+      while (k < PRUEFUNGEN.length && PRUEFUNGEN[k](state, F[i], i)) rest[k++]++;
+      if (k === PRUEFUNGEN.length) treffer.push(i);
     }
-    return raus;
+    return { rest: Object.fromEntries(KETTE.map((n, k) => [n, rest[k]])), treffer };
   }
 
   /* ---------------- Bewertung ----------------
-     Bands und Genre dürfen zugleich gelten. Ein Festival muss dann beide
-     Bedingungen erfüllen; die Übereinstimmung ist das Mittel aus beiden
-     Anteilen — sonst zählte eine der Auswahlen für die Reihenfolge nicht. */
+     Bands und Genre dürfen zugleich gelten; die Übereinstimmung ist das
+     Mittel beider Anteile, sonst zählte eine Auswahl für die Reihenfolge nicht. */
 
   function bewerten(i) {
     const row = F[i];
-    const eintrag = { i, row, pct: null, hits: [], gHits: [],
-                      dist: entfernungVon(row) };
+    const eintrag = { i, row, pct: null, hits: [], gHits: [], dist: entfernungVon(row, state.home, i) };
     const anteile = [];
 
     if (state.bands.an && state.bands.auswahl.size) {
-      const gesamt = [...state.bands.auswahl.values()].reduce((a, b) => a + b, 0);
-      let gewicht = 0;
+      let gesamt = 0, gewicht = 0;
       for (const [b, w] of state.bands.auswahl) {
+        gesamt += w;
         if (sets[i].has(b)) { gewicht += w; eintrag.hits.push([b, w]); }
       }
       anteile.push((gewicht / gesamt) * 100);
@@ -167,25 +169,20 @@
       for (const g of (row[SPALTE.GENRES] || [])) {
         if (state.genre.auswahl.has(g)) eintrag.gHits.push(g);
       }
+      // Ein Festival ohne Genreangabe, nur durch „mitzeigen" hier, bekommt
+      // keinen Anteil und steht damit hinten.
       if (eintrag.gHits.length) {
         anteile.push((eintrag.gHits.length / state.genre.auswahl.size) * 100);
       }
-      // Ein Festival ohne Genreangabe, das nur durch „mitzeigen" hier ist,
-      // bekommt keinen Anteil - es steht damit hinten, nicht vorn.
     }
 
-    if (anteile.length) {
-      eintrag.pct = anteile.reduce((a, b) => a + b, 0) / anteile.length;
-    }
+    if (anteile.length) eintrag.pct = anteile.reduce((a, b) => a + b, 0) / anteile.length;
     return eintrag;
   }
 
   /* ---------------- Sortierung ----------------
-     Was sich zu ordnen lohnt: Übereinstimmung, Entfernung, Datum, Preis.
-     Weggelassen wird, was nichts ordnen kann — ohne Band- oder Genreauswahl
-     gibt es keine Übereinstimmung, ohne Wohnort keine Entfernung. Eine Auswahl
-     anzubieten, die alle Zeilen gleich behandelt, wäre eine Behauptung über
-     eine Ordnung, die es nicht gibt. */
+     Angeboten wird nur, was ordnen kann: ohne Band- oder Genreauswahl keine
+     Übereinstimmung, ohne Wohnort keine Entfernung. */
 
   const gewichtet = () => (state.bands.an && state.bands.auswahl.size) ||
                           (state.genre.an && state.genre.auswahl.size);
@@ -198,30 +195,26 @@
     return liste;
   }
 
-  /** Die geltende Sortierung: die eigene Wahl, sonst die erste mögliche.
-
-      Die Vorgabe muss mitwandern. Früher hatte jede Filterart ihre eigene
-      gemerkte Sortierung; mit der Kette gibt es nur noch eine, und die stand
-      vor der Bandauswahl auf „Datum". Kam danach eine Band dazu, blieb sie
-      dort stehen — die Liste ordnete nach Termin, während die Prozentzahl
-      danebenstand und niemand sie zu Gesicht bekam. */
+  /** Die eigene Wahl, sonst die erste mögliche. Die Vorgabe wandert mit:
+      Kam nach der Datumssortierung eine Band dazu, ordnete die Liste sonst
+      weiter nach Termin, während die Prozentzahl danebenstand. */
   function sortierung() {
     const erlaubt = sortierungen();
     return (state.sortierung && erlaubt.includes(state.sortierung))
       ? state.sortierung : erlaubt[0];
   }
 
-  // Fehlende Angaben ans Ende, egal wonach sortiert wird: Ein Festival ohne
-  // Preis ist nicht das günstigste, eines ohne Termin nicht das nächste.
+  // Fehlende Angaben ans Ende: Ohne Preis ist ein Festival nicht das
+  // günstigste, ohne Termin nicht das nächste.
   const km = (e) => e.dist ?? Infinity;
   const eur = (e) => e.row[SPALTE.EUR] ?? Infinity;
   const tag = (e) => e.row[SPALTE.VON] || '9999-99-99';
   const pct = (e) => (e.pct === null ? -1 : e.pct);
 
   function vergleicher() {
-    const name = (a, b) => a.row[SPALTE.NAME].localeCompare(b.row[SPALTE.NAME],
-                                                            FF.sprache());
-    const datum = (a, b) => tag(a).localeCompare(tag(b));
+    const ordnung = FF.sammler();
+    const name = (a, b) => ordnung.compare(a.row[SPALTE.NAME], b.row[SPALTE.NAME]);
+    const datum = (a, b) => (tag(a) < tag(b) ? -1 : tag(a) > tag(b) ? 1 : 0);
     switch (sortierung()) {
       case 'distance':
         return (a, b) => km(a) - km(b) || datum(a, b) || eur(a) - eur(b) || name(a, b);
@@ -236,7 +229,7 @@
   }
 
   Object.assign(FF, {
-    state, KETTE, PRUEFUNG, uebrig, gefiltert, bewerten,
+    state, KETTE, PRUEFUNG, auswerten, bewerten,
     sortierungen, sortierung, vergleicher, gewichtet,
     entfernungVon, nachEuro, waehrungFuerLand, WAEHRUNG_ZEICHEN: ZEICHEN, KURSE,
   });
