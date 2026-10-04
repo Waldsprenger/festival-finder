@@ -51,32 +51,31 @@ def test_die_genannten_ortsnamen_gibt_es_auch():
 def test_das_nachgeladene_verzeichnis_steht_im_text():
     """Was nachgeladen wird, gehört genannt — auch wenn es vom eigenen Server kommt.
 
-    Die grosse Verortungstabelle wird nicht mitversioniert; ohne sie lässt sich
-    nur prüfen, dass der Text sie überhaupt erwähnt.
+    Die Verzeichnisse für die Wohnortsuche werden nicht mitversioniert; ohne sie
+    lässt sich nur prüfen, dass der Text sie überhaupt erwähnt.
     """
     assert "nach" in DATENSCHUTZ and "Verzeichnis" in DATENSCHUTZ, \
         "das nachgeladene Verzeichnis kommt im Text nicht vor"
 
-    verortung_datei = DATA / "verortung.json"
-    if not verortung_datei.exists():
-        pytest.skip("verortung.json liegt nicht vor (wird nicht mitversioniert)")
+    wohnort_datei = DATA / "wohnort.json"
+    if not wohnort_datei.exists():
+        pytest.skip("wohnort.json liegt nicht vor (wird nicht mitversioniert)")
 
-    verortung = json.loads(verortung_datei.read_text(encoding="utf-8"))
-    plz_fern = verortung.get("plz_nachladen") or []
-    orte_fern = verortung.get("orte") or []
-    laender = {e[4] for e in plz_fern if len(e) > 4 and e[4]}
-
-    genannt_plz = genannte_zahl(r"rund ([\d.]+) weitere Postleitzahlen")
-    assert nah_dran(genannt_plz, len(plz_fern)), \
-        f"genannt {genannt_plz}, wirklich {len(plz_fern)}"
+    wohnort = json.loads(wohnort_datei.read_text(encoding="utf-8"))
+    plz_fern = wohnort.get("plz") or {}
+    gebiete = sum(len(v) for v in plz_fern.values())
 
     genannt_laender = genannte_zahl(r"Postleitzahlen aus (\d+) Ländern")
-    assert genannt_laender == len(laender), \
-        f"genannt {genannt_laender} Länder, wirklich {len(laender)}: {sorted(laender)}"
+    assert genannt_laender == len(plz_fern), \
+        f"genannt {genannt_laender} Länder, wirklich {len(plz_fern)}"
 
-    genannt_orte = genannte_zahl(r"sowie rund ([\d.]+)\s*\n?\s*Ortsnamen weltweit")
-    assert nah_dran(genannt_orte, len(orte_fern)), \
-        f"genannt {genannt_orte}, wirklich {len(orte_fern)}"
+    genannt_gebiete = genannte_zahl(r"zu rund ([\d.]+) Gebieten")
+    assert nah_dran(genannt_gebiete, gebiete), f"genannt {genannt_gebiete}, wirklich {gebiete}"
+
+    for muster, schluessel in ((r"sowie rund ([\d.]+)\s*\n?\s*Ortsnamen weltweit", "orte"),
+                               (r"rund ([\d.]+)\s*\n?\s*Zweitnamen", "zweitnamen")):
+        genannt, wirklich = genannte_zahl(muster), len(wohnort.get(schluessel) or [])
+        assert nah_dran(genannt, wirklich), f"{schluessel}: genannt {genannt}, wirklich {wirklich}"
 
 
 def test_kein_versprechen_von_nur_dach():

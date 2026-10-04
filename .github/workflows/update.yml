@@ -72,6 +72,7 @@ jobs:
             data/gazetteer.json
             data/plz.json
             data/verortung.json
+            data/wohnort.json
             data/quellen_stand.json
             data/preis_verlauf.json
             data/bestand_verlauf.json
@@ -136,6 +137,7 @@ jobs:
             data/gazetteer.json
             data/plz.json
             data/verortung.json
+            data/wohnort.json
             data/quellen_stand.json
             data/preis_verlauf.json
             data/bestand_verlauf.json

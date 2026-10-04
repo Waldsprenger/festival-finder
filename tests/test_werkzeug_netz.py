@@ -112,25 +112,39 @@ class TestGeokodieren:
         assert geokodieren.cc("Bayern") == ""
 
 
-class TestKurzeCodes:
-    """Welche Postleitzahlen die Seite mitbekommt — und welche sie nachlädt."""
+class TestPostleitzahlenDerWelt:
+    """Die Postleitzahlen der Wohnortsuche: so genau wie nötig, so klein wie möglich."""
 
-    def eintrag(self, code, cc):
-        return [code, "Musterstadt", 50.0, 8.0, cc]
+    def test_schreibform_und_schluessel(self):
+        assert gazetteer.plz_schluessel("3750-000", "PT") == ("3750-000", "3750000")
+        assert gazetteer.plz_schluessel("624 66", "SE") == ("624 66", "62466")
+        # Der Ländervorsatz gehört nicht zum Code
+        assert gazetteer.plz_schluessel("LV-5101", "LV") == ("5101", "5101")
+        assert gazetteer.plz_schluessel("L-4968", "LU") == ("4968", "4968")
+        # „CEDEX" ist in Frankreich ein Zusatz für Großkunden
+        assert gazetteer.plz_schluessel("97491 CEDEX", "RE") == ("97491", "97491")
 
-    def test_vierstellige_laender_werden_erkannt(self):
-        alle = [self.eintrag("1012", "NL"), self.eintrag("2000", "BE"),
-                self.eintrag("75001", "FR")]
-        assert gazetteer.kurze_codes(alle) == {"NL", "BE"}
+    def test_form_erkennt_das_land(self):
+        """An der Form liest die Seite ab, aus welchem Land ein Code sein kann."""
+        assert gazetteer.form_von("490-1401") == "999-9999"       # Japan
+        assert gazetteer.form_von("3750-000") == "9999-999"       # Portugal
+        assert gazetteer.form_von("624 66") == "999-99"           # Schweden
+        assert gazetteer.form_von("SW1A") == "AA9A"               # Großbritannien
 
-    def test_ein_langer_code_zaehlt_fuers_ganze_land(self):
-        """Frankreich hat fünfstellige Codes — dort antwortet Nominatim."""
-        alle = [self.eintrag("7500", "FR"), self.eintrag("75001", "FR")]
-        assert gazetteer.kurze_codes(alle) == set()
+    def test_nahe_codes_fallen_zusammen(self):
+        """Lissabon führt jede Straße mit eigenem Code; für den Umkreis genügt das Viertel."""
+        codes = {f"110014{n}": (38.72 + n * 0.0005, -9.13) for n in range(10)}
+        # Zwei Stellen dürfen wegfallen, mehr nicht
+        assert gazetteer.plz_verdichten(codes) == {"11001": [38.722, -9.13]}
 
-    def test_buchstabencodes_zaehlen_nach_laenge(self):
-        """Großbritannien führt Bezirkscodes wie „SW1A"."""
-        assert gazetteer.kurze_codes([self.eintrag("SW1A", "GB")]) == {"GB"}
+    def test_ferne_codes_bleiben_getrennt(self):
+        codes = {"10115": (52.53, 13.38), "10117": (52.52, 13.39), "80331": (48.14, 11.57)}
+        verdichtet = gazetteer.plz_verdichten(codes)
+        assert "80331" in verdichtet or "803" in verdichtet
+        assert not any(k in verdichtet for k in ("", "1", "8"))
 
-    def test_ohne_daten_kein_land(self):
-        assert gazetteer.kurze_codes([]) == set()
+    def test_hoechstens_zwei_stellen_fallen_weg(self):
+        """Monaco liegt ganz in fünf Kilometern. Fiele es auf den leeren Präfix,
+        wäre jede fünfstellige Zahl der Welt eine Postleitzahl in Monaco."""
+        codes = {f"980{n:02d}": (43.73, 7.42) for n in range(20)}
+        assert set(gazetteer.plz_verdichten(codes)) == {"980"}

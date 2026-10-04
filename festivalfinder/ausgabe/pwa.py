@@ -70,6 +70,9 @@ def symbole(neu: bool = False) -> list[dict]:
 SW = """/* erzeugt von festivalfinder/ausgabe/pwa.py */
 const CACHE = 'festival-finder';
 const VORRAT = __VORRAT__;
+// Nur bei Bedarf geholt (Ortsverzeichnis, Postleitzahlen der Welt) — aber
+// beim Aufräumen behalten, solange ihr Stand gilt.
+const NACHLADEN = __NACHLADEN__;
 const FRIST = 2500;
 const versioniert = (url) => new URL(url, self.location).searchParams.has('v');
 
@@ -83,7 +86,7 @@ self.addEventListener('install', (e) => {
 });
 
 self.addEventListener('activate', (e) => {
-  const behalten = new Set(VORRAT.map((u) => new URL(u, self.location).href));
+  const behalten = new Set([...VORRAT, ...NACHLADEN].map((u) => new URL(u, self.location).href));
   e.waitUntil((async () => {
     for (const name of await caches.keys()) if (name !== CACHE) await caches.delete(name);
     const c = await caches.open(CACHE);
@@ -141,8 +144,12 @@ def bauen(versionen: dict[str, str] | None = None) -> dict:
     }
     schreib_text(SITE / "manifest.webmanifest",
                  json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
+    versionen = versionen or {}
     liste = vorrat()
-    if versionen and versionen.get("geo"):
+    if versionen.get("geo"):
         liste.append(f"./geo.js?v={versionen['geo']}")
-    schreib_text(SITE / "sw.js", SW.replace("__VORRAT__", json.dumps(liste, indent=1)))
-    return {"vorrat": liste}
+    nachladen = [f"./{name}.js?v={versionen[name]}" for name in ("orte", "plz")
+                 if versionen.get(name)]
+    schreib_text(SITE / "sw.js", SW.replace("__VORRAT__", json.dumps(liste, indent=1))
+                                   .replace("__NACHLADEN__", json.dumps(nachladen, indent=1)))
+    return {"vorrat": liste, "nachladen": nachladen}

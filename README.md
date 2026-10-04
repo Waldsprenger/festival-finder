@@ -64,7 +64,7 @@ nichts voneinander.
 | **`ausgabe/`** | **was der Lauf hinterlässt** |
 | `festivalfinder/ausgabe/dateien.py` | `data/festivals.json` und drei CSV-Tabellen |
 | `festivalfinder/ausgabe/verorten.py` | vier Ränge auf dem Weg zur Koordinate |
-| `festivalfinder/ausgabe/daten_js.py` | → `site/data.js`, `site/geo.js` und `site/orte.js` |
+| `festivalfinder/ausgabe/daten_js.py` | → `site/data.js`, `site/geo.js`, `site/orte.js` und `site/plz.js` |
 | `festivalfinder/ausgabe/seitenteile.py` | welche Dateien die Seite lädt — aus ihr selbst gelesen |
 | `festivalfinder/ausgabe/uebersicht.py` | → `data/uebersicht.html`, Kontrolltabelle |
 | `festivalfinder/ausgabe/pwa.py` | Manifest, App-Symbole, Service Worker |
@@ -98,7 +98,7 @@ Der Service Worker und die gebündelte Einzelseite lesen genau diese Liste.
 | `site/js/text.js` | `fold` nach den Regeln aus `data/faltung.json`, Formatierung |
 | `site/js/sprache.js` | Übersetzen und Umschalten |
 | `site/js/zustand.js` | was eingestellt ist, was daraus folgt, wie sortiert wird |
-| `site/js/wohnort.js` | von einer Eingabe zu einem Punkt auf der Erde |
+| `site/js/wohnort.js` | von einer Eingabe aus jedem Land — Postleitzahl, Ort, Adresse — zu einem Punkt auf der Erde |
 | `site/js/karte.js` | die Landkarte auf Canvas: Umrisse, Bereich, Pins, Zoom |
 | `site/js/kette.js` | die sechs Schritte: aufklappen, zusammenklappen, weiterreichen |
 | `site/js/auswahl.js` | Bandsuche und Genreauswahl |
@@ -108,7 +108,8 @@ Der Service Worker und die gebündelte Einzelseite lesen genau diese Liste.
 | `site/js/start.js` | die Verdrahtung |
 | `site/data.js` | die Festivals, von `ausgabe/daten_js.py` täglich erzeugt |
 | `site/geo.js` | Orte, Postleitzahlen, Kartenumrisse — ändern sich selten, bleiben im Speicher |
-| `site/orte.js` | das große Ortsverzeichnis, nur bei Bedarf nachgeladen |
+| `site/orte.js` | das große Ortsverzeichnis samt Zweitnamen und Bundesstaaten, nur bei Bedarf nachgeladen |
+| `site/plz.js` | Postleitzahlen aus 117 Ländern, nur bei Bedarf nachgeladen |
 
 ## Selbst bauen
 
@@ -642,29 +643,52 @@ im HTML standen und dort auseinanderliefen. Zahlen in diesen Texten kommen aus
 den Daten (`Für {ohnePreis} Festivals nennt die Quelle keinen Preis`), damit
 sie nicht in zehn Sprachen veralten.
 
-**Schritt 1 — Rahmen setzen.** Der Wohnort lässt sich überall auf der Welt
-angeben, per Postleitzahl oder Ortsname; daraus rechnet die Seite jede
-Entfernung. Vier
-Stufen, von der billigsten zur teuersten:
+**Schritt 1 — Rahmen setzen.** Der Wohnort lässt sich aus jedem Land angeben —
+so, wie man ihn dort schreibt: „97209 Veitshöchheim", „Austin, TX", „SW1A 1AA",
+„〒100-0001 東京都千代田区", „Москва" oder eine ganze Adresse wie „1600
+Pennsylvania Ave NW, Washington, DC 20500". Daraus rechnet die Seite jede
+Entfernung.
 
-1. **Mitgeliefert** (in `geo.js`): die Postleitzahlen von DE/AT/CH und alle
-   Orte der Welt ab 15.000 Einwohnern, DE/AT/CH vollständig — 116.653 Stück.
-   Damit ist der Normalfall ohne einen einzigen Netzabruf beantwortet.
-2. **Nachgeladen** (`site/orte.js`, 3,2 MB übertragen): 155.344 Orte bis
-   hinunter zu kleinen Gemeinden und 24.893 Postleitzahlen der Länder, deren
-   Codes höchstens vierstellig sind. Die Datei kommt erst, wenn die kleine
-   Tabelle nichts hergibt — wer „97209" eingibt, lädt sie nie.
-3. **Nominatim**, strukturiert gefragt (`postalcode` plus `countrycodes`), für
-   fünfstellige Codes wie „75001 FR".
-4. Bleibt auch das ohne Treffer, sagt die Seite das — statt still den falschen
+[site/js/wohnort.js](site/js/wohnort.js) zerlegt die Eingabe zuerst: Was ist
+Postleitzahl, was Ort, was Bundesstaat oder Land, was Straße und Hausnummer?
+Postleitzahlen erkennt sie an ihrer Form — „100-0001" kann nur Japan sein,
+„1100-148" nur Portugal, „M5V 3L9" nur Kanada —, Länder in jeder Sprache, die
+der Browser kennt („Japan", „日本", „Deutschland", „USA"), und die Staaten der
+USA, Kanadas und Australiens als Kürzel oder ausgeschrieben. In einer Straße
+ist eine kurze Zahl die Hausnummer: „Avenida Paulista 1578" liegt nicht in
+Sydney, obwohl es dort die Postleitzahl 1578 gibt. Dann sucht sie, von der
+billigsten Stufe zur teuersten:
+
+1. **Mitgeliefert** (`geo.js`): die Postleitzahlen von DE/AT/CH und alle Orte
+   der Welt ab 15.000 Einwohnern, DE/AT/CH vollständig — 116.653 Stück. Wer
+   „97209" eingibt, lädt nichts nach.
+2. **Orte nachgeladen** (`orte.js`, 4,7 MB übertragen): 260.592 Orte ab 1.000
+   Einwohnern, 104.552 Zweitnamen der Städte ab 100.000 („Warszawa", „Lisboa",
+   „Москва", „東京", „القاهرة") und 24.207 Orte der USA, Kanadas und
+   Australiens mit ihrem Bundesstaat — es gibt 33 Springfields in den USA, und
+   „Springfield, IL" meint keines in Missouri.
+3. **Postleitzahlen nachgeladen** (`plz.js`, 2,2 MB übertragen): 117 Länder.
+   GeoNames führt 1,08 Millionen Codes, Portugal jede Straße, Singapur jedes
+   Haus; für einen Umkreis in Kilometern genügt das Viertel. Jedes Land wird
+   deshalb als Präfixbaum verdichtet: Ein Präfix steht für alle Codes darunter,
+   sobald sie höchstens fünf Kilometer von ihrem Mittel entfernt liegen —
+   319.000 Einträge bleiben. Höchstens zwei Stellen dürfen dabei wegfallen;
+   sonst läge Monaco ganz auf dem leeren Präfix, und jede fünfstellige Zahl
+   der Welt wäre eine Postleitzahl in Monaco.
+4. **Nominatim** — erst wenn nichts davon passt, mit der ganzen Eingabe.
+5. Bleibt auch das ohne Treffer, sagt die Seite das — statt still den falschen
    Ort zu nehmen.
 
-Warum die Aufteilung: „1012" gibt es in Lausanne **und** in Amsterdam. Wer
-„1012 NL" eingibt, bekam früher die Schweiz, weil nur DACH-Codes vorlagen und
-das genannte Land ignoriert wurde. Und Nominatim hilft dort nicht: „75001 FR"
-findet der Dienst, „1012 NL" nicht — niederländische Codes sind dort nur mit
-ihrem Buchstabenteil erfasst („1012 AB"). Genau diese Länder liegen jetzt in
-der nachladbaren Tabelle. Dazu Umkreis, Höchstpreis
+Welches Land gemeint ist, wenn es einen Code mehrfach gibt („2000" ist
+Unterzögersdorf, Sydney, Antwerpen, Kopenhagen-Frederiksberg …): ein genannter
+Ort in der Nähe, ein genanntes Land oder Bundesstaat, sonst die Sprache und
+Region des Browsers — wer mit „en-AU" surft, landet in Sydney —, zuletzt
+DE/AT/CH. Die übrigen Länder nennt die Seite dazu. Bis Oktober 2026 kannte sie
+außerhalb Europas fast nur Ortsnamen ab 15.000 Einwohnern: Von 49 Eingaben aus
+aller Welt löste sie 11 selbst auf, und drei landeten falsch — „1600
+Pennsylvania Ave …, Washington" in Wien, „1012 AB Amsterdam" in Lausanne,
+„2000" für Sydney in Niederösterreich. Jetzt sind es 48 ohne Nominatim; die
+übrige, „C1002" in Buenos Aires, führt GeoNames nicht. Dazu Umkreis, Höchstpreis
 und Zeitraum, jeweils mit Schalter „auch ohne Angabe zeigen", und einer für
 abgesagte Festivals. Die Karte ist ein Canvas aus mitgelieferten Vektorgrenzen
 — keine Kartenkacheln, also erfährt kein fremder Server, wo jemand sucht.
@@ -799,7 +823,7 @@ erspart den zwölf Quellen einen Abruf je Commit und dem Lauf zehn Minuten; die
 Seite ist trotzdem gleich nach dem Push auf dem neuen Stand. Möglich ist das,
 weil ein Sammellauf genau ein Ergebnis hinterlässt — `data/festivals.json` —
 und alles Weitere daraus abgeleitet wird: die drei CSV-Tabellen, die
-Kontrolltabelle, `data.js`, `geo.js`, `orte.js`, die Einzelseite. Fehlt der Bestand, weil
+Kontrolltabelle, `data.js`, `geo.js`, `orte.js`, `plz.js`, die Einzelseite. Fehlt der Bestand, weil
 der Zwischenspeicher abgelaufen ist, läuft stattdessen der volle Lauf; ohne ihn
 gäbe es nichts zu bauen.
 
@@ -876,7 +900,7 @@ Mindestabstand, bevor es so weit kommt.
 pip install pytest pyflakes && python -m pytest tests -q
 ```
 
-780 Tests in knapp acht Sekunden, ohne Netz und ohne Datenbestand. Sie halten
+781 Tests in knapp acht Sekunden, ohne Netz und ohne Datenbestand. Sie halten
 fest, warum die Regeln so aussehen, wie sie aussehen — fast jeder Fall stand
 einmal falsch in den Daten:
 
@@ -904,7 +928,7 @@ einmal falsch in den Daten:
 | `tests/test_werkzeug.py` | Preisgeschichte und mitgebrachter Stand |
 | `tests/test_neuheiten.py` | seit wann wir was kennen — und wann das schweigt |
 | `tests/test_chronik.py` | genau eine Zeile je Monat, auch nach einer Pause |
-| `tests/test_werkzeug_netz.py` | Ausfall des Kartendienstes ist kein „Ort unbekannt" |
+| `tests/test_werkzeug_netz.py` | Ausfall des Kartendienstes ist kein „Ort unbekannt"; Postleitzahlen der Welt verdichten |
 | `tests/test_dateien.py` | JSON schreiben und lesen, auch bei Abbruch mittendrin |
 | `tests/test_statisch.py` | pyflakes über den Quelltext — Namen, die erst zur Laufzeit auffielen |
 | `tests/test_dokumentation.py` | das README gegen das Projekt, das es wirklich gibt |
@@ -1272,6 +1296,14 @@ Ausfall wird morgen erneut gefragt.
   Das ist der Preis dafür, dass alles ohne Server läuft: 13.563 Festivals,
   92.187 Acts, 116.653 Orte. Danach lädt ein Besuch nur noch die
   Festivaldatei; unterwegs beim ersten Mal ist es trotzdem viel.
+- **Postleitzahlen kennt die Seite aus 120 Ländern**, so viele führt GeoNames.
+  Für China, Nigeria, Ägypten, Saudi-Arabien und die übrigen gilt der
+  Ortsname, für Brasilien und Argentinien nur der grobe Bereich: GeoNames
+  führt dort je Stadt einen Code, nicht die Straßenzüge. Mehrdeutige reine
+  Zahlen („06000" gibt es in acht Ländern) entscheidet die Sprache des
+  Browsers, sonst das Alphabet — mit Hinweis auf die anderen. Die Einzelseite
+  für claude.ai kennt nur DE/AT/CH und Orte ab 15.000 Einwohnern; die großen
+  Verzeichnisse lägen dort nur unnötig im Gewicht.
 - **3.991 Festivals haben keinen Termin.** Sie kommen aus festivism und aus
   den festivalabroad-Seiten, deren nächste Ausgabe noch nicht feststeht.
   Voreingestellt sind sie ausgeblendet; der Schalter „Festivals ohne Termin

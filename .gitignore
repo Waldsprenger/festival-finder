@@ -10,9 +10,11 @@ data/uebersicht.html
 data/failed.txt
 data/lauf.json
 data/verortung.json
+data/wohnort.json
 site/data.js
 site/geo.js
 site/orte.js
+site/plz.js
 site/artifact.html
 site/manifest.webmanifest
 site/sw.js

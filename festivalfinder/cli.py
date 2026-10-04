@@ -177,7 +177,8 @@ def befehl_bauen(args) -> int:
 
     z = ausgabe.daten_js.bauen(festivals)
     print(f"data.js   ({z['data_js_mb']:.1f} MB)  geo.js ({z['geo_js_mb']:.1f} MB, "
-          f"Stand {z['versionen']['geo']})  orte.js ({z['orte_js_mb']:.1f} MB zum Nachladen)")
+          f"Stand {z['versionen']['geo']})  zum Nachladen: orte.js ({z['orte_js_mb']:.1f} MB), "
+          f"plz.js ({z['plz_js_mb']:.1f} MB, {z['plz_laender']} Länder)")
     print(f"  Koordinaten aus Postleitzahl: {z['aus_plz']}, aus dem Geo-Cache: "
           f"{z['aus_cache']}, aus dem Ortsverzeichnis: {z['aus_ortsverzeichnis']}, "
           f"aus der Quellseite: {z['aus_quelle']}")
@@ -212,8 +213,9 @@ def befehl_verzeichnis(args) -> int:
     z = gazetteer.bauen(_netz(args))
     print(f"laender.json ({z['laender']}) | gazetteer.json ({z['orte_klein']} Orte) | "
           f"laender_rahmen.json ({z['rahmen']}) | plz.json ({z['plz_dach']})")
-    print(f"verortung.json: {z['plz_welt']} Postleitzahlen, {z['orte_fein']} Orte, "
-          f"{z['plz_nachladen']} zum Nachladen")
+    print(f"verortung.json: {z['plz_welt']} Postleitzahlen, {z['orte_fein']} Orte")
+    print(f"wohnort.json: Postleitzahlen aus {z['plz_laender']} Ländern, verdichtet auf "
+          f"{z['plz_verdichtet']}; {z['zweitnamen']} Zweitnamen")
     return 0
 
 

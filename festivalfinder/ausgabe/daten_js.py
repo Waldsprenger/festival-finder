@@ -1,4 +1,4 @@
-"""Was die Webseite braucht — in drei Dateien, nach Lebensdauer getrennt.
+"""Was die Webseite braucht — in vier Dateien, nach Lebensdauer getrennt.
 
 * `site/data.js` — die Festivals, Bands und Genres. Ändert sich mit jedem Lauf.
 * `site/geo.js` — Ortsverzeichnis, Postleitzahlen und Kartenumrisse. Ändert
@@ -7,9 +7,12 @@
   geändert hatten. Jetzt trägt `data.js` nur die Kennung des Standes; die Seite
   holt `geo.js?v=<kennung>` nach dem ersten Bildaufbau, und Browser wie
   Service Worker behalten sie, bis sich die Kennung ändert.
-* `site/orte.js` — das große Ortsverzeichnis, nur bei Bedarf nachgeladen.
+* `site/orte.js` — das große Ortsverzeichnis samt Zweitnamen großer Städte
+  („Warszawa", „東京"), nur bei Bedarf nachgeladen.
+* `site/plz.js` — Postleitzahlen aus 117 Ländern, nur geladen, wenn jemand
+  eine Postleitzahl außerhalb von DE/AT/CH eingibt.
 
-Alle drei sind JS-Dateien statt JSON: Die Seite läuft so auch per Doppelklick
+Alle vier sind JS-Dateien statt JSON: Die Seite läuft so auch per Doppelklick
 (file://), wo der Browser `fetch()` auf lokale Dateien blockiert.
 """
 
@@ -136,18 +139,24 @@ def _orte(liste) -> list:
     return [[n, round(la, 3), round(lo, 3), cc] for n, la, lo, cc in liste]
 
 
+def _staatorte(liste) -> list:
+    """Orte mit Bundesstaat: „Springfield", …, „IL"."""
+    return [[n, round(la, 3), round(lo, 3), cc, staat] for n, la, lo, cc, staat in liste]
+
+
 def _plz(liste) -> list:
     return [[c, o, round(la, 3), round(lo, 3), cc] for c, o, la, lo, cc in liste]
 
 
 def bauen(festivals: list[Festival]) -> dict:
-    """site/data.js, site/geo.js und site/orte.js; gibt die Kennzahlen zurück."""
+    """site/data.js, geo.js, orte.js und plz.js; gibt die Kennzahlen zurück."""
     geo = lies_json(DATA / "geo.json", {})
     plz = lies_json(DATA / "plz.json", [])
     gazetteer = lies_json(DATA / "gazetteer.json", [])
     # Die große Verortungstabelle wird nicht mitversioniert; fehlt sie,
     # reichen die mitgelieferten Verzeichnisse (dann nur DE/AT/CH bei den PLZ).
     verortung = lies_json(DATA / "verortung.json", {})
+    wohnort = lies_json(DATA / "wohnort.json", {})
 
     genre_keys = list(OBERBEGRIFFE)
     genre_ix = {k: n for n, k in enumerate(genre_keys)}
@@ -185,13 +194,22 @@ def bauen(festivals: list[Festival]) -> dict:
         "worldFine": lies_json(DATA / "welt_fein.json", []),
         # Ausschnitt, für den feine Umrisse vorliegen: lon0, lon1, lat0, lat1
         "fineBox": [FEINRAHMEN[2], FEINRAHMEN[3], FEINRAHMEN[0], FEINRAHMEN[1]],
+        # Wie Postleitzahlen je Land aussehen („999-9999" → JP) und wo die
+        # Bundesstaaten liegen — klein, und die Seite weiß damit, ob sie
+        # plz.js überhaupt braucht.
+        "plzFormen": wohnort.get("formen", {}),
+        "verwaltung": wohnort.get("verwaltung", {}),
+        "staatOrte": _staatorte(wohnort.get("staatorte_gross", [])),
     })
-    welt_orte = verortung.get("orte") or gazetteer
-    welt_plz = verortung.get("plz_nachladen") or []
+    welt_orte = wohnort.get("orte") or verortung.get("orte") or gazetteer
+    welt_plz = wohnort.get("plz") or {}
     if not welt_plz:
-        print("  ! verortung.json fehlt - keine ausländischen Postleitzahlen",
+        print("  ! wohnort.json fehlt - Postleitzahlen nur für DE/AT/CH",
               file=sys.stderr)
-    orte_js = als_javascript("ORTE_WELT", {"orte": _orte(welt_orte), "plz": _plz(welt_plz)})
+    orte_js = als_javascript("ORTE_WELT", {"orte": _orte(welt_orte),
+                                           "zweitnamen": _orte(wohnort.get("zweitnamen", [])),
+                                           "staatOrte": _staatorte(wohnort.get("staatorte", []))})
+    plz_js = als_javascript("PLZ_WELT", welt_plz)
 
     # Kürzel und Zweitschreibweisen: In den Daten steht der ausgeschriebene
     # Name, die Suche braucht beide — sonst findet „TBS" nichts.
@@ -219,7 +237,8 @@ def bauen(festivals: list[Festival]) -> dict:
         "neu": neuigkeiten(festivals, band_ix),
         # Welcher Stand der Geodaten zu diesen Daten gehört
         "versionen": {"geo": schreiben_wenn_neu("geo.js", geo_js),
-                      "orte": schreiben_wenn_neu("orte.js", orte_js)},
+                      "orte": schreiben_wenn_neu("orte.js", orte_js),
+                      "plz": schreiben_wenn_neu("plz.js", plz_js)},
     }
     schreib_text(SITE / "data.js", als_javascript("DATA", payload))
 
@@ -234,10 +253,12 @@ def bauen(festivals: list[Festival]) -> dict:
         "mit_preis": sum(1 for z in zeilen if z[EURO] is not None),
         "mit_genre": sum(1 for z in zeilen if z[GENRES]),
         "acts": len(bands), "orte": len(orte), "plz": len(plz),
-        "welt_orte": len(welt_orte), "welt_plz": len(welt_plz),
+        "welt_orte": len(welt_orte),
+        "welt_plz": sum(len(v) for v in welt_plz.values()), "plz_laender": len(welt_plz),
         "bandkuerzel": len(alias_paare), "ab_datum": payload["minDate"],
         "versionen": payload["versionen"],
         "data_js_mb": (SITE / "data.js").stat().st_size / 1e6,
         "geo_js_mb": (SITE / "geo.js").stat().st_size / 1e6,
         "orte_js_mb": (SITE / "orte.js").stat().st_size / 1e6,
+        "plz_js_mb": (SITE / "plz.js").stat().st_size / 1e6,
     }
