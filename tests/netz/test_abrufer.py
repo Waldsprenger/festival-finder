@@ -16,6 +16,8 @@ Jeder Test bekommt seinen eigenen Abrufer. Vorher stand der Zustand im Modul,
 und jeder Test musste ihn von Hand leeren.
 """
 
+import time
+
 import pytest
 import requests
 
@@ -70,20 +72,44 @@ class TestZuVieleAnfragen:
         assert d.gefragt == 3
         assert abrufer.fehlgeschlagen == []
 
-    def test_die_wartezeit_waechst(self, abrufer):
+    def test_der_abstand_waechst_je_bitte_um_eine_sekunde(self, abrufer):
         dienst(abrufer, Antwort(429), Antwort(429), Antwort(200))
         abrufer.fetch("https://jambase.test/a")
-        assert abrufer.verzoegerung["jambase.test"] == 2.0
+        assert abrufer.abstand("https://jambase.test/") == ABSTAND + 2.0
 
-    def test_retry_after_wird_beachtet(self, abrufer):
-        dienst(abrufer, Antwort(429, kopf={"Retry-After": "5"}), Antwort(200))
+    def test_retry_after_gilt_einmal(self, tmp_path, uhr):
+        """Ein „Retry-After" ist eine Pause, kein Takt. Als Takt genommen,
+        brauchten bei jambase 2.160 Seiten 3,6 Stunden statt einer."""
+        abrufer = Abrufer(cache=tmp_path)
+        zeiten = []
+
+        class Mitschrift(Dienst):
+            def get(self, url, **k):
+                zeiten.append(uhr.jetzt)
+                return super().get(url, **k)
+
+        abrufer.session = lambda d=Mitschrift(
+            Antwort(429, kopf={"Retry-After": "6"})): d
         abrufer.fetch("https://jambase.test/a")
-        assert abrufer.verzoegerung["jambase.test"] == 5.0
+        abrufer.fetch("https://jambase.test/b")
+        pause, danach = zeiten[1] - zeiten[0], zeiten[2] - zeiten[1]
+        assert pause >= 6.0
+        assert danach == abrufer.abstand("https://jambase.test/") == ABSTAND + 1.0
+
+    def test_ein_schub_von_absagen_ist_eine_bitte(self, abrufer):
+        """Vier Fäden fragen, alle vier werden abgewiesen: eine Bitte, nicht
+        vier — sonst stünde der Abstand gleich bei vier Sekunden."""
+        url = "https://jambase.test/a"
+        abgeschickt = time.monotonic() - 1.0      # alle vor der ersten Absage los
+        abrufer.langsamer_werden(url, Antwort(429), abgeschickt)
+        for _ in range(3):
+            abrufer.langsamer_werden(url, Antwort(429), abgeschickt)
+        assert abrufer.abstand(url) == ABSTAND + 1.0
 
     def test_die_wartezeit_gilt_fuer_den_ganzen_rechner(self, abrufer):
         dienst(abrufer, Antwort(429), Antwort(200), Antwort(200))
         abrufer.fetch("https://jambase.test/a")
-        assert abrufer.abstand("https://jambase.test/andere-seite") == 1.0
+        assert abrufer.abstand("https://jambase.test/andere-seite") == ABSTAND + 1.0
         assert abrufer.abstand("https://woanders.test/seite") == ABSTAND
 
     def test_irgendwann_bleibt_die_seite_liegen(self, abrufer):
@@ -184,10 +210,12 @@ class TestAbstand:
         assert abrufer.endziel(f"{FT}/link/1", "festivalticker.de") == "https://festival.test/"
         assert uhr.gewartet == [ABSTAND_JE_HAUS["www.festivalticker.de"]]
 
-    def test_eine_bitte_um_ruhe_kann_den_abstand_nur_vergroessern(self, abrufer):
+    def test_eine_bitte_um_ruhe_zaehlt_vom_festen_abstand_aus(self, abrufer):
+        """jambase bat bei einer Sekunde um Ruhe. „Eine Sekunde Wartezeit"
+        änderte dort nichts — so viel Abstand hatte es schon."""
         dienst(abrufer, Antwort(429), Antwort(200))
         abrufer.fetch(f"{FT}/a/")
-        assert abrufer.abstand(f"{FT}/b/") == ABSTAND_JE_HAUS["www.festivalticker.de"]
+        assert abrufer.abstand(f"{FT}/b/") == ABSTAND_JE_HAUS["www.festivalticker.de"] + 1.0
 
 
 class TestAbgewiesen:

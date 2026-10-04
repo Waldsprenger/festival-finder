@@ -77,10 +77,16 @@ def fund(quelle: str, url: str, name: str, *,
     * Die Webseite muss eine Adresse sein. Acht Karten trugen einen Verweis
       auf „None", weil ein Datenblattfeld null hieß; angeklickt führte er ins
       Nichts.
+    * Ein Termin, der vor seinem Anfang endet, ist keiner. festivalabroad
+      datierte das NorthSide Festival auf den 12. bis 6. Juni — welche Hälfte
+      falsch ist, verrät der Eintrag nicht. Ohne Termin findet er über Ort und
+      Namen zu dem Eintrag, den fünf andere Quellen übereinstimmend datieren.
     """
     if not orte.punkt_plausibel(lat, lon) or not orte.punkt_passt_zum_land(
             lat, lon, land):
         lat = lon = None
+    if von and bis and bis < von:
+        von = bis = None
     stadt, plz = text.plz_und_stadt(stadt, plz)
     return Fund(
         quelle=quelle,

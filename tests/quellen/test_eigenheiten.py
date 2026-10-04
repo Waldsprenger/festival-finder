@@ -60,6 +60,25 @@ class TestFestivalabroad:
         assert f.stadt == "Santa Rosa Beach"
         assert f.land == ""
 
+    def test_der_ort_steht_nicht_hinter_dem_hinweis_auf_den_termin(self, netz):
+        """Seit 2026: „… – Dates to Be Announced | Bend, Unit…". Der volle Ort
+        steht im Verweis auf die Länderseite."""
+        html = ("<html><head><title>4 Peaks Music Festival – Dates to Be Announced"
+                " | Bend, Unit…</title></head><body><h1>4 Peaks Music Festival</h1>"
+                '<span><a href="/festivals-in-united-states">Bend, United States</a>'
+                "</span></body></html>")
+        f = LESER["festivalabroad"].lesen(
+            netz, "https://www.festivalabroad.com/festivals/4-peaks", html)
+        assert f.name == "4 Peaks Music Festival"
+        assert (f.stadt, f.land) == ("Bend", "US")
+
+    def test_ohne_verweis_hilft_der_titel(self, netz):
+        html = ("<html><head><title>Ability Fest – Dates to Be Announced | "
+                "Melbourne, Australia</title></head><body></body></html>")
+        f = LESER["festivalabroad"].lesen(
+            netz, "https://www.festivalabroad.com/festivals/ability", html)
+        assert (f.stadt, f.land) == ("Melbourne", "AU")
+
     def test_ohne_titel_kein_datensatz(self, netz):
         assert LESER["festivalabroad"].lesen(
             netz, "https://www.festivalabroad.com/festivals/x",
@@ -120,6 +139,41 @@ class TestFestivalnetworks:
         netz.seiten["https://festivalnetworks.com/data-api.php?r=festivals"] = roh
         spaet = LESER["festivalnetworks"].sammeldatei(netz, 2099)
         assert all(f.von is None for f in spaet)
+
+
+def startseite(*orte: str) -> str:
+    """Eine festivalflyer-Startseite mit je einem Datenblatt je Ort."""
+    return "".join(
+        '<script type="application/ld+json">{"@type":"Event","name":"Fest",'
+        f'"startDate":"2027-8-25","location":[{{"@type":"Place","name":"{ort}"}}]}}'
+        "</script>" for ort in orte)
+
+
+class TestFestivalflyer:
+    """Die Quelle ruht: Die Startseite nennt nur noch Festivals ohne Land."""
+
+    START = "https://festivalflyer.com/"
+
+    def test_ohne_land_bleibt_sie_zu(self, netz):
+        """So sieht die Startseite seit September 2026 aus."""
+        netz.seiten[self.START] = startseite("Queens Hall", "Damyns Hall Aerodrome")
+        netz.geholt["festivalflyer.com"] = 1
+        assert LESER["festivalflyer"].wieder_offen(netz, 2026) is False
+
+    def test_mit_land_ist_sie_wieder_offen(self, netz):
+        netz.seiten[self.START] = startseite(
+            "Fernhill Farm, Cheddar Road, BS40 6LD Compton Martin, United Kingdom")
+        netz.geholt["festivalflyer.com"] = 1
+        assert LESER["festivalflyer"].wieder_offen(netz, 2026) is True
+
+    def test_vergangene_termine_zaehlen_nicht(self, netz):
+        netz.seiten[self.START] = startseite("Farm, BS40 6LD Compton, United Kingdom")
+        netz.geholt["festivalflyer.com"] = 1
+        assert LESER["festivalflyer"].wieder_offen(netz, 2030) is False
+
+    def test_aus_dem_zwischenspeicher_zaehlt_nichts(self, netz):
+        netz.seiten[self.START] = startseite("Farm, BS40 6LD Compton, United Kingdom")
+        assert LESER["festivalflyer"].wieder_offen(netz, 2026) is None
 
 
 class TestWannafest:

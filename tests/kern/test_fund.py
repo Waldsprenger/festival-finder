@@ -32,6 +32,12 @@ class TestTrichter:
     def test_jahr_ohne_termin_bleibt(self):
         assert fund("festivalsunited", "u", "X", jahr="2027").jahr == "2027"
 
+    def test_ein_termin_der_sich_widerspricht_ist_keiner(self):
+        """festivalabroad: NorthSide vom 12. bis zum 6. Juni."""
+        f = fund("festivalabroad", "u", "NorthSide Festival Denmark",
+                 von=date(2026, 6, 12), bis=date(2026, 6, 6), stadt="Aarhus")
+        assert (f.von, f.bis, f.jahr) == (None, None, "")
+
     def test_land_wird_zum_kuerzel(self):
         assert fund("festapp", "u", "X", land="Deutschland").land == "DE"
 

@@ -6,6 +6,7 @@ wird, in `bund/`.
 """
 
 import concurrent.futures as cf
+import sys
 from dataclasses import dataclass, field
 
 from .kern.festival import Festival
@@ -35,6 +36,17 @@ class Ergebnis:
     bandstatistik: dict = field(default_factory=dict)
 
 
+def zeile(text: str) -> None:
+    """Eine Zeile ins Protokoll, in einem Stück.
+
+    `print` schreibt Text und Zeilenumbruch getrennt. Seit alle Quellen
+    zugleich sammeln, schob sich dazwischen die Zeile eines anderen Fadens:
+    „festivalhopper: 801 Detailseiten  festivism: 5206 Detailseiten".
+    """
+    sys.stdout.write(text + "\n")
+    sys.stdout.flush()
+
+
 def einlesen(netz: Abrufer, quelle: Quelle, urls: list[str],
              parsefehler: dict[str, int]) -> list[Fund]:
     """Detailseiten einer Quelle parallel holen und auslesen."""
@@ -46,7 +58,7 @@ def einlesen(netz: Abrufer, quelle: Quelle, urls: list[str],
             url = auftraege[auftrag]
             fertig += 1
             if fertig % 100 == 0:
-                print(f"  {quelle.name}: {fertig}/{len(urls)}", flush=True)
+                zeile(f"  {quelle.name}: {fertig}/{len(urls)}")
             html = auftrag.result()
             if not html:
                 continue
@@ -110,14 +122,21 @@ def funde_sammeln(netz: Abrufer, seit: int, *, limit: int = 0,
     if ruhende and (pruefen if pruefen is not None else not chronik.steht_schon()):
         ruhende_pruefen(netz, ruhende, seit, ergebnis)
     quellen = [q for q in quellen if not q.ruht]
-    # Quellen mit einer Sammeldatei haben keine Adressen je Festival — ihr
-    # Abruf steht weiter unten, wo auch die Seiten gelesen werden.
-    adressen = {q.name: q.adressen(netz, seit) for q in quellen
-                if type(q).sammeldatei is Quelle.sammeldatei}
-    print("  " + " | ".join(f"{n} {len(u)}" for n, u in adressen.items()), flush=True)
 
-    for quelle in quellen:
-        gefunden = _eine_quelle(netz, quelle, adressen, seit, limit, ergebnis)
+    # Alle Quellen zugleich, jede in einem eigenen Faden. Nacheinander wartete
+    # jede auf die vorige: festivalticker braucht mit seinem Abstand von drei
+    # Sekunden gut 100 Minuten, in denen die übrigen zehn Rechner nichts zu tun
+    # hatten. Rücksicht kostet das keine — der Abstand gilt je Rechner, gleich
+    # wie viele Quellen gerade unterwegs sind. Die Reihenfolge der Funde ist
+    # egal: `bund.lauf` sortiert sie, bevor zusammengeführt wird.
+    with cf.ThreadPoolExecutor(max_workers=max(1, len(quellen))) as pool:
+        auftraege = [pool.submit(_eine_quelle, netz, q, seit, limit, ergebnis)
+                     for q in quellen]
+    # Eingetragen wird in der Reihenfolge der Quellen, nicht in der, in der
+    # sie fertig wurden — sonst stünden sie in Bericht und Chronik jeden Tag
+    # anders da.
+    for quelle, auftrag in zip(quellen, auftraege):
+        gefunden = auftrag.result()
         ergebnis.funde[quelle.name] = len(gefunden)
         alle_funde += gefunden
 
@@ -125,13 +144,15 @@ def funde_sammeln(netz: Abrufer, seit: int, *, limit: int = 0,
     return alle_funde, ergebnis
 
 
-def _eine_quelle(netz: Abrufer, quelle: Quelle, adressen: dict, seit: int,
-                 limit: int, ergebnis: Ergebnis) -> list[Fund]:
-    if quelle.name not in adressen:
+def _eine_quelle(netz: Abrufer, quelle: Quelle, seit: int, limit: int,
+                 ergebnis: Ergebnis) -> list[Fund]:
+    # Quellen mit einer Sammeldatei haben keine Adressen je Festival
+    if type(quelle).sammeldatei is not Quelle.sammeldatei:
         gefunden = quelle.sammeldatei(netz, seit) or []
-        print(f"  {quelle.name}: {len(gefunden)} Datensätze aus einer Datei", flush=True)
+        zeile(f"  {quelle.name}: {len(gefunden)} Datensätze aus einer Datei")
     else:
-        urls = adressen[quelle.name]
+        urls = quelle.adressen(netz, seit)
+        zeile(f"  {quelle.name}: {len(urls)} Detailseiten")
         gefunden = einlesen(netz, quelle, urls[:limit] if limit else urls,
                             ergebnis.parsefehler)
 
@@ -146,13 +167,13 @@ def _eine_quelle(netz: Abrufer, quelle: Quelle, adressen: dict, seit: int,
                                                  frisch=frisch):
             groesse = schnappschuss.datei(quelle.name).stat().st_size / 1e6
             stand = schnappschuss.stand_von(quelle.name)
-            print(f"  Stand von {quelle.name} abgelegt ({groesse:.2f} MB, "
+            zeile(f"  Stand von {quelle.name} abgelegt ({groesse:.2f} MB, "
                   f"vom {stand})")
         return gefunden
 
     mitgebracht, stand = schnappschuss.lesen(quelle.name)
     if mitgebracht:
         ergebnis.mitgebracht[quelle.name] = stand
-        print(f"  {quelle.name} antwortet nicht - Stand vom {stand} "
+        zeile(f"  {quelle.name} antwortet nicht - Stand vom {stand} "
               f"mit {len(mitgebracht)} Datensätzen")
     return mitgebracht

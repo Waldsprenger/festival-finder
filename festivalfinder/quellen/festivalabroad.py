@@ -17,6 +17,8 @@ FB = "https://www.festivalabroad.com"
 
 #: „2000trees – Gloucestershire, United Kingdom 2027"
 TITEL = re.compile(r"^(.*?)\s+[–-]\s+(.*?)(?:\s+(\d{4}))?$")
+#: Verweis auf die Länderseite, beschriftet mit dem Ort: „Bend, United States"
+LAENDERSEITE = re.compile(r"^/festivals-in-")
 
 
 class FestivalAbroad(Quelle):
@@ -79,7 +81,15 @@ class FestivalAbroad(Quelle):
         if not m:
             return None
         name = clean(m.group(1))
-        ort_land = [t.strip(" .…") for t in (m.group(2) or "").split(",") if t.strip(" .…")]
+        # Seit 2026 lautet der Titel „4 Peaks Music Festival – Dates to Be
+        # Announced | Bend, Unit…". Das stand so als Ort in den Daten, bei allen
+        # 145 Festivals ohne Termin — und weil ein terminloser Eintrag über den
+        # Ort zu seinem datierten findet, fand keiner davon zu seinem.
+        # Vollständig steht der Ort im Verweis auf die Länderseite; der Titel
+        # bleibt für Seiten ohne diesen Verweis.
+        ort = next((clean(a.get_text()) for a in s.find_all("a", href=LAENDERSEITE)
+                    if "," in a.get_text()), "") or (m.group(2) or "").split("|")[-1]
+        ort_land = [t.strip(" .…") for t in ort.split(",") if t.strip(" .…")]
         if not name or len(ort_land) < 2:
             return None
         # Lange Titel schneidet die Seite mit Auslassungszeichen ab: aus

@@ -116,10 +116,13 @@ pip install requests beautifulsoup4 pillow
 python -m festivalfinder alles
 ```
 
-Der erste Lauf dauert rund 40 Minuten (24.000 Detailseiten, vier parallele
-Verbindungen); jede Seite landet gepackt unter `cache/`, ein zweiter Lauf am
-selben Tag ist damit in gut acht Minuten durch. Einzelne Schritte lassen sich
-auch getrennt starten:
+Ein vollständiger Lauf holt rund 26.000 Detailseiten. Alle Quellen sammeln
+zugleich, jede in dem Abstand, den ihr Rechner verträgt (siehe „Am 22. August
+2026: zu schnell gefragt"). Die Dauer bestimmt damit festivalticker mit gut
+100 Minuten; nacheinander, wie bis zum 4. Oktober 2026, waren es acht Stunden.
+Jede Seite landet gepackt unter `cache/`, ein zweiter Lauf am selben Tag kommt
+ohne einen einzigen Abruf aus. Einzelne Schritte lassen sich auch getrennt
+starten:
 
 ```bash
 python -m festivalfinder sammeln --limit 20   # Testlauf mit wenigen Seiten
@@ -148,7 +151,7 @@ Doppelklick öffnen.
 | festival-alarm.com | Jahresseiten **und** die Regionsseiten je Land | 935 | 930 |
 | festivalhopper.de | `sitemap-festivals.xml`, Jahrgang steht in der Adresse | 746 | 705 |
 | festivalnetworks.com | **eine** JSON-Datei hinter ihrer Karte; ruht seit Oktober 2026 | 1 | 616 |
-| festivalflyer.com | die Startseite, mehr ist nicht erreichbar | 12 | 1 |
+| festivalflyer.com | die Startseite, mehr ist nicht erreichbar; ruht seit Oktober 2026 | 12 | 1 |
 
 Die zweiten Wege sind nachgemessen, nicht geraten: Über die Länderseiten von
 festivalsunited sind 30 Detailseiten erreichbar, die in der Sitemap fehlen —
@@ -171,6 +174,13 @@ Chronik. Kommt die Datei wieder, steht zusätzlich eine Warnung dabei. In den
 Bestand fließt sie trotzdem nicht, sonst hätte er an einem Tag im Monat ein
 paar hundert Festivals mehr und am nächsten wieder nicht. Ob die Quelle wieder
 mitläuft, entscheidet ein Mensch: Dafür genügt es, `ruht` zu leeren.
+
+Seit Oktober 2026 ruht auch **festivalflyer**, aus einem anderen Grund: Die
+Startseite nennt nur noch zwei Festivals, ihr Datenblatt trägt kein Land mehr
+und bei einem nicht einmal einen Ort; die Detailseiten stehen sogar noch auf
+2023. Seit September stand deshalb in jedem Lauf „kein einziger Fund". Die
+monatliche Prüfung sieht auf der Startseite nach, ob sie wieder ein kommendes
+Festival mit Land nennt — eine Anfrage.
 
 Was jede Quelle beiträgt und wo ihre Fallen liegen, steht im Kopf ihres
 Abschnitts in [quellen/](festivalfinder/quellen/). Drei Beispiele:
@@ -293,13 +303,13 @@ bei festivalticker. Ein voller Durchgang dort dauert damit gut 100 Minuten
 statt einiger Minuten — das ist der Preis dafür, nicht wieder gesperrt zu
 werden.
 
-Am 3. Oktober 2026 antwortete festivalticker dem eigenen Rechner wieder. Die
-abgelegte Datei ist trotzdem noch die vom 21. August: Auffrischen kann sie nur
-ein vollständiger Lauf von zu Hause, und den hat seitdem niemand gestartet.
-Der Serverlauf bekommt weiter 403 und liest die Datei.
+Am 3. Oktober 2026 antwortete festivalticker dem eigenen Rechner wieder, und
+der vollständige Lauf vom 4. Oktober holte alle 2.185 Seiten im neuen Abstand,
+ohne eine einzige Absage. Auffrischen kann die abgelegte Datei weiterhin nur
+ein Lauf von zu Hause; der Serverlauf bekommt weiter 403 und liest sie.
 
 Die abgelegte Datei bleibt. Sie ist die letzte Abschrift dessen, was die
-Quelle beantwortet hat: 1.971 Datensätze vom 21. August 2026. Ohne sie fehlen
+Quelle beantwortet hat: 2.185 Datensätze vom 4. Oktober 2026. Ohne sie fehlen
 der Seite rund 1.900 Festivals von einem Tag auf den anderen — mit ihr altern
 sie sichtbar. Vergangene Termine fallen ohnehin heraus, und ab drei Wochen
 steht das Datum des Standes als Warnung im Laufbericht. Wann diese Daten zu
@@ -814,14 +824,14 @@ Mindestabstand, bevor es so weit kommt.
 pip install pytest pyflakes && python -m pytest tests -q
 ```
 
-741 Tests in knapp acht Sekunden, ohne Netz und ohne Datenbestand. Sie halten
+769 Tests in knapp acht Sekunden, ohne Netz und ohne Datenbestand. Sie halten
 fest, warum die Regeln so aussehen, wie sie aussehen — fast jeder Fall stand
 einmal falsch in den Daten:
 
 | Datei | prüft |
 |---|---|
 | `tests/kern/test_zeit.py` | jede Schreibweise der Quellen, und was kein Datum ist |
-| `tests/kern/test_text.py` | Namen, Schlüssel, Bandnamen, Entschlüsseln |
+| `tests/kern/test_text.py` | Namen, Schlüssel, Bandnamen, Entschlüsseln, Zeichensalat |
 | `tests/kern/test_geld.py` | Preise aus Freitext, Spannen, freier Eintritt, Währungen |
 | `tests/kern/test_orte.py` | Länderschreibweisen, Koordinate gegen Land |
 | `tests/kern/test_genres.py` | Freitext zu Oberbegriffen, samt Irreführern |
@@ -837,7 +847,7 @@ einmal falsch in den Daten:
 | `tests/seite/test_sprachdatei.py` | Anführungszeichen, zehn Sprachen, Platzhalter, Schlüssel |
 | `tests/seite/test_aufbau.py` | Kette, Felder, Sortierung, Karte, Module, Faltung |
 | `tests/seite/test_rechtstexte.py` | Datenschutz und Fußnote gegen die Daten, die es wirklich gibt |
-| `tests/test_sammeln.py` | der Ablauf des Laufs: Parsefehler, Schweigen, Zwischenspeicher |
+| `tests/test_sammeln.py` | der Ablauf des Laufs: alle Quellen zugleich, Parsefehler, Schweigen, Zwischenspeicher |
 | `tests/test_pruefung.py` | Selbstprüfung und Einbruchsmeldung |
 | `tests/test_werkzeug.py` | Preisgeschichte und mitgebrachter Stand |
 | `tests/test_neuheiten.py` | seit wann wir was kennen — und wann das schweigt |
@@ -1079,6 +1089,48 @@ Nebenbei bestätigte derselbe Lauf, dass festivalticker den Serverlauf wieder
 bedient — 1.971 Funde, kein mitgebrachter Stand nötig. Die Sperre von gestern
 war keine dauerhafte Entscheidung, sondern vermutlich dieselbe Ungeduld von
 unserer Seite.
+
+### Was der Lauf vom 4. Oktober 2026 fand
+
+Der erste vollständige Lauf mit Mindestabstand dauerte **acht Stunden**. 110
+Minuten davon gingen bewusst an festivalticker, 3,6 Stunden aber an einen
+Fehler in der Bremse: jambase bat nach hundert Seiten einmal um Ruhe, und der
+Abrufer nahm die genannte Wartezeit als Takt für den Rest des Laufs — die
+übrigen 2.160 Seiten kamen im Abstand von genau sechs Sekunden. Eine
+Einzelanfrage beantwortete jambase danach in 0,6 Sekunden. Seither ist ein
+`Retry-After` eine Pause für den ganzen Rechner, einmal; der Abstand wächst je
+Bitte um eine Sekunde, und vier zugleich abgewiesene Fäden zählen als eine
+Bitte. jambase bekommt von vornherein eine Sekunde Abstand.
+
+Und die Quellen warten nicht mehr aufeinander. Nacheinander hatten die übrigen
+zehn Rechner während der 110 Minuten bei festivalticker nichts zu tun; jetzt
+sammeln alle zugleich, jede in ihrem eigenen Abstand. Rücksicht kostet das
+keine, der Abstand gilt je Rechner.
+
+Dazu vier Fehler in den Daten:
+
+* **festivalabroad** hat das Titelformat geändert: „4 Peaks Music Festival –
+  Dates to Be Announced | Bend, Unit…". Bei allen 145 Festivals ohne Termin
+  stand „Dates to Be Announced | Bend" als Ort in den Daten, fast immer ohne
+  Land. Über den Ort findet ein terminloser Eintrag zu seinem datierten — 29
+  fanden deshalb nicht zusammen, und 121 dieser Orte gingen als Anfrage an
+  Nominatim. Der volle Ort steht im Verweis auf die Länderseite.
+* **Zeichensalat** bei 76 Festivals, meist im Lineup: „Nata\x9aa" statt
+  „Nataša". Seiten in Windows-1252, gelesen als ISO-8859-1 — Browser behandeln
+  beides gleich, `clean()` jetzt auch.
+* **Ende vor Anfang**: festivalabroad datierte das NorthSide Festival auf den
+  12. bis 6. Juni. Welche Hälfte falsch ist, verrät der Eintrag nicht; ohne
+  Termin findet er über Ort und Namen zu dem, den fünf andere Quellen auf den
+  4. bis 6. Juni datieren. Vier weitere Funde hatten denselben Widerspruch,
+  nur fiel er unter dem Termin anderer Quellen nicht auf.
+* **festivalflyer** liefert nichts mehr und ruht (siehe „Die zwölf Quellen").
+
+Beim Messen fiel noch Rechenzeit ab: Das Zusammenführen dauerte 15 Sekunden,
+davon zwei Drittel für `fold` — 1,2 Millionen Aufrufe für 126.000 verschiedene
+Namen. Mit gemerkten Ergebnissen sind es 5 Sekunden, Festival für Festival
+dasselbe Ergebnis. Und jambase baut für den einen Verweis, den es von der
+Seite braucht, nur noch die Verweise als Baum auf: 40 statt 61 Millisekunden
+je Seite.
 
 ### Was nachweislich in Ordnung ist
 

@@ -82,6 +82,19 @@ class TestEntschluesseln:
         assert clean("  Rock \n  am   Ring ") == "Rock am Ring"
         assert clean(None) == ""
 
+    @pytest.mark.parametrize("roh,erwartet", [
+        ("Nata\x9aa Grujović", "Nataša Grujović"),
+        ("Jelena Popr\x9ean", "Jelena Popržan"),
+        ("Katastrophen\x96Kommando", "Katastrophen–Kommando"),
+        ("Spencer Cullum\x92s Coin Collection", "Spencer Cullum’s Coin Collection"),
+        ("Santa \x8aillere", "Santa Šillere"),
+        ("unbelegt\x81", "unbelegt"),
+    ])
+    def test_windows_1252_als_iso_8859_1_gelesen(self, roh, erwartet):
+        """Browser lesen beides gleich, der Abruf nicht: 76 Festivals trugen
+        im Lauf vom 4. Oktober 2026 diesen Zeichensalat, meist im Lineup."""
+        assert clean(roh) == erwartet
+
 
 class TestBandKey:
     def test_getrennt_und_zusammen_ist_dieselbe_band(self):

@@ -12,6 +12,7 @@ auseinandergelaufen.
 
 import re
 import unicodedata
+from functools import lru_cache
 from html import unescape
 
 from ..pfade import DATA, lies_json
@@ -21,6 +22,20 @@ from ..pfade import DATA, lies_json
 UNSICHTBAR = re.compile("[\xa0\u200b-\u200f\u2028\u2029\u202a-\u202e\ufeff]")
 
 
+#: Steuerzeichen, die in keinem Text vorkommen — wohl aber, wenn eine Seite in
+#: Windows-1252 als ISO-8859-1 gelesen wurde: Dann steht „Nata\x9aa" statt
+#: „Nataša" und „Katastrophen\x96Kommando" statt „Katastrophen–Kommando".
+_STEUERZEICHEN = re.compile("[\x80-\x9f]")
+
+
+def _windows_1252(treffer: re.Match) -> str:
+    """Das Zeichen, das ein Browser an dieser Stelle zeigt."""
+    try:
+        return treffer.group().encode("latin-1").decode("cp1252")
+    except UnicodeDecodeError:
+        return ""                        # fünf Stellen sind auch dort unbelegt
+
+
 def clean(text: str | None) -> str:
     """Ein Name in einer Zeile: entschlüsselt, ohne unsichtbare Zeichen.
 
@@ -28,10 +43,15 @@ def clean(text: str | None) -> str:
     Datenblätter aus WordPress liefern sie mit — „Shaq&#8217;s Fun House" und
     „Larry &amp; Joe" standen so auf 236 Karten. Im HTML-Fließtext nimmt der
     Parser sie einem ab, im JSON-Datenblatt nicht.
+
+    Dazu der Zeichensalat aus Windows-1252, gelesen als ISO-8859-1: Browser
+    behandeln beides als dasselbe, der Abruf nicht. Im Lauf vom 4. Oktober 2026
+    stand er bei 76 Festivals, meist im Lineup.
     """
     if not text:
         return ""
-    return re.sub(r"\s+", " ", UNSICHTBAR.sub(" ", unescape(text))).strip()
+    text = _STEUERZEICHEN.sub(_windows_1252, unescape(text))
+    return re.sub(r"\s+", " ", UNSICHTBAR.sub(" ", text)).strip()
 
 
 
@@ -64,7 +84,16 @@ _VERBINDER = re.compile(r"\b(" + "|".join(REGELN["verbinder"]) + r")\b")
 _ARTIKEL = re.compile(r"^(" + "|".join(REGELN["artikel"]) + r")\s+")
 _ZUSATZ = re.compile(r"\s+(" + "|".join(REGELN["zusatz"]) + r")$")
 
+#: So viele Schlüssel merken sich `fold`, `festival_key` und `city_key`. Beim
+#: Zusammenführen fiel `fold` 1,2 Millionen Mal an, für 126.000 verschiedene
+#: Namen — dieselben Bands und Orte, Quelle um Quelle, Stufe um Stufe. Die
+#: Regeln stehen beim Import fest, also darf das Ergebnis gemerkt werden.
+#: Mehr Platz brächte nichts: Beim Bauen faltet das Ortsverzeichnis 260.000
+#: Namen je einmal, die würden nur den Speicher füllen.
+GEDAECHTNIS = 1 << 17
 
+
+@lru_cache(maxsize=GEDAECHTNIS)
 def fold(value: str) -> str:
     """Aggressiver Schlüssel für den Namensvergleich.
 
@@ -164,6 +193,7 @@ def festival_name(name: str) -> str:
     return FESTIVAL_ALIAS.get(fold(name), name)
 
 
+@lru_cache(maxsize=GEDAECHTNIS)
 def festival_key(name: str) -> str:
     """Schlüssel eines Festivals: ohne Artikel, Jahr und Festival/Open Air."""
     v = fold(name)
@@ -183,6 +213,7 @@ def eng(name: str) -> str:
     return festival_key(name).replace(" ", "")
 
 
+@lru_cache(maxsize=GEDAECHTNIS)
 def city_key(value: str) -> str:
     """Ortsschlüssel ohne Postleitzahl."""
     return fold(re.sub(r"\b\d{4,6}\b", " ", value or ""))

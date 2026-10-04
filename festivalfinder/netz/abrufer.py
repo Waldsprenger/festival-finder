@@ -48,6 +48,8 @@ HEADERS = {"User-Agent": UA, "Accept-Language": "de-DE,de;q=0.9,en;q=0.8"}
 SPERRE_AB = 5
 #: Weiter als so wird nicht gebremst; darüber lohnt der Lauf nicht mehr
 VERZOEGERUNG_MAX = 8.0
+#: Länger hält ein „Retry-After" den Rechner nicht am Stück an
+PAUSE_MAX = 120.0
 #: So oft wird eine Bitte um Ruhe erfüllt, bevor die Seite liegen bleibt
 GEDULD_429 = 4
 #: Mindestabstand in Sekunden zwischen zwei Anfragen an denselben Rechner,
@@ -58,7 +60,10 @@ ABSTAND = 0.25
 #: festivalticker sperrt bei zu dichter Folge die Adresse, statt um Ruhe zu
 #: bitten. Ein voller Durchgang mit rund 2.000 Seiten dauert so gut 100
 #: Minuten — die Alternative ist, gar nichts mehr zu bekommen.
-ABSTAND_JE_HAUS = {"www.festivalticker.de": 3.0}
+#: jambase bat im Lauf vom 4. Oktober 2026 nach hundert Seiten in knapp
+#: 0,4 Sekunden Abstand um Ruhe. Eine Sekunde kostet nichts: Die Quellen
+#: sammeln zugleich, und festivalticker braucht ohnehin länger.
+ABSTAND_JE_HAUS = {"www.festivalticker.de": 3.0, "www.jambase.com": 1.0}
 
 
 def code_von(exc: Exception) -> int | None:
@@ -70,11 +75,13 @@ class Abrufer:
     """Holt Seiten und merkt sich, was dabei schiefging."""
 
     def __init__(self, *, cache: Path = CACHE, max_age_h: float = 24.0,
-                 frisch: bool = False, gleichzeitig: int = 4):
+                 frisch: bool = False, gleichzeitig: int = 8):
         self.cache = cache
         self.max_age_h = max_age_h
         self.frisch = frisch
-        #: Vier gleichzeitige Verbindungen, quellenübergreifend gedeckelt
+        #: Gleichzeitige Verbindungen über alle Quellen. Die Rücksicht auf den
+        #: einzelnen Rechner regelt der Abstand; das hier schont die eigene
+        #: Leitung, seit alle Quellen zugleich sammeln.
         self.bremse = threading.Semaphore(gleichzeitig)
         self._lokal = threading.local()
 
@@ -90,7 +97,12 @@ class Abrufer:
         self.verzoegerung: dict[str, float] = {}
         #: Rechner → frühester Zeitpunkt (time.monotonic) der nächsten Anfrage
         self._naechste: dict[str, float] = {}
+        #: Rechner → wann zuletzt nach einem 429 der Abstand wuchs
+        self._gebremst: dict[str, float] = {}
         self._takt = threading.Lock()
+        #: Zählen ist Lesen und Schreiben — aus mehreren Fäden zugleich ginge
+        #: dabei mal ein Schritt verloren
+        self._zaehlen = threading.Lock()
 
     # ---------------- Verbindung ----------------
 
@@ -168,11 +180,23 @@ class Abrufer:
         if dran > jetzt:
             time.sleep(dran - jetzt)
 
-    def langsamer_werden(self, url: str, antwort=None) -> float:
-        """Nach einem „zu viele Anfragen" künftig warten, bevor gefragt wird.
+    def langsamer_werden(self, url: str, antwort=None,
+                         gefragt_um: float | None = None) -> float:
+        """Nach einem „zu viele Anfragen": eine Pause, dann mehr Abstand.
 
-        Die Wartezeit wächst mit jedem Mal und gilt für den Rest des Laufs.
-        Nennt der Server ein „Retry-After", zählt seine Angabe.
+        Zweierlei, das früher eins war. Ein „Retry-After" sagt, wann wieder
+        gefragt werden darf — einmal, und für den ganzen Rechner. Früher galt
+        es als Abstand für den Rest des Laufs: jambase bat am 4. Oktober 2026
+        nach hundert Seiten um Ruhe, und die übrigen 2.160 kamen deshalb im
+        Takt von sechs Sekunden, 3,6 Stunden lang. Eine Einzelanfrage
+        beantwortete jambase danach in 0,6 Sekunden.
+
+        Der Abstand selbst wächst um eine Sekunde, aber einmal je Schub: Vier
+        Fäden, die zugleich abgewiesen werden, haben eine Bitte gehört, nicht
+        vier. Erst eine Anfrage, die nach der letzten Bremsung losging
+        (`gefragt_um`), zählt als neue Bitte.
+
+        Gibt die Pause zurück, die der Rechner jetzt bekommt.
         """
         haus = urlparse(url).netloc
         gewuenscht = 0.0
@@ -181,13 +205,21 @@ class Abrufer:
                 gewuenscht = float(antwort.headers.get("Retry-After", "") or 0)
             except (ValueError, AttributeError):
                 gewuenscht = 0.0
-        neu = min(VERZOEGERUNG_MAX,
-                  max(self.verzoegerung.get(haus, 0.0) + 1.0, gewuenscht))
-        if not self.verzoegerung.get(haus):
+        with self._takt:
+            jetzt = time.monotonic()
+            bisher = self.verzoegerung.get(haus, 0.0)
+            if gefragt_um is None or gefragt_um >= self._gebremst.get(haus, float("-inf")):
+                # Vom Abstand aus, der gerade gilt: jambase bat bei einer
+                # Sekunde um Ruhe, und „eine Sekunde Wartezeit" änderte dort
+                # nichts — so viel Abstand hatte es schon.
+                self.verzoegerung[haus] = min(VERZOEGERUNG_MAX, self.abstand(url) + 1.0)
+                self._gebremst[haus] = jetzt
+            pause = min(PAUSE_MAX, max(gewuenscht, self.abstand(url)))
+            self._naechste[haus] = max(self._naechste.get(haus, 0.0), jetzt + pause)
+        if not bisher:
             self.melde(f"{haus} bittet um Ruhe (429) - ab jetzt "
-                       f"{neu:.0f}s zwischen den Anfragen")
-        self.verzoegerung[haus] = neu
-        return neu
+                       f"{self.verzoegerung[haus]:g}s zwischen den Anfragen")
+        return pause
 
     def abweisung_vermerken(self, url: str, code: int | None) -> bool:
         """Eine Ablehnung zählen; True, sobald der Rechner als abweisend gilt.
@@ -198,11 +230,12 @@ class Abrufer:
         if code != 403:
             return False
         haus = urlparse(url).netloc
-        self.abgewiesen[haus] = self.abgewiesen.get(haus, 0) + 1
-        if self.abgewiesen[haus] == SPERRE_AB:
+        with self._zaehlen:
+            self.abgewiesen[haus] = absagen = self.abgewiesen.get(haus, 0) + 1
+        if absagen == SPERRE_AB:
             self.melde(f"{haus} weist den Lauf ab (403) - "
                        f"keine weiteren Anfragen dorthin")
-        return self.abgewiesen[haus] >= SPERRE_AB
+        return absagen >= SPERRE_AB
 
     def melde(self, text: str) -> None:
         """Hinweis auf die Fehlerausgabe — und in den Bericht.
@@ -216,7 +249,10 @@ class Abrufer:
         if adresse and self.weist_ab(adresse.group()):
             return
         self.meldungen.append(text)
-        print(f"  ! {text}", file=sys.stderr)
+        # In einem Stück: `print` schriebe den Zeilenumbruch getrennt, und
+        # dazwischen käme die Meldung eines anderen Fadens
+        sys.stderr.write(f"  ! {text}\n")
+        sys.stderr.flush()
 
     # ---------------- Abruf ----------------
 
@@ -237,15 +273,18 @@ class Abrufer:
             try:
                 self._anstellen(url)
                 with self.bremse:
+                    gefragt_um = time.monotonic()
                     r = self.session().get(url, timeout=45)
                 if r.status_code in (404, 410):
                     return None
                 if r.status_code == 429:
                     # Eine Bitte, kein Fehlschlag. Sie bekommt eigene Anläufe:
                     # Sonst wären nach drei Bitten die regulären Versuche
-                    # aufgebraucht und die Seite fiele still heraus.
+                    # aufgebraucht und die Seite fiele still heraus. Gewartet
+                    # wird beim nächsten Anstellen — die Pause gilt dem ganzen
+                    # Rechner, nicht nur diesem Faden.
                     gebeten += 1
-                    time.sleep(self.langsamer_werden(url, r))
+                    self.langsamer_werden(url, r, gefragt_um)
                     if gebeten <= GEDULD_429:
                         continue
                     self.fehlgeschlagen.append(f"{url} (HTTPError 429)")
@@ -254,7 +293,8 @@ class Abrufer:
                 r.encoding = r.apparent_encoding or "utf-8"
                 self._schreib(pfad, r.text)
                 haus = urlparse(url).netloc
-                self.geholt[haus] = self.geholt.get(haus, 0) + 1
+                with self._zaehlen:
+                    self.geholt[haus] = self.geholt.get(haus, 0) + 1
                 return r.text
             except Exception as exc:
                 # Mit dem Statuscode: 403 ist eine Entscheidung des Betreibers,

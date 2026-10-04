@@ -6,6 +6,7 @@ mitgebrachten Stand bekommt — und dass ein Lauf, der jede Seite von der Platte
 nimmt, diesen Stand nicht neu datiert.
 """
 
+import threading
 from datetime import date
 
 import pytest
@@ -96,6 +97,37 @@ class TestMitgebrachterStand:
         netz.geholt["ft.test"] = 2                 # zwei Seiten kamen frisch
         sammeln.funde_sammeln(netz, 2026, quellen=[Verzeichnis()])
         assert schnappschuss.stand_von("festivalticker") == date.today().isoformat()
+
+
+class TestZugleich:
+    """Alle Quellen sammeln zugleich.
+
+    Nacheinander wartete jede auf die vorige — und festivalticker braucht mit
+    drei Sekunden Abstand gut 100 Minuten, in denen die übrigen Rechner nichts
+    zu tun hatten.
+    """
+
+    def test_eine_langsame_quelle_haelt_die_andere_nicht_auf(self, ordner):
+        durch = threading.Event()
+
+        class Langsam(Verzeichnis):
+            def adressen(self, netz, seit):
+                # Nacheinander käme die andere Quelle erst danach dran
+                assert durch.wait(timeout=10), "die zweite Quelle kam nicht dran"
+                return super().adressen(netz, seit)
+
+        class Schnell(Verzeichnis):
+            name = "wannafest"
+
+            def adressen(self, netz, seit):
+                durch.set()
+                return super().adressen(netz, seit)
+
+        funde, ergebnis = sammeln.funde_sammeln(netz_mit(["a", "b"]), 2026,
+                                                quellen=[Langsam(), Schnell()])
+        assert len(funde) == 4
+        # Im Bericht in der Reihenfolge der Quellen, nicht der Fertigstellung
+        assert list(ergebnis.funde) == ["festivalticker", "wannafest"]
 
 
 class Ruhend(Verzeichnis):
