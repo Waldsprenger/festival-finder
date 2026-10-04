@@ -735,14 +735,19 @@ jedem Regler, Installation als App mit Offline-Betrieb, Rückmeldung per
 eigenständig über HTTPS läuft. Der Stand bleibt im GoatCounter-Konto; die Seite
 zeigt ihn nirgends.
 
-**Welche Sprachen.** Die Landessprachen der fünfzehn Länder mit den meisten
-Festivals (Oktober 2026: DE, US, GB, NL, FR, ES, AU, CH, CA, BE, IT, AT, PL, CZ,
-FI) — dafür kamen Tschechisch, Finnisch und Schwedisch dazu, Schwedisch als
-zweite Amtssprache Finnlands. Portugiesisch, Russisch und Türkisch waren schon
-vorher da und bleiben. Nicht dabei ist Rätoromanisch: Es ist Landessprache der
+**Welche Sprachen.** Genau die Landessprachen der zwanzig Länder mit den
+meisten Festivals (Oktober 2026: DE, US, GB, NL, FR, ES, AU, CH, CA, BE, IT,
+AT, PL, CZ, FI, NO, SE, PT, BR, HR): Deutsch, Englisch, Französisch, Spanisch,
+Italienisch, Niederländisch, Polnisch, Portugiesisch, Tschechisch, Finnisch,
+Schwedisch, Norwegisch (Bokmål) und Kroatisch. Russisch und Türkisch sind
+dafür entfallen — Russland steht mit 112 Festivals auf Platz 21, die Türkei
+weiter hinten. Nicht dabei ist Rätoromanisch: Es ist Landessprache der
 Schweiz, aber gesprochen von einem halben Prozent, das durchweg auch Deutsch
 kann. Die Seite wählt beim ersten Besuch die Sprache des Browsers, sofern sie
-sie kennt, sonst Deutsch.
+sie kennt, sonst Deutsch; Norwegisch erkennt sie als „nb", „no" und „nn".
+Wer früher Russisch oder Türkisch gewählt hatte, bekommt ebenfalls die
+Browsersprache. Die Adresssuche versteht Ländernamen weiter auch auf Russisch
+und Türkisch.
 
 **Gemerkte Suchen.** Ein Filter lässt sich unter einem Namen ablegen; beim
 nächsten Besuch steht darüber, was seither dazugekommen ist. Zwei Arten von

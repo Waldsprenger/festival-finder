@@ -330,8 +330,8 @@
      („Hauptstraße", „Storgatan"); „St." fehlt, das ist meist Sankt. */
   const STRASSE = new RegExp('\\b(?:street|avenue|ave|road|rd|boulevard|blvd|drive|lane|'
     + 'highway|hwy|parkway|pkwy|calle|avenida|avda|rua|rue|chemin|via|viale|piazza|corso|'
-    + 'ulica|ul|laan|straat|plein|utca|ulitsa)\\b'
-    + '|(?:strasse|str|weg|gasse|platz|allee|gatan|vagen|vej|gade|katu|tie)\\b', 'u');
+    + 'ulica|ul|laan|straat|plein|utca|ulitsa|gate|vei|cesta|trg)\\b'
+    + '|(?:strasse|str|weg|gasse|platz|allee|gatan|vagen|vej|gade|katu|tie|gata|veien|vegen)\\b', 'u');
 
   /** Land oder Bundesstaat? Ein ganzes Stück oder seine letzten Wörter.
       Kürzel zählen am Ende nur in Großbuchstaben: „Austin TX", aber nicht

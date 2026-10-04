@@ -15,8 +15,11 @@
       const gemerkt = localStorage.getItem(SPEICHER);
       if (gemerkt && I18N.SPRACHEN[gemerkt]) return gemerkt;
     } catch (_) { /* Speicher gesperrt - dann eben die Browsersprache */ }
+    // Norwegisch meldet sich als „nb", „no" oder „nn" — alle lesen Bokmål
+    const GLEICH = { no: 'nb', nn: 'nb' };
     for (const wunsch of (navigator.languages || [navigator.language || 'de'])) {
-      const kurz = String(wunsch).slice(0, 2).toLowerCase();
+      let kurz = String(wunsch).slice(0, 2).toLowerCase();
+      kurz = GLEICH[kurz] || kurz;
       if (I18N.SPRACHEN[kurz]) return kurz;
     }
     return 'de';
