@@ -2722,7 +2722,6 @@
     "lon": 12.5700724,
     "display": "Kopenhagen, Hauptstadtregion, 1357, Dänemark"
   },
-  "Budiov nad Budiovkou|Tschechien": {},
   "Kißlegg|Deutschland": {
     "lat": 47.7877083,
     "lon": 9.8830196,
@@ -3384,7 +3383,6 @@
     "lon": 3.8767337,
     "display": "Montpellier, Hérault, Okzitanien, Metropolitanes Frankreich, Frankreich"
   },
-  "Bystřice nad Perntejnem|Tschechien": {},
   "Neustadt-Glewe|Deutschland": {
     "lat": 53.393252,
     "lon": 11.5753248,
@@ -14808,7 +14806,6 @@
     "lon": 10.3313268,
     "display": "Feuchtwangen, Landkreis Ansbach, Bayern, 91555, Deutschland"
   },
-  "Budiov nad Budiovkou|CZ": {},
   "Kißlegg|DE": {
     "lat": 47.7877083,
     "lon": 9.8830196,
@@ -15450,7 +15447,6 @@
     "lon": 23.5489697,
     "display": "Urjala, Etelä-Pirkanmaan seutukunta, Pirkanmaa, Festland-Finnland, Finnland"
   },
-  "Bystřice nad Perntejnem|CZ": {},
   "Withington|GB": {
     "lat": 51.8377332,
     "lon": -1.9541072,
@@ -28045,7 +28041,6 @@
   "Nigrán|NL": {},
   "Builth Wells|IE": {},
   "Belfast BT ET|GB": {},
-  "Fuine|HR": {},
   "Buckinham|GB": {},
   "Offenbach am Main|NL": {},
   "A FP|IE": {},
@@ -28153,5 +28148,369 @@
     "lat": 55.2830077,
     "lon": 14.7915354,
     "display": "Allinge-Sandvig, Bornholms Regionskommune, Hauptstadtregion, 3770, Dänemark"
+  },
+  "Hout Bay|ZA": {
+    "lat": -34.043093,
+    "lon": 18.355645,
+    "display": "Hout Bay, Kapstadt, Westkap, 7872, Südafrika"
+  },
+  "tv|DK": {},
+  "St Kilda|AU": {
+    "lat": -37.8638261,
+    "lon": 144.981637,
+    "display": "St Kilda, Melbourne, Victoria, 3182, Australien"
+  },
+  "Lake Charlegrark|AU": {
+    "lat": -36.7675256,
+    "lon": 141.2389953,
+    "display": "Lake Charlegrark, Minimay, Victoria, 3413, Australien"
+  },
+  "Svitrigailos g.|LT": {
+    "lat": 54.6673623,
+    "lon": 25.2721363,
+    "display": "Švitrigailos g., Neustadt, Vilnius, Stadtgemeinde Vilnius, Bezirk Vilnius, 02153, Litauen"
+  },
+  "Aireys Inlet|AU": {
+    "lat": -38.4620894,
+    "lon": 144.1067555,
+    "display": "Aireys Inlet, Victoria, Australien"
+  },
+  "Graz|RO": {
+    "lat": 45.7798988,
+    "lon": 21.1785313,
+    "display": "Strada Graz, Temeswar, Temesch, 300619, Rumänien"
+  },
+  "Munna Creek|AU": {
+    "lat": -25.881987,
+    "lon": 152.4509775,
+    "display": "Munna Creek, Queensland, Australien"
+  },
+  "Kurrangk (Coorong) on Ngarrindjeri Lands near Long Point|AU": {},
+  "Caltowie|AU": {
+    "lat": -33.1808625,
+    "lon": 138.4826694,
+    "display": "Caltowie, Südaustralien, 5490, Australien"
+  },
+  "Contactweg|NL": {
+    "lat": 52.3986693,
+    "lon": 4.8528354,
+    "display": "Contactweg, Westpoort, Amsterdam, Nordholland, Niederlande, 1014 BJ, Niederlande"
+  },
+  "Moore Park|AU": {
+    "lat": -33.8958333,
+    "lon": 151.2219444,
+    "display": "Moore Park, Sydney, Neusüdwales, 2021, Australien"
+  },
+  "Boulevard -mi Septemvri|MK": {},
+  "Undara Volcanic National Park|AU": {
+    "lat": -18.294367,
+    "lon": 144.6418548,
+    "display": "Undara Volcanic National Park, Queensland, Australien"
+  },
+  "Blandford|GB": {
+    "lat": 50.8560049,
+    "lon": -2.1651766,
+    "display": "Blandford Forum, Dorset, England, DT11 7EB, Vereinigtes Königreich"
+  },
+  "Washington D.C.|US": {
+    "lat": 38.8950982,
+    "lon": -77.0363849,
+    "display": "Washington, District of Columbia, Vereinigte Staaten von Amerika"
+  },
+  "Carsphairn|GB": {
+    "lat": 55.2123128,
+    "lon": -4.2620849,
+    "display": "Carsphairn, Dumfries and Galloway, Schottland, DG7 3TQ, Vereinigtes Königreich"
+  },
+  "EP Erp|NL": {
+    "lat": 51.6004767,
+    "lon": 5.6064592,
+    "display": "Erp, Meierijstad, Nordbrabant, Niederlande"
+  },
+  "MC Amsterdam|NL": {
+    "lat": 52.2955137,
+    "lon": 4.9597338,
+    "display": "Ronald Mc Donald huis, Meibergdreef, Holendrecht, Zuidoost, Amsterdam, Nordholland, Niederlande, 1105 BD, Niederlande"
+  },
+  "Brighton BN PB|GB": {},
+  "ME Utrecht|NL": {
+    "lat": 52.0894206,
+    "lon": 5.109274,
+    "display": "Photo-Me, Stationshal, Hoog Catharijne, Ns, Jaarbeurs, Binnenstad City- En Winkelgebied, Binnenstad, Utrecht, Niederlande, 3511 CE, Niederlande"
+  },
+  "JK Rotterdam|NL": {
+    "lat": 51.8850387,
+    "lon": 4.5127845,
+    "display": "JK Coiffures Jean Koppelaar, 200, Groenezoom, Buurt Negen, Vreewijk, Feijenoord, Rotterdam, Südholland, Niederlande, 3075 GK, Niederlande"
+  },
+  "Albania|AL": {
+    "lat": 40.0800102,
+    "lon": 20.1975049,
+    "display": "Caravan Horse Riding Albania, Lagjia \"RS Vjetori\", Asim Zeneli, Antigonë, Bashkia Gjirokastër, Qark Gjirokastra, 6017, Albanien"
+  },
+  "Chorzow|CZ": {},
+  "Foots Hill Station at Reid River|AU": {},
+  "Thomas Koppels Gade|DK": {
+    "lat": 56.1507773,
+    "lon": 10.1858428,
+    "display": "Thomas Koppels Gade, Langenæs, Frederiksbjerg, Aarhus, Aarhus Kommune, Region Mitteljütland, 8000, Dänemark"
+  },
+  "Yirrkala|AU": {
+    "lat": -12.2539194,
+    "lon": 136.8899744,
+    "display": "Yirrkala, Nordterritorium, Australien"
+  },
+  "Mouth of Wilson|US": {
+    "lat": 36.5895679,
+    "lon": -81.3364889,
+    "display": "Mouth of Wilson, Grayson County, Virginia, 28663, Vereinigte Staaten von Amerika"
+  },
+  "Lac De Geronde-Sierre|CH": {
+    "lat": 46.2887866,
+    "lon": 7.5427851,
+    "display": "Lac de Geronde, Siders, Mittelwallis, Wallis, Schweiz"
+  },
+  "Estonia|EE": {
+    "lat": 59.4095172,
+    "lon": 24.8575968,
+    "display": "DHL Express Estonia AS, Rae küla, Rae vald, Kreis Harju, Estland"
+  },
+  "Brest|LU": {},
+  "Cavendish|CA": {
+    "lat": 50.816667,
+    "lon": -110.466667,
+    "display": "Cavendish, Special Area No. 2, Alberta, Kanada"
+  },
+  "Millwaukee|US": {
+    "lat": 43.7214914,
+    "lon": -91.9762992,
+    "display": "Millwaukee Road, Lanesboro, Fillmore County, Minnesota, 55949, Vereinigte Staaten von Amerika"
+  },
+  "Fo u.|HU": {
+    "lat": 47.50553,
+    "lon": 19.038145,
+    "display": "Fő utca, Ofen, Wasserstadt, I. Bezirk, Budapest, 1011, Ungarn"
+  },
+  "Ciudad Real|PL": {},
+  "RK Nijmegen|NL": {
+    "lat": 51.8425749,
+    "lon": 5.8389606,
+    "display": "Nimwegen, Geldern, Niederlande"
+  },
+  "Echuca Moama|AU": {
+    "lat": -36.1088658,
+    "lon": 144.8193322,
+    "display": "Echuca Regional Park, Echuca Village, Moama, Victoria, 3564, Australien"
+  },
+  "Westquaistrasse|CH": {
+    "lat": 47.5826086,
+    "lon": 7.5888304,
+    "display": "Westquaistrasse, Kleinhüningen, Kleinbasel, Basel, Basel-Stadt, 4047, Schweiz"
+  },
+  "Greece|GR": {
+    "lat": 38.0107953,
+    "lon": 23.8041408,
+    "display": "Νομισματοκοπείο, Chalandri, Δήμος Χαλανδρίου, Regionalbezirk Athen-Nord, Region Attika, Attika, Griechenland"
+  },
+  "Clifftop|US": {
+    "lat": 38.0042804,
+    "lon": -80.9439848,
+    "display": "Clifftop, Fayette County, West Virginia, 25831, Vereinigte Staaten von Amerika"
+  },
+  "Parque Expo-Desportivo de S. Mateus|PT": {
+    "lat": 40.3620083,
+    "lon": -8.6055172,
+    "display": "Parque Expo - Desportivo de São Mateus, EN 335, Zona Industrial de Cantanhede, Cantanhede, Coimbra, 3060-179, Portugal"
+  },
+  "IA|PT": {
+    "lat": 38.7086055,
+    "lon": -9.1476455,
+    "display": "Misc by Tartar-ia, Rua da Boavista, São Paulo, Misericórdia, Lissabon, 1200-151, Portugal"
+  },
+  "Abbaye de Floreffe|BE": {
+    "lat": 50.5237821,
+    "lon": 5.0078335,
+    "display": "Ancienne Ferme de l'abbaye de Floreffe, Hingeon, Fernelmont, Namur, Wallonien, Belgien"
+  },
+  "Senigallia (Ancona)|IT": {
+    "lat": 43.6773749,
+    "lon": 13.2105712,
+    "display": "Senigallia, Ancona, Marken, 60019, Italien"
+  },
+  "Ilino|RS": {
+    "lat": 43.7977223,
+    "lon": 21.9477524,
+    "display": "Илино, Општина Бољевац, Зајечарски управни округ, Zentralserbien, Serbien"
+  },
+  "Germany|DE": {
+    "lat": 50.0707444,
+    "lon": 8.2520476,
+    "display": "Statistisches Bundesamt, 11, Südost, Wiesbaden, Hessen, 65189, Deutschland"
+  },
+  "Nottinghamshire|GB": {
+    "lat": 53.1459288,
+    "lon": -1.0214971,
+    "display": "Nottinghamshire, East Midlands, England, Vereinigtes Königreich"
+  },
+  "Red Rock|CA": {
+    "lat": 48.9425393,
+    "lon": -88.2592117,
+    "display": "Red Rock, Red Rock Township, Thunder Bay District, Northwestern Ontario, Ontario, P0T 2P0, Kanada"
+  },
+  "London SE AL|GB": {
+    "lat": 51.5048337,
+    "lon": 0.4924008,
+    "display": "London Gateway Port, Coryton, Thurrock, Essex, England, SS17 9DY, Vereinigtes Königreich"
+  },
+  "Käsmu|EE": {
+    "lat": 59.6034621,
+    "lon": 25.8967489,
+    "display": "Käsmu küla, Haljala vald, Kreis Lääne-Viru, 45601, Estland"
+  },
+  "Parque Urbano da Costa da Caparica|PT": {
+    "lat": 38.6494955,
+    "lon": -9.2391436,
+    "display": "Parque Urbano da Costa da Caparica, Costa de Caparica, Almada, Setúbal, 2825-448, Portugal"
+  },
+  "Latvia|LV": {
+    "lat": 57.3702707,
+    "lon": 22.3672142,
+    "display": "SIA \"Pindstrup Latvia\", Lielsalas, Valdgales pagasts, Talsu novads, Lettland"
+  },
+  "Bad Godesberglaan|BE": {
+    "lat": 50.8105896,
+    "lon": 3.2958774,
+    "display": "Bad Godesberglaan, Kortrijk, Westflandern, Flandern, 8500, Belgien"
+  },
+  "Italy|IT": {
+    "lat": 43.9233432,
+    "lon": 10.9024837,
+    "display": "Hitachi Rail Italy, San Pantaleo, Pistoia, Toskana, 51100, Italien"
+  },
+  "BA Rotterdam|NL": {
+    "lat": 12.4479452,
+    "lon": -69.9182561,
+    "display": "Rotterdamstraat, Brazil, Aruba, Niederlande"
+  },
+  "Allgäu|DE": {
+    "lat": 47.7267063,
+    "lon": 10.3168835,
+    "display": "Kempten (Allgäu), Bayern, Deutschland"
+  },
+  "Saint-Priest-la-Roche|FR": {
+    "lat": 45.9135756,
+    "lon": 4.0932561,
+    "display": "Saint-Priest-la-Roche, Roanne, Loire, Auvergne-Rhone-Alpen, Metropolitanes Frankreich, 42590, Frankreich"
+  },
+  "Nordrhein-Westfalen|DE": {
+    "lat": 51.4789205,
+    "lon": 7.5543751,
+    "display": "Nordrhein-Westfalen, Deutschland"
+  },
+  "Verschiedene Orte|ES": {},
+  "Gipuzkoa|ES": {
+    "lat": 43.1445278,
+    "lon": -2.2037955,
+    "display": "Gipuzkoa, Autonome Gemeinschaft Baskenland, Spanien"
+  },
+  "Casertavecchia (Caserta)|IT": {
+    "lat": 41.0968218,
+    "lon": 14.3671307,
+    "display": "Casertavecchia, Caserta, Kampanien, 81100, Italien"
+  },
+  "Onbekend|NL": {
+    "lat": 51.8282162,
+    "lon": 5.9264018,
+    "display": "Onbekend, Rijksstraatweg, Beek, Berg en Dal, Geldern, Niederlande, 6573 CR, Niederlande"
+  },
+  "Bang Lamung District|TH": {
+    "lat": 12.9212846,
+    "lon": 100.9735466,
+    "display": "อำเภอบางละมุง, Chon Buri, Thailand"
+  },
+  "Val Thorens|DE": {},
+  "Seventeen Seventy|AU": {
+    "lat": -24.1642742,
+    "lon": 151.885128,
+    "display": "Seventeen Seventy, Queensland, Australien"
+  },
+  "Valdefuentes (Cáceres)|ES": {
+    "lat": 39.2737556,
+    "lon": -6.126006,
+    "display": "Valdefuentes, Cáceres, Extremadura, 10180, Spanien"
+  },
+  "NG PE|GB": {},
+  "Vila Nova de Fanalicão|PT": {},
+  "La Chapelle-Blanche-Saint-Martin|FR": {
+    "lat": 47.0869392,
+    "lon": 0.7927989,
+    "display": "La Chapelle-Blanche-Saint-Martin, Loches, Indre-et-Loire, Zentrum-Loiretal, Metropolitanes Frankreich, 37240, Frankreich"
+  },
+  "Bonnaroo Festival 2025|US": {},
+  "Rosses Point|IE": {
+    "lat": 54.305943,
+    "lon": -8.5589438,
+    "display": "Rosses Point, County Sligo, Connacht, Irland"
+  },
+  "Tomášikovo|SK": {
+    "lat": 48.0825031,
+    "lon": 17.6938719,
+    "display": "Tomášikovo, Bezirk Gallandau, Tyrnauer Landschaftsverband, 925 04, Slowakei"
+  },
+  "Vitoria|ES": {
+    "lat": 42.8505845,
+    "lon": -2.66145,
+    "display": "Vitoria-Gasteiz, Gasteizko kuadrilla, Araba / Álava, Autonome Gemeinschaft Baskenland, Spanien"
+  },
+  "Swinford|GB": {
+    "lat": 51.7730571,
+    "lon": -1.357348,
+    "display": "Swinford, Cumnor, Farmoor, Vale of White Horse, Oxfordshire, England, OX29 4BY, Vereinigtes Königreich"
+  },
+  "AX Breda|NL": {
+    "lat": 51.5887845,
+    "lon": 4.7760237,
+    "display": "Breda, Nordbrabant, Niederlande"
+  },
+  "Tollard Royal|GB": {
+    "lat": 50.9631468,
+    "lon": -2.0971385,
+    "display": "Tollard Royal, Wiltshire, England, Vereinigtes Königreich"
+  },
+  "Bad Bonn Kilbi 2015|CH": {},
+  "Copenhagen Municipality|DK": {
+    "lat": 55.663304,
+    "lon": 12.6032048,
+    "display": "Kopenhagen, Hauptstadtregion, Dänemark"
+  },
+  "Cuxhaven district|DE": {
+    "lat": 53.6199273,
+    "lon": 8.802811,
+    "display": "Cuxhaven, Niedersachsen, 27624, Deutschland"
+  },
+  "City of Edinburgh|GB": {
+    "lat": 55.9533456,
+    "lon": -3.1883749,
+    "display": "Edinburg, Schottland, Vereinigtes Königreich"
+  },
+  "La Ràpita|ES": {
+    "lat": 40.6178149,
+    "lon": 0.5900091,
+    "display": "la Ràpita, Montsià, Tarragona, Katalonien, 43540, Spanien"
+  },
+  "Roskilde Municipality|DK": {
+    "lat": 55.6486047,
+    "lon": 12.0811456,
+    "display": "Roskilde Kommune, Region Seeland, Dänemark"
+  },
+  "Lagos State|NG": {
+    "lat": 6.5269033,
+    "lon": 3.5774005,
+    "display": "Lagos, Nigeria"
+  },
+  "Salacgrīvas novads|LV": {
+    "lat": 57.6948702,
+    "lon": 24.4555538,
+    "display": "Salacgrīvas pagasts, Limbažu novads, LV-4054, Lettland"
   }
 }
