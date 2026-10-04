@@ -93,7 +93,7 @@ Der Service Worker und die gebündelte Einzelseite lesen genau diese Liste.
 | `site/index.html` | das Gerüst: sechs Schritte, Ergebnis, Rückmeldung, Fuß |
 | `site/style.css` | Aussehen, inklusive der Regeln fürs Telefon |
 | `site/js/config.js` | einzige Einstellung: Kennung für die Zugriffszählung |
-| `site/js/i18n.js` | rund 220 Texte in zehn Sprachen |
+| `site/js/i18n.js` | rund 250 Texte in dreizehn Sprachen |
 | `site/js/daten.js` | `window.DATA`, Spaltennamen, abgeleitete Register, Geodaten nachladen |
 | `site/js/text.js` | `fold` nach den Regeln aus `data/faltung.json`, Formatierung |
 | `site/js/sprache.js` | Übersetzen und Umschalten |
@@ -641,7 +641,7 @@ Rest nur vier Handgriffe (`start`, `zeichnen`, `setzePins`, `zentrieren`), die
 `i18n.js` — auch die Hilfetexte hinter den Fragezeichen, die früher zusätzlich
 im HTML standen und dort auseinanderliefen. Zahlen in diesen Texten kommen aus
 den Daten (`Für {ohnePreis} Festivals nennt die Quelle keinen Preis`), damit
-sie nicht in zehn Sprachen veralten.
+sie nicht in dreizehn Sprachen veralten.
 
 **Schritt 1 — Rahmen setzen.** Der Wohnort lässt sich aus jedem Land angeben —
 so, wie man ihn dort schreibt: „97209 Veitshöchheim", „Austin, TX", „SW1A 1AA",
@@ -662,11 +662,20 @@ billigsten Stufe zur teuersten:
 1. **Mitgeliefert** (`geo.js`): die Postleitzahlen von DE/AT/CH und alle Orte
    der Welt ab 15.000 Einwohnern, DE/AT/CH vollständig — 116.653 Stück. Wer
    „97209" eingibt, lädt nichts nach.
-2. **Orte nachgeladen** (`orte.js`, 4,7 MB übertragen): 260.592 Orte ab 1.000
-   Einwohnern, 104.552 Zweitnamen der Städte ab 100.000 („Warszawa", „Lisboa",
+2. **Orte nachgeladen** (`orte.js`, 4,8 MB übertragen): 260.592 Orte ab 1.000
+   Einwohnern, 114.338 Zweitnamen der Städte ab 100.000 („Warszawa", „Åbo",
    „Москва", „東京", „القاهرة") und 24.207 Orte der USA, Kanadas und
    Australiens mit ihrem Bundesstaat — es gibt 33 Springfields in den USA, und
    „Springfield, IL" meint keines in Missouri.
+
+Jeder Ort trägt seine Einwohnerzahl, und bei gleichem Namen gewinnt erst die
+genaue Schreibweise, dann die Größe. Ohne das fand „München" ein Dorf in
+Brandenburg und „Mailand" einen Weiler im Allgäu: Die mitgelieferte Liste
+führt Deutschland vollständig, und GeoNames nennt die Städte „Munich" und
+„Milan" — die deutschen Namen sind dort nur Zweitnamen. Die 2.376 Zweitnamen,
+die wie ein Ort der kleinen Liste lauten, liegen deshalb gleich in `geo.js`.
+Und „Åbo" ist Turku, nicht das „Abo" in Osttimor: Wer den Kringel schreibt,
+meint ihn auch.
 3. **Postleitzahlen nachgeladen** (`plz.js`, 2,2 MB übertragen): 117 Länder.
    GeoNames führt 1,08 Millionen Codes, Portugal jede Straße, Singapur jedes
    Haus; für einen Umkreis in Kilometern genügt das Viertel. Jedes Land wird
@@ -719,12 +728,21 @@ Wechsel auf einen neuen Stand räumt er den alten weg. Ortsverzeichnis und
 Postleitzahlen werden auf drei Nachkommastellen gekürzt — 110 Meter genügen für
 einen Wohnort, den ein Umkreisfilter in Kilometern auswertet.
 
-Dazu: zehn Sprachen ([js/i18n.js](site/js/i18n.js), 190 Schlüssel), Hilfetexte an
+Dazu: dreizehn Sprachen ([js/i18n.js](site/js/i18n.js), 248 Schlüssel), Hilfetexte an
 jedem Regler, Installation als App mit Offline-Betrieb, Rückmeldung per
 `mailto` und eine Zugriffszählung, die nur startet, wenn in
 [js/config.js](site/js/config.js) eine GoatCounter-Kennung steht **und** die Seite
 eigenständig über HTTPS läuft. Der Stand bleibt im GoatCounter-Konto; die Seite
 zeigt ihn nirgends.
+
+**Welche Sprachen.** Die Landessprachen der fünfzehn Länder mit den meisten
+Festivals (Oktober 2026: DE, US, GB, NL, FR, ES, AU, CH, CA, BE, IT, AT, PL, CZ,
+FI) — dafür kamen Tschechisch, Finnisch und Schwedisch dazu, Schwedisch als
+zweite Amtssprache Finnlands. Portugiesisch, Russisch und Türkisch waren schon
+vorher da und bleiben. Nicht dabei ist Rätoromanisch: Es ist Landessprache der
+Schweiz, aber gesprochen von einem halben Prozent, das durchweg auch Deutsch
+kann. Die Seite wählt beim ersten Besuch die Sprache des Browsers, sofern sie
+sie kennt, sonst Deutsch.
 
 **Gemerkte Suchen.** Ein Filter lässt sich unter einem Namen ablegen; beim
 nächsten Besuch steht darüber, was seither dazugekommen ist. Zwei Arten von
@@ -900,7 +918,7 @@ Mindestabstand, bevor es so weit kommt.
 pip install pytest pyflakes && python -m pytest tests -q
 ```
 
-781 Tests in knapp acht Sekunden, ohne Netz und ohne Datenbestand. Sie halten
+782 Tests in knapp acht Sekunden, ohne Netz und ohne Datenbestand. Sie halten
 fest, warum die Regeln so aussehen, wie sie aussehen — fast jeder Fall stand
 einmal falsch in den Daten:
 
@@ -920,7 +938,7 @@ einmal falsch in den Daten:
 | `tests/bund/test_verluste.py` | beim Zusammenführen geht keine Quelladresse verloren |
 | `tests/ausgabe/test_daten_js.py` | die Prüfung der Zahlenreihen vor dem Ausliefern |
 | `tests/ausgabe/test_verorten.py` | vier Ränge auf dem Weg zur Koordinate |
-| `tests/seite/test_sprachdatei.py` | Anführungszeichen, zehn Sprachen, Platzhalter, Schlüssel |
+| `tests/seite/test_sprachdatei.py` | Anführungszeichen, dreizehn Sprachen, Platzhalter, Schlüssel |
 | `tests/seite/test_aufbau.py` | Kette, Felder, Sortierung, Karte, Module, Faltung |
 | `tests/seite/test_rechtstexte.py` | Datenschutz und Fußnote gegen die Daten, die es wirklich gibt |
 | `tests/test_sammeln.py` | der Ablauf des Laufs: alle Quellen zugleich, Parsefehler, Schweigen, Zwischenspeicher |
@@ -1291,8 +1309,8 @@ Ausfall wird morgen erneut gefragt.
 
 ## Bekannte Grenzen
 
-- **Die Seite wiegt beim ersten Besuch 3,6 MB** (gepackt; 9,7 MB roh): 1,9 MB
-  Festivals, die täglich neu kommen, und 1,8 MB Orte und Karte, die bleiben.
+- **Die Seite wiegt beim ersten Besuch 3,8 MB** (gepackt; 10,3 MB roh): 1,9 MB
+  Festivals, die täglich neu kommen, und 1,9 MB Orte und Karte, die bleiben.
   Das ist der Preis dafür, dass alles ohne Server läuft: 13.563 Festivals,
   92.187 Acts, 116.653 Orte. Danach lädt ein Besuch nur noch die
   Festivaldatei; unterwegs beim ersten Mal ist es trotzdem viel.

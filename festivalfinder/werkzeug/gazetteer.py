@@ -28,6 +28,7 @@ import io
 import math
 import re
 import statistics
+import unicodedata
 import zipfile
 
 from ..kern.text import fold
@@ -271,8 +272,20 @@ def plz_verdichten(codes: dict[str, tuple[float, float]],
     return dict(sorted(ergebnis.items()))
 
 
-def wohnort_daten(netz: Abrufer, fein: dict[tuple[str, str], list]) -> dict:
-    """Alles, was die Wohnortsuche über DE/AT/CH hinaus braucht."""
+def _tausend(einwohner: int) -> int:
+    """Einwohner in Tausend — genug, um gleichnamige Orte zu reihen."""
+    return round(einwohner / 1000)
+
+
+def wohnort_daten(netz: Abrufer, fein: dict[tuple[str, str], list],
+                  klein: dict[tuple[str, str], list]) -> dict:
+    """Alles, was die Wohnortsuche über DE/AT/CH hinaus braucht.
+
+    Jeder Ort trägt seine Einwohnerzahl in Tausend. Ohne sie fand „München"
+    ein Dorf in Brandenburg und „Mailand" einen Weiler im Allgäu: Die Liste
+    führt Deutschland vollständig, und GeoNames nennt die Städte „Munich" und
+    „Milan" — die deutschen Namen sind dort nur Zweitnamen.
+    """
     # Postleitzahlen: verdichtet, dazu ihre Schreibformen je Land
     codes: dict[str, dict[str, tuple[float, float]]] = {}
     formen: dict[str, set[str]] = {}
@@ -310,6 +323,10 @@ def wohnort_daten(netz: Abrufer, fein: dict[tuple[str, str], list]) -> dict:
         if int(r[POP] or 0) >= ZWEITNAMEN_AB:
             zweitnamen += _zweitnamen(r)
     staatorte.sort(key=lambda e: -e[5])
+    zweitnamen.sort(key=lambda e: -e[4])
+    # Zweitnamen, die wie ein Ort der kleinen Liste lauten, gehören mit in
+    # geo.js — sonst fände die Suche dort das Dorf und fragte nie weiter.
+    namen_klein = {fold(e[0]) for e in klein.values()}
     verwaltung: dict[str, dict[str, list]] = {}
     for (cc, admin), liste in sorted(punkte.items()):
         kuerzel, name = VERWALTUNG[cc][admin]
@@ -322,26 +339,35 @@ def wohnort_daten(netz: Abrufer, fein: dict[tuple[str, str], list]) -> dict:
         "formen": {f: sorted(l) for f, l in sorted(formen.items())},
         "verwaltung": verwaltung,
         # Die großen liegen in geo.js bei, die übrigen kommen mit orte.js
-        "staatorte_gross": [e[:5] for e in staatorte if e[5] >= 15000],
-        "staatorte": [e[:5] for e in staatorte if e[5] < 15000],
+        "staatorte_gross": [[*e[:5], _tausend(e[5])] for e in staatorte if e[5] >= 15000],
+        "staatorte": [[*e[:5], _tausend(e[5])] for e in staatorte if e[5] < 15000],
         # Größte zuerst: Bei gleichem Namen gewinnt in der Suche der bekanntere
-        "orte": [e[:4] for e in sorted(fein.values(), key=lambda e: -e[4])],
-        "zweitnamen": [e[:4] for e in sorted(zweitnamen, key=lambda e: -e[4])],
+        "orte_klein": [[*e[:4], _tausend(e[4])] for e in sorted(klein.values(), key=lambda e: -e[4])],
+        "orte": [[*e[:4], _tausend(e[4])] for e in sorted(fein.values(), key=lambda e: -e[4])],
+        "zweitnamen": [[*e[:4], _tausend(e[4])] for e in zweitnamen],
+        "zweitnamen_klein": [[*e[:4], _tausend(e[4])] for e in zweitnamen
+                             if fold(e[0]) in namen_klein],
     }
 
 
 def _zweitnamen(r: list[str]) -> list[list]:
-    """Die anderen Namen einer Stadt, ohne Kennungen und Wiederholungen."""
-    gesehen = {fold(r[NAME]), fold(r[ASCII])}
+    """Die anderen Namen einer Stadt, ohne Kennungen und Wiederholungen.
+
+    Gleich ist nur, was gleich geschrieben ist: „Abo" und „Åbo" bleiben beide,
+    denn wer „Åbo" schreibt, soll Turku vor einem „Abo" in Osttimor finden. In
+    die übliche Unicode-Form gebracht wird trotzdem — GeoNames führt „München"
+    mit zerlegtem Umlaut, und so tippt es niemand.
+    """
+    gesehen = {unicodedata.normalize("NFC", r[NAME]).casefold(), r[ASCII].casefold()}
     namen = []
     for n in r[ZWEIT].split(","):
-        n = n.strip()
+        n = unicodedata.normalize("NFC", n.strip())
         # Flughafenkürzel („MUC") und Verweise sind keine Ortsnamen
         if (not n or len(n) > 40 or n.startswith("http")
                 or (n.isascii() and n.isupper() and len(n) <= 4)):
             continue
-        if (f := fold(n)) and f not in gesehen:
-            gesehen.add(f)
+        if fold(n) and n.casefold() not in gesehen:
+            gesehen.add(n.casefold())
             namen.append([n, round(float(r[LAT]), 4), round(float(r[LON]), 4),
                           r[CC], int(r[POP] or 0)])
     return namen
@@ -416,7 +442,7 @@ def bauen(netz: Abrufer) -> dict:
 
     # --- Wohnortsuche aus jedem Land: nachgeladen, wenn sie gebraucht wird --
     print("Wohnortsuche: Postleitzahlen verdichten, Zweitnamen", flush=True)
-    wohnort = wohnort_daten(netz, fein)
+    wohnort = wohnort_daten(netz, fein, orte)
     schreib_json(DATA / "wohnort.json", wohnort, kompakt=True)
 
     return {"laender": len(laender), "orte_klein": len(schlank),

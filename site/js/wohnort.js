@@ -272,26 +272,33 @@
   // Schriften ohne Leerzeichen zwischen den Wörtern: „東京都千代田区"
   const OHNE_LEERZEICHEN = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}\p{Script=Thai}]/u;
 
-  /** Alle Orte eines Namens, die größten zuerst, ohne Doppelte. */
+  /** Alle Orte eines Namens, ohne Doppelte. Vorn steht, was auch mit
+      Akzenten gleich geschrieben ist — wer „Åbo" schreibt, meint Turku, nicht
+      das „Abo" in Osttimor —, dann der größere: „München" ist die Stadt mit
+      1,5 Millionen Einwohnern, nicht das Dorf in Brandenburg. */
   function orteNamens(text, listen) {
     const f = fold(text);
     if (!f) return [];
-    const ergebnis = [];
-    const dazu = (e) => {
-      const ort = { name: e[0], lat: e[1], lon: e[2], cc: e[3] };
-      if (!ergebnis.some((o) => o.cc === ort.cc && km(o, ort) < 5)) ergebnis.push(ort);
+    const genau = text.normalize('NFC').toLocaleLowerCase();
+    const ordnen = (roh) => {
+      const orte = roh.map((e) => ({ name: e[0], lat: e[1], lon: e[2], cc: e[3], ew: e[4] || 0 }));
+      orte.sort((a, b) => ((b.name.toLocaleLowerCase() === genau) - (a.name.toLocaleLowerCase() === genau))
+                          || b.ew - a.ew);
+      const ergebnis = [];
+      for (const o of orte) if (!ergebnis.some((x) => x.cc === o.cc && km(x, o) < 5)) ergebnis.push(o);
+      return ergebnis;
     };
-    for (const liste of listen) for (const e of register(liste).get(f) || []) dazu(e);
-    if (ergebnis.length || !OHNE_LEERZEICHEN.test(f)) return ergebnis;
+    const treffer = listen.flatMap((liste) => register(liste).get(f) || []);
+    if (treffer.length || !OHNE_LEERZEICHEN.test(f)) return ordnen(treffer);
     // Japanisch, Chinesisch, Koreanisch, Thai: Die Adresse beginnt mit dem
     // größten Gebiet — der längste bekannte Anfang ist der Ort.
     for (const wort of f.split(' ')) {
       for (let n = wort.length; n >= 2; n--) {
-        for (const liste of listen) for (const e of register(liste).get(wort.slice(0, n)) || []) dazu(e);
-        if (ergebnis.length) return ergebnis;
+        const anfang = listen.flatMap((liste) => register(liste).get(wort.slice(0, n)) || []);
+        if (anfang.length) return ordnen(anfang);
       }
     }
-    return ergebnis;
+    return [];
   }
 
   /** Bei einem Namen, der mehrfach vorkommt: das genannte Land, sonst der
@@ -401,8 +408,9 @@
     for (const teil of teile) {
       const woerter = teil.text.split(' ');
       for (let n = woerter.length; n >= 1; n--) {
-        const kandidaten = orteNamens(woerter.slice(0, n).join(' '), listen);
-        if (kandidaten.length) return { kandidaten, ort: auswaehlen(kandidaten, hinweise) };
+        const text = woerter.slice(0, n).join(' ');
+        const kandidaten = orteNamens(text, listen);
+        if (kandidaten.length) return { kandidaten, ort: auswaehlen(kandidaten, hinweise), text };
         if (teil.strasse) break;      // in einer Straße steckt kein Ortsname
       }
     }
@@ -466,17 +474,23 @@
 
     // Ort: zuerst im kleinen Verzeichnis, das große nur bei Bedarf
     let gefunden = ortImStaat(teile, z.hinweise, [geo.staatOrte || []])
-      || ortFinden(teile, z.hinweise, [geo.places || []]);
+      || ortFinden(teile, z.hinweise, [geo.places || [], geo.zweitnamen || []]);
     // „Paris, TN" ist zu klein für geo.js — erst orte.js kennt es. „Toronto,
     // CA" dagegen ist schon gefunden: CA ist hier Kanada, nicht Kalifornien.
     const staatOffen = z.hinweise.staaten.length && !(gefunden && (gefunden.ort.staat
       || z.hinweise.laender.includes(gefunden.ort.cc)));
-    if (teile.length && (!gefunden || staatOffen || !passtZuHinweisen(gefunden.ort, z.hinweise))) {
+    // „Göteborg" passt in der kleinen Liste nur als „Goteborg" — die richtige
+    // Schreibweise steht unter den Zweitnamen im großen Verzeichnis.
+    const nurOhneAkzente = gefunden && gefunden.text && /[^\x00-\x7F]/.test(gefunden.text)
+      && !gefunden.kandidaten.some((o) => o.name.toLocaleLowerCase()
+                                          === gefunden.text.toLocaleLowerCase());
+    if (teile.length && (!gefunden || staatOffen || nurOhneAkzente
+                         || !passtZuHinweisen(gefunden.ort, z.hinweise))) {
       const welt = await grossesVerzeichnis();
       if (welt) {
         const gross = ortImStaat(teile, z.hinweise, [geo.staatOrte || [], welt.staatOrte || []])
           || ortFinden(teile, z.hinweise,
-                       [geo.places || [], welt.orte || [], welt.zweitnamen || []]);
+                       [geo.places || [], geo.zweitnamen || [], welt.orte || [], welt.zweitnamen || []]);
         if (gross && (!gefunden || gross.ort.staat || passtZuHinweisen(gross.ort, z.hinweise))) {
           gefunden = gross;
         }

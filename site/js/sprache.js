@@ -1,4 +1,4 @@
-/* Zehn Sprachen, eine Funktion.
+/* Dreizehn Sprachen, eine Funktion.
 
    Die Texte stehen in i18n.js. Fehlt eine Übersetzung, greift Deutsch; die
    Seite bleibt damit auch bei unvollständiger Sprachdatei benutzbar. */

@@ -93,7 +93,7 @@ def test_jede_zeile_bleibt_in_ihren_anfuehrungszeichen():
 
 def test_jeder_text_kennt_alle_sprachen():
     alle = sprachen()
-    assert len(alle) == 10
+    assert len(alle) == 13
     fehlt = {k: sorted(alle - set(v)) for k, v in texte().items() if alle - set(v)}
     assert not fehlt, f"unübersetzt: {fehlt}"
 

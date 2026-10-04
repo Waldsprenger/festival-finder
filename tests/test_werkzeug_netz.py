@@ -143,6 +143,15 @@ class TestPostleitzahlenDerWelt:
         assert "80331" in verdichtet or "803" in verdichtet
         assert not any(k in verdichtet for k in ("", "1", "8"))
 
+    def test_zweitnamen_bleiben_mit_akzent_erhalten(self):
+        """„Åbo" ist Turku — und darf nicht als „Abo" verschwinden, das es
+        auch in Osttimor gibt. GeoNames führt „München" mit zerlegtem Umlaut."""
+        zeile = [""] * 15
+        zeile[1:6] = ["Turku", "Turku", "Abo,Åbo,München,TKU,Turku", "60.45", "22.27"]
+        zeile[8], zeile[14] = "FI", "206655"
+        namen = [e[0] for e in gazetteer._zweitnamen(zeile)]
+        assert namen == ["Abo", "Åbo", "München"]
+
     def test_hoechstens_zwei_stellen_fallen_weg(self):
         """Monaco liegt ganz in fünf Kilometern. Fiele es auf den leeren Präfix,
         wäre jede fünfstellige Zahl der Welt eine Postleitzahl in Monaco."""

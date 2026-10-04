@@ -136,12 +136,13 @@ def neuigkeiten(festivals: list[Festival], band_nr: dict[str, int]) -> dict:
 
 
 def _orte(liste) -> list:
-    return [[n, round(la, 3), round(lo, 3), cc] for n, la, lo, cc in liste]
+    """Name, Koordinate, Land — und, wo bekannt, Einwohner in Tausend."""
+    return [[e[0], round(e[1], 3), round(e[2], 3), *e[3:5]] for e in liste]
 
 
 def _staatorte(liste) -> list:
-    """Orte mit Bundesstaat: „Springfield", …, „IL"."""
-    return [[n, round(la, 3), round(lo, 3), cc, staat] for n, la, lo, cc, staat in liste]
+    """Orte mit Bundesstaat: „Springfield", …, „IL", Einwohner in Tausend."""
+    return [[e[0], round(e[1], 3), round(e[2], 3), *e[3:6]] for e in liste]
 
 
 def _plz(liste) -> list:
@@ -188,7 +189,9 @@ def bauen(festivals: list[Festival]) -> dict:
     orte = gazetteer or [[k.split("|")[0], v["lat"], v["lon"], ""]
                          for k, v in geo.items() if v and v.get("lat") is not None]
     geo_js = als_javascript("GEO", {
-        "places": _orte(orte),
+        "places": _orte(wohnort.get("orte_klein") or orte),
+        # Zweitnamen, die wie ein Ort oben lauten: „München" ist sonst ein Dorf
+        "zweitnamen": _orte(wohnort.get("zweitnamen_klein", [])),
         "plz": _plz(plz),
         "world": lies_json(DATA / "welt_grob.json", []),
         "worldFine": lies_json(DATA / "welt_fein.json", []),
